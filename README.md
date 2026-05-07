@@ -1,6 +1,52 @@
 # Museum Portfolio
 
-A pixel-art museum you walk through in the browser. Each "painting" on the wall is an interactable exhibit that pops up project info, links, embedded demos, or plays audio. Built with Next.js, TypeScript, and a canvas-based game engine.
+A 2D pixel-art museum where visitors control a character walking through themed rooms, interacting with exhibits that showcase projects, skills, and contact info. Built with Next.js, TypeScript, Tailwind CSS, and HTML5 Canvas.
+
+---
+
+## For Claude Code / AI Assistants
+
+If you're picking this up in a future session, read this section first.
+
+### What is actually working right now
+
+- The game engine runs: canvas renders, player moves, camera follows, collision works.
+- Interactable tiles (10–16) glow red when the player walks near them. Pressing **E** opens a popup.
+- All 7 room exhibit arrays in `projects.ts` are wired to their tile IDs and display correctly.
+- The `ExhibitOverlay` popup handles text, tech tags, links, and iframe embeds.
+- `DialogBox` shows the "Press E to inspect" prompt when near an exhibit.
+- Audio plays via Howler.js on interact when `exhibit.audio` is set.
+
+### What is stubbed / empty and needs implementation
+
+| File | Status | What it needs |
+|------|--------|---------------|
+| `src/components/HUD.tsx` | Empty stub | Minimap, current room name, controls hint overlay |
+| `src/components/LoadingScreen.tsx` | Empty stub | Splash screen shown while assets preload |
+| `src/game/player.ts` | Empty stub | Sprite animation, facing direction tracking (engine.ts handles movement inline for now) |
+| `src/game/collision.ts` | Empty stub | Extracted collision logic (engine.ts has it inline in `resolveCollisionX/Y`) |
+
+### Known constraints
+
+- **Do not run `npm audit fix --force`** — it downgrades `next` to 9.x (a known npm bug with a PostCSS advisory). The 2 moderate vulnerabilities flagged by audit exist inside Next.js itself with no released fix yet; they are safe to ignore for a personal portfolio.
+- `INTERACTABLE_TILES` must be typed `Set<number>` explicitly (not inferred) — TypeScript's narrowing makes `.has(number)` fail if the type is inferred as the literal union.
+- The map in `tilemap.ts` is a hardcoded 40×30 grid. The current exhibits assigned to painting tiles are **placeholder content** — the real project URLs, descriptions, and contact links still need to be filled in inside `projects.ts`.
+- `player.ts` and `collision.ts` are empty but imported nowhere — they are placeholders for when the engine is refactored. Do not try to import them.
+
+### What to work on next (Phase 5 — Sprites)
+
+The biggest visual gap: everything renders as colored rectangles. The next major milestone is replacing them with pixel-art sprites:
+
+1. Add a character sprite sheet (4 directions × 4 walk frames) to `public/assets/sprites/`.
+2. Implement walk animation in `engine.ts` or extract to `player.ts` — track `facing` direction and cycle frame index using accumulated delta time.
+3. Add a museum tileset (walls, floors, paintings) to `public/assets/tilesets/`.
+4. Update `engine.ts render()` to draw `drawImage` calls instead of `fillRect` for each tile type.
+
+---
+
+## Why This Approach
+
+A polished 2D pixel-art museum is more charming, more distinctive, and more achievable than a 3D gallery. It runs on everything, lets you focus on interaction design and content, and the technical complexity (you're building a mini game engine) is portfolio-worthy on its own. Think Undertale / Stardew Valley / Pokémon — not a tech demo, but an experience people want to explore.
 
 ---
 
@@ -15,29 +61,116 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 
 ---
 
-## Project Structure
+## Tech Stack
+
+| Tool | Purpose |
+|------|---------|
+| **Next.js 16** | Framework, routing, SSR, deployment |
+| **TypeScript** | Type safety across game engine + React |
+| **Tailwind CSS** | Styling for overlay UI |
+| **HTML5 Canvas** | Game rendering (tilemap, sprites, particles) |
+| **Framer Motion** | Popup animations (enter/exit transitions) |
+| **Howler.js** | Audio playback (footsteps, ambient, SFX) |
+| **Tiled** *(future)* | Visual map design → JSON export |
+| **Aseprite / LibreSprite** *(future)* | Pixel art sprites and tileset customization |
+
+---
+
+## Architecture Overview
+
+Two completely separate layers that communicate through events:
 
 ```
-src/
-├── app/
-│   ├── layout.tsx          # Root layout (fonts, global CSS)
-│   ├── page.tsx            # Entry point — just renders <GameCanvas>
-│   └── globals.css         # Global styles
-├── components/
-│   ├── GameCanvas.tsx      # React shell: mounts the engine, manages popup state
-│   ├── DialogBox.tsx       # "Press E to inspect" prompt
-│   ├── ExhibitOverlay.tsx  # The popup modal shown on interact
-│   ├── HUD.tsx             # (reserved for future HUD elements)
-│   └── LoadingScreen.tsx   # (reserved for a loading screen)
-├── data/
-│   └── projects.ts         # ← All your content lives here
-└── game/
-    ├── engine.ts           # Game loop, movement, collision, rendering
-    ├── tilemap.ts          # Tile IDs, colors, and the museum map grid
-    ├── interactables.ts    # Scans the map and pairs tiles with exhibit data
-    ├── camera.ts           # Smooth-follow camera
-    └── input.ts            # Keyboard input manager
+┌─────────────────────────────────────────────────┐
+│                  REACT LAYER                     │
+│  (Popups, HUD, Dialog, Loading Screen)           │
+│                                                  │
+│  GameCanvas.tsx ← listens for engine events      │
+│       ↕ renders                                  │
+│  ExhibitOverlay.tsx   DialogBox.tsx   HUD.tsx     │
+└──────────────────────┬──────────────────────────┘
+                       │ events: nearby / interact / leave
+┌──────────────────────┴──────────────────────────┐
+│                GAME ENGINE LAYER                 │
+│  (Pure TypeScript, no React dependency)          │
+│                                                  │
+│  engine.ts → runs update/render loop at 60fps    │
+│  input.ts → tracks held keys                     │
+│  camera.ts → viewport follows player             │
+│  tilemap.ts → map data + tile rendering          │
+│  player.ts → (stub) sprite animation             │
+│  interactables.ts → auto-scans map for exhibits  │
+└─────────────────────────────────────────────────┘
 ```
+
+**Key principle:** The game engine never imports React. React never draws to the canvas. They communicate only through an `onEvent` callback on the `GameEngine` class.
+
+---
+
+## File Map
+
+### `/src/game/` — Pure TypeScript Game Engine
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `engine.ts` | ✅ Complete | Main loop: update → render at 60fps. Player movement, collision, interaction detection. Emits events to React. |
+| `input.ts` | ✅ Complete | Tracks held keys via a `Set`. Game loop polls `isDown("ArrowUp")` each frame. |
+| `camera.ts` | ✅ Complete | Viewport offset that smooth-lerps to follow the player. |
+| `tilemap.ts` | ✅ Complete | Map grid, tile constants (0–16), colors, `getTileAt`, `setTileAt`. Exports `TILES`, `INTERACTABLE_TILES`, `TILE_COLORS`. |
+| `interactables.ts` | ✅ Complete | Auto-scans map for interactable tile types, links them to exhibits from `roomRegistry` in reading order (left→right, top→bottom). |
+| `player.ts` | 🔲 Stub | Future home for character sprite animation and facing direction. Movement is currently inline in `engine.ts`. |
+| `collision.ts` | 🔲 Stub | Future home for extracted collision logic. Currently inline in `engine.ts` as `resolveCollisionX/Y`. |
+
+### `/src/data/` — Content Layer
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `projects.ts` | ✅ Wired, placeholder content | Defines `Exhibit` type and all room exhibit arrays. Exports `roomRegistry` mapping tile IDs → exhibit lists. **Fill this in with your real projects.** |
+
+### `/src/components/` — React UI Layer
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `GameCanvas.tsx` | ✅ Complete | Mounts `<canvas>`, creates engine, wires all events. Plays audio, manages popup state. |
+| `ExhibitOverlay.tsx` | ✅ Complete | Centered popup — handles title, description, tech tags, links, and iframe embeds. |
+| `DialogBox.tsx` | ✅ Complete | "Press E to inspect" prompt at the bottom of the screen. |
+| `HUD.tsx` | 🔲 Stub | Future minimap, room name label, controls hint. |
+| `LoadingScreen.tsx` | 🔲 Stub | Future splash screen while assets preload. |
+
+### `/public/assets/` — Static Assets
+
+```
+public/assets/
+├── sprites/     ← Character + NPC sprite sheets (.png) — not yet created
+├── tilesets/    ← Museum wall/floor/decoration tiles (.png) — not yet created
+├── maps/        ← Tiled JSON exports — not yet used
+└── audio/       ← Footsteps, ambient music, SFX (.mp3/.ogg)
+                   (quack.mp3 referenced in easter egg — add this file)
+```
+
+---
+
+## Museum Layout
+
+```
+┌──────────────┬────────────────┬──────────────┐
+│              │                │              │
+│   LOBBY      │   MAIN HALL    │  SKILLS &    │
+│   (tile 10)  │   (tile 11)    │  TECH WING   │
+│  3 exhibits  │  5 exhibits    │  (tile 12)   │
+│              │                │  6 exhibits  │
+├─────────────────────────────────────────────┤
+│         HALLWAY + EASTER EGGS (tile 16)      │
+├─────────────────────────────────────────────┤
+│              │                │              │
+│   ARCHIVE    │    OFFICE      │  GIFT SHOP   │
+│   (tile 13)  │   (tile 14)    │  (tile 15)   │
+│  6 exhibits  │  3 exhibits    │  4 exhibits  │
+│              │                │              │
+└──────────────┴────────────────┴──────────────┘
+```
+
+Each room has its own tile number (10–16). Placing that tile number on the map auto-links it to the next exhibit in that room's array (scanned left→right, top→bottom). No hardcoded positions needed.
 
 ---
 
@@ -45,148 +178,212 @@ src/
 
 **All content is in [`src/data/projects.ts`](src/data/projects.ts).** You never need to touch the game engine to change what pops up.
 
-Each room has its own array of `Exhibit` objects. The exhibits are assigned to map tiles in the order they appear in the array — first exhibit → first painting tile of that room (scanning left→right, top→bottom).
-
-### Exhibit shapes
-
 ```ts
-// Text + links only
+// Text + links
 {
   popup: {
     title: "My Project",
-    description: "A short description shown in the popup.",
-    tech: ["React", "TypeScript"],           // optional tag pills
-    links: [
-      { label: "GitHub", url: "https://github.com/you/project" },
-      { label: "Live Demo", url: "https://project.vercel.app" },
-    ],
+    description: "Built this cool thing.",
+    tech: ["React", "TypeScript"],
+    links: [{ label: "GitHub", url: "https://github.com/you/project" }],
   },
 }
 
-// Embedded iframe (playable game, CodeSandbox, etc.)
+// Playable iframe demo
 {
   popup: {
     title: "My Game",
     embedUrl: "https://my-game.vercel.app",
-    width: "900px",    // optional, defaults to 500px
-    height: "650px",   // optional, defaults to 650px
-    links: [{ label: "Source", url: "https://github.com/you/game" }],
+    width: "900px",    // optional, default 500px
+    height: "650px",   // optional, default 650px
   },
 }
 
-// Audio only — no popup (good for easter eggs)
-{
-  audio: "/assets/audio/quack.mp3",   // path relative to /public
-}
+// Audio only — no popup (easter egg)
+{ audio: "/assets/audio/quack.mp3" }
 
 // Audio + popup together
 {
-  audio: "/assets/audio/discovery.mp3",
+  audio: "/assets/audio/secret.mp3",
   popup: { title: "Secret Found!", description: "Nice work." },
 }
 ```
 
-### Room arrays
+### Room exhibit arrays
 
-| Array | Room | Painting tiles on map |
-|---|---|---|
-| `lobbyExhibits` | Lobby / Entrance | 3 |
-| `mainHallExhibits` | Main Hall / Featured Projects | 5 |
-| `skillsExhibits` | Skills & Tech Wing | 6 |
-| `archiveExhibits` | Archive / Other Projects | 6 |
-| `officeExhibits` | Office / About Me | 3 |
-| `giftShopExhibits` | Gift Shop / Contact | 4 |
-| `easterEggExhibits` | Easter Eggs | 1 |
+| Array | Tile ID | Slots on map |
+|-------|---------|-------------|
+| `lobbyExhibits` | `TILES.LOBBY` (10) | 3 |
+| `mainHallExhibits` | `TILES.MAIN_HALL` (11) | 5 |
+| `skillsExhibits` | `TILES.SKILLS_WING` (12) | 6 |
+| `archiveExhibits` | `TILES.ARCHIVE` (13) | 6 |
+| `officeExhibits` | `TILES.OFFICE` (14) | 3 |
+| `giftShopExhibits` | `TILES.GIFT_SHOP` (15) | 4 |
+| `easterEggExhibits` | `TILES.EASTER_EGG` (16) | 1 |
 
-If you add more items to an array than there are painting tiles for that room, the extras are silently ignored. If you add fewer, the remaining tiles are inert (no glow, no interaction).
+Extras beyond the slot count are silently ignored. Fewer than the slot count leaves the remaining tiles inert.
 
 ---
 
 ## Modifying the Map
 
-The map is a 2D number grid in [`src/game/tilemap.ts`](src/game/tilemap.ts). Each number is a tile ID:
+The map is the 40×30 `museumMap` grid in [`src/game/tilemap.ts`](src/game/tilemap.ts).
 
-| ID | Constant | Visual |
-|---|---|---|
-| `0` | `TILES.FLOOR` | Dark blue floor |
-| `1` | `TILES.WALL` | Grey/purple wall |
-| `2` | `TILES.PAINTING` | Red tile (decorative, non-interactive) |
-| `3` | `TILES.DOOR` | Dark blue door |
-| `10` | `TILES.LOBBY` | Red (interactable — lobby exhibits) |
-| `11` | `TILES.MAIN_HALL` | Red (interactable — main hall exhibits) |
-| `12` | `TILES.SKILLS_WING` | Red (interactable — skills exhibits) |
-| `13` | `TILES.ARCHIVE` | Red (interactable — archive exhibits) |
-| `14` | `TILES.OFFICE` | Red (interactable — office exhibits) |
-| `15` | `TILES.GIFT_SHOP` | Red (interactable — gift shop exhibits) |
-| `16` | `TILES.EASTER_EGG` | Red (interactable — easter egg exhibits) |
+| ID | Constant | Behavior |
+|----|----------|----------|
+| `0` | `TILES.FLOOR` | Walkable, dark blue |
+| `1` | `TILES.WALL` | Solid — blocks movement |
+| `2` | `TILES.PAINTING` | Walkable, red (decorative only) |
+| `3` | `TILES.DOOR` | Walkable, dark blue |
+| `10–16` | `TILES.LOBBY` … `TILES.EASTER_EGG` | Walkable, red, glows when player is within 2 tiles, triggers exhibit on E |
 
-**Rules:**
-- `1` (WALL) blocks movement. Everything else is walkable.
-- Interactable tiles (10–16) glow red when the player is within 2 tiles. They behave like floor tiles visually but trigger the exhibit on that room's list.
-- The map is 40 columns × 30 rows. Expanding it is as simple as adding rows/columns to the array (keep the outer wall of `1`s).
+### Add a new interactable painting
 
-### Adding a new interactable painting
+1. Place a tile ID (10–16) at the desired position in `museumMap`.
+2. Append a new `Exhibit` to the matching array in `projects.ts`. Order in the array = reading order on the map.
 
-1. Place a tile ID (10–16) at the desired grid position in `museumMap`.
-2. Add a corresponding `Exhibit` to the matching room array in `projects.ts`. Position in the array maps to painting order (top-left → bottom-right scan).
+### Add a new room type
 
-### Adding a new tile type / room
-
-1. Add a constant to `TILES` in `tilemap.ts`:
-   ```ts
-   MY_ROOM: 17,
-   ```
-2. Add a color to `TILE_COLORS`:
-   ```ts
-   [TILES.MY_ROOM]: "#e94560",
-   ```
-3. Add it to `INTERACTABLE_TILES`:
-   ```ts
-   export const INTERACTABLE_TILES: Set<number> = new Set([
-     // ...existing,
-     TILES.MY_ROOM,
-   ]);
-   ```
-4. Add a new exhibit array and register it in `roomRegistry` (in `projects.ts`):
-   ```ts
-   export const myRoomExhibits: Exhibit[] = [ /* ... */ ];
-
-   export const roomRegistry: Record<number, Exhibit[]> = {
-     // ...existing,
-     [TILES.MY_ROOM]: myRoomExhibits,
-   };
-   ```
-5. Place the new tile ID on the map.
+1. Add a constant to `TILES` in `tilemap.ts` (e.g., `LIBRARY: 17`).
+2. Add a color to `TILE_COLORS`.
+3. Add it to `INTERACTABLE_TILES` (the set must stay typed as `Set<number>`).
+4. Add an exhibit array and register it in `roomRegistry` in `projects.ts`.
+5. Place the tile on the map.
 
 ---
 
-## Changing Colors & Appearance
+## Changing Appearance
 
-- **Tile colors** — edit `TILE_COLORS` in `tilemap.ts`.
-- **Player color** — change the `ctx.fillStyle` in the `render()` method of `engine.ts` (currently `#e94560`).
-- **Popup style** — edit inline styles in `ExhibitOverlay.tsx`.
-- **Dialog prompt** — edit `DialogBox.tsx`.
-- **Background color** — the canvas clears to `#0a0a0a` in `engine.ts`; the page background is `#0f0f1a` in `globals.css`.
+- **Tile colors** → `TILE_COLORS` in `tilemap.ts`
+- **Player color** → `ctx.fillStyle = "#e94560"` in `engine.ts` `render()` (replace with `drawImage` when sprites exist)
+- **Popup style** → inline styles in `ExhibitOverlay.tsx`
+- **Dialog prompt** → `DialogBox.tsx`
+- **Canvas background** → `ctx.fillStyle = "#0a0a0a"` in `engine.ts` `render()`
+- **Page background** → `globals.css`
 
 ---
 
 ## Audio
 
-Place audio files in `public/assets/audio/`. Reference them with a leading slash:
+Place files in `public/assets/audio/` and reference with a leading slash:
 
 ```ts
 { audio: "/assets/audio/my-sound.mp3" }
 ```
 
-Audio is played via [Howler.js](https://howlerjs.com/) and fires once on interact.
+Played via [Howler.js](https://howlerjs.com/). Fires once on interact.
 
 ---
 
-## Deployment
+## Data Flow
 
-```bash
-npm run build
-npm run start
+```
+1. Player walks near tile 10–16
+   └→ interactables.ts: getNearbyInteractable() finds closest match
+
+2. Engine emits: { type: "nearby", content: exhibit }
+   └→ GameCanvas.tsx: shows DialogBox ("Press E to inspect")
+
+3. Player presses E
+   └→ Engine emits: { type: "interact", content: exhibit }
+   └→ GameCanvas.tsx:
+       ├─ exhibit.audio → new Howl(src).play()
+       ├─ exhibit.popup → setActivePopup(popup), engine.setPaused(true)
+       └─ neither → silent (audio-only easter egg still plays)
+
+4. Player presses Esc or clicks backdrop
+   └→ setActivePopup(null), engine.setPaused(false)
+
+5. Player walks away
+   └→ Engine emits: { type: "leave" }
+   └→ GameCanvas.tsx: hides DialogBox
 ```
 
-Or deploy to [Vercel](https://vercel.com) — push the repo and import the project. No extra configuration needed.
+---
+
+## Development Phases
+
+### ✅ Phase 0 — Prerequisites
+- [x] HTML5 Canvas + requestAnimationFrame game loop
+- [x] Keyboard input handling
+- [ ] Sprite sheet animation
+- [ ] Tiled map editor
+- [ ] Pixel art (Aseprite / LibreSprite)
+
+### ✅ Phase 1 — Scaffold
+- [x] Next.js + TypeScript + Tailwind
+- [x] Framer Motion + Howler.js installed
+- [x] Folder structure created
+
+### ✅ Phase 2 — Game Engine Core
+- [x] Game loop with delta time (`engine.ts`)
+- [x] Keyboard input manager (`input.ts`)
+- [x] Camera with smooth lerp (`camera.ts`)
+- [x] Tilemap rendering (`tilemap.ts`)
+- [x] Collision detection with wall snapping
+- [x] Auto-scanning interactable system (`interactables.ts`)
+- [x] Event system connecting engine → React
+
+### ✅ Phase 3 — Museum Map
+- [x] 40×30 map with open layout
+- [x] Room-specific tile types (10–16) wired to exhibit arrays
+- [x] Doorways (tile 3 present on map)
+- [ ] Replace hardcoded grid with Tiled JSON export
+- [ ] Auto-generate map from project data (stretch goal)
+
+### ✅ Phase 4 — React Overlay UI
+- [x] Unified popup (`ExhibitOverlay.tsx`) — text, tags, links, iframe embed
+- [x] "Press E" dialog prompt (`DialogBox.tsx`)
+- [x] Audio on interact (Howler.js)
+- [x] Pause/unpause engine during popup
+- [x] ESC to close
+- [ ] HUD — minimap, room name, controls hint (`HUD.tsx` is a stub)
+- [ ] Loading/splash screen (`LoadingScreen.tsx` is a stub)
+
+### 🔲 Phase 5 — Sprites & Art (NEXT)
+- [ ] Character sprite sheet (4 directions × 4 walk frames)
+- [ ] Walk animation system — facing direction + frame cycling in `engine.ts` or `player.ts`
+- [ ] Museum tileset (walls, floors, paintings, decorations)
+- [ ] Replace `fillRect` calls in `engine.ts render()` with `drawImage`
+- [ ] Room-specific decorative props
+
+### 🔲 Phase 6 — Polish & Juice
+- [ ] Footstep sounds while walking
+- [ ] Ambient background music
+- [ ] Particle effects (dust motes, spotlight glow)
+- [ ] NPC museum guide (optional)
+- [ ] Mobile touch controls (virtual D-pad)
+- [ ] Easter egg hidden room
+
+### 🔲 Phase 7 — Content & Deploy
+- [ ] Fill `projects.ts` with real project data (URLs, descriptions, links)
+- [ ] Add real resume PDF to `public/`
+- [ ] `<noscript>` fallback with plain HTML content
+- [ ] Meta tags + Open Graph image
+- [ ] Asset preloading before game start
+- [ ] Performance profiling (< 16ms per frame target)
+- [ ] Deploy to Vercel + custom domain
+- [ ] Analytics (Vercel Analytics or Plausible)
+
+---
+
+## Key Design Decisions
+
+**Canvas over DOM/CSS for the game** — DOM manipulation at 60fps creates GC pauses and layout thrashing. Canvas gives a single draw surface with predictable performance. React handles only the overlay UI, which updates infrequently.
+
+**Engine decoupled from React** — The game loop runs 60×/second. Keeping them separate means the engine stays fast and React stays clean. They communicate only through the `onEvent` callback.
+
+**Auto-scan interactables** — Hardcoded positions break every time you edit the map. Scanning the grid means you just place a tile and add an exhibit to the list — the system handles the mapping.
+
+**One unified Exhibit type** — Multiple types (project, demo, redirect, easter-egg) created unnecessary complexity. One type with optional fields covers every use case.
+
+---
+
+## Future Ideas
+
+- Auto-generated maps: feed project data into a generator that creates rooms sized to fit content
+- NPC guided tour: a character that walks visitors through exhibits in sequence
+- Guestbook: Supabase or a simple form for visitor messages
+- Multiplayer ghost cursors: show other visitors as sprite overlays (WebSocket)
+- Seasonal themes: swap tilesets/music for holidays
+- Achievement system: track which exhibits a visitor has seen
