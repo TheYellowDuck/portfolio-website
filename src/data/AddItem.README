@@ -1,0 +1,31 @@
+// Audio only (easter egg quack)
+{ audio: "/assets/audio/quack.mp3" },
+
+// Text popup only
+{ popup: { title: "Hello", description: "Welcome to the museum." } },
+
+// Full project with links
+{
+  popup: {
+    title: "My Project",
+    description: "Built this cool thing.",
+    tech: ["React", "TypeScript"],
+    links: [{ label: "GitHub", url: "https://..." }],
+  },
+},
+
+// Playable demo
+{
+  popup: {
+    title: "My Game",
+    embedUrl: "https://my-game.vercel.app",
+    width: "900px",
+    height: "650px",
+  },
+},
+
+// Audio + popup together
+{
+  audio: "/assets/audio/discovery.mp3",
+  popup: { title: "Secret Found!", description: "Nice work." },
+},

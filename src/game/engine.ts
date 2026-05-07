@@ -5,9 +5,15 @@ import {
   TILES,
   TILE_COLORS,
   museumMap,
-//   MAP_WIDTH,
-//   MAP_HEIGHT,
+  setTileAt,
 } from "./tilemap";
+import { getNearbyInteractable, Interactable } from "./interactables";
+import { Exhibit } from "@/data/projects";
+
+export type GameEvent =
+  | { type: "nearby"; content: Exhibit }
+  | { type: "interact"; content: Exhibit }
+  | { type: "leave" };
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
@@ -16,10 +22,15 @@ export class GameEngine {
   private camera: Camera;
   private animationFrameId: number = 0;
   private lastTime: number = 0;
+  private paused: boolean = false;
+  private interactCooldown: boolean = false;
+
+  public onEvent: ((event: GameEvent) => void) | null = null;
+  private currentNearby: Interactable | null = null;
 
   private player = {
-    x: TILE_SIZE * 19,
-    y: TILE_SIZE * 14,
+    x: TILE_SIZE * 5,
+    y: TILE_SIZE * 6,
     width: 24,
     height: 24,
     speed: 180,
@@ -29,15 +40,27 @@ export class GameEngine {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.input = new InputManager();
-    // this.camera = new Camera(canvas.width, canvas.height, MAP_WIDTH, MAP_HEIGHT);
     this.camera = new Camera(canvas.width, canvas.height);
   }
 
   resize(width: number, height: number) {
     this.canvas.width = width;
     this.canvas.height = height;
-    // this.camera = new Camera(width, height, MAP_WIDTH, MAP_HEIGHT);
     this.camera = new Camera(width, height);
+  }
+
+  setPaused(paused: boolean) {
+    this.paused = paused;
+    if (!paused) {
+      this.interactCooldown = true;
+      setTimeout(() => { this.interactCooldown = false; }, 300);
+    }
+  }
+
+  changeTiles(changes: { col: number; row: number; newTile: number }[]) {
+    for (const change of changes) {
+      setTileAt(change.col, change.row, change.newTile);
+    }
   }
 
   start() {
@@ -53,16 +76,17 @@ export class GameEngine {
     const deltaTime = (currentTime - this.lastTime) / 1000;
     this.lastTime = currentTime;
 
-    this.update(deltaTime);
+    if (!this.paused) {
+      this.update(deltaTime);
+    }
     this.render();
 
     this.animationFrameId = requestAnimationFrame(this.loop);
   };
 
-  // Check if a tile at (col, row) is solid
   private isSolid(col: number, row: number): boolean {
     if (row < 0 || row >= museumMap.length || col < 0 || col >= museumMap[0].length) {
-      return true; // Out of bounds = solid
+      return true;
     }
     return museumMap[row][col] === TILES.WALL;
   }
@@ -71,7 +95,6 @@ export class GameEngine {
     const { player } = this;
     const moveAmount = player.speed * dt;
 
-    // Determine movement direction
     let dx = 0;
     let dy = 0;
 
@@ -80,48 +103,60 @@ export class GameEngine {
     if (this.input.isDown("ArrowLeft") || this.input.isDown("a")) dx -= moveAmount;
     if (this.input.isDown("ArrowRight") || this.input.isDown("d")) dx += moveAmount;
 
-    // Move on X axis first, then resolve collisions
     if (dx !== 0) {
       player.x += dx;
       this.resolveCollisionX(dx);
     }
-
-    // Move on Y axis, then resolve collisions
     if (dy !== 0) {
       player.y += dy;
       this.resolveCollisionY(dy);
     }
 
-    // Update camera
     this.camera.follow(
       player.x + player.width / 2,
       player.y + player.height / 2
     );
+
+    // Interaction detection
+    const nearby = getNearbyInteractable(
+      player.x, player.y, player.width, player.height
+    );
+
+    if (nearby) {
+      if (this.currentNearby !== nearby) {
+        this.currentNearby = nearby;
+        this.onEvent?.({ type: "nearby", content: nearby.content });
+      }
+
+      const ePressed = this.input.isDown("e") || this.input.isDown("E") || this.input.isDown("Enter");
+      if (ePressed && !this.interactCooldown) {
+        this.onEvent?.({ type: "interact", content: nearby.content });
+        this.interactCooldown = true;
+        setTimeout(() => { this.interactCooldown = false; }, 500);
+      }
+    } else if (this.currentNearby !== null) {
+      this.currentNearby = null;
+      this.onEvent?.({ type: "leave" });
+    }
   }
 
   private resolveCollisionX(direction: number) {
     const { player } = this;
-
-    // Which rows does the player span?
     const topRow = Math.floor(player.y / TILE_SIZE);
     const bottomRow = Math.floor((player.y + player.height - 0.01) / TILE_SIZE);
 
     if (direction < 0) {
-      // Moving left — check player's left edge
       const col = Math.floor(player.x / TILE_SIZE);
       for (let row = topRow; row <= bottomRow; row++) {
         if (this.isSolid(col, row)) {
-          // Snap player's left edge to the right side of the wall tile
           player.x = (col + 1) * TILE_SIZE;
           break;
         }
       }
     } else {
-      // Moving right — check player's right edge
       const col = Math.floor((player.x + player.width - 0.01) / TILE_SIZE);
       for (let row = topRow; row <= bottomRow; row++) {
         if (this.isSolid(col, row)) {
-          // Snap player's right edge to the left side of the wall tile
           player.x = col * TILE_SIZE - player.width;
           break;
         }
@@ -131,27 +166,21 @@ export class GameEngine {
 
   private resolveCollisionY(direction: number) {
     const { player } = this;
-
-    // Which columns does the player span?
     const leftCol = Math.floor(player.x / TILE_SIZE);
     const rightCol = Math.floor((player.x + player.width - 0.01) / TILE_SIZE);
 
     if (direction < 0) {
-      // Moving up — check player's top edge
       const row = Math.floor(player.y / TILE_SIZE);
       for (let col = leftCol; col <= rightCol; col++) {
         if (this.isSolid(col, row)) {
-          // Snap player's top edge to the bottom of the wall tile
           player.y = (row + 1) * TILE_SIZE;
           break;
         }
       }
     } else {
-      // Moving down — check player's bottom edge
       const row = Math.floor((player.y + player.height - 0.01) / TILE_SIZE);
       for (let col = leftCol; col <= rightCol; col++) {
         if (this.isSolid(col, row)) {
-          // Snap player's bottom edge to the top of the wall tile
           player.y = row * TILE_SIZE - player.height;
           break;
         }
@@ -161,15 +190,12 @@ export class GameEngine {
 
   private render() {
     const { ctx, canvas, camera, player } = this;
-
     const camX = Math.round(camera.x);
     const camY = Math.round(camera.y);
 
-    // Fill entire screen with black (void outside the map)
-    ctx.fillStyle = "#0a0a0a"; // background
+    ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw tilemap
     const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
     const startRow = Math.max(0, Math.floor(camY / TILE_SIZE));
     const endCol = Math.min(museumMap[0].length - 1, Math.ceil((camX + canvas.width) / TILE_SIZE));
@@ -189,7 +215,19 @@ export class GameEngine {
       }
     }
 
-    // Draw player
+    if (this.currentNearby) {
+      const glowX = this.currentNearby.col * TILE_SIZE - camX;
+      const glowY = this.currentNearby.row * TILE_SIZE - camY;
+
+      ctx.shadowColor = "#e94560";
+      ctx.shadowBlur = 15;
+      ctx.strokeStyle = "#e94560";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(glowX, glowY, TILE_SIZE, TILE_SIZE);
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 1;
+    }
+
     ctx.fillStyle = "#e94560";
     ctx.fillRect(
       Math.round(player.x - camX),
