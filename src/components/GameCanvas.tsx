@@ -11,18 +11,26 @@ export default function GameCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas size
-    canvas.width = 800;
-    canvas.height = 600;
+    // Set canvas to full window size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    // Create and start the engine
     const engine = new GameEngine(canvas);
     engineRef.current = engine;
     engine.start();
 
-    // Clean up when component unmounts
+    // Handle window resizing
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      engine.resize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       engine.stop();
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -31,9 +39,7 @@ export default function GameCanvas() {
       ref={canvasRef}
       style={{
         display: "block",
-        margin: "0 auto",
-        border: "2px solid #333",
-        imageRendering: "pixelated", // This keeps pixel art crisp
+        imageRendering: "pixelated",
       }}
     />
   );
