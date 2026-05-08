@@ -4,7 +4,10 @@ import {
   TILE_SIZE,
   TILES,
   TILE_COLORS,
+  OBJECT_COLORS,
   museumMap,
+  objectMap,
+  solidMap,
   setTileAt,
   PLAYER_SPAWN_COL,
   PLAYER_SPAWN_ROW,
@@ -35,7 +38,7 @@ export class GameEngine {
     y: TILE_SIZE * PLAYER_SPAWN_ROW,
     width: 56,
     height: 56,
-    speed: 360, // scaled with TILE_SIZE (64/32 × 180) to keep same tiles/second feel
+    speed: 360,
   };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -90,7 +93,7 @@ export class GameEngine {
     if (row < 0 || row >= museumMap.length || col < 0 || col >= museumMap[0].length) {
       return true;
     }
-    return museumMap[row][col] === TILES.WALL;
+    return solidMap[row][col];
   }
 
   private update(dt: number) {
@@ -119,7 +122,6 @@ export class GameEngine {
       player.y + player.height / 2
     );
 
-    // Interaction detection
     const nearby = getNearbyInteractable(
       player.x, player.y, player.width, player.height
     );
@@ -195,28 +197,65 @@ export class GameEngine {
     const camX = Math.round(camera.x);
     const camY = Math.round(camera.y);
 
+    // Background — shows through VOID tiles
     ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
     const startRow = Math.max(0, Math.floor(camY / TILE_SIZE));
-    const endCol = Math.min(museumMap[0].length - 1, Math.ceil((camX + canvas.width) / TILE_SIZE));
-    const endRow = Math.min(museumMap.length - 1, Math.ceil((camY + canvas.height) / TILE_SIZE));
+    const endCol   = Math.min(museumMap[0].length - 1, Math.ceil((camX + canvas.width)  / TILE_SIZE));
+    const endRow   = Math.min(museumMap.length - 1,    Math.ceil((camY + canvas.height) / TILE_SIZE));
 
+    // Pass 1: floor and wall tiles
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         const tile = museumMap[row][col];
+        if (tile === TILES.VOID) continue;
+
         const screenX = col * TILE_SIZE - camX;
         const screenY = row * TILE_SIZE - camY;
 
-        ctx.fillStyle = TILE_COLORS[tile] || "#000";
+        ctx.fillStyle = TILE_COLORS[tile] ?? TILE_COLORS[TILES.FLOOR];
         ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-
         ctx.strokeStyle = "rgba(255,255,255,0.03)";
         ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
       }
     }
 
+    // Pass 2: y-sorted player + objects
+    // Player sort key: its bottom-edge row.
+    // Object sort key: objectRow + 1 (the pedestal's visual front face, one row south).
+    // Drawing north-to-south means anything with a higher sort row renders in front.
+    const playerSortRow = Math.floor((player.y + player.height - 0.01) / TILE_SIZE);
+
+    for (let sortRow = startRow; sortRow <= endRow + 1; sortRow++) {
+      // Player
+      if (sortRow === playerSortRow) {
+        ctx.fillStyle = "#e94560";
+        ctx.fillRect(
+          Math.round(player.x - camX),
+          Math.round(player.y - camY),
+          player.width,
+          player.height
+        );
+      }
+
+      // Objects at objectMap[sortRow - 1] have sort key sortRow
+      const objectRow = sortRow - 1;
+      if (objectRow >= startRow && objectRow <= endRow) {
+        for (let col = startCol; col <= endCol; col++) {
+          const obj = objectMap[objectRow][col];
+          if (obj === null) continue;
+          const screenX = col * TILE_SIZE - camX;
+          const screenY = objectRow * TILE_SIZE - camY;
+          const pad = Math.round(TILE_SIZE / 5);
+          ctx.fillStyle = OBJECT_COLORS[obj] ?? "#888888";
+          ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
+        }
+      }
+    }
+
+    // Glow — always on top so it's visible regardless of y-sort order
     if (this.currentNearby) {
       const glowX = this.currentNearby.col * TILE_SIZE - camX;
       const glowY = this.currentNearby.row * TILE_SIZE - camY;
@@ -229,13 +268,5 @@ export class GameEngine {
       ctx.shadowBlur = 0;
       ctx.lineWidth = 1;
     }
-
-    ctx.fillStyle = "#e94560";
-    ctx.fillRect(
-      Math.round(player.x - camX),
-      Math.round(player.y - camY),
-      player.width,
-      player.height
-    );
   }
 }
