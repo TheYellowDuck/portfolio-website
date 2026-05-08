@@ -11,6 +11,8 @@ If you're picking this up in a future session, read this section first.
 ### What is actually working right now
 
 - The game engine runs: canvas renders, player moves, camera follows, collision works.
+- Player is 40×40 px and spawns at the center of the hallway (tile col 26, row 16).
+- Map is 54×34 tiles built by `buildMap()`. `TILE_SIZE=48` — the hallway is 10 tiles tall (480px), approximately half a ~960px screen. Corridors are 4 tiles wide (192px).
 - Interactable tiles (10–16) glow red when the player walks near them. Pressing **E** opens a popup.
 - All 7 room exhibit arrays in `projects.ts` are wired to their tile IDs and display correctly.
 - The `ExhibitOverlay` popup handles text, tech tags, links, and iframe embeds.
@@ -152,25 +154,38 @@ public/assets/
 
 ## Museum Layout
 
+The map is 54 × 34 tiles at `TILE_SIZE=64`. Branch rooms are perpendicular hallways — each is 5 tiles wide (wall + 3 floor + wall) and as deep as its exhibit count. Exhibits sit in the center column, one per row.
+
 ```
-┌──────────────┬────────────────┬──────────────┐
-│              │                │              │
-│   LOBBY      │   MAIN HALL    │  SKILLS &    │
-│   (tile 10)  │   (tile 11)    │  TECH WING   │
-│  3 exhibits  │  5 exhibits    │  (tile 12)   │
-│              │                │  6 exhibits  │
-├─────────────────────────────────────────────┤
-│         HALLWAY + EASTER EGGS (tile 16)      │
-├─────────────────────────────────────────────┤
-│              │                │              │
-│   ARCHIVE    │    OFFICE      │  GIFT SHOP   │
-│   (tile 13)  │   (tile 14)    │  (tile 15)   │
-│  6 exhibits  │  3 exhibits    │  4 exhibits  │
-│              │                │              │
-└──────────────┴────────────────┴──────────────┘
+cols:    5-9        24-28       43-47
+         |           |            |
+row  5  [■]  Skills [■]  Office  [■] Gift Shop
+row  6  [E]  (6 ex) [E]  (3 ex) [E] (4 ex)
+...      |           |            |
+row 11   |           |            |       <- hallway north wall (opens here)
+     ════════════════★════════════════    row 12-21
+row 22   |           |            |       <- hallway south wall (opens here)
+row 23  [E]  Lobby  [E] MainHall [E] Archive
+...     [E]  (3 ex) [E]  (5 ex) [E] (6 ex)
+row 28   |           |            |
+         [■]         [■]          [■]     <- end walls
+
+★ = Easter Egg hidden at (row 16, col 2) far left of hallway
+[E] = exhibit tile (center of branch corridor, triggers on E press)
+[■] = wall
 ```
 
-Each room has its own tile number (10–16). Placing that tile number on the map auto-links it to the next exhibit in that room's array (scanned left→right, top→bottom). No hardcoded positions needed.
+Each branch tile number (10–16) auto-links to the next exhibit in that room's array (scanned top→bottom). To add a room or change depths, edit `buildMap()` in [tilemap.ts](src/game/tilemap.ts).
+
+### Map generator
+
+`buildMap()` in [tilemap.ts](src/game/tilemap.ts):
+1. Fills everything with `WALL`
+2. Carves the main hallway with `fill()`
+3. Carves each branch corridor with `fill()`, connecting it to the hallway
+4. Places exhibit tiles in the center column of each branch with a `for` loop
+
+To change a branch's depth, adjust the row range in both the `fill()` call and the exhibit `for` loop. The two must always match.
 
 ---
 

@@ -6,6 +6,8 @@ import {
   TILE_COLORS,
   museumMap,
   setTileAt,
+  PLAYER_SPAWN_COL,
+  PLAYER_SPAWN_ROW,
 } from "./tilemap";
 import { getNearbyInteractable, Interactable } from "./interactables";
 import { Exhibit } from "@/data/projects";
@@ -29,11 +31,11 @@ export class GameEngine {
   private currentNearby: Interactable | null = null;
 
   private player = {
-    x: TILE_SIZE * 5,
-    y: TILE_SIZE * 6,
-    width: 24,
-    height: 24,
-    speed: 180,
+    x: TILE_SIZE * PLAYER_SPAWN_COL,
+    y: TILE_SIZE * PLAYER_SPAWN_ROW,
+    width: 56,
+    height: 56,
+    speed: 360, // scaled with TILE_SIZE (64/32 × 180) to keep same tiles/second feel
   };
 
   constructor(canvas: HTMLCanvasElement) {
