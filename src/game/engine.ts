@@ -240,33 +240,35 @@ export class GameEngine {
         );
       }
 
-      // Objects at objectMap[sortRow - 1] have sort key sortRow
+      // Objects (and their glow) at objectMap[sortRow - 1] have sort key sortRow
       const objectRow = sortRow - 1;
       if (objectRow >= startRow && objectRow <= endRow) {
         for (let col = startCol; col <= endCol; col++) {
-          const obj = objectMap[objectRow][col];
-          if (obj === null) continue;
           const screenX = col * TILE_SIZE - camX;
           const screenY = objectRow * TILE_SIZE - camY;
+
+          // Soft glow — checked before the object null-guard so it fires even
+          // for interactables that have no object (e.g. the easter egg).
+          if (this.currentNearby?.row === objectRow && this.currentNearby?.col === col) {
+            ctx.save();
+            ctx.shadowColor = "#e94560";
+            ctx.shadowBlur = 40;
+            ctx.fillStyle = "rgba(233,69,96,0.08)";
+            ctx.fillRect(screenX - 6, screenY - 6, TILE_SIZE + 12, TILE_SIZE + 12);
+            ctx.shadowBlur = 20;
+            ctx.strokeStyle = "rgba(233,69,96,0.45)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+            ctx.restore();
+          }
+
+          const obj = objectMap[objectRow][col];
+          if (obj === null) continue;
           const pad = Math.round(TILE_SIZE / 5);
           ctx.fillStyle = OBJECT_COLORS[obj] ?? "#888888";
           ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
         }
       }
-    }
-
-    // Glow — always on top so it's visible regardless of y-sort order
-    if (this.currentNearby) {
-      const glowX = this.currentNearby.col * TILE_SIZE - camX;
-      const glowY = this.currentNearby.row * TILE_SIZE - camY;
-
-      ctx.shadowColor = "#e94560";
-      ctx.shadowBlur = 15;
-      ctx.strokeStyle = "#e94560";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(glowX, glowY, TILE_SIZE, TILE_SIZE);
-      ctx.shadowBlur = 0;
-      ctx.lineWidth = 1;
     }
   }
 }

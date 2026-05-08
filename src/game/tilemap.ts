@@ -178,7 +178,12 @@ function buildMap(): number[][] {
 
     const southBottomRow = SOUTH_BRANCH_TOP + branchDepth(sb.count) - 1;
     fill(SOUTH_BRANCH_TOP, intLeft, southBottomRow, intRight, TILES.FLOOR);
-    const southFirstExhibit = SOUTH_BRANCH_TOP + ENTRANCE_BUFFER;
+    // Offset -2 corrects the 3-D asymmetry: north pedestals face south (toward
+    // the hallway) so the first obstacle is at ENTRANCE_BUFFER-1 rows in.
+    // South pedestals face north (away from hallway) by the same rule, which
+    // would place them at ENTRANCE_BUFFER+1 rows in — 2 too far.  Subtracting
+    // 2 here puts both directions' first pedestal at the same depth.
+    const southFirstExhibit = SOUTH_BRANCH_TOP + ENTRANCE_BUFFER - 2;
     for (let j = 0; j < sb.count; j++)
       set(southFirstExhibit + j * EXHIBIT_SPACING, cc, sb.tile);
   }
