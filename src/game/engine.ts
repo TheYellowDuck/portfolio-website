@@ -202,7 +202,7 @@ export class GameEngine {
     const camY = Math.round(camera.y);
 
     // Background — shows through VOID tiles
-    ctx.fillStyle = "#0a0a0a";
+    ctx.fillStyle = "#1c1508";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
@@ -221,7 +221,7 @@ export class GameEngine {
 
         ctx.fillStyle = TILE_COLORS[tile] ?? TILE_COLORS[TILES.FLOOR];
         ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-        ctx.strokeStyle = "rgba(255,255,255,0.03)";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
         ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
       }
     }
@@ -235,7 +235,7 @@ export class GameEngine {
     for (let sortRow = startRow; sortRow <= endRow + 1; sortRow++) {
       // Player
       if (sortRow === playerSortRow) {
-        ctx.fillStyle = "#e94560";
+        ctx.fillStyle = "#7a9e7e";
         ctx.fillRect(
           Math.round(player.x - camX),
           Math.round(player.y - camY),
@@ -255,12 +255,12 @@ export class GameEngine {
           // for interactables that have no object (e.g. the easter egg).
           if (this.currentNearby?.row === objectRow && this.currentNearby?.col === col) {
             ctx.save();
-            ctx.shadowColor = "#e94560";
+            ctx.shadowColor = "#7a9e7e";
             ctx.shadowBlur = 40;
-            ctx.fillStyle = "rgba(233,69,96,0.08)";
+            ctx.fillStyle = "rgba(122,158,126,0.12)";
             ctx.fillRect(screenX - 6, screenY - 6, TILE_SIZE + 12, TILE_SIZE + 12);
             ctx.shadowBlur = 20;
-            ctx.strokeStyle = "rgba(233,69,96,0.45)";
+            ctx.strokeStyle = "rgba(122,158,126,0.5)";
             ctx.lineWidth = 2;
             ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
             ctx.restore();

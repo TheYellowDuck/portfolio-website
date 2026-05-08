@@ -23,7 +23,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0, 0, 0, 0.7)",
+              background: "rgba(28, 21, 8, 0.72)",
               zIndex: 20,
             }}
           />
@@ -44,31 +44,33 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               maxHeight: popup.embedUrl
                 ? `min(${popup.height || "650px"}, 90vh)`
                 : "80vh",
-              background: "#16162a",
-              border: "2px solid #e94560",
+              background: "#fef9ec",
+              border: "2px solid #7a9e7e",
               borderRadius: 8,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
               zIndex: 30,
+              boxShadow: "0 8px 40px rgba(28,21,8,0.35)",
             }}
           >
-            {/* Header — always present */}
+            {/* Header */}
             <div style={{
               padding: "16px 20px",
               borderBottom: popup.description || popup.embedUrl
-                ? "1px solid rgba(255,255,255,0.1)"
+                ? "1px solid rgba(58,46,30,0.15)"
                 : "none",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "flex-start",
               gap: 16,
               flexShrink: 0,
+              background: "#fef9ec",
             }}>
               <div style={{ flex: 1 }}>
                 {popup.title && (
                   <h2 style={{
-                    color: "#e94560",
+                    color: "#4a7a44",
                     fontFamily: "monospace",
                     fontSize: 22,
                     margin: 0,
@@ -82,11 +84,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
                     {popup.tech.map((t) => (
                       <span key={t} style={{
-                        background: "rgba(233,69,96,0.15)",
-                        border: "1px solid rgba(233,69,96,0.4)",
+                        background: "rgba(122,158,126,0.15)",
+                        border: "1px solid rgba(122,158,126,0.5)",
                         borderRadius: 4,
                         padding: "2px 10px",
-                        color: "#e94560",
+                        color: "#4a7a44",
                         fontFamily: "monospace",
                         fontSize: 12,
                       }}>
@@ -99,9 +101,9 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
               <button onClick={onClose} style={{
                 background: "none",
-                border: "1px solid rgba(255,255,255,0.2)",
+                border: "1px solid rgba(58,46,30,0.25)",
                 borderRadius: 4,
-                color: "#fff",
+                color: "#3a2e1e",
                 padding: "4px 12px",
                 cursor: "pointer",
                 fontFamily: "monospace",
@@ -112,17 +114,17 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               </button>
             </div>
 
-            {/* Body — scrollable content area */}
+            {/* Body */}
             <div style={{
               flex: popup.embedUrl ? 1 : undefined,
               display: "flex",
               flexDirection: "column",
               overflow: popup.embedUrl ? "hidden" : "auto",
+              background: "#fef9ec",
             }}>
-              {/* Description */}
               {popup.description && (
                 <p style={{
-                  color: "#ccc",
+                  color: "#3a2e1e",
                   fontFamily: "monospace",
                   fontSize: 14,
                   lineHeight: 1.7,
@@ -134,7 +136,6 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                 </p>
               )}
 
-              {/* Embedded content (game, demo, sandbox) */}
               {popup.embedUrl && (
                 <iframe
                   src={popup.embedUrl}
@@ -148,7 +149,6 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                 />
               )}
 
-              {/* Links */}
               {popup.links && popup.links.length > 0 && (
                 <div style={{
                   display: "flex",
@@ -165,11 +165,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                       rel="noopener noreferrer"
                       style={{
                         display: "inline-block",
-                        background: "rgba(233,69,96,0.15)",
-                        border: "1px solid rgba(233,69,96,0.5)",
+                        background: "rgba(122,158,126,0.15)",
+                        border: "1px solid rgba(122,158,126,0.55)",
                         borderRadius: 4,
                         padding: "8px 16px",
-                        color: "#fff",
+                        color: "#3a2e1e",
                         fontFamily: "monospace",
                         fontSize: 13,
                         textDecoration: "none",

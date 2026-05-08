@@ -42,28 +42,28 @@ export const OBJECTS = {
 // ── COLORS ───────────────────────────────────────────────────────────────────
 // Interactable tiles render as plain FLOOR — the object layer provides the visual.
 export const TILE_COLORS: Record<number, string> = {
-  [TILES.FLOOR]:       "#2a2a4a",
-  [TILES.WALL]:        "#4a4a6a",
-  [TILES.PAINTING]:    "#e94560",
-  [TILES.DOOR]:        "#0f3460",
-  [TILES.LOBBY]:       "#2a2a4a",
-  [TILES.MAIN_HALL]:   "#2a2a4a",
-  [TILES.SKILLS_WING]: "#2a2a4a",
-  [TILES.ARCHIVE]:     "#2a2a4a",
-  [TILES.OFFICE]:      "#2a2a4a",
-  [TILES.GIFT_SHOP]:   "#2a2a4a",
-  [TILES.EASTER_EGG]:  "#2a2a4a",
-  [TILES.EXPERIENCE]:  "#2a2a4a",
-  [TILES.RESUME]:      "#2a2a4a",
+  [TILES.FLOOR]:       "#c9a87c",
+  [TILES.WALL]:        "#ddd0b3",
+  [TILES.PAINTING]:    "#7a9e7e",
+  [TILES.DOOR]:        "#7a4f2a",
+  [TILES.LOBBY]:       "#c9a87c",
+  [TILES.MAIN_HALL]:   "#c9a87c",
+  [TILES.SKILLS_WING]: "#c9a87c",
+  [TILES.ARCHIVE]:     "#c9a87c",
+  [TILES.OFFICE]:      "#c9a87c",
+  [TILES.GIFT_SHOP]:   "#c9a87c",
+  [TILES.EASTER_EGG]:  "#c9a87c",
+  [TILES.EXPERIENCE]:  "#c9a87c",
+  [TILES.RESUME]:      "#c9a87c",
 };
 
 export const OBJECT_COLORS: Record<number, string> = {
-  [OBJECTS.PEDESTAL]:     "#8b7355",
-  [OBJECTS.DISPLAY_CASE]: "#a0d8ef",
-  [OBJECTS.BENCH]:        "#6b4226",
-  [OBJECTS.TABLE]:        "#5c3d1e",
-  [OBJECTS.PLANTER]:      "#2d5a27",
-  [OBJECTS.DESK]:         "#4a3520",
+  [OBJECTS.PEDESTAL]:     "#a07840",
+  [OBJECTS.DISPLAY_CASE]: "#b8d4b0",
+  [OBJECTS.BENCH]:        "#7a5030",
+  [OBJECTS.TABLE]:        "#7a5030",
+  [OBJECTS.PLANTER]:      "#557a50",
+  [OBJECTS.DESK]:         "#6b4030",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
