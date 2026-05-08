@@ -10,6 +10,7 @@ import ExhibitOverlay from "./ExhibitOverlay";
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
+  const howlCache = useRef<Map<string, Howl>>(new Map());
 
   const [prompt, setPrompt] = useState<string | null>(null);
   const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
@@ -19,12 +20,9 @@ export default function GameCanvas() {
     engineRef.current?.setPaused(false);
   }, []);
 
-  // ESC to close
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && activePopup) {
-        handleClose();
-      }
+      if (e.key === "Escape" && activePopup) handleClose();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -51,14 +49,17 @@ export default function GameCanvas() {
           break;
 
         case "interact": {
-          const exhibit = event.content;
+          const exhibit: Exhibit = event.content;
 
-          // Play audio if present
           if (exhibit.audio) {
-            new Howl({ src: [exhibit.audio] }).play();
+            let howl = howlCache.current.get(exhibit.audio);
+            if (!howl) {
+              howl = new Howl({ src: [exhibit.audio] });
+              howlCache.current.set(exhibit.audio, howl);
+            }
+            howl.play();
           }
 
-          // Show popup if present, otherwise just the audio plays
           if (exhibit.popup) {
             setActivePopup(exhibit.popup);
             setPrompt(null);

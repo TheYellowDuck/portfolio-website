@@ -25,14 +25,14 @@ export class Camera {
     this.y = targetY - this.viewportHeight / 2;
   }
 
-  follow(targetX: number, targetY: number) {
-    // Center on the target
+  follow(targetX: number, targetY: number, dt: number) {
     const desiredX = targetX - this.viewportWidth / 2;
     const desiredY = targetY - this.viewportHeight / 2;
 
-    // Smooth follow
-    this.x += (desiredX - this.x) * this.smoothing;
-    this.y += (desiredY - this.y) * this.smoothing;
+    // Frame-rate independent smooth follow: identical feel at 30, 60, or 120 fps
+    const factor = 1 - Math.pow(1 - this.smoothing, dt * 60);
+    this.x += (desiredX - this.x) * factor;
+    this.y += (desiredY - this.y) * factor;
 
     // If the world is smaller than the viewport, center the world
     // Otherwise, clamp so the camera doesn't show past the edges

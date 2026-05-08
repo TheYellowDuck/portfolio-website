@@ -1,12 +1,14 @@
+import { COLORS } from "@/styles/theme";
+
 export const TILE_SIZE = 64;
 
 // ── TILE IDs ─────────────────────────────────────────────────────────────────
 export const TILES = {
   FLOOR:       0,
   WALL:        1,
-  PAINTING:    2,
+  PAINTING:    2,  // defined but not currently placed on the map — reserved for future wall art
   DOOR:        3,
-  LOBBY:       10, // kept for compat; no longer assigned to a branch
+  LOBBY:       10, // kept for compat; no longer assigned to a branch — do not reuse ID 10
   MAIN_HALL:   11,
   SKILLS_WING: 12,
   ARCHIVE:     13,
@@ -42,28 +44,28 @@ export const OBJECTS = {
 // ── COLORS ───────────────────────────────────────────────────────────────────
 // Interactable tiles render as plain FLOOR — the object layer provides the visual.
 export const TILE_COLORS: Record<number, string> = {
-  [TILES.FLOOR]:       "#c9a87c",
-  [TILES.WALL]:        "#ddd0b3",
-  [TILES.PAINTING]:    "#7a9e7e",
-  [TILES.DOOR]:        "#7a4f2a",
-  [TILES.LOBBY]:       "#c9a87c",
-  [TILES.MAIN_HALL]:   "#c9a87c",
-  [TILES.SKILLS_WING]: "#c9a87c",
-  [TILES.ARCHIVE]:     "#c9a87c",
-  [TILES.OFFICE]:      "#c9a87c",
-  [TILES.GIFT_SHOP]:   "#c9a87c",
-  [TILES.EASTER_EGG]:  "#c9a87c",
-  [TILES.EXPERIENCE]:  "#c9a87c",
-  [TILES.RESUME]:      "#c9a87c",
+  [TILES.FLOOR]:       COLORS.FLOOR,
+  [TILES.WALL]:        COLORS.WALL,
+  [TILES.PAINTING]:    COLORS.SAGE,
+  [TILES.DOOR]:        COLORS.DOOR,
+  [TILES.LOBBY]:       COLORS.FLOOR,
+  [TILES.MAIN_HALL]:   COLORS.FLOOR,
+  [TILES.SKILLS_WING]: COLORS.FLOOR,
+  [TILES.ARCHIVE]:     COLORS.FLOOR,
+  [TILES.OFFICE]:      COLORS.FLOOR,
+  [TILES.GIFT_SHOP]:   COLORS.FLOOR,
+  [TILES.EASTER_EGG]:  COLORS.FLOOR,
+  [TILES.EXPERIENCE]:  COLORS.FLOOR,
+  [TILES.RESUME]:      COLORS.FLOOR,
 };
 
 export const OBJECT_COLORS: Record<number, string> = {
-  [OBJECTS.PEDESTAL]:     "#a07840",
-  [OBJECTS.DISPLAY_CASE]: "#b8d4b0",
-  [OBJECTS.BENCH]:        "#7a5030",
-  [OBJECTS.TABLE]:        "#7a5030",
-  [OBJECTS.PLANTER]:      "#557a50",
-  [OBJECTS.DESK]:         "#6b4030",
+  [OBJECTS.PEDESTAL]:     COLORS.PEDESTAL,
+  [OBJECTS.DISPLAY_CASE]: COLORS.DISPLAY_CASE,
+  [OBJECTS.BENCH]:        COLORS.WOOD_DARK,
+  [OBJECTS.TABLE]:        COLORS.WOOD_DARK,
+  [OBJECTS.PLANTER]:      COLORS.PLANTER,
+  [OBJECTS.DESK]:         COLORS.DESK,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -250,6 +252,12 @@ export function getTileAt(worldX: number, worldY: number): number {
 export function setTileAt(col: number, row: number, tile: number) {
   if (row >= 0 && row < museumMap.length && col >= 0 && col < museumMap[0].length) {
     museumMap[row][col] = tile;
+  }
+}
+
+export function setSolidAt(col: number, row: number, solid: boolean) {
+  if (row >= 0 && row < solidMap.length && col >= 0 && col < solidMap[0].length) {
+    solidMap[row][col] = solid;
   }
 }
 

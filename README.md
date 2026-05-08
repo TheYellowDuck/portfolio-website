@@ -4,6 +4,41 @@ A 2D pixel-art museum where visitors control a character walking through themed 
 
 ---
 
+## Vision & Aesthetic
+
+The portfolio should feel like wandering into a well-loved private library at golden hour — cozy, serene, and personal. Think warm wood paneling, bookshelves, soft lamplight, worn rugs. A lo-fi playlist playing in another room. The kind of space that feels lived-in and reflects the owner's personality, not a cold public institution.
+
+**Mood:** cozy · serene · lo-fi · home library / mansion · personal  
+**Not:** dark · edgy · cold · corporate · cyberpunk
+
+### Color palette
+
+All colors are centralized in [`src/styles/theme.ts`](src/styles/theme.ts). Never hardcode hex values elsewhere.
+
+| Role | Value | Description |
+|------|-------|-------------|
+| Canvas background | `#1c1508` | Deep warm walnut — shows through VOID tiles outside the museum |
+| Floor | `#c9a87c` | Warm honey wood parquet |
+| Wall | `#ddd0b3` | Warm cream plaster |
+| Door | `#7a4f2a` | Warm mahogany threshold |
+| Accent | `#7a9e7e` | Soft sage green — interactive highlights, player, glow |
+| Popup background | `#fef9ec` | Warm parchment |
+| Text | `#3a2e1e` | Warm dark brown |
+| Text (accent) | `#4a7a44` | Deep sage — titles and tags |
+
+### Sprite direction
+
+When pixel art is created, it should reinforce the cozy library/mansion aesthetic:
+- Warm wood floor tiles with subtle grain variation
+- Cream plaster walls with a baseboard/wainscoting detail
+- Pedestals as warm wood or stone columns
+- Soft ambient lighting — warm golden cone overhead, not harsh neon
+- Player character with a cozy aesthetic (warm-toned outfit, not a sci-fi suit)
+- "Me at my desk" character should look natural and relaxed, not posed
+- Plants, rugs, bookshelves, and lamps as furniture to reinforce the home-library feel
+
+---
+
 ## For Claude Code / AI Assistants
 
 Read this section first when picking up a new session.

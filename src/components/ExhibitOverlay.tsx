@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
+import { COLORS } from "@/styles/theme";
 
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
@@ -23,7 +24,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(28, 21, 8, 0.72)",
+              background: COLORS.BACKDROP,
               zIndex: 20,
             }}
           />
@@ -44,33 +45,33 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               maxHeight: popup.embedUrl
                 ? `min(${popup.height || "650px"}, 90vh)`
                 : "80vh",
-              background: "#fef9ec",
-              border: "2px solid #7a9e7e",
+              background: COLORS.PARCHMENT,
+              border: `2px solid ${COLORS.SAGE}`,
               borderRadius: 8,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
               zIndex: 30,
-              boxShadow: "0 8px 40px rgba(28,21,8,0.35)",
+              boxShadow: `0 8px 40px ${COLORS.POPUP_SHADOW}`,
             }}
           >
             {/* Header */}
             <div style={{
               padding: "16px 20px",
               borderBottom: popup.description || popup.embedUrl
-                ? "1px solid rgba(58,46,30,0.15)"
+                ? `1px solid ${COLORS.DIVIDER}`
                 : "none",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "flex-start",
               gap: 16,
               flexShrink: 0,
-              background: "#fef9ec",
+              background: COLORS.PARCHMENT,
             }}>
               <div style={{ flex: 1 }}>
                 {popup.title && (
                   <h2 style={{
-                    color: "#4a7a44",
+                    color: COLORS.TEXT_SAGE,
                     fontFamily: "monospace",
                     fontSize: 22,
                     margin: 0,
@@ -78,17 +79,15 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                     {popup.title}
                   </h2>
                 )}
-
-                {/* Tech tags */}
                 {popup.tech && popup.tech.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
                     {popup.tech.map((t) => (
                       <span key={t} style={{
-                        background: "rgba(122,158,126,0.15)",
-                        border: "1px solid rgba(122,158,126,0.5)",
+                        background: COLORS.TAG_BG,
+                        border: `1px solid ${COLORS.TAG_BORDER}`,
                         borderRadius: 4,
                         padding: "2px 10px",
-                        color: "#4a7a44",
+                        color: COLORS.TEXT_SAGE,
                         fontFamily: "monospace",
                         fontSize: 12,
                       }}>
@@ -101,9 +100,9 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
               <button onClick={onClose} style={{
                 background: "none",
-                border: "1px solid rgba(58,46,30,0.25)",
+                border: `1px solid ${COLORS.BTN_BORDER}`,
                 borderRadius: 4,
-                color: "#3a2e1e",
+                color: COLORS.TEXT_DARK,
                 padding: "4px 12px",
                 cursor: "pointer",
                 fontFamily: "monospace",
@@ -120,11 +119,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               display: "flex",
               flexDirection: "column",
               overflow: popup.embedUrl ? "hidden" : "auto",
-              background: "#fef9ec",
+              background: COLORS.PARCHMENT,
             }}>
               {popup.description && (
                 <p style={{
-                  color: "#3a2e1e",
+                  color: COLORS.TEXT_DARK,
                   fontFamily: "monospace",
                   fontSize: 14,
                   lineHeight: 1.7,
@@ -139,12 +138,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               {popup.embedUrl && (
                 <iframe
                   src={popup.embedUrl}
-                  style={{
-                    flex: 1,
-                    border: "none",
-                    background: "#000",
-                    minHeight: 300,
-                  }}
+                  style={{ flex: 1, border: "none", background: "#000", minHeight: 300 }}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 />
               )}
@@ -165,11 +159,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                       rel="noopener noreferrer"
                       style={{
                         display: "inline-block",
-                        background: "rgba(122,158,126,0.15)",
-                        border: "1px solid rgba(122,158,126,0.55)",
+                        background: COLORS.LINK_BG,
+                        border: `1px solid ${COLORS.LINK_BORDER}`,
                         borderRadius: 4,
                         padding: "8px 16px",
-                        color: "#3a2e1e",
+                        color: COLORS.TEXT_DARK,
                         fontFamily: "monospace",
                         fontSize: 13,
                         textDecoration: "none",

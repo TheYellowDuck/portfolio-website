@@ -9,9 +9,11 @@ import {
   objectMap,
   solidMap,
   setTileAt,
+  setSolidAt,
   PLAYER_SPAWN_COL,
   PLAYER_SPAWN_ROW,
 } from "./tilemap";
+import { COLORS } from "@/styles/theme";
 import { getNearbyInteractable, Interactable } from "./interactables";
 import { Exhibit } from "@/data/projects";
 
@@ -65,6 +67,10 @@ export class GameEngine {
   changeTiles(changes: { col: number; row: number; newTile: number }[]) {
     for (const change of changes) {
       setTileAt(change.col, change.row, change.newTile);
+      // Keep solidMap in sync for tile-based solidity (WALL/VOID).
+      // Note: pedestal-based solidity (row+1 blocked) is set at build time
+      // and is unaffected here since changeTiles does not touch objectMap.
+      setSolidAt(change.col, change.row, change.newTile === TILES.WALL || change.newTile === TILES.VOID);
     }
   }
 
@@ -123,7 +129,8 @@ export class GameEngine {
 
     this.camera.follow(
       player.x + player.width / 2,
-      player.y + player.height / 2
+      player.y + player.height / 2,
+      dt
     );
 
     const nearby = getNearbyInteractable(
@@ -202,7 +209,7 @@ export class GameEngine {
     const camY = Math.round(camera.y);
 
     // Background — shows through VOID tiles
-    ctx.fillStyle = "#1c1508";
+    ctx.fillStyle = COLORS.CANVAS_BG;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
@@ -221,7 +228,7 @@ export class GameEngine {
 
         ctx.fillStyle = TILE_COLORS[tile] ?? TILE_COLORS[TILES.FLOOR];
         ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        ctx.strokeStyle = COLORS.TILE_GRID;
         ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
       }
     }
@@ -235,7 +242,7 @@ export class GameEngine {
     for (let sortRow = startRow; sortRow <= endRow + 1; sortRow++) {
       // Player
       if (sortRow === playerSortRow) {
-        ctx.fillStyle = "#7a9e7e";
+        ctx.fillStyle = COLORS.SAGE;
         ctx.fillRect(
           Math.round(player.x - camX),
           Math.round(player.y - camY),
@@ -255,12 +262,12 @@ export class GameEngine {
           // for interactables that have no object (e.g. the easter egg).
           if (this.currentNearby?.row === objectRow && this.currentNearby?.col === col) {
             ctx.save();
-            ctx.shadowColor = "#7a9e7e";
+            ctx.shadowColor = COLORS.SAGE;
             ctx.shadowBlur = 40;
-            ctx.fillStyle = "rgba(122,158,126,0.12)";
+            ctx.fillStyle = COLORS.SAGE_GLOW_FILL;
             ctx.fillRect(screenX - 6, screenY - 6, TILE_SIZE + 12, TILE_SIZE + 12);
             ctx.shadowBlur = 20;
-            ctx.strokeStyle = "rgba(122,158,126,0.5)";
+            ctx.strokeStyle = COLORS.SAGE_GLOW_STROKE;
             ctx.lineWidth = 2;
             ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
             ctx.restore();
