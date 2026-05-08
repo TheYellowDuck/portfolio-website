@@ -20,6 +20,11 @@ export class Camera {
     // this.worldHeight = worldHeight;
   }
 
+  snapTo(targetX: number, targetY: number) {
+    this.x = targetX - this.viewportWidth / 2;
+    this.y = targetY - this.viewportHeight / 2;
+  }
+
   follow(targetX: number, targetY: number) {
     // Center on the target
     const desiredX = targetX - this.viewportWidth / 2;

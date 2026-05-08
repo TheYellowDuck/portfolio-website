@@ -69,6 +69,10 @@ export class GameEngine {
   }
 
   start() {
+    this.camera.snapTo(
+      this.player.x + this.player.width  / 2,
+      this.player.y + this.player.height / 2,
+    );
     this.lastTime = performance.now();
     this.loop(this.lastTime);
   }

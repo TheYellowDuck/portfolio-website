@@ -212,6 +212,52 @@ export const archiveExhibits: Exhibit[] = [
   },
 ];
 
+// Tile 18 — EXPERIENCE / WORK HISTORY
+export const experienceExhibits: Exhibit[] = [
+  {
+    popup: {
+      title: "Ford Motor Company",
+      description: "Software Engineering Co-op.",
+      tech: ["Python", "React", "TypeScript"],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 2",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 3",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 4",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+];
+
+// Tile 19 — RESUME (standalone hallway pedestal)
+export const resumeExhibit: Exhibit[] = [
+  {
+    popup: {
+      title: "Resume",
+      description: "Download my resume or view it online.",
+      links: [
+        { label: "Download PDF", url: "/resume.pdf" },
+        { label: "View Online", url: "/resume" },
+      ],
+    },
+  },
+];
+
 // Tile 14 — OFFICE / ABOUT ME
 export const officeExhibits: Exhibit[] = [
   {
@@ -289,11 +335,12 @@ export const easterEggExhibits: Exhibit[] = [
 import { TILES } from "@/game/tilemap";
 
 export const roomRegistry: Record<number, Exhibit[]> = {
-  [TILES.LOBBY]: lobbyExhibits,
-  [TILES.MAIN_HALL]: mainHallExhibits,
+  [TILES.EXPERIENCE]:  experienceExhibits,
+  [TILES.MAIN_HALL]:   mainHallExhibits,
   [TILES.SKILLS_WING]: skillsExhibits,
-  [TILES.ARCHIVE]: archiveExhibits,
-  [TILES.OFFICE]: officeExhibits,
-  [TILES.GIFT_SHOP]: giftShopExhibits,
-  [TILES.EASTER_EGG]: easterEggExhibits,
+  [TILES.ARCHIVE]:     archiveExhibits,
+  [TILES.OFFICE]:      officeExhibits,
+  [TILES.GIFT_SHOP]:   giftShopExhibits,
+  [TILES.EASTER_EGG]:  easterEggExhibits,
+  [TILES.RESUME]:      resumeExhibit,
 };
