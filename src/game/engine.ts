@@ -73,6 +73,7 @@ export class GameEngine {
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private northIdleSprite: HTMLImageElement = new Image();
+  private glowAlpha: number = 0;
 
   public onEvent: ((event: GameEvent) => void) | null = null;
   private currentNearby: Interactable | null = null;
@@ -168,6 +169,7 @@ export class GameEngine {
   setPaused(paused: boolean) {
     this.paused = paused;
     if (!paused) {
+      this.currentNearby = null;
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 300);
     }
@@ -197,7 +199,7 @@ export class GameEngine {
   }
 
   private loop = (currentTime: number) => {
-    const deltaTime = (currentTime - this.lastTime) / 1000;
+    const deltaTime = Math.min((currentTime - this.lastTime) / 1000, 0.1);
     this.lastTime = currentTime;
 
     if (!this.paused) {
@@ -227,6 +229,12 @@ export class GameEngine {
     if (this.input.isDown("ArrowLeft") || this.input.isDown("a")) dx -= moveAmount;
     if (this.input.isDown("ArrowRight") || this.input.isDown("d")) dx += moveAmount;
 
+    if (dx !== 0 && dy !== 0) {
+      const norm = 1 / Math.SQRT2;
+      dx *= norm;
+      dy *= norm;
+    }
+
     if (dx !== 0) {
       player.x += dx;
       this.resolveCollisionX(dx);
@@ -251,6 +259,14 @@ export class GameEngine {
       player.animTimer -= frameDuration;
       player.animFrame = (player.animFrame + 1) % frameCount;
     }
+
+    const pCol = Math.floor((player.x + TILE_SIZE / 2) / TILE_SIZE);
+    const pRow = Math.floor(player.y / TILE_SIZE);
+    const occluded = museumMap[pRow + 1]?.[pCol] === TILES.WALL;
+    const fadeSpeed = 1.5;
+    this.glowAlpha = occluded
+      ? Math.min(1, this.glowAlpha + fadeSpeed * dt)
+      : Math.max(0, this.glowAlpha - fadeSpeed * dt);
 
     this.camera.follow(
       player.x + player.width / 2,
@@ -565,6 +581,33 @@ export class GameEngine {
             ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
           }
         }
+      }
+    }
+
+    // Character glow — fades in/out as player moves behind walls
+    if (this.glowAlpha > 0) {
+      const gCX = player.x - camX + TILE_SIZE / 2;
+      const gCY = player.y - camY - TILE_SIZE * 0.4;
+      const gRX = TILE_SIZE * 0.5;
+      const gRY = TILE_SIZE;
+      const glowColor = "#FFA54F";
+      const glowPasses = [
+        { lineWidth: 18, shadowBlur: 70, alpha: 0.04 },
+        { lineWidth:  9, shadowBlur: 40, alpha: 0.06 },
+        { lineWidth:  4, shadowBlur: 22, alpha: 0.07 },
+        { lineWidth:  1, shadowBlur: 18, alpha: 0.05 },
+      ];
+      for (const pass of glowPasses) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(gCX, gCY, gRX, gRY, 0, 0, Math.PI * 2);
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = pass.shadowBlur;
+        ctx.strokeStyle = glowColor;
+        ctx.lineWidth = pass.lineWidth;
+        ctx.globalAlpha = pass.alpha * this.glowAlpha;
+        ctx.stroke();
+        ctx.restore();
       }
     }
   }

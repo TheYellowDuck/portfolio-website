@@ -30,6 +30,17 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
           />
 
           {/* Centered popup */}
+          <div style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 30,
+            width: `min(${popup.width || "500px"}, 90vw)`,
+            maxHeight: popup.embedUrl
+              ? `min(${popup.height || "650px"}, 90vh)`
+              : "80vh",
+          }}>
           <motion.div
             key="popup"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -37,21 +48,14 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: `min(${popup.width || "500px"}, 90vw)`,
-              maxHeight: popup.embedUrl
-                ? `min(${popup.height || "650px"}, 90vh)`
-                : "80vh",
+              width: "100%",
+              maxHeight: "inherit",
               background: COLORS.PARCHMENT,
               border: `2px solid ${COLORS.SAGE}`,
               borderRadius: 8,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              zIndex: 30,
               boxShadow: `0 8px 40px ${COLORS.POPUP_SHADOW}`,
             }}
           >
@@ -109,7 +113,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                 fontSize: 13,
                 flexShrink: 0,
               }}>
-                ESC
+                close [`]
               </button>
             </div>
 
@@ -176,6 +180,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               )}
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

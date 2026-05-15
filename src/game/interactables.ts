@@ -57,7 +57,7 @@ export function getNearbyInteractable(
 
   for (const item of interactables) {
     const dx = playerCenterCol - (item.col + 0.5);
-    const dy = playerCenterRow - (item.row + 0.5);
+    const dy = playerCenterRow - (item.row + 1.5);
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance <= item.radius && distance < closestDist) {

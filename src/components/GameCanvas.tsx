@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
-import { Exhibit, ExhibitPopup } from "@/data/projects";
+import { Exhibit, ExhibitPopup, resumeExhibit } from "@/data/projects";
 import { Howl } from "howler";
 import DialogBox from "./DialogBox";
 import ExhibitOverlay from "./ExhibitOverlay";
@@ -13,7 +13,7 @@ export default function GameCanvas() {
   const howlCache = useRef<Map<string, Howl>>(new Map());
 
   const [prompt, setPrompt] = useState<string | null>(null);
-  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
+  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(resumeExhibit[0].popup ?? null);
 
   const handleClose = useCallback(() => {
     setActivePopup(null);
@@ -22,7 +22,7 @@ export default function GameCanvas() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && activePopup) handleClose();
+      if (e.key === "`" && activePopup) handleClose();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -71,6 +71,7 @@ export default function GameCanvas() {
     };
 
     engine.start();
+    engine.setPaused(true);
 
     const handleResize = () => {
       canvas.width = window.innerWidth;
