@@ -1,5 +1,24 @@
 import InputManager from "./input";
 import { Camera } from "./camera";
+
+type Direction = 'east' | 'west' | 'north' | 'south' | 'north-east' | 'north-west' | 'south-east' | 'south-west';
+
+const IDLE_DIRS: Direction[] = ['east', 'north-east', 'north-west', 'south-east', 'south-west', 'south', 'west'];
+const WALK_DIRS: Direction[] = ['east', 'north-east', 'north', 'north-west', 'south-east', 'south-west', 'south', 'west'];
+const IDLE_FRAMES = 5;
+const WALK_FRAMES = 6;
+
+function dirFromInput(dx: number, dy: number): Direction {
+  if (dx > 0 && dy < 0) return 'north-east';
+  if (dx > 0 && dy > 0) return 'south-east';
+  if (dx < 0 && dy < 0) return 'north-west';
+  if (dx < 0 && dy > 0) return 'south-west';
+  if (dx > 0) return 'east';
+  if (dx < 0) return 'west';
+  if (dy < 0) return 'north';
+  return 'south';
+}
+
 import {
   TILE_SIZE,
   TILES,
@@ -49,6 +68,11 @@ export class GameEngine {
   private wallTopIntersectReady: boolean = false;
   private wallTopCrossSprite: HTMLImageElement;
   private wallTopCrossReady: boolean = false;
+  private pedestalSprite: HTMLImageElement;
+  private pedestalReady: boolean = false;
+  private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
+  private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
+  private northIdleSprite: HTMLImageElement = new Image();
 
   public onEvent: ((event: GameEvent) => void) | null = null;
   private currentNearby: Interactable | null = null;
@@ -56,9 +80,13 @@ export class GameEngine {
   private player = {
     x: TILE_SIZE * PLAYER_SPAWN_COL,
     y: TILE_SIZE * PLAYER_SPAWN_ROW,
-    width: 56,
-    height: 56,
-    speed: 360,
+    width: TILE_SIZE,
+    height: TILE_SIZE,
+    speed: 200,
+    facing: 'east' as Direction,
+    isMoving: false,
+    animFrame: 0,
+    animTimer: 0,
   };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -106,6 +134,29 @@ export class GameEngine {
     this.wallTopKnubSprite = new Image();
     this.wallTopKnubSprite.onload = () => { this.wallTopKnubReady = true; };
     this.wallTopKnubSprite.src = "/assets/sprites/wall-top-knub.png";
+    this.pedestalSprite = new Image();
+    this.pedestalSprite.onload = () => { this.pedestalReady = true; };
+    this.pedestalSprite.src = "/assets/sprites/pedestal-3.png";
+
+    for (const dir of IDLE_DIRS) {
+      const frames: HTMLImageElement[] = [];
+      for (let i = 0; i < IDLE_FRAMES; i++) {
+        const img = new Image();
+        img.src = `/assets/sprites/character/states/standing/animations/idle/${dir}/frame_${String(i).padStart(3, "0")}.png`;
+        frames.push(img);
+      }
+      this.idleSprites.set(dir, frames);
+    }
+    for (const dir of WALK_DIRS) {
+      const frames: HTMLImageElement[] = [];
+      for (let i = 0; i < WALK_FRAMES; i++) {
+        const img = new Image();
+        img.src = `/assets/sprites/character/states/standing/animations/walk/${dir}/frame_${String(i).padStart(3, "0")}.png`;
+        frames.push(img);
+      }
+      this.walkSprites.set(dir, frames);
+    }
+    this.northIdleSprite.src = "/assets/sprites/character/states/standing/rotations/north.png";
   }
 
   resize(width: number, height: number) {
@@ -183,6 +234,22 @@ export class GameEngine {
     if (dy !== 0) {
       player.y += dy;
       this.resolveCollisionY(dy);
+    }
+
+    const wasMoving = player.isMoving;
+    const isMoving = dx !== 0 || dy !== 0;
+    if (isMoving) player.facing = dirFromInput(dx, dy);
+    player.isMoving = isMoving;
+    if (wasMoving !== isMoving) {
+      player.animFrame = 0;
+      player.animTimer = 0;
+    }
+    const frameDuration = isMoving ? 0.15 : 0.45;
+    const frameCount = isMoving ? WALK_FRAMES : IDLE_FRAMES;
+    player.animTimer += dt;
+    if (player.animTimer >= frameDuration) {
+      player.animTimer -= frameDuration;
+      player.animFrame = (player.animFrame + 1) % frameCount;
     }
 
     this.camera.follow(
@@ -265,6 +332,8 @@ export class GameEngine {
     const { ctx, canvas, camera, player } = this;
     const camX = Math.round(camera.x);
     const camY = Math.round(camera.y);
+
+    ctx.imageSmoothingEnabled = false;
 
     // Background — shows through VOID tiles
     ctx.fillStyle = COLORS.CANVAS_BG;
@@ -450,8 +519,21 @@ export class GameEngine {
 
       // Player
       if (sortRow === playerSortRow) {
-        ctx.fillStyle = COLORS.SAGE;
-        ctx.fillRect(Math.round(player.x - camX), Math.round(player.y - camY), player.width, player.height);
+        const drawH = TILE_SIZE * 4;
+        const centerX = Math.round(player.x - camX + TILE_SIZE / 2);
+        const sy = Math.round(player.y - camY) - TILE_SIZE * 2.4;
+        const drawImg = (img: HTMLImageElement) => {
+          if (!img.complete || img.naturalWidth === 0) return;
+          const drawW = drawH * (img.naturalWidth / img.naturalHeight);
+          ctx.drawImage(img, centerX - drawW / 2, sy, drawW, drawH);
+        };
+        if (!player.isMoving && player.facing === 'north') {
+          drawImg(this.northIdleSprite);
+        } else {
+          const frames = (player.isMoving ? this.walkSprites : this.idleSprites).get(player.facing);
+          const frame = frames?.[player.animFrame];
+          if (frame) drawImg(frame);
+        }
       }
 
       // Objects and glow
@@ -475,9 +557,13 @@ export class GameEngine {
 
           const obj = objectMap[row][col];
           if (obj === null) continue;
-          const pad = Math.round(TILE_SIZE / 5);
-          ctx.fillStyle = OBJECT_COLORS[obj] ?? "#888888";
-          ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
+          if (obj === 1 && this.pedestalReady) {
+            ctx.drawImage(this.pedestalSprite, screenX, screenY, TILE_SIZE, TILE_SIZE * 2);
+          } else {
+            const pad = Math.round(TILE_SIZE / 5);
+            ctx.fillStyle = OBJECT_COLORS[obj] ?? "#888888";
+            ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
+          }
         }
       }
     }

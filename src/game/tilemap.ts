@@ -98,13 +98,13 @@ const southBranches: BranchDef[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BRANCH_WIDTH    = 11; // side wall + 9-tile interior + side wall
-const BRANCH_GAP      = 12; // hallway floor tiles between adjacent branch walls
+const BRANCH_GAP      = 10; // hallway floor tiles between adjacent branch walls
 const LEFT_MARGIN     = 2;  // hallway floor tiles west of first branch
 const RIGHT_MARGIN    = 7;  // hallway floor tiles east of last branch (desk space)
 const DOORWAY_HALF    = 2;  // half-span; doorway = DOORWAY_HALF*2+1 = 5 tiles
-const ENTRANCE_BUFFER = 5;  // rows between doorway and nearest exhibit tile
-const END_BUFFER      = 3;  // rows between end wall and farthest exhibit tile
-const EXHIBIT_SPACING = 5;  // rows between consecutive exhibit tiles
+const ENTRANCE_BUFFER = 4;  // rows between doorway and nearest exhibit tile
+const END_BUFFER      = 2;  // rows between end wall and farthest exhibit tile
+const EXHIBIT_SPACING = 4;  // rows between consecutive exhibit tiles
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTO-COMPUTED MAP DIMENSIONS
@@ -118,7 +118,7 @@ const maxDepth = Math.max(
 );
 
 const HALLWAY_ROW_TOP    = maxDepth + 2;
-const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 9;
+const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 8;
 const NORTH_ENTRANCE_ROW  = HALLWAY_ROW_TOP - 1;
 const SOUTH_ENTRANCE_ROW  = HALLWAY_ROW_BOTTOM + 1;
 const NORTH_BRANCH_BOTTOM = NORTH_ENTRANCE_ROW - 1;
@@ -132,7 +132,7 @@ const branchRightWall = (i: number) => branchLeftWall(i) + BRANCH_WIDTH - 1;
 const branchCenterCol = (i: number) => branchLeftWall(i) + Math.floor(BRANCH_WIDTH / 2);
 
 export const PLAYER_SPAWN_COL = branchCenterCol(0);
-export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2) + 1;
+export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
 
 
 function buildMap(): number[][] {
@@ -184,7 +184,7 @@ function buildMap(): number[][] {
   set(PLAYER_SPAWN_ROW - 1, PLAYER_SPAWN_COL + 2, TILES.RESUME);
 
   // Easter egg — hidden in hallway, looks like plain floor
-  set(Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2), 2, TILES.EASTER_EGG);
+  set(Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2) - 1, 2, TILES.EASTER_EGG);
 
   // Adjacency pass — VOID tiles adjacent to any non-VOID become WALL.
   // Snapshot-based so freshly-created walls don't cascade.

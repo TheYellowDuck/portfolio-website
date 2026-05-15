@@ -1,0 +1,154 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "c3ae37bb-aeb8-4403-a858-b20d10d3f5b3",
+        "name": "full body anime schoolgirl sprite, pixel art, standing pose, dark long straight hair with bangs, white japanese sailor uniform with red scarf, slim build, soft muted pastel colors, melancholic cute vibe, retro visual novel aesthetic, detailed pixel shading, front-facing character sprite, visible legs and shoes, clean outline, idle pose for 2D game, small pixel sprite, 48-bit pixel art style, neutral gray background, centered character, full character visible from head to toe\n\nRPG maker sprite style, indie pixel game character, side-facing idle sprite sheet aesthetic\n\ndont do: cropped, portrait only, close-up, cut off legs, cut off feet, realistic, 3d render, blurry, extra limbs, deformed anatomy, chibi, oversized head\n",
+        "prompt": "full body anime schoolgirl sprite, pixel art, standing pose, dark long straight hair with bangs, white japanese sailor uniform with red scarf, slim build, soft muted pastel colors, melancholic cute vibe, retro visual novel aesthetic, detailed pixel shading, front-facing character sprite, visible legs and shoes, clean outline, idle pose for 2D game, small pixel sprite, 48-bit pixel art style, neutral gray background, centered character, full character visible from head to toe\n\nRPG maker sprite style, indie pixel game character, side-facing idle sprite sheet aesthetic\n\ndont do: cropped, portrait only, close-up, cut off legs, cut off feet, realistic, 3d render, blurry, extra limbs, deformed anatomy, chibi, oversized head\n",
+        "size": {
+          "width": 120,
+          "height": 120
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-05-15T00:30:33.449754+00:00"
+      },
+      "folder": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi",
+      "frames": {
+        "rotations": {
+          "south": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/south.png",
+          "south-east": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/south-east.png",
+          "east": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/east.png",
+          "north-east": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/north-east.png",
+          "north": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/north.png",
+          "north-west": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/north-west.png",
+          "west": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/west.png",
+          "south-west": "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/rotations/south-west.png"
+        },
+        "animations": {
+          "animation-a16b11cc": {
+            "north-east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-east/frame_005.png"
+            ],
+            "north": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north/frame_005.png"
+            ],
+            "south-west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-west/frame_005.png"
+            ],
+            "north-west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/north-west/frame_005.png"
+            ],
+            "south": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south/frame_005.png"
+            ],
+            "south-east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/south-east/frame_005.png"
+            ],
+            "east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/east/frame_005.png"
+            ],
+            "west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_004.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-a16b11cc/west/frame_005.png"
+            ]
+          },
+          "animation-0c88a7c6": {
+            "south": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south/frame_004.png"
+            ],
+            "south-east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-east/frame_004.png"
+            ],
+            "east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/east/frame_004.png"
+            ],
+            "south-west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/south-west/frame_004.png"
+            ],
+            "north-east": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-east/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-east/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-east/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-east/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-east/frame_004.png"
+            ],
+            "north-west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/north-west/frame_004.png"
+            ],
+            "west": [
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/west/frame_000.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/west/frame_001.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/west/frame_002.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/west/frame_003.png",
+              "states/full_body_anime_schoolgirl_sprite_pixel_art_standi/animations/animation-0c88a7c6/west/frame_004.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-15T01:16:45.357314"
+}
