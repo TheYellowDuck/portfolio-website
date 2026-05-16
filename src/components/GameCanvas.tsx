@@ -23,6 +23,13 @@ export default function GameCanvas() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "`" && activePopup) handleClose();
+      if (e.key === "f" || e.key === "F") {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -90,7 +97,7 @@ export default function GameCanvas() {
     <>
       <canvas
         ref={canvasRef}
-        style={{ display: "block", imageRendering: "pixelated" }}
+        className="block [image-rendering:pixelated]"
       />
       <DialogBox message={prompt || ""} visible={!!prompt && !activePopup} />
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />

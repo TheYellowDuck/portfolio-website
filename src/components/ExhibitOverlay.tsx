@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
-import { COLORS } from "@/styles/theme";
+
 import ResumePopup from "./ResumePopup";
 
 interface ExhibitOverlayProps {
@@ -28,7 +28,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             style={{
               position: "fixed",
               inset: 0,
-              background: COLORS.BACKDROP,
+              background: "rgba(28,21,8,0.72)",
               zIndex: 20,
             }}
           />
@@ -54,32 +54,32 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             style={{
               width: "100%",
               maxHeight: "inherit",
-              background: COLORS.PARCHMENT,
-              border: `2px solid ${COLORS.SAGE}`,
+              background: "#fef9ec",
+              border: `2px solid ${"#7a9e7e"}`,
               borderRadius: 8,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              boxShadow: `0 8px 40px ${COLORS.POPUP_SHADOW}`,
+              boxShadow: `0 8px 40px ${"rgba(28,21,8,0.35)"}`,
             }}
           >
             {/* Header */}
             <div style={{
               padding: "16px 20px",
               borderBottom: popup.description || popup.embedUrl
-                ? `1px solid ${COLORS.DIVIDER}`
+                ? `1px solid ${"rgba(58,46,30,0.15)"}`
                 : "none",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "flex-start",
               gap: 16,
               flexShrink: 0,
-              background: COLORS.PARCHMENT,
+              background: "#fef9ec",
             }}>
               <div style={{ flex: 1 }}>
                 {popup.title && (
                   <h2 style={{
-                    color: COLORS.TEXT_SAGE,
+                    color: "#4a7a44",
                     fontFamily: "monospace",
                     fontSize: 22,
                     margin: 0,
@@ -91,11 +91,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
                     {popup.tech.map((t) => (
                       <span key={t} style={{
-                        background: COLORS.TAG_BG,
-                        border: `1px solid ${COLORS.TAG_BORDER}`,
+                        background: "rgba(122,158,126,0.15)",
+                        border: `1px solid ${"rgba(122,158,126,0.5)"}`,
                         borderRadius: 4,
                         padding: "2px 10px",
-                        color: COLORS.TEXT_SAGE,
+                        color: "#4a7a44",
                         fontFamily: "monospace",
                         fontSize: 12,
                       }}>
@@ -108,9 +108,9 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
               <button onClick={onClose} style={{
                 background: "none",
-                border: `1px solid ${COLORS.BTN_BORDER}`,
+                border: `1px solid ${"rgba(58,46,30,0.25)"}`,
                 borderRadius: 4,
-                color: COLORS.TEXT_DARK,
+                color: "#3a2e1e",
                 padding: "4px 12px",
                 cursor: "pointer",
                 fontFamily: "monospace",
@@ -127,11 +127,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               display: "flex",
               flexDirection: "column",
               overflow: popup.embedUrl ? "hidden" : "auto",
-              background: COLORS.PARCHMENT,
+              background: "#fef9ec",
             }}>
               {popup.description && (
                 <p style={{
-                  color: COLORS.TEXT_DARK,
+                  color: "#3a2e1e",
                   fontFamily: "monospace",
                   fontSize: 14,
                   lineHeight: 1.7,
@@ -167,11 +167,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                       rel="noopener noreferrer"
                       style={{
                         display: "inline-block",
-                        background: COLORS.LINK_BG,
-                        border: `1px solid ${COLORS.LINK_BORDER}`,
+                        background: "rgba(122,158,126,0.15)",
+                        border: `1px solid ${"rgba(122,158,126,0.55)"}`,
                         borderRadius: 4,
                         padding: "8px 16px",
-                        color: COLORS.TEXT_DARK,
+                        color: "#3a2e1e",
                         fontFamily: "monospace",
                         fontSize: 13,
                         textDecoration: "none",

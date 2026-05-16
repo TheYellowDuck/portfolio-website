@@ -14,4 +14,20 @@ html, body {
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-system-mono: ui-monospace, Menlo, Monaco, "Cascadia Code", "Segoe UI Mono", "Roboto Mono", monospace;
+
+  /* popup surface layers */
+  --color-panel:    #26200f;
+  --color-panel-2:  #1d1809;
+  --color-panel-3:  #312a18;
+
+  /* popup text */
+  --color-ink-1:    #f0e4c4;
+  --color-ink-2:    #b8a880;
+  --color-ink-3:    #7a6a4a;
+  --color-ink-4:    #4e4228;
+
+  /* accent */
+  --color-sage:     #7a9e7e;
+  --color-sage-2:   #5a8260;
 }

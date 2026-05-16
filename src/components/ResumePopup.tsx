@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { COLORS } from "@/styles/theme";
+
 import type { ResumeData, ResumeEntry, ResumeSection } from "@/app/api/resume/route";
 
 // Human-readable short labels for known section titles
@@ -58,7 +58,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
         style={{
           position: "fixed",
           inset: 0,
-          background: COLORS.BACKDROP,
+          background: "rgba(28,21,8,0.72)",
           zIndex: 20,
         }}
       />
@@ -87,29 +87,29 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
             width: "100%",
             height: "100%",
             maxHeight: "inherit",
-            background: COLORS.PARCHMENT,
-            border: `2px solid ${COLORS.SAGE}`,
+            background: "#fef9ec",
+            border: `2px solid ${"#7a9e7e"}`,
             borderRadius: 8,
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
-            boxShadow: `0 8px 40px ${COLORS.POPUP_SHADOW}`,
+            boxShadow: `0 8px 40px ${"rgba(28,21,8,0.35)"}`,
           }}
         >
           {/* ── Header ─────────────────────────────────────────────────── */}
           <div
             style={{
               padding: "16px 20px 12px",
-              borderBottom: `1px solid ${COLORS.DIVIDER}`,
+              borderBottom: `1px solid ${"rgba(58,46,30,0.15)"}`,
               flexShrink: 0,
-              background: COLORS.PARCHMENT,
+              background: "#fef9ec",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
                 <h2
                   style={{
-                    color: COLORS.TEXT_SAGE,
+                    color: "#4a7a44",
                     fontFamily: "monospace",
                     fontSize: 24,
                     margin: 0,
@@ -127,7 +127,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                       marginTop: 6,
                       fontFamily: "monospace",
                       fontSize: 12,
-                      color: COLORS.TEXT_DARK,
+                      color: "#3a2e1e",
                       opacity: 0.8,
                     }}
                   >
@@ -138,7 +138,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                         href={`https://${data.contact.linkedin.replace(/^https?:\/\//, "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: COLORS.TEXT_SAGE, textDecoration: "none" }}
+                        style={{ color: "#4a7a44", textDecoration: "none" }}
                       >
                         LinkedIn ↗
                       </a>
@@ -148,7 +148,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                         href={data.contact.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: COLORS.TEXT_SAGE, textDecoration: "none" }}
+                        style={{ color: "#4a7a44", textDecoration: "none" }}
                       >
                         GitHub ↗
                       </a>
@@ -163,11 +163,11 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     href={data.pdfPath}
                     download
                     style={{
-                      background: COLORS.LINK_BG,
-                      border: `1px solid ${COLORS.LINK_BORDER}`,
+                      background: "rgba(122,158,126,0.15)",
+                      border: `1px solid ${"rgba(122,158,126,0.55)"}`,
                       borderRadius: 4,
                       padding: "4px 12px",
-                      color: COLORS.TEXT_DARK,
+                      color: "#3a2e1e",
                       fontFamily: "monospace",
                       fontSize: 12,
                       textDecoration: "none",
@@ -181,9 +181,9 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                   onClick={onClose}
                   style={{
                     background: "none",
-                    border: `1px solid ${COLORS.BTN_BORDER}`,
+                    border: `1px solid ${"rgba(58,46,30,0.25)"}`,
                     borderRadius: 4,
-                    color: COLORS.TEXT_DARK,
+                    color: "#3a2e1e",
                     padding: "4px 12px",
                     cursor: "pointer",
                     fontFamily: "monospace",
@@ -201,7 +201,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                 display: "flex",
                 gap: 4,
                 marginTop: 12,
-                borderBottom: `1px solid ${COLORS.DIVIDER}`,
+                borderBottom: `1px solid ${"rgba(58,46,30,0.15)"}`,
                 paddingBottom: 0,
               }}
             >
@@ -212,12 +212,12 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     key={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     style={{
-                      background: active ? COLORS.TAG_BG : "none",
-                      border: `1px solid ${active ? COLORS.TAG_BORDER : "transparent"}`,
-                      borderBottom: active ? `1px solid ${COLORS.PARCHMENT}` : "1px solid transparent",
+                      background: active ? "rgba(122,158,126,0.15)" : "none",
+                      border: `1px solid ${active ? "rgba(122,158,126,0.5)" : "transparent"}`,
+                      borderBottom: active ? `1px solid ${"#fef9ec"}` : "1px solid transparent",
                       borderRadius: "4px 4px 0 0",
                       padding: "5px 14px",
-                      color: active ? COLORS.TEXT_SAGE : COLORS.TEXT_DARK,
+                      color: active ? "#4a7a44" : "#3a2e1e",
                       fontFamily: "monospace",
                       fontSize: 12,
                       cursor: "pointer",
@@ -239,7 +239,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
               flex: 1,
               overflowY: "auto",
               padding: "16px 24px",
-              background: COLORS.PARCHMENT,
+              background: "#fef9ec",
             }}
           >
             {!data && !error && <LoadingState />}
@@ -268,7 +268,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
             )}
 
             {data && !section && (
-              <p style={{ fontFamily: "monospace", fontSize: 13, color: COLORS.TEXT_DARK, opacity: 0.5 }}>
+              <p style={{ fontFamily: "monospace", fontSize: 13, color: "#3a2e1e", opacity: 0.5 }}>
                 No data found for this section.
               </p>
             )}
@@ -287,7 +287,7 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
       style={{
         marginBottom: 24,
         paddingBottom: 20,
-        borderBottom: `1px solid ${COLORS.DIVIDER}`,
+        borderBottom: `1px solid ${"rgba(58,46,30,0.15)"}`,
       }}
     >
       <div
@@ -304,7 +304,7 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
             fontFamily: "monospace",
             fontSize: 14,
             fontWeight: "bold",
-            color: COLORS.TEXT_SAGE,
+            color: "#4a7a44",
           }}
         >
           {entry.title}
@@ -314,7 +314,7 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
             style={{
               fontFamily: "monospace",
               fontSize: 12,
-              color: COLORS.TEXT_DARK,
+              color: "#3a2e1e",
               opacity: 0.6,
               whiteSpace: "nowrap",
             }}
@@ -331,7 +331,7 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
             justifyContent: "space-between",
             fontFamily: "monospace",
             fontSize: 12,
-            color: COLORS.TEXT_DARK,
+            color: "#3a2e1e",
             opacity: 0.75,
             marginTop: 2,
           }}
@@ -347,13 +347,13 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
             <span
               key={t}
               style={{
-                background: COLORS.TAG_BG,
-                border: `1px solid ${COLORS.TAG_BORDER}`,
+                background: "rgba(122,158,126,0.15)",
+                border: `1px solid ${"rgba(122,158,126,0.5)"}`,
                 borderRadius: 4,
                 padding: "1px 8px",
                 fontFamily: "monospace",
                 fontSize: 11,
-                color: COLORS.TEXT_SAGE,
+                color: "#4a7a44",
               }}
             >
               {t}
@@ -376,7 +376,7 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
               style={{
                 fontFamily: "monospace",
                 fontSize: 12,
-                color: COLORS.TEXT_DARK,
+                color: "#3a2e1e",
                 lineHeight: 1.65,
                 marginBottom: 4,
               }}
@@ -407,7 +407,7 @@ function BulletList({ bullets, styled }: { bullets: string[]; styled?: boolean }
                   style={{
                     fontFamily: "monospace",
                     fontSize: 12,
-                    color: COLORS.TEXT_SAGE,
+                    color: "#4a7a44",
                     fontWeight: "bold",
                     display: "block",
                     marginBottom: 6,
@@ -421,13 +421,13 @@ function BulletList({ bullets, styled }: { bullets: string[]; styled?: boolean }
                   <span
                     key={item}
                     style={{
-                      background: COLORS.TAG_BG,
-                      border: `1px solid ${COLORS.TAG_BORDER}`,
+                      background: "rgba(122,158,126,0.15)",
+                      border: `1px solid ${"rgba(122,158,126,0.5)"}`,
                       borderRadius: 4,
                       padding: "2px 10px",
                       fontFamily: "monospace",
                       fontSize: 12,
-                      color: COLORS.TEXT_SAGE,
+                      color: "#4a7a44",
                     }}
                   >
                     {item}
@@ -449,7 +449,7 @@ function BulletList({ bullets, styled }: { bullets: string[]; styled?: boolean }
           style={{
             fontFamily: "monospace",
             fontSize: 13,
-            color: COLORS.TEXT_DARK,
+            color: "#3a2e1e",
             lineHeight: 1.7,
             marginBottom: 6,
           }}
@@ -463,7 +463,7 @@ function BulletList({ bullets, styled }: { bullets: string[]; styled?: boolean }
 
 function LoadingState() {
   return (
-    <p style={{ fontFamily: "monospace", fontSize: 13, color: COLORS.TEXT_DARK, opacity: 0.5 }}>
+    <p style={{ fontFamily: "monospace", fontSize: 13, color: "#3a2e1e", opacity: 0.5 }}>
       Scanning resume...
     </p>
   );

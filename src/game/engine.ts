@@ -223,7 +223,9 @@ export class GameEngine {
 
   private update(dt: number) {
     const { player } = this;
-    const moveAmount = player.speed * dt;
+    const running = this.input.isDown("Shift");
+    const runMultiplier = 1.9;
+    const moveAmount = player.speed * (running ? runMultiplier : 1) * dt;
 
     let dx = 0;
     let dy = 0;
@@ -256,7 +258,7 @@ export class GameEngine {
       player.animFrame = 0;
       player.animTimer = 0;
     }
-    const frameDuration = isMoving ? 0.15 : 0.45;
+    const frameDuration = isMoving ? 0.085 / (running ? runMultiplier : 1) : 0.45;
     const frameCount = isMoving ? WALK_FRAMES : IDLE_FRAMES;
     player.animTimer += dt;
     if (player.animTimer >= frameDuration) {

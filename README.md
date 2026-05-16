@@ -13,7 +13,7 @@ The portfolio should feel like wandering into a well-loved private library at go
 
 ### Color palette
 
-All colors are centralized in [`src/styles/theme.ts`](src/styles/theme.ts). Never hardcode hex values elsewhere.
+Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts). Note: `ExhibitOverlay.tsx` and `ResumePopup.tsx` currently use hardcoded hex values (restored to match original design); `styles/theme.ts` is not the active source of truth for those components.
 
 | Role | Value | Description |
 |------|-------|-------------|
@@ -98,7 +98,7 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 | **HTML5 Canvas** | Game rendering (tilemap, objects, sprites) |
 | **Framer Motion** | Popup enter/exit animations |
 | **Howler.js** | Audio playback (SFX, ambient) |
-| **Aseprite / LibreSprite** *(planned)* | Pixel art sprites and tilesets |
+| **Aseprite / LibreSprite** | Pixel art sprites — character, walls, floor, pedestals in use |
 
 ---
 
@@ -151,19 +151,21 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 |------|--------|---------|
 | `GameCanvas.tsx` | ✅ | Mounts canvas, creates engine, wires events, manages popup state |
 | `ExhibitOverlay.tsx` | ✅ | Popup — title, description, tech tags, links, iframe embeds |
+| `ResumePopup.tsx` | ✅ | Resume popup — tabbed sections, PDF download, fetches `/api/resume` |
 | `DialogBox.tsx` | ✅ | "Press E to inspect" bottom prompt |
 | `HUD.tsx` | 🔲 Stub | Minimap, room name, controls hint |
 | `LoadingScreen.tsx` | 🔲 Stub | Splash screen |
+| `ExhibitOverlay.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
+| `ResumePopup.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
 
 ### `/public/assets/`
 
 ```
 public/assets/
-├── sprites/     ← character + NPC sheets (.png) — not yet created
-├── tilesets/    ← museum walls/floors/objects (.png) — not yet created
+├── sprites/     ← in use: character (idle + walk, 8 directions), walls, floor, pedestal (.png)
+├── tilesets/    ← Cute RPG Interior tileset present but not wired into engine
 ├── maps/        ← Tiled JSON exports — not yet used
-└── audio/       ← SFX, ambient (.mp3/.ogg)
-                   quack.mp3 is referenced by easter egg — add this file
+└── audio/       ← directory exists but empty; quack.mp3 referenced by easter egg — add this file
 ```
 
 ---
@@ -365,7 +367,7 @@ Exhibits beyond the slot count are ignored. The slot count equals `count` in the
 
 ## Sprite Roadmap
 
-Everything currently renders as colored rectangles. The next major milestone is replacing them. Sprites should be designed at **16×16 px native** (rendered 4× at 64px tile size).
+Sprites are partially implemented. `engine.ts` uses `drawImage` for floor tiles, wall tiles, and pedestals. The player character has idle and walk animations in 8 directions. Remaining work is furniture, NPCs, and atmosphere.
 
 ### Priority order
 
@@ -498,20 +500,22 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 
 ### ✅ Phase 5 — React Overlay UI
 - [x] `ExhibitOverlay.tsx` — text, tags, links, iframe
+- [x] `ResumePopup.tsx` — tabbed resume viewer, PDF download, `/api/resume` integration
 - [x] `DialogBox.tsx` — "Press E" prompt
-- [x] Audio on interact (Howler.js)
+- [x] Audio on interact (Howler.js wired — audio files still needed)
 - [x] Pause/unpause engine during popup
 - [ ] HUD — minimap, room name, controls hint
 - [ ] Loading / splash screen
 
-### 🔲 Phase 6 — Sprites & Art (NEXT)
-- [ ] Design sprites at 16×16 px (see sprite roadmap above)
-- [ ] Replace `fillRect` with `drawImage` in `engine.ts`
-- [ ] Player walk cycle (4 directions × 2–4 frames)
-- [ ] Wall back face + baseboard front face
-- [ ] Pedestal + display case sprite
+### 🚧 Phase 6 — Sprites & Art (In Progress)
+- [x] Replace `fillRect` with `drawImage` in `engine.ts`
+- [x] Player idle + walk cycle (8 directions)
+- [x] Wall sprites (side + top variants)
+- [x] Floor tile variants
+- [x] Pedestal sprite
 - [ ] "Me at desk" character in the alcove
 - [ ] Duck Easter egg sprite
+- [ ] Furniture (desk, bookshelf, bench, lamp, planter, rug)
 
 ### 🔲 Phase 7 — Content
 - [ ] Fill `projects.ts` with real data (URLs, descriptions, experience)

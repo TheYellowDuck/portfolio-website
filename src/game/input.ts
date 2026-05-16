@@ -9,10 +9,12 @@ class InputManager {
     // Bind to window so we catch keys even when canvas isn't focused
     window.addEventListener("keydown", (e) => {
       this.keys.add(e.key);
+      this.keys.add(e.key.toLowerCase());
     });
 
     window.addEventListener("keyup", (e) => {
       this.keys.delete(e.key);
+      this.keys.delete(e.key.toLowerCase());
     });
   }
 
