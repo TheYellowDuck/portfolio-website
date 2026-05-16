@@ -23,6 +23,9 @@ export interface ExhibitPopup {
   // Control popup size (defaults provided)
   width?: string;   // e.g. "900px", "80vw"
   height?: string;  // e.g. "600px", "70vh"
+
+  // Special popup types
+  type?: "resume";
 }
 
 export interface Exhibit {
@@ -47,12 +50,7 @@ export const lobbyExhibits: Exhibit[] = [
   },
   {
     popup: {
-      title: "Resume",
-      description: "Download my resume or view it online.",
-      links: [
-        { label: "Download PDF", url: "/resume.pdf" },
-        { label: "View Online", url: "/resume" },
-      ],
+      type: "resume",
     },
   },
   {
@@ -248,12 +246,7 @@ export const experienceExhibits: Exhibit[] = [
 export const resumeExhibit: Exhibit[] = [
   {
     popup: {
-      title: "Resume",
-      description: "Download my resume or view it online.",
-      links: [
-        { label: "Download PDF", url: "/resume.pdf" },
-        { label: "View Online", url: "/resume" },
-      ],
+      type: "resume",
     },
   },
 ];

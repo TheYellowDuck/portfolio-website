@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import { COLORS } from "@/styles/theme";
+import ResumePopup from "./ResumePopup";
 
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
@@ -12,7 +13,10 @@ interface ExhibitOverlayProps {
 export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) {
   return (
     <AnimatePresence>
-      {popup && (
+      {popup && popup.type === "resume" && (
+        <ResumePopup key="resume" onClose={onClose} />
+      )}
+      {popup && popup.type !== "resume" && (
         <>
           {/* Backdrop */}
           <motion.div

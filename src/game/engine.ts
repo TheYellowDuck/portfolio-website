@@ -163,7 +163,11 @@ export class GameEngine {
   resize(width: number, height: number) {
     this.canvas.width = width;
     this.canvas.height = height;
-    this.camera = new Camera(width, height);
+    this.camera.resize(width, height);
+    this.camera.snapTo(
+      this.player.x + this.player.width  / 2,
+      this.player.y + this.player.height / 2,
+    );
   }
 
   setPaused(paused: boolean) {

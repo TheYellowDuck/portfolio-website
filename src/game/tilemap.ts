@@ -98,7 +98,7 @@ const southBranches: BranchDef[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BRANCH_WIDTH    = 9;  // side wall + 7-tile interior + side wall
-const BRANCH_GAP      = 8;  // hallway floor tiles between adjacent branch walls
+const BRANCH_GAP      = 7;  // hallway floor tiles between adjacent branch walls
 const LEFT_MARGIN     = 2;  // hallway floor tiles west of first branch
 const RIGHT_MARGIN    = 7;  // hallway floor tiles east of last branch (desk space)
 const DOORWAY_HALF    = 2;  // half-span; doorway = DOORWAY_HALF*2+1 = 5 tiles
@@ -118,7 +118,7 @@ const maxDepth = Math.max(
 );
 
 const HALLWAY_ROW_TOP    = maxDepth + 2;
-const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 8;
+const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 6;
 const NORTH_ENTRANCE_ROW  = HALLWAY_ROW_TOP - 1;
 const SOUTH_ENTRANCE_ROW  = HALLWAY_ROW_BOTTOM + 1;
 const NORTH_BRANCH_BOTTOM = NORTH_ENTRANCE_ROW - 1;

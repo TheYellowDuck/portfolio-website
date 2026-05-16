@@ -20,6 +20,11 @@ export class Camera {
     // this.worldHeight = worldHeight;
   }
 
+  resize(viewportWidth: number, viewportHeight: number) {
+    this.viewportWidth = viewportWidth;
+    this.viewportHeight = viewportHeight;
+  }
+
   snapTo(targetX: number, targetY: number) {
     this.x = targetX - this.viewportWidth / 2;
     this.y = targetY - this.viewportHeight / 2;
