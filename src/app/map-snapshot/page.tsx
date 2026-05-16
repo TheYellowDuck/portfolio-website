@@ -15,7 +15,7 @@ export default function MapSnapshot() {
 
   const [status, setStatus]       = useState<'loading' | 'ready' | 'error'>('loading');
   const [isDragging, setIsDragging] = useState(false);
-  const [view, setView]           = useState({ zoom: 0.3, panX: 16, panY: 16 });
+  const [view, setView]           = useState({ zoom: 0.3, panX: 0, panY: 0 });
 
   // Sprite loading — engine renders into the real canvas once ready
   useEffect(() => {
@@ -28,6 +28,13 @@ export default function MapSnapshot() {
     engine.onReady = () => {
       try {
         engine.renderFull(canvas);
+        const { width: cw, height: ch } = containerRef.current!.getBoundingClientRect();
+        const zoom = 0.3;
+        setView({
+          zoom,
+          panX: (cw - canvas.width  * zoom) / 2,
+          panY: (ch - canvas.height * zoom) / 2,
+        });
         setStatus('ready');
       } catch (err) {
         console.error(err);

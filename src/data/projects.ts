@@ -243,6 +243,55 @@ export const experienceExhibits: Exhibit[] = [
       tech: [],
     },
   },
+  {
+    popup: {
+      title: "Experience 5",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 6",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 7",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 8",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 9",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 10",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
+  {
+    popup: {
+      title: "Experience 11",
+      description: "Your description here.",
+      tech: [],
+    },
+  },
 ];
 
 // Tile 19 — RESUME (standalone hallway pedestal)
@@ -328,7 +377,7 @@ export const easterEggExhibits: Exhibit[] = [
 // ROOM REGISTRY — maps tile IDs → exhibit lists
 // ============================================================
 
-import { TILES } from "@/game/tilemap";
+import { TILES } from "@/game/tile-ids";
 
 export const roomRegistry: Record<number, Exhibit[]> = {
   [TILES.EXPERIENCE]: experienceExhibits,

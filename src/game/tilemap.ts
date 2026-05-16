@@ -1,24 +1,15 @@
 import { COLORS } from "@/styles/theme";
+import { TILES } from "./tile-ids";
+import {
+  experienceExhibits,
+  mainHallExhibits,
+  archiveExhibits,
+  officeExhibits,
+  giftShopExhibits,
+} from "@/data/projects";
 
+export { TILES };  // re-export so existing imports from this file keep working
 export const TILE_SIZE = 64;
-
-// ── TILE IDs ─────────────────────────────────────────────────────────────────
-export const TILES = {
-  FLOOR:       0,
-  WALL:        1,
-  PAINTING:    2,  // defined but not currently placed on the map — reserved for future wall art
-  DOOR:        3,
-  LOBBY:       10, // kept for compat; no longer assigned to a branch — do not reuse ID 10
-  MAIN_HALL:   11,
-  SKILLS_WING: 12,
-  ARCHIVE:     13,
-  OFFICE:      14,
-  GIFT_SHOP:   15,
-  EASTER_EGG:  16,
-  VOID:        17, // outside museum bounds — not rendered, treated as solid
-  EXPERIENCE:  18,
-  RESUME:      19, // standalone hallway pedestal (resume / CV)
-} as const;
 
 export const INTERACTABLE_TILES: Set<number> = new Set([
   TILES.MAIN_HALL,
@@ -70,68 +61,208 @@ export const OBJECT_COLORS: Record<number, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 // BRANCH DEFINITIONS
 //
-// northBranches[i] and southBranches[i] share the same horizontal column slot.
-// Arrays may be different lengths — the shorter side simply has no branch for
-// that slot. Keep |north.length - south.length| ≤ 1 when adding branches.
+// The longer side is "primary" (defines horizontal layout).
+// The shorter side is "secondary" — each branch is centered between two adjacent
+// primary doorways. Keep |north.length - south.length| ≤ 1 for best results.
 //
 // Layout (T = top/north, B = bottom/south):
 //   T: Experience | Projects | Archive
 //   B: About Me   | Links    |
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface BranchDef { tile: number; count: number; }
+interface BranchDef { tile: number; count: number; label: string; }
 
 const northBranches: BranchDef[] = [
-  { tile: TILES.EXPERIENCE, count: 4 },
-  { tile: TILES.MAIN_HALL,  count: 5 },
-  { tile: TILES.ARCHIVE,    count: 6 },
+  { tile: TILES.EXPERIENCE, count: experienceExhibits.length, label: "Experience" },
+  { tile: TILES.MAIN_HALL,  count: mainHallExhibits.length,  label: "Projects" },
+  { tile: TILES.ARCHIVE,    count: archiveExhibits.length,   label: "Archive" },
 ];
 
 const southBranches: BranchDef[] = [
-  { tile: TILES.OFFICE,    count: 3 },
-  { tile: TILES.GIFT_SHOP, count: 4 },
+  { tile: TILES.OFFICE,    count: officeExhibits.length,    label: "About Me" },
+  { tile: TILES.GIFT_SHOP, count: giftShopExhibits.length,  label: "Links" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LAYOUT CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BRANCH_WIDTH    = 9;  // side wall + 7-tile interior + side wall
-const BRANCH_GAP      = 7;  // hallway floor tiles between adjacent branch walls
+const COL_MARGIN      = 2;  // tiles from interior edge to first/last pedestal column
+const COL_GAP         = 3;  // tiles between adjacent pedestal column centers
+const ROW_GAP         = 4;  // tiles between adjacent pedestal row centers
+const ENTRANCE_BUFFER = 4;  // rows between connector entrance and nearest exhibit row
+const END_BUFFER      = 2;  // rows between end wall and farthest exhibit row
+const CONNECTOR_LEN   = 2;  // rows of narrow corridor between main hallway and each branch room
+const MIN_BRANCH_GAP  = 3;  // minimum floor tiles between adjacent branch walls
 const LEFT_MARGIN     = 2;  // hallway floor tiles west of first branch
 const RIGHT_MARGIN    = 7;  // hallway floor tiles east of last branch (desk space)
-const DOORWAY_HALF    = 2;  // half-span; doorway = DOORWAY_HALF*2+1 = 5 tiles
-const ENTRANCE_BUFFER = 4;  // rows between doorway and nearest exhibit tile
-const END_BUFFER      = 2;  // rows between end wall and farthest exhibit tile
-const EXHIBIT_SPACING = 4;  // rows between consecutive exhibit tiles
+const DOORWAY_HALF    = 2;  // half-span; connector/doorway = DOORWAY_HALF*2+1 = 5 tiles wide
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GRID MATH — each room's pedestals are arranged in a near-square grid
+// ─────────────────────────────────────────────────────────────────────────────
+
+function gridDims(count: number): { gc: number; gr: number } {
+  const gc = Math.ceil(Math.sqrt(count));
+  const gr = Math.ceil(count / gc);
+  return { gc, gr };
+}
+
+// Even gc (2, 4, …) uses COL_GAP+1 so the room width stays odd in all cases.
+// An odd room width means the room center is always a whole tile, which makes
+// the connector align exactly with the center of the pedestal group.
+// Odd gc (1, 3, …) uses COL_GAP as-is — the pedestal center already lands on a whole tile.
+function effectiveColGap(gc: number): number {
+  return gc % 2 === 0 ? COL_GAP + 1 : COL_GAP;
+}
+
+// Interior width is always odd so floor(intWidth/2) is the exact center tile.
+function calcInteriorWidth(gc: number): number {
+  if (gc === 1) return 7;
+  const gap = effectiveColGap(gc);
+  return 2 * COL_MARGIN + (gc - 1) * gap + 1;
+}
+
+function calcBranchWidth(count: number): number {
+  return 2 + calcInteriorWidth(gridDims(count).gc);
+}
+
+// Branch depth (rows) needed to fit gr pedestal rows with entrance/end buffers.
+function calcBranchDepth(count: number): number {
+  const { gr } = gridDims(count);
+  return END_BUFFER + (gr - 1) * ROW_GAP + 1 + ENTRANCE_BUFFER;
+}
+
+// Pedestal columns centered on the room's center tile.
+// startCol anchors the group so its midpoint = floor(intWidth/2) for all gc.
+function pedestalCols(intLeft: number, intWidth: number, gc: number): number[] {
+  const gap      = effectiveColGap(gc);
+  const startCol = Math.floor(intWidth / 2) - Math.floor((gc - 1) * gap / 2);
+  return Array.from({ length: gc }, (_, k) => intLeft + startCol + k * gap);
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTO-COMPUTED MAP DIMENSIONS
 // ─────────────────────────────────────────────────────────────────────────────
 
 const N = northBranches.length;
-const branchDepth = (n: number) => END_BUFFER + (n - 1) * EXHIBIT_SPACING + 1 + ENTRANCE_BUFFER;
-const maxDepth = Math.max(
-  ...northBranches.map(b => branchDepth(b.count)),
-  ...southBranches.map(b => branchDepth(b.count)),
+const M = southBranches.length;
+
+const northWidths = northBranches.map(b => calcBranchWidth(b.count));
+const southWidths = southBranches.map(b => calcBranchWidth(b.count));
+
+// The longer side is "primary" (defines layout width).
+// The shorter side is "secondary" (centered between adjacent primary pairs).
+const longIsNorth = N >= M;
+const longWidths  = longIsNorth ? northWidths : southWidths;
+const shortWidths = longIsNorth ? southWidths : northWidths;
+const L = longIsNorth ? N : M;
+const S = longIsNorth ? M : N;
+
+// Minimum center-to-center spacing: just enough that same-side walls are MIN_BRANCH_GAP apart.
+// Opposite-side rooms never share row space, so cross-hallway column overlap is harmless.
+// Equal spacing across all pairs → mutual centering on both sides.
+const rawCenterSpacing = (i: number): number =>
+  MIN_BRANCH_GAP + Math.ceil(longWidths[i] / 2) + Math.floor(longWidths[i + 1] / 2);
+
+const rawD = Math.max(0, ...Array.from({ length: Math.max(0, L - 1) }, (_, i) => rawCenterSpacing(i)));
+const D    = rawD % 2 === 1 ? rawD + 1 : rawD;  // round up to even for exact integer midpoints
+
+// Per-pair wall gaps derived from the uniform center spacing.
+const pairGaps: number[] = Array.from({ length: Math.max(0, L - 1) }, (_, i) =>
+  D - Math.ceil(longWidths[i] / 2) - Math.floor(longWidths[i + 1] / 2)
 );
 
-const HALLWAY_ROW_TOP    = maxDepth + 2;
-const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 6;
+// Long-side left walls and centers.
+const longLeftWalls: number[] = [];
+{
+  let x = 1 + LEFT_MARGIN;
+  for (let i = 0; i < L; i++) {
+    longLeftWalls.push(x);
+    x += longWidths[i] + (pairGaps[i] ?? 0);
+  }
+}
+const longCenterCols = longLeftWalls.map((lw, i) => lw + Math.floor(longWidths[i] / 2));
+
+// Short-side branches centered between adjacent long-side pairs.
+const shortCenterCols = Array.from({ length: S }, (_, i) =>
+  S >= L
+    ? longCenterCols[i]
+    : Math.round((longCenterCols[i] + longCenterCols[i + 1]) / 2)
+);
+const shortLeftWalls = shortCenterCols.map((cc, i) =>
+  cc - Math.floor(shortWidths[i] / 2)
+);
+
+// Map back to north/south.
+const northLeftWalls  = longIsNorth ? longLeftWalls   : shortLeftWalls;
+const northCenterCols = longIsNorth ? longCenterCols  : shortCenterCols;
+const southCenterCols = longIsNorth ? shortCenterCols : longCenterCols;
+const southLeftWalls  = longIsNorth ? shortLeftWalls  : longLeftWalls;
+
+const maxNorthDepth = Math.max(...northBranches.map(b => calcBranchDepth(b.count)));
+const maxSouthDepth = southBranches.length
+  ? Math.max(...southBranches.map(b => calcBranchDepth(b.count)))
+  : 0;
+
+const HALLWAY_ROW_TOP    = maxNorthDepth + CONNECTOR_LEN + 2;
+const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 8;
 const NORTH_ENTRANCE_ROW  = HALLWAY_ROW_TOP - 1;
 const SOUTH_ENTRANCE_ROW  = HALLWAY_ROW_BOTTOM + 1;
-const NORTH_BRANCH_BOTTOM = NORTH_ENTRANCE_ROW - 1;
-const SOUTH_BRANCH_TOP    = SOUTH_ENTRANCE_ROW + 1;
+// Branch rooms sit CONNECTOR_LEN + 1 rows away from the main hallway edge.
+const NORTH_BRANCH_BOTTOM = NORTH_ENTRANCE_ROW - CONNECTOR_LEN - 1;
+const SOUTH_BRANCH_TOP    = SOUTH_ENTRANCE_ROW + CONNECTOR_LEN + 1;
 
-const COLS = 1 + LEFT_MARGIN + N * BRANCH_WIDTH + (N - 1) * BRANCH_GAP + RIGHT_MARGIN + 1;
-const ROWS = SOUTH_BRANCH_TOP + maxDepth + 2;
+const COLS = 1 + LEFT_MARGIN
+  + longWidths.reduce((a, b) => a + b, 0)
+  + pairGaps.reduce((a, b) => a + b, 0)
+  + RIGHT_MARGIN + 1;
+const ROWS = SOUTH_BRANCH_TOP + maxSouthDepth + 2;
 
-const branchLeftWall  = (i: number) => 1 + LEFT_MARGIN + i * (BRANCH_WIDTH + BRANCH_GAP);
-const branchRightWall = (i: number) => branchLeftWall(i) + BRANCH_WIDTH - 1;
-const branchCenterCol = (i: number) => branchLeftWall(i) + Math.floor(BRANCH_WIDTH / 2);
-
-export const PLAYER_SPAWN_COL = branchCenterCol(0);
+export const PLAYER_SPAWN_COL = northCenterCols[0];
 export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
+
+export interface BranchLabel {
+  label: string;
+  col: number;    // center column of the branch room (tiles)
+  row: number;    // center row of the branch room (tiles)
+  tile: number;   // tile type that identifies this branch
+  rowMin: number; // inclusive row bounds of the room interior
+  rowMax: number;
+  colMin: number; // inclusive col bounds of the room interior
+  colMax: number;
+}
+
+export const branchLabels: BranchLabel[] = [
+  ...northBranches.map((b, i) => {
+    const depth  = calcBranchDepth(b.count);
+    const topRow = NORTH_BRANCH_BOTTOM - depth + 1;
+    return {
+      label:  b.label,
+      col:    northCenterCols[i],
+      row:    topRow - 3,
+      tile:   b.tile,
+      rowMin: topRow,
+      rowMax: NORTH_BRANCH_BOTTOM,
+      colMin: northLeftWalls[i] + 1,
+      colMax: northLeftWalls[i] + northWidths[i] - 2,
+    };
+  }),
+  ...southBranches.map((b, i) => {
+    const depth     = calcBranchDepth(b.count);
+    const bottomRow = SOUTH_BRANCH_TOP + depth - 1;
+    return {
+      label:  b.label,
+      col:    southCenterCols[i],
+      row:    bottomRow + 3,
+      tile:   b.tile,
+      rowMin: SOUTH_BRANCH_TOP,
+      rowMax: bottomRow,
+      colMin: southLeftWalls[i] + 1,
+      colMax: southLeftWalls[i] + southWidths[i] - 2,
+    };
+  }),
+];
 
 
 function buildMap(): number[][] {
@@ -145,58 +276,65 @@ function buildMap(): number[][] {
   const set = (r: number, c: number, tile: number) => { m[r][c] = tile; };
 
   // Hallway
-  // The right margin (cols after last branch) doubles as the desk alcove.
   fill(HALLWAY_ROW_TOP, 1, HALLWAY_ROW_BOTTOM, COLS - 2, TILES.FLOOR);
 
-  // South branch center columns:
-  //   M === N  → align directly opposite each north branch.
-  //   M === N-1 → center each south branch between consecutive north pairs (W pattern).
-  const M = southBranches.length;
-  const halfBW = Math.floor(BRANCH_WIDTH / 2);
-  const southCCs: number[] = Array.from({ length: M }, (_, i) =>
-    M >= N
-      ? branchCenterCol(i)
-      : Math.round((branchCenterCol(i) + branchCenterCol(i + 1)) / 2)
-  );
-
-  // Doorways
+  // North connectors — narrow corridor from each branch room to the main hallway.
   for (let i = 0; i < N; i++) {
-    const cc = branchCenterCol(i);
-    fill(NORTH_ENTRANCE_ROW, cc - DOORWAY_HALF, NORTH_ENTRANCE_ROW, cc + DOORWAY_HALF, TILES.FLOOR);
+    const cc = northCenterCols[i];
+    fill(NORTH_BRANCH_BOTTOM + 1, cc - DOORWAY_HALF, NORTH_ENTRANCE_ROW, cc + DOORWAY_HALF, TILES.FLOOR);
   }
+
+  // South connectors
   for (let i = 0; i < M; i++) {
-    const cc = southCCs[i];
-    fill(SOUTH_ENTRANCE_ROW, cc - DOORWAY_HALF, SOUTH_ENTRANCE_ROW, cc + DOORWAY_HALF, TILES.FLOOR);
+    const cc = southCenterCols[i];
+    fill(SOUTH_ENTRANCE_ROW, cc - DOORWAY_HALF, SOUTH_BRANCH_TOP - 1, cc + DOORWAY_HALF, TILES.FLOOR);
   }
 
-  // North branch interiors + exhibit tiles
+  // North branch interiors + grid-arranged exhibit tiles
   for (let i = 0; i < N; i++) {
-    const intLeft = branchLeftWall(i) + 1;
-    const intRight = branchRightWall(i) - 1;
-    const cc = branchCenterCol(i);
-    const nb = northBranches[i];
+    const intLeft  = northLeftWalls[i] + 1;
+    const intRight = northLeftWalls[i] + northWidths[i] - 2;
+    const intWidth = northWidths[i] - 2;
+    const nb       = northBranches[i];
+    const { gc, gr } = gridDims(nb.count);
+    const depth    = calcBranchDepth(nb.count);
 
-    const northTopRow = NORTH_BRANCH_BOTTOM - branchDepth(nb.count) + 1;
+    const northTopRow = NORTH_BRANCH_BOTTOM - depth + 1;
     fill(northTopRow, intLeft, NORTH_BRANCH_BOTTOM, intRight, TILES.FLOOR);
-    const northFirstExhibit = northTopRow + END_BUFFER;
-    for (let j = 0; j < nb.count; j++)
-      set(northFirstExhibit + j * EXHIBIT_SPACING, cc, nb.tile);
+
+    // Pedestals fill top→bottom, left→right — matches the scanner in interactables.ts.
+    const firstRow = northTopRow + END_BUFFER;
+    const cols     = pedestalCols(intLeft, intWidth, gc);
+    let idx = 0;
+    for (let row = 0; row < gr && idx < nb.count; row++) {
+      for (let col = 0; col < gc && idx < nb.count; col++, idx++) {
+        set(firstRow + row * ROW_GAP, cols[col], nb.tile);
+      }
+    }
   }
 
-  // South branch interiors + exhibit tiles (independently positioned)
+  // South branch interiors + grid-arranged exhibit tiles
   for (let i = 0; i < M; i++) {
-    const cc = southCCs[i];
-    const intLeft = cc - halfBW + 1;
-    const intRight = cc + halfBW - 1;
-    const sb = southBranches[i];
+    const intLeft  = southLeftWalls[i] + 1;
+    const intRight = southLeftWalls[i] + southWidths[i] - 2;
+    const intWidth = southWidths[i] - 2;
+    const sb       = southBranches[i];
+    const { gc, gr } = gridDims(sb.count);
+    const depth    = calcBranchDepth(sb.count);
 
-    const southBottomRow = SOUTH_BRANCH_TOP + branchDepth(sb.count) - 1;
+    const southBottomRow = SOUTH_BRANCH_TOP + depth - 1;
     fill(SOUTH_BRANCH_TOP, intLeft, southBottomRow, intRight, TILES.FLOOR);
-    // -2 corrects the 3-D pedestal asymmetry so both directions place their
+
+    // -2 corrects the 3-D pedestal asymmetry so both directions place the
     // first pedestal at ENTRANCE_BUFFER-1 rows from the doorway.
-    const southFirstExhibit = SOUTH_BRANCH_TOP + ENTRANCE_BUFFER - 2;
-    for (let j = 0; j < sb.count; j++)
-      set(southFirstExhibit + j * EXHIBIT_SPACING, cc, sb.tile);
+    const firstRow = SOUTH_BRANCH_TOP + ENTRANCE_BUFFER - 2;
+    const cols     = pedestalCols(intLeft, intWidth, gc);
+    let idx = 0;
+    for (let row = 0; row < gr && idx < sb.count; row++) {
+      for (let col = 0; col < gc && idx < sb.count; col++, idx++) {
+        set(firstRow + row * ROW_GAP, cols[col], sb.tile);
+      }
+    }
   }
 
   // Resume pedestal — standalone interactable in the hallway

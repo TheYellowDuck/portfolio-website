@@ -8,9 +8,10 @@ import {
   INTERACTABLE_TILES,
   PLAYER_SPAWN_COL,
   PLAYER_SPAWN_ROW,
+  branchLabels,
 } from "@/game/tilemap";
 
-const SCALE = 4;
+const SCALE = 6;
 const MAP_COLS = museumMap[0].length;
 const MAP_ROWS = museumMap.length;
 const FULL_W = MAP_COLS * SCALE;
@@ -52,14 +53,53 @@ export default function Minimap({ onRegisterDraw }: MinimapProps) {
     }
 
     const draw = (playerX: number, playerY: number) => {
+      const pxFull = (playerX / TILE_SIZE + 0.5) * SCALE;
       const pyFull = (playerY / TILE_SIZE + 0.5) * SCALE;
-      const cropY = Math.max(0, Math.min(FULL_H - H, pyFull - H / 2));
+      const cropX = pxFull - W / 2;
+      const cropY = pyFull - H / 2;
 
+      // Draw bg map with player-centered crop (handles edges by leaving canvas transparent)
       ctx.clearRect(0, 0, W, H);
-      ctx.drawImage(bg, 0, cropY, W, H, 0, 0, W, H);
+      const srcX = Math.max(0, cropX);
+      const srcY = Math.max(0, cropY);
+      const srcW = Math.min(W, FULL_W - srcX);
+      const srcH = Math.min(H, FULL_H - srcY);
+      const dstX = Math.max(0, -cropX);
+      const dstY = Math.max(0, -cropY);
+      if (srcW > 0 && srcH > 0) {
+        ctx.drawImage(bg, srcX, srcY, srcW, srcH, dstX, dstY, srcW, srcH);
+      }
 
-      const px = (playerX / TILE_SIZE + 0.5) * SCALE;
-      const py = pyFull - cropY;
+      // Branch labels
+      const playerCol = Math.floor(playerX / TILE_SIZE);
+      const playerRow = Math.floor(playerY / TILE_SIZE);
+      const activeBranch = branchLabels.find(bl =>
+        playerRow >= bl.rowMin && playerRow <= bl.rowMax &&
+        playerCol >= bl.colMin && playerCol <= bl.colMax
+      );
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const bl of branchLabels) {
+        const lx = (bl.col + 0.5) * SCALE - cropX;
+        const ly = (bl.row + 0.5) * SCALE - cropY;
+        if (lx < -60 || lx > W + 60 || ly < -30 || ly > H + 30) continue;
+
+        const isActive = activeBranch === bl;
+        ctx.font = `500 ${isActive ? 11 : 9}px "Century Gothic", "Futura", "Trebuchet MS", sans-serif`;
+        ctx.shadowColor = "rgba(0,0,0,0.95)";
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.fillStyle = isActive ? "#f0d98a" : "rgba(200,178,130,0.8)";
+        ctx.fillText(bl.label.toUpperCase(), lx, ly);
+        ctx.shadowBlur = 0;
+      }
+      ctx.restore();
+
+      const px = W / 2;
+      const py = H / 2;
       const dotR = SCALE * 1.2;
 
       ctx.beginPath();

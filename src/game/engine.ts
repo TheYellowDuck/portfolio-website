@@ -476,14 +476,14 @@ export class GameEngine {
         }
 
         if (tile === TILES.WALL && this.floorSpritesLoaded === 2) {
-          const hwType = horizWallType(row, col);
           const isFloorTile = (t: number | undefined) =>
             t !== undefined && t !== TILES.VOID && (TILE_COLORS[t] ?? TILE_COLORS[TILES.FLOOR]) === COLORS.FLOOR;
-          if (hwType === 'left' && isFloorTile(museumMap[row]?.[col - 1])) {
+          if (isFloorTile(museumMap[row]?.[col - 1])) {
             const img = this.floorSprites[(row * 7 + (col - 1) * 13) & 1];
             ctx.drawImage(img, img.naturalWidth / 2, 0, img.naturalWidth / 2, img.naturalHeight,
               screenX, screenY, TILE_SIZE / 2, TILE_SIZE);
-          } else if (hwType === 'right' && isFloorTile(museumMap[row]?.[col + 1])) {
+          }
+          if (isFloorTile(museumMap[row]?.[col + 1])) {
             const img = this.floorSprites[(row * 7 + (col + 1) * 13) & 1];
             ctx.drawImage(img, 0, 0, img.naturalWidth / 2, img.naturalHeight,
               screenX + TILE_SIZE / 2, screenY, TILE_SIZE / 2, TILE_SIZE);
