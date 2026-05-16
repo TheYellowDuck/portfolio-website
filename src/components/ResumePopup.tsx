@@ -46,6 +46,21 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
     (s) => s.title === activeTitle
   );
 
+  useEffect(() => {
+    if (!data) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      const idx = data.sections.findIndex((s) => s.title === activeTitle);
+      const next = e.key === "ArrowLeft"
+        ? (idx - 1 + data.sections.length) % data.sections.length
+        : (idx + 1) % data.sections.length;
+      setActiveTitle(data.sections[next].title);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [data, activeTitle]);
+
   return (
     <>
       {/* Backdrop */}

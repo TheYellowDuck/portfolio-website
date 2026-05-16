@@ -17,6 +17,9 @@ export interface ExhibitPopup {
   // Tech stack tags (optional)
   tech?: string[];
 
+  // Skills used — shown as a dedicated column in the popup body
+  skills?: string[];
+
   // Embed a playable demo, game, or CodeSandbox
   embedUrl?: string;
 
@@ -328,12 +331,11 @@ export const easterEggExhibits: Exhibit[] = [
 import { TILES } from "@/game/tilemap";
 
 export const roomRegistry: Record<number, Exhibit[]> = {
-  [TILES.EXPERIENCE]:  experienceExhibits,
-  [TILES.MAIN_HALL]:   mainHallExhibits,
-  [TILES.SKILLS_WING]: skillsExhibits,
-  [TILES.ARCHIVE]:     archiveExhibits,
-  [TILES.OFFICE]:      officeExhibits,
-  [TILES.GIFT_SHOP]:   giftShopExhibits,
-  [TILES.EASTER_EGG]:  easterEggExhibits,
-  [TILES.RESUME]:      resumeExhibit,
+  [TILES.EXPERIENCE]: experienceExhibits,
+  [TILES.MAIN_HALL]:  mainHallExhibits,
+  [TILES.ARCHIVE]:    archiveExhibits,
+  [TILES.OFFICE]:     officeExhibits,
+  [TILES.GIFT_SHOP]:  giftShopExhibits,
+  [TILES.EASTER_EGG]: easterEggExhibits,
+  [TILES.RESUME]:     resumeExhibit,
 };

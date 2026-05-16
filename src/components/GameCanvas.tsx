@@ -4,16 +4,26 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
 import { Exhibit, ExhibitPopup, resumeExhibit } from "@/data/projects";
 import { Howl } from "howler";
+import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
 import ExhibitOverlay from "./ExhibitOverlay";
+import LoadingScreen from "./LoadingScreen";
+import Minimap from "./Minimap";
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   const howlCache = useRef<Map<string, Howl>>(new Map());
+  const minimapDrawRef = useRef<((x: number, y: number) => void) | null>(null);
 
+  const handleRegisterMinimapDraw = useCallback((fn: (x: number, y: number) => void) => {
+    minimapDrawRef.current = fn;
+  }, []);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [prompt, setPrompt] = useState<string | null>(null);
   const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(resumeExhibit[0].popup ?? null);
+  const [showControls, setShowControls] = useState(false);
 
   const handleClose = useCallback(() => {
     setActivePopup(null);
@@ -55,6 +65,14 @@ export default function GameCanvas() {
           setPrompt(null);
           break;
 
+        case "idle":
+          setShowControls(true);
+          break;
+
+        case "active":
+          setShowControls(false);
+          break;
+
         case "interact": {
           const exhibit: Exhibit = event.content;
 
@@ -70,6 +88,7 @@ export default function GameCanvas() {
           if (exhibit.popup) {
             setActivePopup(exhibit.popup);
             setPrompt(null);
+            setShowControls(false);
             engine.setPaused(true);
           }
           break;
@@ -77,6 +96,12 @@ export default function GameCanvas() {
       }
     };
 
+    let spritesReady = false;
+    let timerReady = false;
+    const tryHide = () => { if (spritesReady && timerReady) setIsLoading(false); };
+    engine.onReady = () => { spritesReady = true; tryHide(); };
+    engine.onPositionChange = (x, y) => minimapDrawRef.current?.(x, y);
+    setTimeout(() => { timerReady = true; tryHide(); }, 1500);
     engine.start();
     engine.setPaused(true);
 
@@ -99,8 +124,11 @@ export default function GameCanvas() {
         ref={canvasRef}
         className="block [image-rendering:pixelated]"
       />
-      <DialogBox message={prompt || ""} visible={!!prompt && !activePopup} />
+      <ControlsHint visible={showControls && !isLoading && !activePopup} />
+      <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />
+      <Minimap onRegisterDraw={handleRegisterMinimapDraw} />
+      <LoadingScreen visible={isLoading} />
     </>
   );
 }

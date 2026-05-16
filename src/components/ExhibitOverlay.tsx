@@ -129,18 +129,61 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
               overflow: popup.embedUrl ? "hidden" : "auto",
               background: "#fef9ec",
             }}>
-              {popup.description && (
-                <p style={{
-                  color: "#3a2e1e",
-                  fontFamily: "monospace",
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                  margin: 0,
-                  padding: "16px 20px",
+              {(popup.description || (popup.skills && popup.skills.length > 0)) && (
+                <div style={{
+                  display: "flex",
+                  gap: 0,
                   flexShrink: 0,
                 }}>
-                  {popup.description}
-                </p>
+                  {popup.description && (
+                    <p style={{
+                      color: "#3a2e1e",
+                      fontFamily: "monospace",
+                      fontSize: 14,
+                      lineHeight: 1.7,
+                      margin: 0,
+                      padding: "16px 20px",
+                      flex: 1,
+                    }}>
+                      {popup.description}
+                    </p>
+                  )}
+                  {popup.skills && popup.skills.length > 0 && (
+                    <div style={{
+                      flexShrink: 0,
+                      width: 160,
+                      padding: "16px 20px 16px 0",
+                      borderLeft: popup.description ? "1px solid rgba(58,46,30,0.1)" : "none",
+                      paddingLeft: popup.description ? 20 : 20,
+                    }}>
+                      <p style={{
+                        margin: "0 0 8px",
+                        fontFamily: "monospace",
+                        fontSize: 10,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.12em",
+                        color: "#7a9e7e",
+                      }}>
+                        Skills Used
+                      </p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                        {popup.skills.map((s) => (
+                          <span key={s} style={{
+                            background: "rgba(122,158,126,0.1)",
+                            border: "1px solid rgba(122,158,126,0.38)",
+                            borderRadius: 4,
+                            padding: "3px 9px",
+                            fontFamily: "monospace",
+                            fontSize: 12,
+                            color: "#3a2e1e",
+                          }}>
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {popup.embedUrl && (

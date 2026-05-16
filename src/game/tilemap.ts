@@ -22,7 +22,6 @@ export const TILES = {
 
 export const INTERACTABLE_TILES: Set<number> = new Set([
   TILES.MAIN_HALL,
-  TILES.SKILLS_WING,
   TILES.ARCHIVE,
   TILES.OFFICE,
   TILES.GIFT_SHOP,
@@ -72,23 +71,23 @@ export const OBJECT_COLORS: Record<number, string> = {
 // BRANCH DEFINITIONS
 //
 // northBranches[i] and southBranches[i] share the same horizontal column slot.
-// Append one entry to each array to add a branch pair; map width auto-adjusts.
+// Arrays may be different lengths — the shorter side simply has no branch for
+// that slot. Keep |north.length - south.length| ≤ 1 when adding branches.
 //
 // Layout (T = top/north, B = bottom/south):
-//   T: Experience | Projects | Skills
-//   B: Archive    | About Me | Links
+//   T: Experience | Projects | Archive
+//   B: About Me   | Links    |
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface BranchDef { tile: number; count: number; }
 
 const northBranches: BranchDef[] = [
-  { tile: TILES.EXPERIENCE,  count: 4 },
-  { tile: TILES.MAIN_HALL,   count: 5 },
-  { tile: TILES.SKILLS_WING, count: 6 },
+  { tile: TILES.EXPERIENCE, count: 4 },
+  { tile: TILES.MAIN_HALL,  count: 5 },
+  { tile: TILES.ARCHIVE,    count: 6 },
 ];
 
 const southBranches: BranchDef[] = [
-  { tile: TILES.ARCHIVE,   count: 6 },
   { tile: TILES.OFFICE,    count: 3 },
   { tile: TILES.GIFT_SHOP, count: 4 },
 ];
@@ -149,27 +148,47 @@ function buildMap(): number[][] {
   // The right margin (cols after last branch) doubles as the desk alcove.
   fill(HALLWAY_ROW_TOP, 1, HALLWAY_ROW_BOTTOM, COLS - 2, TILES.FLOOR);
 
+  // South branch center columns:
+  //   M === N  → align directly opposite each north branch.
+  //   M === N-1 → center each south branch between consecutive north pairs (W pattern).
+  const M = southBranches.length;
+  const halfBW = Math.floor(BRANCH_WIDTH / 2);
+  const southCCs: number[] = Array.from({ length: M }, (_, i) =>
+    M >= N
+      ? branchCenterCol(i)
+      : Math.round((branchCenterCol(i) + branchCenterCol(i + 1)) / 2)
+  );
+
   // Doorways
   for (let i = 0; i < N; i++) {
     const cc = branchCenterCol(i);
     fill(NORTH_ENTRANCE_ROW, cc - DOORWAY_HALF, NORTH_ENTRANCE_ROW, cc + DOORWAY_HALF, TILES.FLOOR);
+  }
+  for (let i = 0; i < M; i++) {
+    const cc = southCCs[i];
     fill(SOUTH_ENTRANCE_ROW, cc - DOORWAY_HALF, SOUTH_ENTRANCE_ROW, cc + DOORWAY_HALF, TILES.FLOOR);
   }
 
-  // Branch interiors + exhibit tiles
+  // North branch interiors + exhibit tiles
   for (let i = 0; i < N; i++) {
-    const intLeft  = branchLeftWall(i) + 1;
+    const intLeft = branchLeftWall(i) + 1;
     const intRight = branchRightWall(i) - 1;
-    const cc       = branchCenterCol(i);
-
+    const cc = branchCenterCol(i);
     const nb = northBranches[i];
-    const sb = southBranches[i];
 
     const northTopRow = NORTH_BRANCH_BOTTOM - branchDepth(nb.count) + 1;
     fill(northTopRow, intLeft, NORTH_BRANCH_BOTTOM, intRight, TILES.FLOOR);
     const northFirstExhibit = northTopRow + END_BUFFER;
     for (let j = 0; j < nb.count; j++)
       set(northFirstExhibit + j * EXHIBIT_SPACING, cc, nb.tile);
+  }
+
+  // South branch interiors + exhibit tiles (independently positioned)
+  for (let i = 0; i < M; i++) {
+    const cc = southCCs[i];
+    const intLeft = cc - halfBW + 1;
+    const intRight = cc + halfBW - 1;
+    const sb = southBranches[i];
 
     const southBottomRow = SOUTH_BRANCH_TOP + branchDepth(sb.count) - 1;
     fill(SOUTH_BRANCH_TOP, intLeft, southBottomRow, intRight, TILES.FLOOR);

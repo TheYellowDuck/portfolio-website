@@ -39,7 +39,9 @@ import { Exhibit } from "@/data/projects";
 export type GameEvent =
   | { type: "nearby"; content: Exhibit }
   | { type: "interact"; content: Exhibit }
-  | { type: "leave" };
+  | { type: "leave" }
+  | { type: "idle" }
+  | { type: "active" };
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
@@ -76,7 +78,13 @@ export class GameEngine {
   private glowAlpha: number = 0;
 
   public onEvent: ((event: GameEvent) => void) | null = null;
+  public onReady: (() => void) | null = null;
+  public onPositionChange: ((x: number, y: number) => void) | null = null;
+  private _spritesLoaded: number = 0;
+  private readonly _SPRITE_TOTAL = 20;
   private currentNearby: Interactable | null = null;
+  private idleTimer: number = 0;
+  private idleFired: boolean = false;
 
   private player = {
     x: TILE_SIZE * PLAYER_SPAWN_COL,
@@ -90,6 +98,10 @@ export class GameEngine {
     animTimer: 0,
   };
 
+  private _markLoaded() {
+    if (++this._spritesLoaded >= this._SPRITE_TOTAL) this.onReady?.();
+  }
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
@@ -97,7 +109,7 @@ export class GameEngine {
     this.camera = new Camera(canvas.width, canvas.height);
     const makeSprite = (src: string) => {
       const img = new Image();
-      img.onload = () => { this.floorSpritesLoaded++; };
+      img.onload = () => { this.floorSpritesLoaded++; this._markLoaded(); };
       img.src = src;
       return img;
     };
@@ -107,37 +119,37 @@ export class GameEngine {
     ];
     for (let i = 0; i < 5; i++) {
       const img = new Image();
-      img.onload = () => { this.wallHSpritesLoaded++; };
+      img.onload = () => { this.wallHSpritesLoaded++; this._markLoaded(); };
       img.src = `/assets/sprites/wall-side/tile${String(i).padStart(2, "0")}.png`;
       this.wallHSprites.push(img);
     }
     for (let i = 0; i < 7; i++) {
       const img = new Image();
-      img.onload = () => { this.wallTopSpritesLoaded++; };
+      img.onload = () => { this.wallTopSpritesLoaded++; this._markLoaded(); };
       img.src = `/assets/sprites/wall-top/tile${String(i).padStart(2, "0")}.png`;
       this.wallTopSprites.push(img);
     }
     this.wallHLeftSprite = new Image();
-    this.wallHLeftSprite.onload = () => { this.wallHLeftReady = true; };
+    this.wallHLeftSprite.onload = () => { this.wallHLeftReady = true; this._markLoaded(); };
     this.wallHLeftSprite.src = "/assets/sprites/wall-side-left.png";
     this.wallHRightSprite = new Image();
-    this.wallHRightSprite.onload = () => { this.wallHRightReady = true; };
+    this.wallHRightSprite.onload = () => { this.wallHRightReady = true; this._markLoaded(); };
     this.wallHRightSprite.src = "/assets/sprites/wall-side-right.png";
     this.wallTopCrossSprite = new Image();
-    this.wallTopCrossSprite.onload = () => { this.wallTopCrossReady = true; };
+    this.wallTopCrossSprite.onload = () => { this.wallTopCrossReady = true; this._markLoaded(); };
     this.wallTopCrossSprite.src = "/assets/sprites/wall-top-cross.png";
     this.wallTopIntersectSprite = new Image();
-    this.wallTopIntersectSprite.onload = () => { this.wallTopIntersectReady = true; };
+    this.wallTopIntersectSprite.onload = () => { this.wallTopIntersectReady = true; this._markLoaded(); };
     this.wallTopIntersectSprite.src = "/assets/sprites/wall-top-intersect.png";
     this.wallTopCornerSprite = new Image();
-    this.wallTopCornerSprite.onload = () => { this.wallTopCornerReady = true; };
+    this.wallTopCornerSprite.onload = () => { this.wallTopCornerReady = true; this._markLoaded(); };
     this.wallTopCornerSprite.src = "/assets/sprites/wall-top-corner.png";
     this.wallTopKnubSprite = new Image();
-    this.wallTopKnubSprite.onload = () => { this.wallTopKnubReady = true; };
+    this.wallTopKnubSprite.onload = () => { this.wallTopKnubReady = true; this._markLoaded(); };
     this.wallTopKnubSprite.src = "/assets/sprites/wall-top-knub.png";
     this.pedestalSprite = new Image();
-    this.pedestalSprite.onload = () => { this.pedestalReady = true; };
-    this.pedestalSprite.src = "/assets/sprites/pedestal-3.png";
+    this.pedestalSprite.onload = () => { this.pedestalReady = true; this._markLoaded(); };
+    this.pedestalSprite.src = "/assets/sprites/pedestal-book.png";
 
     for (const dir of IDLE_DIRS) {
       const frames: HTMLImageElement[] = [];
@@ -176,6 +188,8 @@ export class GameEngine {
       this.currentNearby = null;
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 300);
+      this.idleTimer = 0;
+      this.idleFired = false;
     }
   }
 
@@ -254,6 +268,20 @@ export class GameEngine {
     const isMoving = dx !== 0 || dy !== 0;
     if (isMoving) player.facing = dirFromInput(dx, dy);
     player.isMoving = isMoving;
+
+    if (!isMoving) {
+      this.idleTimer += dt;
+      if (!this.idleFired && this.idleTimer >= 3) {
+        this.idleFired = true;
+        this.onEvent?.({ type: "idle" });
+      }
+    } else {
+      this.idleTimer = 0;
+      if (this.idleFired) {
+        this.idleFired = false;
+        this.onEvent?.({ type: "active" });
+      }
+    }
     if (wasMoving !== isMoving) {
       player.animFrame = 0;
       player.animTimer = 0;
@@ -300,6 +328,8 @@ export class GameEngine {
       this.currentNearby = null;
       this.onEvent?.({ type: "leave" });
     }
+
+    this.onPositionChange?.(this.player.x, this.player.y);
   }
 
   private resolveCollisionX(direction: number) {
@@ -351,21 +381,61 @@ export class GameEngine {
   }
 
   private render() {
-    const { ctx, canvas, camera, player } = this;
-    const camX = Math.round(camera.x);
-    const camY = Math.round(camera.y);
+    this.drawScene(
+      this.ctx,
+      Math.round(this.camera.x),
+      Math.round(this.camera.y),
+      this.canvas.width,
+      this.canvas.height,
+      this.player,
+      this.currentNearby,
+      this.glowAlpha,
+    );
+  }
 
+  // Renders the full map (all tiles, all sprites) into destCanvas, sized automatically.
+  // Call this only after onReady has fired. Player appears at spawn facing east.
+  public renderFull(destCanvas: HTMLCanvasElement) {
+    const TOP_PAD = 3 * TILE_SIZE;
+    const BOT_PAD = 2 * TILE_SIZE;
+    destCanvas.width  = museumMap[0].length * TILE_SIZE;
+    destCanvas.height = museumMap.length    * TILE_SIZE + TOP_PAD + BOT_PAD;
+    const ctx = destCanvas.getContext('2d')!;
+    this.drawScene(
+      ctx,
+      0,        // camX: column 0 aligned to canvas left
+      -TOP_PAD, // camY: row 0 appears at y=TOP_PAD, leaving room for wall tops
+      destCanvas.width,
+      destCanvas.height,
+      { x: PLAYER_SPAWN_COL * TILE_SIZE, y: PLAYER_SPAWN_ROW * TILE_SIZE,
+        width: TILE_SIZE, height: TILE_SIZE, speed: 0,
+        facing: 'east', isMoving: false, animFrame: 0, animTimer: 0 },
+      null,
+      0,
+    );
+  }
+
+  private drawScene(
+    ctx: CanvasRenderingContext2D,
+    camX: number,
+    camY: number,
+    viewW: number,
+    viewH: number,
+    player: typeof this.player,
+    currentNearby: typeof this.currentNearby,
+    glowAlpha: number,
+  ) {
     ctx.imageSmoothingEnabled = false;
 
     // Background — shows through VOID tiles
     ctx.fillStyle = COLORS.CANVAS_BG;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, viewW, viewH);
 
     // Extra rows above so tall wall sprites (up to 3 tiles high) don't pop in.
     const startCol = Math.max(0, Math.floor(camX / TILE_SIZE) - 2);
     const startRow = Math.max(0, Math.floor(camY / TILE_SIZE) - 5);
-    const endCol   = Math.min(museumMap[0].length - 1, Math.ceil((camX + canvas.width)  / TILE_SIZE) + 2);
-    const endRow   = Math.min(museumMap.length - 1,    Math.ceil((camY + canvas.height) / TILE_SIZE) + 2);
+    const endCol   = Math.min(museumMap[0].length - 1, Math.ceil((camX + viewW)  / TILE_SIZE) + 2);
+    const endRow   = Math.min(museumMap.length - 1,    Math.ceil((camY + viewH) / TILE_SIZE) + 2);
 
     // Returns 'left', 'middle', 'right', or null for non-horizontal wall tiles.
     // Left/right edges: one horizontal neighbor is non-wall; middle: both are wall.
@@ -564,7 +634,7 @@ export class GameEngine {
           const screenX = col * TILE_SIZE - camX;
           const screenY = row * TILE_SIZE - camY;
 
-          if (this.currentNearby?.row === row && this.currentNearby?.col === col) {
+          if (currentNearby?.row === row && currentNearby?.col === col) {
             ctx.save();
             ctx.shadowColor = COLORS.SAGE;
             ctx.shadowBlur = 40;
@@ -591,7 +661,7 @@ export class GameEngine {
     }
 
     // Character glow — fades in/out as player moves behind walls
-    if (this.glowAlpha > 0) {
+    if (glowAlpha > 0) {
       const gCX = player.x - camX + TILE_SIZE / 2;
       const gCY = player.y - camY - TILE_SIZE * 0.4;
       const gRX = TILE_SIZE * 0.5;
@@ -611,7 +681,7 @@ export class GameEngine {
         ctx.shadowBlur = pass.shadowBlur;
         ctx.strokeStyle = glowColor;
         ctx.lineWidth = pass.lineWidth;
-        ctx.globalAlpha = pass.alpha * this.glowAlpha;
+        ctx.globalAlpha = pass.alpha * glowAlpha;
         ctx.stroke();
         ctx.restore();
       }
