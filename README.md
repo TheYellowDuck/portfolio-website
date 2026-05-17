@@ -56,13 +56,16 @@ Read this section first when picking up a new session.
 - A standalone **Resume pedestal** sits in the main hallway, one tile north and two tiles right of player spawn.
 - The far-right margin of the hallway is a **desk alcove** (7 tiles wide) — floor space reserved for a desk sprite and "me at my desk" character.
 - Camera snaps to player on load (no pan from top-left).
+- **Minimap** renders in the bottom-right corner — player-centered, pre-rendered static base, active branch label highlighted.
+- **ControlsHint** fades in on load and disappears after the player first moves.
+- **LoadingScreen** covers the canvas until assets are ready, then fades out.
+- `TILES` constants are defined in `tile-ids.ts` (extracted from `tilemap.ts`).
 
 ### What is stubbed / needs implementation
 
 | File | Status | What it needs |
 |------|--------|---------------|
-| `src/components/HUD.tsx` | Empty stub | Minimap, room name label, controls hint overlay |
-| `src/components/LoadingScreen.tsx` | Empty stub | Splash screen while assets preload |
+| `src/components/HUD.tsx` | Empty stub | Room name label (Minimap and ControlsHint have been extracted as separate components) |
 | `src/game/player.ts` | Empty stub | Sprite animation, facing direction (movement is inline in `engine.ts`) |
 | `src/game/collision.ts` | Empty stub | Extracted collision logic (inline in `engine.ts` as `resolveCollisionX/Y`) |
 | `projects.ts` | Wired, placeholder content | Real project URLs, descriptions, experience entries, contact links |
@@ -134,7 +137,8 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 | `engine.ts` | ✅ | Main loop, movement, collision, interaction, 3-pass render, y-sort |
 | `input.ts` | ✅ | Held-key tracking via a `Set` |
 | `camera.ts` | ✅ | `snapTo()` on load + smooth `follow()` each frame |
-| `tilemap.ts` | ✅ | Map builder, tile/object/solid constants, 3 exported maps |
+| `tilemap.ts` | ✅ | Map builder, object/solid constants, 3 exported maps, `branchLabels` |
+| `tile-ids.ts` | ✅ | `TILES` constant object — all tile ID definitions. Extracted from `tilemap.ts`. |
 | `interactables.ts` | ✅ | Auto-scans `museumMap` for interactable tiles, links to exhibits |
 | `player.ts` | 🔲 Stub | Future sprite animation + facing direction |
 | `collision.ts` | 🔲 Stub | Future extracted collision logic |
@@ -153,8 +157,10 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 | `ExhibitOverlay.tsx` | ✅ | Popup — title, description, tech tags, links, iframe embeds |
 | `ResumePopup.tsx` | ✅ | Resume popup — tabbed sections, PDF download, fetches `/api/resume` |
 | `DialogBox.tsx` | ✅ | "Press E to inspect" bottom prompt |
-| `HUD.tsx` | 🔲 Stub | Minimap, room name, controls hint |
-| `LoadingScreen.tsx` | 🔲 Stub | Splash screen |
+| `Minimap.tsx` | ✅ | Player-centered minimap — pre-rendered static map, player dot, branch labels |
+| `ControlsHint.tsx` | ✅ | "WASD to move · Shift to sprint" overlay — fades out after first move |
+| `LoadingScreen.tsx` | ✅ | Splash screen with animated dots, fades out when assets are loaded |
+| `HUD.tsx` | 🔲 Stub | Room name label (Minimap and ControlsHint are separate components) |
 | `ExhibitOverlay.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
 | `ResumePopup.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
 
@@ -162,10 +168,19 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 
 ```
 public/assets/
-├── sprites/     ← in use: character (idle + walk, 8 directions), walls, floor, pedestal (.png)
-├── tilesets/    ← Cute RPG Interior tileset present but not wired into engine
-├── maps/        ← Tiled JSON exports — not yet used
-└── audio/       ← directory exists but empty; quack.mp3 referenced by easter egg — add this file
+├── sprites/
+│   ├── character/    ← idle + walk cycle, 8 directions; states/ dir + metadata.json
+│   ├── floor/        ← 16 floor tile variants + 5 extra tile variants
+│   ├── wall-side/    ← 4 wall side variants (left, right, etc.)
+│   ├── wall-top/     ← 7 wall top variants (corner, cross, intersect, knub, etc.)
+│   ├── pedestal.png, pedestal-2.png, pedestal-3.png, pedestal-book.png
+│   ├── floor.png, floor2.png, floor3.png
+│   └── wall-side-left.png, wall-side-right.png, wall-top-corner.png, wall-top-cross.png, …
+├── ai-generated/ ← AI-generated sprite experiments (not wired into engine)
+├── tilesets/     ← Cute RPG Interior tileset present but not wired into engine
+├── maps/         ← Tiled JSON exports — not yet used
+├── resume/       ← George Zhang Resume - V8.pdf (served via /api/resume)
+└── audio/        ← directory exists but empty; quack.mp3 referenced by easter egg — add this file
 ```
 
 ---
@@ -234,8 +249,10 @@ All exported from `tilemap.ts`. Do not reconstruct them — read from these.
 |----|----------|--------|-------|
 | 0 | `FLOOR` | No | Plain walkable floor |
 | 1 | `WALL` | Yes | |
+| 2 | `PAINTING` | — | Defined in `tile-ids.ts`; not currently placed — reserved for future wall art |
+| 3 | `DOOR` | — | Defined in `tile-ids.ts`; not currently placed |
 | 17 | `VOID` | Yes | Outside museum bounds, not rendered |
-| 10 | `LOBBY` | No | Kept for compat, not currently on map |
+| 10 | `LOBBY` | No | Kept for compat; no longer assigned to a branch — do not reuse ID 10 |
 | 11 | `MAIN_HALL` | No | Projects branch (north, center) |
 | 12 | `SKILLS_WING` | No | Skills branch (north, right) |
 | 13 | `ARCHIVE` | No | Archive branch (south, left) |
@@ -504,8 +521,10 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 - [x] `DialogBox.tsx` — "Press E" prompt
 - [x] Audio on interact (Howler.js wired — audio files still needed)
 - [x] Pause/unpause engine during popup
-- [ ] HUD — minimap, room name, controls hint
-- [ ] Loading / splash screen
+- [x] `Minimap.tsx` — player-centered minimap with branch labels
+- [x] `ControlsHint.tsx` — WASD hint overlay
+- [x] `LoadingScreen.tsx` — splash screen with animated dots
+- [ ] HUD — room name label
 
 ### 🚧 Phase 6 — Sprites & Art (In Progress)
 - [x] Replace `fillRect` with `drawImage` in `engine.ts`
@@ -519,7 +538,7 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 
 ### 🔲 Phase 7 — Content
 - [ ] Fill `projects.ts` with real data (URLs, descriptions, experience)
-- [ ] Add resume PDF to `public/`
+- [x] Add resume PDF to `public/assets/resume/`
 - [ ] Add `quack.mp3` to `public/assets/audio/`
 
 ### 🔲 Phase 8 — Polish & Deploy
