@@ -8,6 +8,18 @@ const WALK_DIRS: Direction[] = ['east', 'north-east', 'north', 'north-west', 'so
 const IDLE_FRAMES = 5;
 const WALK_FRAMES = 6;
 
+interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  life: number; maxLife: number;
+  size: number;
+  r: number; g: number; b: number;
+  type: 'dust' | 'footstep' | 'sparkle';
+  phase: number;
+  freq: number;
+  amp: number;
+}
+
 function dirFromInput(dx: number, dy: number): Direction {
   if (dx > 0 && dy < 0) return 'north-east';
   if (dx > 0 && dy > 0) return 'south-east';
@@ -31,6 +43,8 @@ import {
   setSolidAt,
   PLAYER_SPAWN_COL,
   PLAYER_SPAWN_ROW,
+  NPC_COL,
+  NPC_ROW,
 } from "./tilemap";
 import { COLORS } from "@/styles/theme";
 import { getNearbyInteractable, Interactable } from "./interactables";
@@ -72,25 +86,32 @@ export class GameEngine {
   private wallTopCrossReady: boolean = false;
   private pedestalSprite: HTMLImageElement;
   private pedestalReady: boolean = false;
+  private meSprite: HTMLImageElement;
+  private meSpriteReady: boolean = false;
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private northIdleSprite: HTMLImageElement = new Image();
   private glowAlpha: number = 0;
+  private particles: Particle[] = [];
+  private footstepTimer: number = 0;
+  private sparkleTimer: number = 0;
+  private dustSpawnTimer: number = 0;
 
   public onEvent: ((event: GameEvent) => void) | null = null;
   public onReady: (() => void) | null = null;
   public onPositionChange: ((x: number, y: number) => void) | null = null;
+  public debugPhysics: boolean = false;
   private _spritesLoaded: number = 0;
-  private readonly _SPRITE_TOTAL = 20;
+  private _spritesTotal: number = 0;
   private currentNearby: Interactable | null = null;
   private idleTimer: number = 0;
   private idleFired: boolean = false;
 
   private player = {
-    x: TILE_SIZE * PLAYER_SPAWN_COL,
-    y: TILE_SIZE * PLAYER_SPAWN_ROW,
-    width: TILE_SIZE,
-    height: TILE_SIZE,
+    x: TILE_SIZE * PLAYER_SPAWN_COL + TILE_SIZE / 4,
+    y: TILE_SIZE * PLAYER_SPAWN_ROW + TILE_SIZE / 2,
+    width: TILE_SIZE / 2,
+    height: TILE_SIZE / 2,
     speed: 200,
     facing: 'east' as Direction,
     isMoving: false,
@@ -99,63 +120,61 @@ export class GameEngine {
   };
 
   private _markLoaded() {
-    if (++this._spritesLoaded >= this._SPRITE_TOTAL) this.onReady?.();
+    if (++this._spritesLoaded >= this._spritesTotal) this.onReady?.();
   }
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, cacheBust?: string) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.input = new InputManager();
     this.camera = new Camera(canvas.width, canvas.height);
-    const makeSprite = (src: string) => {
-      const img = new Image();
-      img.onload = () => { this.floorSpritesLoaded++; this._markLoaded(); };
-      img.src = src;
+    const url = (path: string) => cacheBust ? `${path}?v=${cacheBust}` : path;
+    // Registers a sprite for readiness tracking — increment total synchronously,
+    // decrement (via _markLoaded) when the image actually loads.
+    const tracked = (img: HTMLImageElement, onLoad?: () => void): HTMLImageElement => {
+      this._spritesTotal++;
+      img.onload = () => { onLoad?.(); this._markLoaded(); };
       return img;
     };
     this.floorSprites = [
-      makeSprite("/assets/sprites/floor2.png"),
-      makeSprite("/assets/sprites/floor3.png"),
+      tracked(new Image(), () => { this.floorSpritesLoaded++; }),
+      tracked(new Image(), () => { this.floorSpritesLoaded++; }),
     ];
+    this.floorSprites[0].src = url("/assets/sprites/floor2.png");
+    this.floorSprites[1].src = url("/assets/sprites/floor3.png");
     for (let i = 0; i < 5; i++) {
-      const img = new Image();
-      img.onload = () => { this.wallHSpritesLoaded++; this._markLoaded(); };
-      img.src = `/assets/sprites/wall-side/tile${String(i).padStart(2, "0")}.png`;
+      const img = tracked(new Image(), () => { this.wallHSpritesLoaded++; });
+      img.src = url(`/assets/sprites/wall-side/tile${String(i).padStart(2, "0")}.png`);
       this.wallHSprites.push(img);
     }
     for (let i = 0; i < 7; i++) {
-      const img = new Image();
-      img.onload = () => { this.wallTopSpritesLoaded++; this._markLoaded(); };
-      img.src = `/assets/sprites/wall-top/tile${String(i).padStart(2, "0")}.png`;
+      const img = tracked(new Image(), () => { this.wallTopSpritesLoaded++; });
+      img.src = url(`/assets/sprites/wall-top/tile${String(i).padStart(2, "0")}.png`);
       this.wallTopSprites.push(img);
     }
-    this.wallHLeftSprite = new Image();
-    this.wallHLeftSprite.onload = () => { this.wallHLeftReady = true; this._markLoaded(); };
-    this.wallHLeftSprite.src = "/assets/sprites/wall-side-left.png";
-    this.wallHRightSprite = new Image();
-    this.wallHRightSprite.onload = () => { this.wallHRightReady = true; this._markLoaded(); };
-    this.wallHRightSprite.src = "/assets/sprites/wall-side-right.png";
-    this.wallTopCrossSprite = new Image();
-    this.wallTopCrossSprite.onload = () => { this.wallTopCrossReady = true; this._markLoaded(); };
-    this.wallTopCrossSprite.src = "/assets/sprites/wall-top-cross.png";
-    this.wallTopIntersectSprite = new Image();
-    this.wallTopIntersectSprite.onload = () => { this.wallTopIntersectReady = true; this._markLoaded(); };
-    this.wallTopIntersectSprite.src = "/assets/sprites/wall-top-intersect.png";
-    this.wallTopCornerSprite = new Image();
-    this.wallTopCornerSprite.onload = () => { this.wallTopCornerReady = true; this._markLoaded(); };
-    this.wallTopCornerSprite.src = "/assets/sprites/wall-top-corner.png";
-    this.wallTopKnubSprite = new Image();
-    this.wallTopKnubSprite.onload = () => { this.wallTopKnubReady = true; this._markLoaded(); };
-    this.wallTopKnubSprite.src = "/assets/sprites/wall-top-knub.png";
-    this.pedestalSprite = new Image();
-    this.pedestalSprite.onload = () => { this.pedestalReady = true; this._markLoaded(); };
-    this.pedestalSprite.src = "/assets/sprites/pedestal-book.png";
+    this.wallHLeftSprite = tracked(new Image(), () => { this.wallHLeftReady = true; });
+    this.wallHLeftSprite.src = url("/assets/sprites/wall-side-left.png");
+    this.wallHRightSprite = tracked(new Image(), () => { this.wallHRightReady = true; });
+    this.wallHRightSprite.src = url("/assets/sprites/wall-side-right.png");
+    this.wallTopCrossSprite = tracked(new Image(), () => { this.wallTopCrossReady = true; });
+    this.wallTopCrossSprite.src = url("/assets/sprites/wall-top-cross.png");
+    this.wallTopIntersectSprite = tracked(new Image(), () => { this.wallTopIntersectReady = true; });
+    this.wallTopIntersectSprite.src = url("/assets/sprites/wall-top-intersect.png");
+    this.wallTopCornerSprite = tracked(new Image(), () => { this.wallTopCornerReady = true; });
+    this.wallTopCornerSprite.src = url("/assets/sprites/wall-top-corner.png");
+    this.wallTopKnubSprite = tracked(new Image(), () => { this.wallTopKnubReady = true; });
+    this.wallTopKnubSprite.src = url("/assets/sprites/wall-top-knub.png");
+    this.pedestalSprite = tracked(new Image(), () => { this.pedestalReady = true; });
+    this.pedestalSprite.src = url("/assets/sprites/pedestal-book.png");
+
+    this.meSprite = tracked(new Image(), () => { this.meSpriteReady = true; });
+    this.meSprite.src = url("/assets/sprites/me.png");
 
     for (const dir of IDLE_DIRS) {
       const frames: HTMLImageElement[] = [];
       for (let i = 0; i < IDLE_FRAMES; i++) {
         const img = new Image();
-        img.src = `/assets/sprites/character/states/standing/animations/idle/${dir}/frame_${String(i).padStart(3, "0")}.png`;
+        img.src = url(`/assets/sprites/character/states/standing/animations/idle/${dir}/frame_${String(i).padStart(3, "0")}.png`);
         frames.push(img);
       }
       this.idleSprites.set(dir, frames);
@@ -164,12 +183,12 @@ export class GameEngine {
       const frames: HTMLImageElement[] = [];
       for (let i = 0; i < WALK_FRAMES; i++) {
         const img = new Image();
-        img.src = `/assets/sprites/character/states/standing/animations/walk/${dir}/frame_${String(i).padStart(3, "0")}.png`;
+        img.src = url(`/assets/sprites/character/states/standing/animations/walk/${dir}/frame_${String(i).padStart(3, "0")}.png`);
         frames.push(img);
       }
       this.walkSprites.set(dir, frames);
     }
-    this.northIdleSprite.src = "/assets/sprites/character/states/standing/rotations/north.png";
+    this.northIdleSprite.src = url("/assets/sprites/character/states/standing/rotations/north.png");
   }
 
   resize(width: number, height: number) {
@@ -236,6 +255,7 @@ export class GameEngine {
   }
 
   private update(dt: number) {
+    this.updateParticles(dt);
     const { player } = this;
     const running = this.input.isDown("Shift");
     const runMultiplier = 1.9;
@@ -269,6 +289,16 @@ export class GameEngine {
     if (isMoving) player.facing = dirFromInput(dx, dy);
     player.isMoving = isMoving;
 
+    if (isMoving) {
+      this.footstepTimer -= dt;
+      if (this.footstepTimer <= 0) {
+        this.footstepTimer = running ? 0.15 : 0.22;
+        this.spawnFootstepDust();
+      }
+    } else {
+      this.footstepTimer = 0;
+    }
+
     if (!isMoving) {
       this.idleTimer += dt;
       if (!this.idleFired && this.idleTimer >= 3) {
@@ -294,7 +324,7 @@ export class GameEngine {
       player.animFrame = (player.animFrame + 1) % frameCount;
     }
 
-    const pCol = Math.floor((player.x + TILE_SIZE / 2) / TILE_SIZE);
+    const pCol = Math.floor((player.x + player.width / 2) / TILE_SIZE);
     const pRow = Math.floor(player.y / TILE_SIZE);
     const occluded = museumMap[pRow + 1]?.[pCol] === TILES.WALL;
     const fadeSpeed = 1.5;
@@ -307,6 +337,13 @@ export class GameEngine {
       player.y + player.height / 2,
       dt
     );
+
+    this.dustSpawnTimer -= dt;
+    if (this.dustSpawnTimer <= 0) {
+      this.dustSpawnTimer = 0.12;
+      const dustCount = this.particles.filter(p => p.type === 'dust').length;
+      if (dustCount < 38) { this.spawnDustMote(); this.spawnDustMote(); }
+    }
 
     const nearby = getNearbyInteractable(
       player.x, player.y, player.width, player.height
@@ -327,6 +364,16 @@ export class GameEngine {
     } else if (this.currentNearby !== null) {
       this.currentNearby = null;
       this.onEvent?.({ type: "leave" });
+    }
+
+    if (this.currentNearby) {
+      this.sparkleTimer -= dt;
+      if (this.sparkleTimer <= 0) {
+        this.sparkleTimer = 0.13;
+        this.spawnPedestalSparkle();
+      }
+    } else {
+      this.sparkleTimer = 0;
     }
 
     this.onPositionChange?.(this.player.x, this.player.y);
@@ -380,6 +427,117 @@ export class GameEngine {
     }
   }
 
+  private spawnDustMote() {
+    const x = this.camera.x + Math.random() * this.canvas.width;
+    const y = this.camera.y + Math.random() * this.canvas.height;
+    const maxLife = 10 + Math.random() * 10;
+    this.particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -(8 + Math.random() * 18),
+      life: maxLife, maxLife,
+      size: 0.7 + Math.random() * 1.5,
+      r: 225 + Math.floor(Math.random() * 30),
+      g: 165 + Math.floor(Math.random() * 45),
+      b: 75 + Math.floor(Math.random() * 55),
+      type: 'dust',
+      phase: Math.random() * Math.PI * 2,
+      freq: 0.35 + Math.random() * 0.55,
+      amp: 8 + Math.random() * 14,
+    });
+  }
+
+  private spawnFootstepDust() {
+    const { player } = this;
+    const footX = player.x + player.width / 2;
+    const footY = player.y + player.height - 6 - TILE_SIZE / 4;
+    for (let i = 0; i < 5; i++) {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
+      const speed = 15 + Math.random() * 45;
+      const maxLife = 0.25 + Math.random() * 0.35;
+      const v = Math.floor(Math.random() * 22) - 11;
+      this.particles.push({
+        x: footX + (Math.random() - 0.5) * 24,
+        y: footY + (Math.random() - 0.5) * 10,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: maxLife, maxLife,
+        size: 1.5 + Math.random() * 2,
+        r: Math.min(255, 201 + v), g: Math.min(255, 168 + v), b: Math.min(255, 124 + v),
+        type: 'footstep', phase: 0, freq: 0, amp: 0,
+      });
+    }
+  }
+
+  private spawnPedestalSparkle() {
+    if (!this.currentNearby) return;
+    const { row, col } = this.currentNearby;
+    const baseX = col * TILE_SIZE + TILE_SIZE / 2 + (Math.random() - 0.5) * TILE_SIZE * 0.9;
+    const baseY = row * TILE_SIZE + (Math.random() - 0.5) * TILE_SIZE * 0.6;
+    const maxLife = 0.9 + Math.random() * 0.9;
+    const isSage = Math.random() > 0.45;
+    this.particles.push({
+      x: baseX, y: baseY,
+      vx: (Math.random() - 0.5) * 28,
+      vy: -(45 + Math.random() * 65),
+      life: maxLife, maxLife,
+      size: 0.9 + Math.random() * 1.6,
+      r: isSage ? 122 : 252, g: isSage ? 158 : 200, b: isSage ? 126 : 80,
+      type: 'sparkle', phase: 0, freq: 0, amp: 0,
+    });
+  }
+
+  private updateParticles(dt: number) {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.life -= dt;
+      if (p.life <= 0) { this.particles.splice(i, 1); continue; }
+      const elapsed = p.maxLife - p.life;
+      if (p.type === 'dust') {
+        p.x += (p.vx + Math.sin(elapsed * p.freq + p.phase) * p.amp) * dt;
+        p.y += p.vy * dt;
+      } else if (p.type === 'footstep') {
+        const drag = Math.pow(0.15, dt);
+        p.vx *= drag; p.vy *= drag;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+      } else {
+        const drag = Math.pow(0.6, dt);
+        p.vx *= drag; p.vy *= drag;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+      }
+    }
+  }
+
+  private drawParticles(ctx: CanvasRenderingContext2D, camX: number, camY: number, viewW: number, viewH: number) {
+    for (const p of this.particles) {
+      const sx = p.x - camX;
+      const sy = p.y - camY;
+      if (sx < -p.size * 4 || sx > viewW + p.size * 4 ||
+          sy < -p.size * 4 || sy > viewH + p.size * 4) continue;
+      const t = p.life / p.maxLife;
+      let alpha: number;
+      if (p.type === 'dust') {
+        const fadeIn  = Math.min(1, (1 - t) / 0.12);
+        const fadeOut = Math.min(1, t / 0.18);
+        alpha = Math.min(fadeIn, fadeOut) * 0.48;
+      } else if (p.type === 'footstep') {
+        alpha = t * 0.45;
+      } else {
+        alpha = Math.sin(t * Math.PI) * 0.75;
+      }
+      if (alpha <= 0) continue;
+      if (p.type === 'sparkle') {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+      }
+      ctx.beginPath();
+      ctx.arc(sx, sy, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha.toFixed(3)})`;
+      ctx.fill();
+      if (p.type === 'sparkle') ctx.restore();
+    }
+  }
+
   private render() {
     this.drawScene(
       this.ctx,
@@ -424,6 +582,7 @@ export class GameEngine {
     player: typeof this.player,
     currentNearby: typeof this.currentNearby,
     glowAlpha: number,
+    renderParticles = true,
   ) {
     ctx.imageSmoothingEnabled = false;
 
@@ -609,11 +768,20 @@ export class GameEngine {
         }
       }
 
+      // "Me" desk sprite — static scene at the right end of the hallway
+      if (sortRow === NPC_ROW && this.meSpriteReady) {
+        const drawH = TILE_SIZE * 2.25;
+        const drawW = drawH * (this.meSprite.naturalWidth / this.meSprite.naturalHeight);
+        const centerX = Math.round(NPC_COL * TILE_SIZE - camX + TILE_SIZE / 2);
+        const sy = Math.round(NPC_ROW * TILE_SIZE - camY) - TILE_SIZE * 1.25;
+        ctx.drawImage(this.meSprite, centerX - drawW / 2, sy, drawW, drawH);
+      }
+
       // Player
       if (sortRow === playerSortRow) {
         const drawH = TILE_SIZE * 4;
-        const centerX = Math.round(player.x - camX + TILE_SIZE / 2);
-        const sy = Math.round(player.y - camY) - TILE_SIZE * 2.4;
+        const centerX = Math.round(player.x - camX + player.width / 2);
+        const sy = Math.round(player.y - camY) - TILE_SIZE * 2.65;
         const drawImg = (img: HTMLImageElement) => {
           if (!img.complete || img.naturalWidth === 0) return;
           const drawW = drawH * (img.naturalWidth / img.naturalHeight);
@@ -662,7 +830,7 @@ export class GameEngine {
 
     // Character glow — fades in/out as player moves behind walls
     if (glowAlpha > 0) {
-      const gCX = player.x - camX + TILE_SIZE / 2;
+      const gCX = player.x - camX + player.width / 2;
       const gCY = player.y - camY - TILE_SIZE * 0.4;
       const gRX = TILE_SIZE * 0.5;
       const gRY = TILE_SIZE;
@@ -685,6 +853,33 @@ export class GameEngine {
         ctx.stroke();
         ctx.restore();
       }
+    }
+
+    if (renderParticles) this.drawParticles(ctx, camX, camY, viewW, viewH);
+
+    // Debug: solid-tile outlines + entity boxes drawn on top of everything (VOID excluded)
+    if (this.debugPhysics) {
+      ctx.save();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 1.5;
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+          if (!solidMap[row]?.[col]) continue;
+          if (museumMap[row]?.[col] === TILES.VOID) continue;
+          ctx.strokeRect(col * TILE_SIZE - camX + 0.5, row * TILE_SIZE - camY + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+        }
+      }
+
+      // Player physics rect
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.strokeRect(player.x - camX + 0.5, player.y - camY + 0.5, player.width - 1, player.height - 1);
+
+      // Me sprite tile
+      ctx.strokeRect(NPC_COL * TILE_SIZE - camX + 0.5, NPC_ROW * TILE_SIZE - camY + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+
+      ctx.restore();
     }
   }
 }

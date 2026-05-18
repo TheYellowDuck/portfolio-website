@@ -71,6 +71,15 @@ Read this section first when picking up a new session.
 | `projects.ts` | Wired, placeholder content | Real project URLs, descriptions, experience entries, contact links |
 | `public/assets/audio/quack.mp3` | Missing file | Easter egg audio — add this file |
 
+### Map Snapshot (`/map-snapshot`)
+
+A developer-only page that renders the full museum map to a canvas for inspection and download.
+
+- Loads a headless `GameEngine` (1×1 dummy canvas, no game loop) with cache-busting sprite URLs (`?v=<timestamp>`) so every page refresh fetches fresh sprite files from disk, bypassing the browser cache.
+- `onReady` fires only after **all** tracked sprites have loaded (see sprite loading below), so `renderFull` always draws a complete scene.
+- The **Download PNG** button re-renders the canvas fresh before exporting, so any runtime tilemap changes are captured.
+- Cache-busting is opt-in — the main game passes no `cacheBust` argument so sprites load from the browser cache normally.
+
 ### Known constraints
 
 - **Never run `npm audit fix --force`** — it downgrades `next` to 9.x. The 2 moderate PostCSS advisories have no released fix; ignore them.
@@ -154,6 +163,7 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 | File | Status | Purpose |
 |------|--------|---------|
 | `GameCanvas.tsx` | ✅ | Mounts canvas, creates engine, wires events, manages popup state |
+| `app/map-snapshot/page.tsx` | ✅ | Developer tool — full-map render viewer with zoom/pan and PNG download |
 | `ExhibitOverlay.tsx` | ✅ | Popup — title, description, tech tags, links, iframe embeds |
 | `ResumePopup.tsx` | ✅ | Resume popup — tabbed sections, PDF download, fetches `/api/resume` |
 | `DialogBox.tsx` | ✅ | "Press E to inspect" bottom prompt |
@@ -433,6 +443,19 @@ Sprites are partially implemented. `engine.ts` uses `drawImage` for floor tiles,
 - Ceiling light overhead
 - Light cone / radial overlay (multiply blend mode)
 - Cast shadow tile
+
+### Adding sprites to `engine.ts`
+
+Sprite readiness is tracked via a `tracked()` helper inside the constructor. It increments `_spritesTotal` synchronously at registration time, then calls `_markLoaded()` when the image loads. `onReady` fires once `_spritesLoaded >= _spritesTotal`.
+
+To add a new tracked sprite:
+
+```ts
+this.myNewSprite = tracked(new Image(), () => { this.myNewReady = true; });
+this.myNewSprite.src = url("/assets/sprites/my-new-sprite.png");
+```
+
+The `url()` helper appends `?v=<cacheBust>` when the engine is constructed with a cache-busting token (used by `/map-snapshot`). No counter update needed — `_spritesTotal` adjusts automatically.
 
 ### Implementing sprites in `engine.ts`
 

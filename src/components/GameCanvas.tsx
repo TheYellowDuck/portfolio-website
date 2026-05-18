@@ -33,7 +33,7 @@ export default function GameCanvas() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "`" && activePopup) handleClose();
-      if (e.key === "f" || e.key === "F") {
+if (e.key === "f" || e.key === "F") {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen();
         } else {
@@ -53,6 +53,7 @@ export default function GameCanvas() {
     canvas.height = window.innerHeight;
 
     const engine = new GameEngine(canvas);
+    engine.debugPhysics = true;
     engineRef.current = engine;
 
     engine.onEvent = (event: GameEvent) => {

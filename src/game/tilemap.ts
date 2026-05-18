@@ -222,6 +222,9 @@ const ROWS = SOUTH_BRANCH_TOP + maxSouthDepth + 2;
 export const PLAYER_SPAWN_COL = northCenterCols[0];
 export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
 
+export const NPC_COL = COLS - 4;
+export const NPC_ROW = PLAYER_SPAWN_ROW;
+
 export interface BranchLabel {
   label: string;
   col: number;    // center column of the branch room (tiles)
@@ -389,6 +392,11 @@ function buildSolidMap(m: number[][], obj: (number | null)[][]): boolean[][] {
         solid[r + 1][c] = true;
       }
     }
+  }
+  // NPC desk collision — 1 tile tall, 3 tiles wide at the base of the sprite
+  for (let dc = -1; dc <= 1; dc++) {
+    const c = NPC_COL + dc;
+    if (c >= 0 && c < m[0].length) solid[NPC_ROW][c] = true;
   }
   return solid;
 }

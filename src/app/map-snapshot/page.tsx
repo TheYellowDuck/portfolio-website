@@ -12,6 +12,7 @@ export default function MapSnapshot() {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef      = useRef<{ startMouse: { x: number; y: number }; startPan: { x: number; y: number } } | null>(null);
+  const engineRef    = useRef<GameEngine | null>(null);
 
   const [status, setStatus]       = useState<'loading' | 'ready' | 'error'>('loading');
   const [isDragging, setIsDragging] = useState(false);
@@ -24,7 +25,8 @@ export default function MapSnapshot() {
     const dummy = document.createElement('canvas');
     dummy.width = 1;
     dummy.height = 1;
-    const engine = new GameEngine(dummy);
+    const engine = new GameEngine(dummy, String(Date.now()));
+    engineRef.current = engine;
     engine.onReady = () => {
       try {
         engine.renderFull(canvas);
@@ -41,7 +43,7 @@ export default function MapSnapshot() {
         setStatus('error');
       }
     };
-    return () => engine.stop();
+    return () => { engine.stop(); engineRef.current = null; };
   }, []);
 
   // Wheel zoom — must be non-passive to call preventDefault
@@ -108,7 +110,9 @@ export default function MapSnapshot() {
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const engine = engineRef.current;
+    if (!canvas || !engine) return;
+    engine.renderFull(canvas);
     const link = document.createElement('a');
     link.download = 'museum-map.png';
     link.href = canvas.toDataURL('image/png');
