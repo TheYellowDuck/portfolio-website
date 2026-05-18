@@ -32,4 +32,9 @@ html, body {
   /* accent */
   --color-sage:     #7a9e7e;
   --color-sage-2:   #5a8260;
+
+  /* warm popup palette (parchment theme) */
+  --color-parchment: #fef9ec;
+  --color-pine:      #4a7a44;
+  --color-walnut:    #3a2e1e;
 }

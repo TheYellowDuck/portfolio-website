@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
-import ResumePopup from "./ResumePopup";
+import ResumePopup from "./ResumePopup.tailwind";
 
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
@@ -25,41 +25,48 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-20 bg-black/55 backdrop-blur-sm"
+            className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)]"
           />
 
-          {/* Card */}
+          {/* Centered popup */}
           <div
             className="fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: `min(${popup.width ?? "500px"}, 92vw)` }}
+            style={{
+              width: `min(${popup.width ?? "500px"}, 90vw)`,
+              maxHeight: popup.embedUrl
+                ? `min(${popup.height ?? "650px"}, 90vh)`
+                : "80vh",
+            }}
           >
             <motion.div
               key="popup"
-              initial={{ opacity: 0, scale: 0.96, y: 10 }}
-              animate={{ opacity: 1, scale: 1,   y: 0  }}
-              exit={{    opacity: 0, scale: 0.96, y: 10 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="flex flex-col overflow-hidden rounded-xl border border-white/8 bg-panel shadow-[0_32px_80px_rgba(0,0,0,0.72)]"
-              style={{
-                maxHeight: popup.embedUrl
-                  ? `min(${popup.height ?? "650px"}, 90vh)`
-                  : "80vh",
-              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="w-full flex flex-col overflow-hidden rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)]"
+              style={{ maxHeight: "inherit" }}
             >
               {/* Header */}
-              <div className="flex shrink-0 items-start justify-between gap-4 px-6 pt-6 pb-5">
-                <div className="min-w-0 flex-1">
+              <div
+                className={`shrink-0 flex justify-between items-start gap-4 px-5 py-4 bg-parchment${
+                  popup.description || popup.embedUrl
+                    ? " border-b border-[rgba(58,46,30,0.15)]"
+                    : ""
+                }`}
+              >
+                <div className="flex-1">
                   {popup.title && (
-                    <h2 className="font-mono text-[15px] font-semibold leading-snug text-ink-1 m-0">
+                    <h2 className="m-0 font-mono text-[22px] text-pine">
                       {popup.title}
                     </h2>
                   )}
                   {popup.tech && popup.tech.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 mt-2">
                       {popup.tech.map((t) => (
                         <span
                           key={t}
-                          className="font-mono text-[11px] text-sage bg-[rgba(122,158,126,0.10)] border border-[rgba(122,158,126,0.28)] rounded-[5px] px-2.5 py-0.5"
+                          className="font-mono text-[12px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2.5 py-0.5"
                         >
                           {t}
                         </span>
@@ -70,58 +77,72 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
                 <button
                   onClick={onClose}
-                  aria-label="Close"
-                  className="mt-0.5 shrink-0 rounded-md p-1.5 text-ink-4 border-none cursor-pointer bg-transparent transition-colors hover:bg-white/6 hover:text-ink-2"
+                  className="shrink-0 bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer"
                 >
-                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                    <path d="M1 1l11 11M12 1L1 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-                  </svg>
+                  close [`]
                 </button>
               </div>
 
               {/* Body */}
-              {(popup.description || popup.embedUrl || popup.links?.length) ? (
-                <div
-                  className={`flex flex-col border-t border-white/6 ${
-                    popup.embedUrl ? "flex-1 overflow-hidden" : "overflow-y-auto"
-                  }`}
-                >
-                  {popup.description && (
-                    <p className="shrink-0 px-6 py-5 font-mono text-[13px] leading-relaxed text-ink-2 m-0">
-                      {popup.description}
-                    </p>
-                  )}
+              <div
+                className={`flex flex-col bg-parchment${
+                  popup.embedUrl ? " flex-1 overflow-hidden" : " overflow-y-auto"
+                }`}
+              >
+                {(popup.description || (popup.skills && popup.skills.length > 0)) && (
+                  <div className="flex shrink-0">
+                    {popup.description && (
+                      <p className="flex-1 m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
+                        {popup.description}
+                      </p>
+                    )}
+                    {popup.skills && popup.skills.length > 0 && (
+                      <div
+                        className={`shrink-0 w-[160px] py-4 pr-5 pl-5${
+                          popup.description ? " border-l border-[rgba(58,46,30,0.1)]" : ""
+                        }`}
+                      >
+                        <p className="m-0 mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-sage">
+                          Skills Used
+                        </p>
+                        <div className="flex flex-col gap-1.5">
+                          {popup.skills.map((s) => (
+                            <span
+                              key={s}
+                              className="font-mono text-[12px] text-walnut bg-[rgba(122,158,126,0.1)] border border-[rgba(122,158,126,0.38)] rounded px-2 py-0.5"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                  {popup.embedUrl && (
-                    <iframe
-                      src={popup.embedUrl}
-                      className="min-h-[300px] flex-1 border-0 bg-black"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-                    />
-                  )}
+                {popup.embedUrl && (
+                  <iframe
+                    src={popup.embedUrl}
+                    className="flex-1 min-h-[300px] border-0 bg-black"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+                  />
+                )}
 
-                  {popup.links && popup.links.length > 0 && (
-                    <div className="flex shrink-0 flex-wrap gap-2 border-t border-white/6 px-6 py-4">
-                      {popup.links.map((link) => (
-                        <a
-                          key={link.url}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(122,158,126,0.35)] bg-[rgba(122,158,126,0.10)] px-4 py-2 font-mono text-[13px] text-sage no-underline transition-colors hover:bg-[rgba(122,158,126,0.18)] hover:text-ink-1"
-                        >
-                          {link.label}
-                          <span className="opacity-50 text-[11px]">↗</span>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : null}
-
-              {/* Footer */}
-              <div className="shrink-0 border-t border-white/6 px-6 py-2.5">
-                <span className="select-none font-mono text-[11px] text-ink-4">` to close</span>
+                {popup.links && popup.links.length > 0 && (
+                  <div className="shrink-0 flex flex-wrap gap-2.5 px-5 py-4">
+                    {popup.links.map((link) => (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2"
+                      >
+                        {link.label} →
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

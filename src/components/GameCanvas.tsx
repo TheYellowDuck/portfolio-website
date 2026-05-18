@@ -6,7 +6,7 @@ import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { Howl, Howler } from "howler";
 import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
-import ExhibitOverlay from "./ExhibitOverlay";
+import ExhibitOverlay from "./ExhibitOverlay.tailwind";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
 
@@ -233,14 +233,14 @@ export default function GameCanvas() {
         <div className="fixed bottom-8 left-8 z-20 flex gap-2">
           <button
             onClick={toggleBgmMute}
-            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-[#3a2e1e] shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
             title={isBgmMuted ? "Unmute music" : "Mute music"}
           >
             {isBgmMuted ? "♪ off" : "♪ on"}
           </button>
           <button
             onClick={toggleSfxMute}
-            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-[#3a2e1e] shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
             title={isSfxMuted ? "Unmute effects" : "Mute effects"}
           >
             {isSfxMuted ? "sfx off" : "sfx on"}
