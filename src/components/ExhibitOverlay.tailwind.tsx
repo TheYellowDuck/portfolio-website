@@ -25,7 +25,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)]"
+            className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
           />
 
           {/* Centered popup */}
@@ -77,7 +77,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
                 <button
                   onClick={onClose}
-                  className="shrink-0 bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer"
+                  className="shrink-0 select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 >
                   close [`]
                 </button>
@@ -136,7 +136,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2"
+                        className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                       >
                         {link.label} →
                       </a>

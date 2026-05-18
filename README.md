@@ -13,7 +13,7 @@ The portfolio should feel like wandering into a well-loved private library at go
 
 ### Color palette
 
-Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts). Note: `ExhibitOverlay.tsx` and `ResumePopup.tsx` currently use hardcoded hex values (restored to match original design); `styles/theme.ts` is not the active source of truth for those components.
+Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts) and surfaced as Tailwind tokens (`parchment`, `pine`, `walnut`, `sage`, etc.) in `globals.css`. The active overlay components (`ExhibitOverlay.tailwind.tsx`, `ResumePopup.tailwind.tsx`) consume these tokens exclusively — no hardcoded hex values.
 
 | Role | Value | Description |
 |------|-------|-------------|
@@ -120,7 +120,7 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 ┌─────────────────────────────────────────────────┐
 │                  REACT LAYER                     │
 │  GameCanvas.tsx ← listens for engine events      │
-│  ExhibitOverlay.tsx   DialogBox.tsx   HUD.tsx     │
+│  ExhibitOverlay.tailwind.tsx  DialogBox.tsx  HUD.tsx │
 └──────────────────────┬──────────────────────────┘
                        │ events: nearby / interact / leave
 ┌──────────────────────┴──────────────────────────┐
@@ -164,15 +164,15 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 |------|--------|---------|
 | `GameCanvas.tsx` | ✅ | Mounts canvas, creates engine, wires events, manages popup state |
 | `app/map-snapshot/page.tsx` | ✅ | Developer tool — full-map render viewer with zoom/pan and PNG download |
-| `ExhibitOverlay.tsx` | ✅ | Popup — title, description, tech tags, links, iframe embeds |
-| `ResumePopup.tsx` | ✅ | Resume popup — tabbed sections, PDF download, fetches `/api/resume` |
+| `ExhibitOverlay.tailwind.tsx` | ✅ | **Active** — exhibit popup (Tailwind CSS); warm parchment theme, hover/focus states, backdrop blur |
+| `ResumePopup.tailwind.tsx` | ✅ | **Active** — resume popup (Tailwind CSS); tabbed sections, PDF download, themed scrollbar |
 | `DialogBox.tsx` | ✅ | "Press E to inspect" bottom prompt |
 | `Minimap.tsx` | ✅ | Player-centered minimap — pre-rendered static map, player dot, branch labels |
 | `ControlsHint.tsx` | ✅ | "WASD to move · Shift to sprint" overlay — fades out after first move |
 | `LoadingScreen.tsx` | ✅ | Splash screen with animated dots, fades out when assets are loaded |
 | `HUD.tsx` | 🔲 Stub | Room name label (Minimap and ControlsHint are separate components) |
-| `ExhibitOverlay.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
-| `ResumePopup.tailwind.tsx` | 🗃 Backup | Dark sidebar variant — not wired into app |
+| `ExhibitOverlay.tsx` | 🗃 Reference | Original inline-style implementation — not wired into app |
+| `ResumePopup.tsx` | 🗃 Reference | Original inline-style implementation — not wired into app |
 
 ### `/public/assets/`
 
@@ -538,8 +538,9 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 - [x] Exhibit layout symmetry correction for south branches
 
 ### ✅ Phase 5 — React Overlay UI
-- [x] `ExhibitOverlay.tsx` — text, tags, links, iframe
-- [x] `ResumePopup.tsx` — tabbed resume viewer, PDF download, `/api/resume` integration
+
+- [x] `ExhibitOverlay.tailwind.tsx` — text, tags, links, iframe; Tailwind CSS with hover/focus states and backdrop blur
+- [x] `ResumePopup.tailwind.tsx` — tabbed resume viewer, PDF download, `/api/resume` integration; themed scrollbar
 - [x] `DialogBox.tsx` — "Press E" prompt
 - [x] Audio on interact (Howler.js wired — audio files still needed)
 - [x] Pause/unpause engine during popup

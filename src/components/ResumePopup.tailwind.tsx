@@ -23,8 +23,8 @@ interface ResumePopupProps {
 }
 
 export default function ResumePopup({ onClose }: ResumePopupProps) {
-  const [data, setData]            = useState<ResumeData | null>(null);
-  const [error, setError]          = useState(false);
+  const [data, setData]               = useState<ResumeData | null>(null);
+  const [error, setError]             = useState(false);
   const [activeTitle, setActiveTitle] = useState<string | null>(null);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)]"
+        className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
       />
 
       {/* Popup shell */}
@@ -90,13 +90,13 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                 </h2>
                 {data && (
                   <div className="flex flex-wrap gap-x-3.5 gap-y-1 mt-1.5 font-mono text-[12px] text-walnut opacity-80">
-                    {data.contact.phone    && <span>{data.contact.phone}</span>}
-                    {data.contact.email    && <span>{data.contact.email}</span>}
+                    {data.contact.phone && <span>{data.contact.phone}</span>}
+                    {data.contact.email && <span>{data.contact.email}</span>}
                     {data.contact.linkedin && (
                       <a
                         href={`https://${data.contact.linkedin.replace(/^https?:\/\//, "")}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="text-pine no-underline"
+                        className="text-pine no-underline transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
                       >
                         LinkedIn ↗
                       </a>
@@ -105,7 +105,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                       <a
                         href={data.contact.github}
                         target="_blank" rel="noopener noreferrer"
-                        className="text-pine no-underline"
+                        className="text-pine no-underline transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
                       >
                         GitHub ↗
                       </a>
@@ -119,14 +119,14 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                   <a
                     href={data.pdfPath}
                     download
-                    className="font-mono text-[12px] text-walnut no-underline whitespace-nowrap bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-3 py-1"
+                    className="font-mono text-[12px] text-walnut no-underline whitespace-nowrap bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-3 py-1 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                   >
                     Download PDF
                   </a>
                 )}
                 <button
                   onClick={onClose}
-                  className="bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer"
+                  className="select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 >
                   close [`]
                 </button>
@@ -142,10 +142,10 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     key={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     className={[
-                      "font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-opacity duration-150",
+                      "font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
                       active
                         ? "bg-[rgba(122,158,126,0.15)] border-[rgba(122,158,126,0.5)] border-b-parchment text-pine opacity-100"
-                        : "bg-transparent border-transparent text-walnut opacity-60",
+                        : "bg-transparent border-transparent text-walnut opacity-60 hover:opacity-80",
                     ].join(" ")}
                   >
                     {sectionLabel(s.title)}
@@ -156,7 +156,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
           </div>
 
           {/* ── Body ────────────────────────────────────────────────── */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 bg-parchment">
+          <div className="flex-1 overflow-y-auto px-6 py-4 bg-parchment [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
             {!data && !error && <LoadingState />}
             {error            && <ErrorState />}
 
