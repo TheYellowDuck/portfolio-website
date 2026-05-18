@@ -595,7 +595,7 @@ export class GameEngine {
   // Renders the full map (all tiles, all sprites) into destCanvas, sized automatically.
   // Call this only after onReady has fired. Player appears at spawn facing east.
   public renderFull(destCanvas: HTMLCanvasElement) {
-    const TOP_PAD = 3 * TILE_SIZE;
+    const TOP_PAD = 2 * TILE_SIZE;
     const BOT_PAD = 2 * TILE_SIZE;
     destCanvas.width  = museumMap[0].length * TILE_SIZE;
     destCanvas.height = museumMap.length    * TILE_SIZE + TOP_PAD + BOT_PAD;
@@ -743,7 +743,7 @@ export class GameEngine {
           }
           if (!sprite) continue;
           ctx.save();
-          ctx.translate(screenX + TILE_SIZE / 2, screenY - 2.5 * TILE_SIZE);
+          ctx.translate(screenX + TILE_SIZE / 2, screenY - 1.5 * TILE_SIZE);
           ctx.rotate(angle);
           ctx.drawImage(sprite, -TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
           ctx.restore();
@@ -761,7 +761,7 @@ export class GameEngine {
           const screenX = col * TILE_SIZE - camX;
           const screenY = row * TILE_SIZE - camY;
           ctx.save();
-          ctx.translate(screenX + TILE_SIZE / 2, screenY - 2.5 * TILE_SIZE);
+          ctx.translate(screenX + TILE_SIZE / 2, screenY - 1.5 * TILE_SIZE);
           ctx.rotate(angle);
           ctx.drawImage(this.wallTopKnubSprite, -TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
           ctx.restore();
@@ -780,17 +780,17 @@ export class GameEngine {
           if (type === 'right'  && this.wallHRightReady)          img = this.wallHRightSprite;
           if (type === 'middle' && this.wallHSpritesLoaded === 5) img = this.wallHSprites[(row * 7 + col * 13) % 5];
           if (!img) continue;
-          ctx.drawImage(img, screenX, screenY - 2 * TILE_SIZE, TILE_SIZE, 3 * TILE_SIZE);
+          ctx.drawImage(img, screenX, screenY - 1 * TILE_SIZE, TILE_SIZE, 2 * TILE_SIZE);
           if (type === 'middle') {
             const iAngle = intersectAngle(row, col);
             if (iAngle !== null && this.wallTopIntersectReady) {
               ctx.save();
-              ctx.translate(screenX + TILE_SIZE / 2, screenY - 2.5 * TILE_SIZE);
+              ctx.translate(screenX + TILE_SIZE / 2, screenY - 1.5 * TILE_SIZE);
               ctx.rotate(iAngle);
               ctx.drawImage(this.wallTopIntersectSprite, -TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
               ctx.restore();
             } else if (iAngle === null && this.wallTopSpritesLoaded === 7) {
-              ctx.drawImage(this.wallTopSprites[(row * 11 + col * 17) % 7], screenX, screenY - 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+              ctx.drawImage(this.wallTopSprites[(row * 11 + col * 17) % 7], screenX, screenY - 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
           }
           if ((type === 'left' || type === 'right') && this.wallTopCornerReady) {
@@ -800,7 +800,7 @@ export class GameEngine {
               const hasW = type === 'right';
               const angle = hasN && hasW ? 0 : hasN ? Math.PI / 2 : hasW ? -Math.PI / 2 : Math.PI;
               ctx.save();
-              ctx.translate(screenX + TILE_SIZE / 2, screenY - 2.5 * TILE_SIZE);
+              ctx.translate(screenX + TILE_SIZE / 2, screenY - 1.5 * TILE_SIZE);
               ctx.rotate(angle);
               ctx.drawImage(this.wallTopCornerSprite, -TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
               ctx.restore();

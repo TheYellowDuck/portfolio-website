@@ -206,7 +206,7 @@ const maxSouthDepth = southBranches.length
   : 0;
 
 const HALLWAY_ROW_TOP    = maxNorthDepth + CONNECTOR_LEN + 2;
-const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 8;
+const HALLWAY_ROW_BOTTOM = HALLWAY_ROW_TOP + 6;
 const NORTH_ENTRANCE_ROW  = HALLWAY_ROW_TOP - 1;
 const SOUTH_ENTRANCE_ROW  = HALLWAY_ROW_BOTTOM + 1;
 // Branch rooms sit CONNECTOR_LEN + 1 rows away from the main hallway edge.
