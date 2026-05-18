@@ -219,11 +219,14 @@ const COLS = 1 + LEFT_MARGIN
   + RIGHT_MARGIN + 1;
 const ROWS = SOUTH_BRANCH_TOP + maxSouthDepth + 2;
 
-export const PLAYER_SPAWN_COL = northCenterCols[0];
-export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
+const FIRST_NORTH_CENTER_COL = northCenterCols[0];
+const HALLWAY_CENTER_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
+
+export const PLAYER_SPAWN_COL = FIRST_NORTH_CENTER_COL - 1;
+export const PLAYER_SPAWN_ROW = HALLWAY_CENTER_ROW;
 
 export const NPC_COL = COLS - 5;
-export const NPC_ROW = PLAYER_SPAWN_ROW;
+export const NPC_ROW = HALLWAY_CENTER_ROW;
 
 export interface BranchLabel {
   label: string;
@@ -340,8 +343,8 @@ function buildMap(): number[][] {
     }
   }
 
-  // Resume pedestal — standalone interactable in the hallway
-  set(PLAYER_SPAWN_ROW - 1, PLAYER_SPAWN_COL + 2, TILES.RESUME);
+  // Resume pedestal — center of first north branch
+  set(HALLWAY_CENTER_ROW - 1, FIRST_NORTH_CENTER_COL, TILES.RESUME);
 
   // Easter egg — hidden in hallway, looks like plain floor
   set(Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2) - 1, 2, TILES.EASTER_EGG);

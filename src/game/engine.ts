@@ -104,6 +104,7 @@ export class GameEngine {
   public onEvent: ((event: GameEvent) => void) | null = null;
   public onReady: (() => void) | null = null;
   public onPositionChange: ((x: number, y: number) => void) | null = null;
+  public onFootstep: ((running: boolean) => void) | null = null;
   public debugPhysics: boolean = false;
   private _spritesLoaded: number = 0;
   private _spritesTotal: number = 0;
@@ -320,6 +321,7 @@ export class GameEngine {
       if (this.footstepTimer <= 0) {
         this.footstepTimer = running ? 0.15 : 0.22;
         this.spawnFootstepDust();
+        this.onFootstep?.(running);
       }
     } else {
       this.footstepTimer = 0;
@@ -549,8 +551,9 @@ export class GameEngine {
     }
   }
 
-  private drawParticles(ctx: CanvasRenderingContext2D, camX: number, camY: number, viewW: number, viewH: number) {
+  private drawParticles(ctx: CanvasRenderingContext2D, camX: number, camY: number, viewW: number, viewH: number, layer: 'footstep' | 'sparkle' | 'dust') {
     for (const p of this.particles) {
+      if (p.type !== layer) continue;
       const sx = p.x - camX;
       const sy = p.y - camY;
       if (sx < -p.size * 4 || sx > viewW + p.size * 4 ||
@@ -819,6 +822,11 @@ export class GameEngine {
         ctx.drawImage(activeMe, centerX - drawW / 2, sy, drawW, drawH);
       }
 
+      // Footstep particles — drawn at player depth, beneath the player sprite
+      if (renderParticles && sortRow === playerSortRow) {
+        this.drawParticles(ctx, camX, camY, viewW, viewH, 'footstep');
+      }
+
       // Player
       if (sortRow === playerSortRow) {
         const drawH = TILE_SIZE * 4;
@@ -867,6 +875,11 @@ export class GameEngine {
             ctx.fillRect(screenX + pad, screenY + pad, TILE_SIZE - pad * 2, TILE_SIZE - pad * 2);
           }
         }
+
+        // Sparkles — drawn after the pedestal sprite, same depth row
+        if (renderParticles && currentNearby?.row === row) {
+          this.drawParticles(ctx, camX, camY, viewW, viewH, 'sparkle');
+        }
       }
     }
 
@@ -897,7 +910,7 @@ export class GameEngine {
       }
     }
 
-    if (renderParticles) this.drawParticles(ctx, camX, camY, viewW, viewH);
+    if (renderParticles) this.drawParticles(ctx, camX, camY, viewW, viewH, 'dust');
 
     // Debug: solid-tile outlines + entity boxes drawn on top of everything (VOID excluded)
     if (this.debugPhysics) {
