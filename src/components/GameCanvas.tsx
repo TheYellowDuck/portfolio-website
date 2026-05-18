@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
 import ExhibitOverlay from "./ExhibitOverlay";
@@ -38,7 +38,16 @@ export default function GameCanvas() {
     if (musicStartedRef.current) return;
     musicStartedRef.current = true;
     setMusicStarted(true);
-    const howl = new Howl({ src: BG_MUSIC_SRCS, loop: true, volume: 0.1, html5: true });
+    const howl = new Howl({
+      src: BG_MUSIC_SRCS, loop: true, volume: 0.1, html5: true,
+      onpause: () => {
+        setTimeout(() => {
+          if (musicStartedRef.current && bgMusicRef.current && !bgMusicRef.current.playing()) {
+            bgMusicRef.current.play();
+          }
+        }, 50);
+      },
+    });
     bgMusicRef.current = howl;
     howl.play();
   }, []);
@@ -68,12 +77,19 @@ export default function GameCanvas() {
   const [bigMap, setBigMap] = useState(false);
 
   useEffect(() => {
-    const handleVisibility = () => {
-      if (document.visibilityState !== "visible" || !musicStartedRef.current) return;
-      if (bgMusicRef.current && !bgMusicRef.current.playing()) bgMusicRef.current.play();
+    const resume = () => {
+      if (Howler.ctx?.state === "suspended") Howler.ctx.resume();
+      if (musicStartedRef.current && bgMusicRef.current && !bgMusicRef.current.playing()) {
+        bgMusicRef.current.play();
+      }
     };
+    const handleVisibility = () => { if (document.visibilityState === "visible") resume(); };
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+    const heartbeat = setInterval(resume, 4000);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      clearInterval(heartbeat);
+    };
   }, []);
 
   const handleClose = useCallback(() => {

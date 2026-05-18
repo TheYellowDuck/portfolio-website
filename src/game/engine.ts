@@ -92,6 +92,13 @@ export class GameEngine {
   private meBlinkTimer: number = 3 + Math.random() * 2;
   private meBlinking: boolean = false;
   private meBlinkDuration: number = 0;
+  private meLightOffSprite: HTMLImageElement;
+  private meLightOffReady: boolean = false;
+  private flickerTimer: number = 18 + Math.random() * 25;
+  private flickerBurst: number[] = [];
+  private flickerPhaseTimer: number = 0;
+  private lightsOff: boolean = false;
+  private flickerSustainTimer: number = 0;
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private northIdleSprite: HTMLImageElement = new Image();
@@ -176,6 +183,8 @@ export class GameEngine {
     this.meSprite.src = url("/assets/sprites/me-2.png");
     this.meBlinkSprite = tracked(new Image(), () => { this.meBlinkReady = true; });
     this.meBlinkSprite.src = url("/assets/sprites/me-blink.png");
+    this.meLightOffSprite = tracked(new Image(), () => { this.meLightOffReady = true; });
+    this.meLightOffSprite.src = url("/assets/sprites/me-light-off.png");
 
     for (const dir of IDLE_DIRS) {
       const frames: HTMLImageElement[] = [];
@@ -352,6 +361,36 @@ export class GameEngine {
       if (this.meBlinkTimer <= 0) {
         this.meBlinking = true;
         this.meBlinkDuration = 0.12;
+      }
+    }
+
+    // Light flicker burst
+    if (this.flickerSustainTimer > 0) {
+      this.flickerSustainTimer -= dt;
+      if (this.flickerSustainTimer <= 0) {
+        this.lightsOff = false;
+      }
+    } else if (this.flickerBurst.length > 0) {
+      this.flickerPhaseTimer -= dt;
+      if (this.flickerPhaseTimer <= 0) {
+        this.flickerBurst.shift();
+        this.lightsOff = !this.lightsOff;
+        if (this.flickerBurst.length > 0) {
+          this.flickerPhaseTimer = this.flickerBurst[0];
+        } else if (Math.random() < 0.5) {
+          this.lightsOff = true;
+          this.flickerSustainTimer = 3;
+        } else {
+          this.lightsOff = false;
+        }
+      }
+    } else {
+      this.flickerTimer -= dt;
+      if (this.flickerTimer <= 0) {
+        this.flickerTimer = 18 + Math.random() * 25;
+        this.flickerBurst = [0.05, 0.07, 0.04, 0.1, 0.05, 0.08, 0.3, 0.06, 0.55];
+        this.lightsOff = true;
+        this.flickerPhaseTimer = this.flickerBurst[0];
       }
     }
 
@@ -815,7 +854,12 @@ export class GameEngine {
       // "Me" desk sprite — static scene at the right end of the hallway
       if (sortRow === NPC_ROW && this.meSpriteReady) {
         const drawH = TILE_SIZE * 2.5;
-        const activeMe = (this.meBlinking && this.meBlinkReady) ? this.meBlinkSprite : this.meSprite;
+        let activeMe: HTMLImageElement;
+        if (this.lightsOff && this.meLightOffReady) {
+          activeMe = this.meLightOffSprite;
+        } else {
+          activeMe = (this.meBlinking && this.meBlinkReady) ? this.meBlinkSprite : this.meSprite;
+        }
         const drawW = drawH * (activeMe.naturalWidth / activeMe.naturalHeight);
         const centerX = Math.round(NPC_COL * TILE_SIZE - camX + TILE_SIZE / 2);
         const sy = Math.round(NPC_ROW * TILE_SIZE - camY) - TILE_SIZE * 1.25;
