@@ -222,7 +222,7 @@ const ROWS = SOUTH_BRANCH_TOP + maxSouthDepth + 2;
 export const PLAYER_SPAWN_COL = northCenterCols[0];
 export const PLAYER_SPAWN_ROW = Math.floor((HALLWAY_ROW_TOP + HALLWAY_ROW_BOTTOM) / 2);
 
-export const NPC_COL = COLS - 4;
+export const NPC_COL = COLS - 5;
 export const NPC_ROW = PLAYER_SPAWN_ROW;
 
 export interface BranchLabel {

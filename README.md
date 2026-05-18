@@ -47,7 +47,7 @@ Read this section first when picking up a new session.
 
 - Game engine runs: canvas renders at 60fps, player moves, smooth-lerp camera follows, collision works.
 - Player is 56×56 px, spawns at the leftmost branch center column, hallway center row + 1.
-- Map is **auto-generated** — width and height are computed from branch definitions. Currently ~72 cols × 83 rows at `TILE_SIZE = 64`. Do not hardcode dimensions anywhere.
+- Map is **auto-generated** — width and height are computed from branch definitions. Do not hardcode dimensions anywhere.
 - Three rendering layers: **floor/wall** (pass 1) → **player + objects y-sorted** (pass 2) → **glow** (on top).
 - Objects (`objectMap`) are rendered above the floor and y-sorted against the player for a 3D depth effect.
 - Collision is driven by `solidMap` (a `boolean[][]`), which is independent of tile type — allows sprites to extend beyond their tile bounds.
@@ -199,19 +199,18 @@ public/assets/
 
 ```
 North (top)
-                 col 8         col 31        col 54
-                   │             │              │
-              ┌─────────┐  ┌─────────┐  ┌─────────┐
-              │Experience│  │Projects │  │  Skills  │
-              │ (4 ex)  │  │ (5 ex)  │  │ (6 ex)  │
-              └────┬────┘  └────┬────┘  └────┬────┘
-═══════════════════╪════════════╪═════════════╪══════════════════╗
- ★  [R]            │            │             │              desk ║  hallway
-═══════════════════╪════════════╪═════════════╪══════════════════╝
-              ┌────┴────┐  ┌────┴────┐  ┌────┴────┐
-              │ Archive │  │ About Me│  │  Links  │
-              │ (6 ex)  │  │ (3 ex)  │  │ (4 ex)  │
-              └─────────┘  └─────────┘  └─────────┘
+    ┌───────────┐    ┌───────────┐    ┌───────────┐
+    │ Experience│    │ Projects  │    │  Archive  │
+    │  (11 ex)  │    │  (5 ex)   │    │  (6 ex)   │
+    └─────┬─────┘    └─────┬─────┘    └─────┬─────┘
+══════════╪════════════════╪════════════════╪═════════════════╗
+ ★  [R]   │                │                │            desk ║  hallway
+══════════╪══════════╪═════╪══════════╪═════╪═════════════════╝
+                     │                │
+               ┌─────┴─────┐    ┌─────┴─────┐
+               │  About Me │    │   Links   │
+               │  (3 ex)   │    │  (4 ex)   │
+               └───────────┘    └───────────┘
 South (bottom)
 
 ★  = Easter Egg — hidden far-left of hallway, looks like plain floor
@@ -264,9 +263,9 @@ All exported from `tilemap.ts`. Do not reconstruct them — read from these.
 | 17 | `VOID` | Yes | Outside museum bounds, not rendered |
 | 10 | `LOBBY` | No | Kept for compat; no longer assigned to a branch — do not reuse ID 10 |
 | 11 | `MAIN_HALL` | No | Projects branch (north, center) |
-| 12 | `SKILLS_WING` | No | Skills branch (north, right) |
-| 13 | `ARCHIVE` | No | Archive branch (south, left) |
-| 14 | `OFFICE` | No | About Me branch (south, center) |
+| 12 | `SKILLS_WING` | No | Defined in `tile-ids.ts`; not currently assigned to a branch |
+| 13 | `ARCHIVE` | No | Archive branch (north, right) |
+| 14 | `OFFICE` | No | About Me branch (south, left) |
 | 15 | `GIFT_SHOP` | No | Links branch (south, right) |
 | 16 | `EASTER_EGG` | No | Hidden in hallway, no pedestal |
 | 18 | `EXPERIENCE` | No | Experience branch (north, left) |
@@ -299,15 +298,14 @@ objectMap[row][col] = OBJECTS.DESK;
 
 ```ts
 const northBranches: BranchDef[] = [
-  { tile: TILES.EXPERIENCE,  count: 4 },
-  { tile: TILES.MAIN_HALL,   count: 5 },
-  { tile: TILES.SKILLS_WING, count: 6 },
+  { tile: TILES.EXPERIENCE, count: experienceExhibits.length, label: "Experience" },
+  { tile: TILES.MAIN_HALL,  count: mainHallExhibits.length,  label: "Projects" },
+  { tile: TILES.ARCHIVE,    count: archiveExhibits.length,   label: "Archive" },
 ];
 
 const southBranches: BranchDef[] = [
-  { tile: TILES.ARCHIVE,   count: 6 },
-  { tile: TILES.OFFICE,    count: 3 },
-  { tile: TILES.GIFT_SHOP, count: 4 },
+  { tile: TILES.OFFICE,    count: officeExhibits.length,    label: "About Me" },
+  { tile: TILES.GIFT_SHOP, count: giftShopExhibits.length,  label: "Links" },
 ];
 ```
 
@@ -368,14 +366,15 @@ All content lives in [`src/data/projects.ts`](src/data/projects.ts).
 
 | Array | Tile | Branch | Slots |
 |-------|------|--------|-------|
-| `experienceExhibits` | `EXPERIENCE` (18) | North left | 4 |
+| `experienceExhibits` | `EXPERIENCE` (18) | North left | 11 |
 | `mainHallExhibits` | `MAIN_HALL` (11) | North center | 5 |
-| `skillsExhibits` | `SKILLS_WING` (12) | North right | 6 |
-| `archiveExhibits` | `ARCHIVE` (13) | South left | 6 |
-| `officeExhibits` | `OFFICE` (14) | South center | 3 |
+| `archiveExhibits` | `ARCHIVE` (13) | North right | 6 |
+| `officeExhibits` | `OFFICE` (14) | South left | 3 |
 | `giftShopExhibits` | `GIFT_SHOP` (15) | South right | 4 |
 | `resumeExhibit` | `RESUME` (19) | Hallway pedestal | 1 |
 | `easterEggExhibits` | `EASTER_EGG` (16) | Hidden hallway | 1 |
+| `skillsExhibits` | `SKILLS_WING` (12) | — (not wired) | 6 |
+| `lobbyExhibits` | `LOBBY` (10) | — (not wired) | — |
 
 Exhibits beyond the slot count are ignored. The slot count equals `count` in the branch definition.
 
@@ -387,7 +386,7 @@ Exhibits beyond the slot count are ignored. The slot count equals `count` in the
 2. Add it to `INTERACTABLE_TILES` (`Set<number>` — keep the explicit type annotation).
 3. Add a floor color entry to `TILE_COLORS` (use `"#2a2a4a"` — the object layer provides the visual).
 4. Add the branch to `northBranches` or `southBranches` with a `count`.
-5. Add a matching entry to the other array (they must stay the same length).
+5. Optionally add an entry to the other side — north and south can have different lengths; the shorter side's branches are centered between adjacent pairs on the longer side.
 6. Create an exhibit array and register it in `roomRegistry` in `projects.ts`.
 
 ---
@@ -526,7 +525,7 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 - [x] Auto-generated map from branch definitions
 - [x] VOID tiles — museum silhouette, not a rectangle
 - [x] Snapshot-based wall adjacency pass
-- [x] 6 branch rooms + hallway + desk alcove
+- [x] 5 branch rooms + hallway + desk alcove
 - [x] Standalone resume pedestal in hallway
 - [x] Hidden Easter egg
 

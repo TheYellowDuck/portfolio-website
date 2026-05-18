@@ -1,3 +1,5 @@
+import { TILES } from "@/game/tile-ids";
+
 // ============================================================
 // EXHIBIT — One simple type for everything
 // ============================================================
@@ -376,8 +378,6 @@ export const easterEggExhibits: Exhibit[] = [
 // ============================================================
 // ROOM REGISTRY — maps tile IDs → exhibit lists
 // ============================================================
-
-import { TILES } from "@/game/tile-ids";
 
 export const roomRegistry: Record<number, Exhibit[]> = {
   [TILES.EXPERIENCE]: experienceExhibits,

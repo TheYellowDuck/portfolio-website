@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
-import { Exhibit, ExhibitPopup, resumeExhibit } from "@/data/projects";
+import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { Howl } from "howler";
 import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
@@ -22,8 +22,9 @@ export default function GameCanvas() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [prompt, setPrompt] = useState<string | null>(null);
-  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(resumeExhibit[0].popup ?? null);
+  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
   const [showControls, setShowControls] = useState(false);
+  const [bigMap, setBigMap] = useState(false);
 
   const handleClose = useCallback(() => {
     setActivePopup(null);
@@ -33,13 +34,14 @@ export default function GameCanvas() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "`" && activePopup) handleClose();
-if (e.key === "f" || e.key === "F") {
+      if (e.key === "f" || e.key === "F") {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen();
         } else {
           document.exitFullscreen();
         }
       }
+      if (e.key === "m" || e.key === "M") setBigMap(prev => !prev);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -53,7 +55,7 @@ if (e.key === "f" || e.key === "F") {
     canvas.height = window.innerHeight;
 
     const engine = new GameEngine(canvas);
-    engine.debugPhysics = true;
+    engine.debugPhysics = false;
     engineRef.current = engine;
 
     engine.onEvent = (event: GameEvent) => {
@@ -99,7 +101,12 @@ if (e.key === "f" || e.key === "F") {
 
     let spritesReady = false;
     let timerReady = false;
-    const tryHide = () => { if (spritesReady && timerReady) setIsLoading(false); };
+    const tryHide = () => {
+      if (spritesReady && timerReady) {
+        setIsLoading(false);
+        engineRef.current?.setPaused(false);
+      }
+    };
     engine.onReady = () => { spritesReady = true; tryHide(); };
     engine.onPositionChange = (x, y) => minimapDrawRef.current?.(x, y);
     setTimeout(() => { timerReady = true; tryHide(); }, 1500);
@@ -124,11 +131,15 @@ if (e.key === "f" || e.key === "F") {
       <canvas
         ref={canvasRef}
         className="block [image-rendering:pixelated]"
+        onClick={e => {
+          const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+          engineRef.current?.clickAt(e.clientX - rect.left, e.clientY - rect.top);
+        }}
       />
       <ControlsHint visible={showControls && !isLoading && !activePopup} />
       <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />
-      <Minimap onRegisterDraw={handleRegisterMinimapDraw} />
+      <Minimap onRegisterDraw={handleRegisterMinimapDraw} bigMap={bigMap} onOpenBigMap={() => setBigMap(true)} onCloseBigMap={() => setBigMap(false)} />
       <LoadingScreen visible={isLoading} />
     </>
   );

@@ -4,20 +4,11 @@ export class Camera {
 
   private viewportWidth: number;
   private viewportHeight: number;
-//   private worldWidth: number;
-//   private worldHeight: number;
   private smoothing: number = 0.08;
 
-  constructor(
-    viewportWidth: number,
-    viewportHeight: number,
-    // worldWidth: number,
-    // worldHeight: number
-  ) {
+  constructor(viewportWidth: number, viewportHeight: number) {
     this.viewportWidth = viewportWidth;
     this.viewportHeight = viewportHeight;
-    // this.worldWidth = worldWidth;
-    // this.worldHeight = worldHeight;
   }
 
   resize(viewportWidth: number, viewportHeight: number) {
@@ -38,19 +29,5 @@ export class Camera {
     const factor = 1 - Math.pow(1 - this.smoothing, dt * 60);
     this.x += (desiredX - this.x) * factor;
     this.y += (desiredY - this.y) * factor;
-
-    // If the world is smaller than the viewport, center the world
-    // Otherwise, clamp so the camera doesn't show past the edges
-    // if (this.worldWidth <= this.viewportWidth) {
-    //   this.x = -(this.viewportWidth - this.worldWidth) / 2;
-    // } else {
-    //   this.x = Math.max(0, Math.min(this.worldWidth - this.viewportWidth, this.x));
-    // }
-
-    // if (this.worldHeight <= this.viewportHeight) {
-    //   this.y = -(this.viewportHeight - this.worldHeight) / 2;
-    // } else {
-    //   this.y = Math.max(0, Math.min(this.worldHeight - this.viewportHeight, this.y));
-    // }
   }
 }

@@ -1,5 +1,23 @@
 import InputManager from "./input";
 import { Camera } from "./camera";
+import {
+  TILE_SIZE,
+  TILES,
+  TILE_COLORS,
+  OBJECT_COLORS,
+  museumMap,
+  objectMap,
+  solidMap,
+  setTileAt,
+  setSolidAt,
+  PLAYER_SPAWN_COL,
+  PLAYER_SPAWN_ROW,
+  NPC_COL,
+  NPC_ROW,
+} from "./tilemap";
+import { COLORS } from "@/styles/theme";
+import { getNearbyInteractable, interactables, Interactable } from "./interactables";
+import { Exhibit } from "@/data/projects";
 
 type Direction = 'east' | 'west' | 'north' | 'south' | 'north-east' | 'north-west' | 'south-east' | 'south-west';
 
@@ -30,25 +48,6 @@ function dirFromInput(dx: number, dy: number): Direction {
   if (dy < 0) return 'north';
   return 'south';
 }
-
-import {
-  TILE_SIZE,
-  TILES,
-  TILE_COLORS,
-  OBJECT_COLORS,
-  museumMap,
-  objectMap,
-  solidMap,
-  setTileAt,
-  setSolidAt,
-  PLAYER_SPAWN_COL,
-  PLAYER_SPAWN_ROW,
-  NPC_COL,
-  NPC_ROW,
-} from "./tilemap";
-import { COLORS } from "@/styles/theme";
-import { getNearbyInteractable, Interactable } from "./interactables";
-import { Exhibit } from "@/data/projects";
 
 export type GameEvent =
   | { type: "nearby"; content: Exhibit }
@@ -88,6 +87,11 @@ export class GameEngine {
   private pedestalReady: boolean = false;
   private meSprite: HTMLImageElement;
   private meSpriteReady: boolean = false;
+  private meBlinkSprite: HTMLImageElement;
+  private meBlinkReady: boolean = false;
+  private meBlinkTimer: number = 3 + Math.random() * 2;
+  private meBlinking: boolean = false;
+  private meBlinkDuration: number = 0;
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private northIdleSprite: HTMLImageElement = new Image();
@@ -168,7 +172,9 @@ export class GameEngine {
     this.pedestalSprite.src = url("/assets/sprites/pedestal-book.png");
 
     this.meSprite = tracked(new Image(), () => { this.meSpriteReady = true; });
-    this.meSprite.src = url("/assets/sprites/me.png");
+    this.meSprite.src = url("/assets/sprites/me-2.png");
+    this.meBlinkSprite = tracked(new Image(), () => { this.meBlinkReady = true; });
+    this.meBlinkSprite.src = url("/assets/sprites/me-blink.png");
 
     for (const dir of IDLE_DIRS) {
       const frames: HTMLImageElement[] = [];
@@ -199,6 +205,26 @@ export class GameEngine {
       this.player.x + this.player.width  / 2,
       this.player.y + this.player.height / 2,
     );
+  }
+
+  triggerInteract() {
+    if (this.currentNearby && !this.interactCooldown) {
+      this.onEvent?.({ type: "interact", content: this.currentNearby.content });
+      this.interactCooldown = true;
+      setTimeout(() => { this.interactCooldown = false; }, 500);
+    }
+  }
+
+  clickAt(screenX: number, screenY: number) {
+    if (this.paused || this.interactCooldown) return;
+    const col = Math.floor((screenX + this.camera.x) / TILE_SIZE);
+    const row = Math.floor((screenY + this.camera.y) / TILE_SIZE);
+    const target = interactables.find(i => i.col === col && (i.row === row || i.row === row - 1));
+    if (target) {
+      this.onEvent?.({ type: "interact", content: target.content });
+      this.interactCooldown = true;
+      setTimeout(() => { this.interactCooldown = false; }, 500);
+    }
   }
 
   setPaused(paused: boolean) {
@@ -312,6 +338,21 @@ export class GameEngine {
         this.onEvent?.({ type: "active" });
       }
     }
+    // Me-sprite blink
+    if (this.meBlinking) {
+      this.meBlinkDuration -= dt;
+      if (this.meBlinkDuration <= 0) {
+        this.meBlinking = false;
+        this.meBlinkTimer = 3 + Math.random() * 4;
+      }
+    } else {
+      this.meBlinkTimer -= dt;
+      if (this.meBlinkTimer <= 0) {
+        this.meBlinking = true;
+        this.meBlinkDuration = 0.12;
+      }
+    }
+
     if (wasMoving !== isMoving) {
       player.animFrame = 0;
       player.animTimer = 0;
@@ -770,11 +811,12 @@ export class GameEngine {
 
       // "Me" desk sprite — static scene at the right end of the hallway
       if (sortRow === NPC_ROW && this.meSpriteReady) {
-        const drawH = TILE_SIZE * 2.25;
-        const drawW = drawH * (this.meSprite.naturalWidth / this.meSprite.naturalHeight);
+        const drawH = TILE_SIZE * 2.5;
+        const activeMe = (this.meBlinking && this.meBlinkReady) ? this.meBlinkSprite : this.meSprite;
+        const drawW = drawH * (activeMe.naturalWidth / activeMe.naturalHeight);
         const centerX = Math.round(NPC_COL * TILE_SIZE - camX + TILE_SIZE / 2);
         const sy = Math.round(NPC_ROW * TILE_SIZE - camY) - TILE_SIZE * 1.25;
-        ctx.drawImage(this.meSprite, centerX - drawW / 2, sy, drawW, drawH);
+        ctx.drawImage(activeMe, centerX - drawW / 2, sy, drawW, drawH);
       }
 
       // Player
