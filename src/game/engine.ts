@@ -647,7 +647,6 @@ export class GameEngine {
       this.canvas.width,
       this.canvas.height,
       this.player,
-      this.currentNearby,
       this.glowAlpha,
     );
   }
@@ -669,7 +668,6 @@ export class GameEngine {
       { x: PLAYER_SPAWN_COL * TILE_SIZE, y: PLAYER_SPAWN_ROW * TILE_SIZE,
         width: TILE_SIZE, height: TILE_SIZE, speed: 0,
         facing: 'east', isMoving: false, animFrame: 0, animTimer: 0 },
-      null,
       0,
     );
   }
@@ -681,7 +679,6 @@ export class GameEngine {
     viewW: number,
     viewH: number,
     player: typeof this.player,
-    currentNearby: typeof this.currentNearby,
     glowAlpha: number,
     renderParticles = true,
   ) {
@@ -878,7 +875,7 @@ export class GameEngine {
         } else {
           activeMe = (this.meBlinking && this.meBlinkReady) ? this.meBlinkSprite : this.meSprite;
         }
-        const drawW = drawH * (activeMe.naturalWidth / activeMe.naturalHeight);
+        const drawW = TILE_SIZE * 3;
         const centerX = Math.round(NPC_COL * TILE_SIZE - camX + TILE_SIZE / 2);
         const sy = Math.round(NPC_ROW * TILE_SIZE - camY) - TILE_SIZE * 1.25;
         ctx.drawImage(activeMe, centerX - drawW / 2, sy, drawW, drawH);
