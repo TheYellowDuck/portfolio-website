@@ -1,28 +1,92 @@
-// Audio only (easter egg quack)
+// ============================================================
+// HOW TO ADD AN EXHIBIT
+// ============================================================
+// All exhibits live in projects.ts. Find the array for the
+// room you want, add an object, and you're done — no other
+// files need to change.
+//
+// ROOM ARRAYS  →  where they appear in the museum
+// ─────────────────────────────────────────────────────────
+//   lobbyExhibits       Lobby / entrance
+//   mainHallExhibits    Main hall — featured projects
+//   skillsExhibits      Skills & tech wing
+//   archiveExhibits     Archive — side / older projects
+//   experienceExhibits  Work experience wing
+//   officeExhibits      Office — about me
+//   giftShopExhibits    Gift shop — contact links
+//   easterEggExhibits   Hidden easter eggs
+//   resumeExhibit       Standalone resume pedestal
+//
+// ============================================================
+// EXHIBIT SHAPE
+// ============================================================
+//
+// interface Exhibit {
+//   audio?: string;       // path from /public, e.g. "/assets/audio/quack.mp3"
+//   popup?: ExhibitPopup;
+// }
+//
+// interface ExhibitPopup {
+//   title?:       string;
+//   description?: string;
+//   tech?:        string[];        // shown as pill tags
+//   skills?:      string[];        // shown as a dedicated column
+//   links?:       { label: string; url: string }[];
+//   embedUrl?:    string;          // renders an iframe in the popup
+//   width?:       string;          // e.g. "900px", "80vw"  (defaults provided)
+//   height?:      string;          // e.g. "600px", "70vh"
+//   type?:        "resume";        // special popup — shows the resume viewer
+// }
+
+// ============================================================
+// EXAMPLES
+// ============================================================
+
+// Audio only (easter egg / secret)
 { audio: "/assets/audio/quack.mp3" },
 
 // Text popup only
 { popup: { title: "Hello", description: "Welcome to the museum." } },
 
-// Full project with links
+// Full project card
 {
   popup: {
     title: "My Project",
-    description: "Built this cool thing.",
-    tech: ["React", "TypeScript"],
-    links: [{ label: "GitHub", url: "https://..." }],
+    description: "What it does and why it matters.",
+    tech: ["React", "TypeScript", "Node.js"],
+    links: [
+      { label: "GitHub", url: "https://github.com/you/project" },
+      { label: "Live Demo", url: "https://yourproject.com" },
+    ],
   },
 },
 
-// Playable demo
+// Project with skills column
+{
+  popup: {
+    title: "My Project",
+    description: "A short description.",
+    tech: ["Python", "FastAPI"],
+    skills: ["REST API design", "Data modeling", "CI/CD"],
+    links: [{ label: "GitHub", url: "https://github.com/you/project" }],
+  },
+},
+
+// Playable demo / embedded iframe
 {
   popup: {
     title: "My Game",
+    description: "A Tetris-inspired puzzle game.",
+    tech: ["C++", "X11"],
     embedUrl: "https://my-game.vercel.app",
     width: "900px",
     height: "650px",
+    links: [{ label: "Source Code", url: "https://github.com/you/game" }],
   },
 },
+
+// Resume popup (opens the resume viewer)
+{ popup: { type: "resume" } },
 
 // Audio + popup together
 {

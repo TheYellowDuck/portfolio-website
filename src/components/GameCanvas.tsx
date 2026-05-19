@@ -17,18 +17,25 @@ const BG_MUSIC_SRCS = [
 ];
 
 export default function GameCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<GameEngine | null>(null);
-  const howlCache = useRef<Map<string, Howl>>(new Map());
+  const canvasRef   = useRef<HTMLCanvasElement>(null);
+  const engineRef   = useRef<GameEngine | null>(null);
+  const howlCache   = useRef<Map<string, Howl>>(new Map());
   const footstepHowls = useRef<Howl[]>([]);
+  const scaleRef    = useRef(1);
 
-  const minimapDrawRef = useRef<((x: number, y: number) => void) | null>(null);
-  const bgMusicRef = useRef<Howl | null>(null);
+  const minimapDrawRef  = useRef<((x: number, y: number) => void) | null>(null);
+  const bgMusicRef      = useRef<Howl | null>(null);
   const musicStartedRef = useRef(false);
   const [isBgmMuted, setIsBgmMuted] = useState(false);
   const [isSfxMuted, setIsSfxMuted] = useState(false);
   const sfxMutedRef = useRef(false);
   const [musicStarted, setMusicStarted] = useState(false);
+
+  // Virtual canvas dimensions — captured from the actual window on mount so
+  // scale starts at exactly 1 and the game looks identical to before.
+  // SSR-safe default (1920×1080) is overwritten before the first paint.
+  const [base, setBase] = useState({ w: 1920, h: 1080 });
+  const [scale, setScale] = useState(1);
 
   const handleRegisterMinimapDraw = useCallback((fn: (x: number, y: number) => void) => {
     minimapDrawRef.current = fn;
@@ -61,11 +68,11 @@ export default function GameCanvas() {
     });
   }, []);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [prompt, setPrompt] = useState<string | null>(null);
+  const [isLoading, setIsLoading]     = useState(true);
+  const [prompt, setPrompt]           = useState<string | null>(null);
   const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
   const [showControls, setShowControls] = useState(false);
-  const [bigMap, setBigMap] = useState(false);
+  const [bigMap, setBigMap]           = useState(false);
 
   useEffect(() => {
     const resume = () => {
@@ -109,8 +116,13 @@ export default function GameCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Lock the virtual resolution to the window size at load time.
+    // CSS transform handles all subsequent scaling — the canvas never resizes.
+    const baseW = window.innerWidth;
+    const baseH = window.innerHeight;
+    canvas.width  = baseW;
+    canvas.height = baseH;
+    setBase({ w: baseW, h: baseH });
 
     const engine = new GameEngine(canvas);
     engine.debugPhysics = false;
@@ -130,22 +142,17 @@ export default function GameCanvas() {
         case "nearby":
           setPrompt("Press E to inspect");
           break;
-
         case "leave":
           setPrompt(null);
           break;
-
         case "idle":
           setShowControls(true);
           break;
-
         case "active":
           setShowControls(false);
           break;
-
         case "interact": {
           const exhibit: Exhibit = event.content;
-
           {
             let howl = howlCache.current.get("__interact__");
             if (!howl) {
@@ -155,7 +162,6 @@ export default function GameCanvas() {
             }
             howl.play();
           }
-
           if (exhibit.audio) {
             let howl = howlCache.current.get(exhibit.audio);
             if (!howl) {
@@ -165,7 +171,6 @@ export default function GameCanvas() {
             }
             howl.play();
           }
-
           if (exhibit.popup) {
             setActivePopup(exhibit.popup);
             setPrompt(null);
@@ -178,7 +183,7 @@ export default function GameCanvas() {
     };
 
     let spritesReady = false;
-    let timerReady = false;
+    let timerReady   = false;
     const tryHide = () => {
       if (spritesReady && timerReady) {
         setIsLoading(false);
@@ -191,10 +196,13 @@ export default function GameCanvas() {
     engine.start();
     engine.setPaused(true);
 
+    // On resize: zoom-fill via CSS scale (Math.max) so the screen is always
+    // fully covered with no black bars. Edges may be slightly cropped when
+    // the aspect ratio changes significantly.
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      engine.resize(window.innerWidth, window.innerHeight);
+      const s = Math.max(window.innerWidth / baseW, window.innerHeight / baseH);
+      scaleRef.current = s;
+      setScale(s);
     };
     window.addEventListener("resize", handleResize);
 
@@ -205,39 +213,60 @@ export default function GameCanvas() {
   }, []);
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        className="block [image-rendering:pixelated]"
-        onClick={e => {
-          startBgMusic();
-          const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-          engineRef.current?.clickAt(e.clientX - rect.left, e.clientY - rect.top);
-        }}
-      />
-      <ControlsHint visible={showControls && !isLoading && !activePopup} />
-      <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
-      <ExhibitOverlay popup={activePopup} onClose={handleClose} />
-      <Minimap onRegisterDraw={handleRegisterMinimapDraw} bigMap={bigMap} onOpenBigMap={() => setBigMap(true)} onCloseBigMap={() => setBigMap(false)} />
-      <LoadingScreen visible={isLoading} />
-      {musicStarted && (
-        <div className="fixed bottom-8 left-8 z-20 flex gap-2">
-          <button
-            onClick={toggleBgmMute}
-            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-            title={isBgmMuted ? "Unmute music" : "Mute music"}
-          >
-            {isBgmMuted ? "♪ off" : "♪ on"}
-          </button>
-          <button
-            onClick={toggleSfxMute}
-            className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-            title={isSfxMuted ? "Unmute effects" : "Mute effects"}
-          >
-            {isSfxMuted ? "sfx off" : "sfx on"}
-          </button>
-        </div>
-      )}
-    </>
+    // Outer: fills the viewport; overflow-hidden clips the edges that zoom-fill
+    // pushes beyond the screen boundary on unusual aspect ratios.
+    <div className="fixed inset-0 overflow-hidden flex items-center justify-center bg-[#1c1508]">
+      {/* Inner: fixed virtual resolution, uniformly scaled to fill the screen */}
+      <div
+        style={{
+          "--game-scale": scale,
+          width:  base.w,
+          height: base.h,
+        } as React.CSSProperties}
+        className="transform-[scale(var(--game-scale))] origin-center relative overflow-hidden shrink-0"
+      >
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 block [image-rendering:pixelated]"
+          onClick={e => {
+            startBgMusic();
+            const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+            // Convert screen-space click to game-space by dividing out CSS scale.
+            engineRef.current?.clickAt(
+              (e.clientX - rect.left) / scaleRef.current,
+              (e.clientY - rect.top)  / scaleRef.current,
+            );
+          }}
+        />
+        <ControlsHint visible={showControls && !isLoading && !activePopup} />
+        <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
+        <ExhibitOverlay popup={activePopup} onClose={handleClose} />
+        <Minimap
+          onRegisterDraw={handleRegisterMinimapDraw}
+          bigMap={bigMap}
+          onOpenBigMap={() => setBigMap(true)}
+          onCloseBigMap={() => setBigMap(false)}
+        />
+        <LoadingScreen visible={isLoading} />
+        {musicStarted && (
+          <div className="fixed bottom-8 left-8 z-20 flex gap-2">
+            <button
+              onClick={toggleBgmMute}
+              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+              title={isBgmMuted ? "Unmute music" : "Mute music"}
+            >
+              {isBgmMuted ? "♪ off" : "♪ on"}
+            </button>
+            <button
+              onClick={toggleSfxMute}
+              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+              title={isSfxMuted ? "Unmute effects" : "Mute effects"}
+            >
+              {isSfxMuted ? "sfx off" : "sfx on"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
