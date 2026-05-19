@@ -221,7 +221,7 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-10 flex flex-col items-end gap-1">
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-1">
         <div
           className="overflow-hidden rounded-2xl border border-[rgba(122,158,126,0.4)] bg-[#1c1508] shadow-[0_4px_20px_rgba(28,21,8,0.4)] opacity-85 cursor-pointer"
           onClick={onOpenBigMap}
@@ -231,6 +231,7 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
             width={W}
             height={H}
             className="block [image-rendering:pixelated]"
+            style={{ width: `min(22vw, ${W}px)`, height: "auto" }}
           />
         </div>
         <p className="text-[rgba(200,178,130,0.4)] text-[10px] font-mono tracking-widest select-none pr-1">

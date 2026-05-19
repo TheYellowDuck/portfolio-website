@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { Howl, Howler } from "howler";
@@ -10,18 +10,25 @@ import ExhibitOverlay from "./ExhibitOverlay.tailwind";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
 
-// M4A listed first so Safari picks it (no OGG support); Chrome/Firefox fall through to OGG.
 const BG_MUSIC_SRCS = [
   "/assets/audio/Interior Birdecorator Explore_CUTE.m4a",
   "/assets/audio/Interior Birdecorator Explore_CUTE.ogg",
 ];
 
+// SSR/pre-mount fallback — overwritten at mount with the actual window size.
+const BASE_W = 1920;
+const BASE_H = 1080;
+
 export default function GameCanvas() {
-  const canvasRef   = useRef<HTMLCanvasElement>(null);
-  const engineRef   = useRef<GameEngine | null>(null);
-  const howlCache   = useRef<Map<string, Howl>>(new Map());
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const engineRef    = useRef<GameEngine | null>(null);
+  const howlCache    = useRef<Map<string, Howl>>(new Map());
   const footstepHowls = useRef<Howl[]>([]);
-  const scaleRef    = useRef(1);
+  const scaleRef     = useRef(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const safeFrameRef = useRef<HTMLDivElement>(null);
+  // Grow-only base size: starts at mount's window size, never shrinks.
+  const baseSizeRef  = useRef({ w: BASE_W, h: BASE_H });
 
   const minimapDrawRef  = useRef<((x: number, y: number) => void) | null>(null);
   const bgMusicRef      = useRef<Howl | null>(null);
@@ -31,11 +38,60 @@ export default function GameCanvas() {
   const sfxMutedRef = useRef(false);
   const [musicStarted, setMusicStarted] = useState(false);
 
-  // Virtual canvas dimensions — captured from the actual window on mount so
-  // scale starts at exactly 1 and the game looks identical to before.
-  // SSR-safe default (1920×1080) is overwritten before the first paint.
-  const [base, setBase] = useState({ w: 1920, h: 1080 });
-  const [scale, setScale] = useState(1);
+  // Layout is driven by direct DOM mutation — no setState means no cascading renders.
+  const updateLayout = useCallback(() => {
+    const { w: bw, h: bh } = baseSizeRef.current;
+
+    // Grow the base if the window expanded beyond the initial size.
+    const newW = Math.max(bw, window.innerWidth);
+    const newH = Math.max(bh, window.innerHeight);
+    if (newW !== bw || newH !== bh) {
+      baseSizeRef.current = { w: newW, h: newH };
+      if (containerRef.current) {
+        containerRef.current.style.width      = `${newW}px`;
+        containerRef.current.style.height     = `${newH}px`;
+        containerRef.current.style.marginLeft = `${-newW / 2}px`;
+        containerRef.current.style.marginTop  = `${-newH / 2}px`;
+      }
+      if (canvasRef.current) {
+        canvasRef.current.width  = newW;
+        canvasRef.current.height = newH;
+      }
+      engineRef.current?.resize(newW, newH);
+    }
+
+    const { w, h } = baseSizeRef.current;
+    const s = Math.max(window.innerWidth / w, window.innerHeight / h);
+    scaleRef.current = s;
+    const cx = Math.max(0, (w - window.innerWidth  / s) / 2);
+    const cy = Math.max(0, (h - window.innerHeight / s) / 2);
+    if (containerRef.current) {
+      containerRef.current.style.transform = `scale(${s})`;
+    }
+    if (safeFrameRef.current) {
+      safeFrameRef.current.style.top    = `${cy + 8}px`;
+      safeFrameRef.current.style.right  = `${cx + 8}px`;
+      safeFrameRef.current.style.bottom = `${cy + 8}px`;
+      safeFrameRef.current.style.left   = `${cx + 8}px`;
+    }
+  }, []);
+
+  // Runs before first paint — use screen dimensions as the fixed base so full-window
+  // users always get scale≈1 and small windows proportionally scale down.
+  useLayoutEffect(() => {
+    const bw = window.screen.width;
+    const bh = window.screen.height;
+    baseSizeRef.current = { w: bw, h: bh };
+    if (containerRef.current) {
+      containerRef.current.style.width      = `${bw}px`;
+      containerRef.current.style.height     = `${bh}px`;
+      containerRef.current.style.marginLeft = `${-bw / 2}px`;
+      containerRef.current.style.marginTop  = `${-bh / 2}px`;
+    }
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, [updateLayout]);
 
   const handleRegisterMinimapDraw = useCallback((fn: (x: number, y: number) => void) => {
     minimapDrawRef.current = fn;
@@ -51,7 +107,7 @@ export default function GameCanvas() {
   }, []);
 
   const toggleBgmMute = useCallback(() => {
-    setIsBgmMuted((prev: boolean) => {
+    setIsBgmMuted(prev => {
       const next = !prev;
       if (bgMusicRef.current) bgMusicRef.current.mute(next);
       return next;
@@ -59,7 +115,7 @@ export default function GameCanvas() {
   }, []);
 
   const toggleSfxMute = useCallback(() => {
-    setIsSfxMuted((prev: boolean) => {
+    setIsSfxMuted(prev => {
       const next = !prev;
       sfxMutedRef.current = next;
       howlCache.current.forEach(h => h.mute(next));
@@ -68,11 +124,11 @@ export default function GameCanvas() {
     });
   }, []);
 
-  const [isLoading, setIsLoading]     = useState(true);
-  const [prompt, setPrompt]           = useState<string | null>(null);
-  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
+  const [isLoading, setIsLoading]       = useState(true);
+  const [prompt, setPrompt]             = useState<string | null>(null);
+  const [activePopup, setActivePopup]   = useState<ExhibitPopup | null>(null);
   const [showControls, setShowControls] = useState(false);
-  const [bigMap, setBigMap]           = useState(false);
+  const [bigMap, setBigMap]             = useState(false);
 
   useEffect(() => {
     const resume = () => {
@@ -81,11 +137,11 @@ export default function GameCanvas() {
         bgMusicRef.current.play();
       }
     };
-    const handleVisibility = () => { if (document.visibilityState === "visible") resume(); };
-    document.addEventListener("visibilitychange", handleVisibility);
+    const onVisibility = () => { if (document.visibilityState === "visible") resume(); };
+    document.addEventListener("visibilitychange", onVisibility);
     const heartbeat = setInterval(resume, 4000);
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
+      document.removeEventListener("visibilitychange", onVisibility);
       clearInterval(heartbeat);
     };
   }, []);
@@ -96,33 +152,25 @@ export default function GameCanvas() {
   }, []);
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       startBgMusic();
       if (e.key === "`" && activePopup) handleClose();
       if (e.key === "f" || e.key === "F") {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
       }
       if (e.key === "m" || e.key === "M") setBigMap(prev => !prev);
     };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [activePopup, handleClose, startBgMusic]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Lock the virtual resolution to the window size at load time.
-    // CSS transform handles all subsequent scaling — the canvas never resizes.
-    const baseW = window.innerWidth;
-    const baseH = window.innerHeight;
-    canvas.width  = baseW;
-    canvas.height = baseH;
-    setBase({ w: baseW, h: baseH });
+    canvas.width  = baseSizeRef.current.w;
+    canvas.height = baseSizeRef.current.h;
 
     const engine = new GameEngine(canvas);
     engine.debugPhysics = false;
@@ -139,18 +187,10 @@ export default function GameCanvas() {
 
     engine.onEvent = (event: GameEvent) => {
       switch (event.type) {
-        case "nearby":
-          setPrompt("Press E to inspect");
-          break;
-        case "leave":
-          setPrompt(null);
-          break;
-        case "idle":
-          setShowControls(true);
-          break;
-        case "active":
-          setShowControls(false);
-          break;
+        case "nearby":  setPrompt("Press E to inspect"); break;
+        case "leave":   setPrompt(null); break;
+        case "idle":    setShowControls(true); break;
+        case "active":  setShowControls(false); break;
         case "interact": {
           const exhibit: Exhibit = event.content;
           {
@@ -196,34 +236,18 @@ export default function GameCanvas() {
     engine.start();
     engine.setPaused(true);
 
-    // On resize: zoom-fill via CSS scale (Math.max) so the screen is always
-    // fully covered with no black bars. Edges may be slightly cropped when
-    // the aspect ratio changes significantly.
-    const handleResize = () => {
-      const s = Math.max(window.innerWidth / baseW, window.innerHeight / baseH);
-      scaleRef.current = s;
-      setScale(s);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      engine.stop();
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => engine.stop();
   }, []);
 
   return (
-    // Outer: fills the viewport; overflow-hidden clips the edges that zoom-fill
-    // pushes beyond the screen boundary on unusual aspect ratios.
-    <div className="fixed inset-0 overflow-hidden flex items-center justify-center bg-[#1c1508]">
-      {/* Inner: fixed virtual resolution, uniformly scaled to fill the screen */}
+    // Outer: fills viewport, clips edges that zoom-fill pushes past screen boundary.
+    <div className="fixed inset-0 overflow-hidden bg-[#1c1508]">
+      {/* Inner: fixed reference resolution. Centered via absolute+negative-margin (reliable
+          cross-browser vs flex). Transform and safe-frame insets written by updateLayout. */}
       <div
-        style={{
-          "--game-scale": scale,
-          width:  base.w,
-          height: base.h,
-        } as React.CSSProperties}
-        className="transform-[scale(var(--game-scale))] origin-center relative overflow-hidden shrink-0"
+        ref={containerRef}
+        className="absolute overflow-hidden origin-center"
+        style={{ top: "50%", left: "50%" }}
       >
         <canvas
           ref={canvasRef}
@@ -231,41 +255,49 @@ export default function GameCanvas() {
           onClick={e => {
             startBgMusic();
             const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-            // Convert screen-space click to game-space by dividing out CSS scale.
             engineRef.current?.clickAt(
               (e.clientX - rect.left) / scaleRef.current,
               (e.clientY - rect.top)  / scaleRef.current,
             );
           }}
         />
-        <ControlsHint visible={showControls && !isLoading && !activePopup} />
-        <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
+
+        {/* Full-screen overlays sit outside the safe frame so they cover the whole canvas. */}
         <ExhibitOverlay popup={activePopup} onClose={handleClose} />
-        <Minimap
-          onRegisterDraw={handleRegisterMinimapDraw}
-          bigMap={bigMap}
-          onOpenBigMap={() => setBigMap(true)}
-          onCloseBigMap={() => setBigMap(false)}
-        />
         <LoadingScreen visible={isLoading} />
-        {musicStarted && (
-          <div className="fixed bottom-8 left-8 z-20 flex gap-2">
-            <button
-              onClick={toggleBgmMute}
-              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-              title={isBgmMuted ? "Unmute music" : "Mute music"}
-            >
-              {isBgmMuted ? "♪ off" : "♪ on"}
-            </button>
-            <button
-              onClick={toggleSfxMute}
-              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-              title={isSfxMuted ? "Unmute effects" : "Mute effects"}
-            >
-              {isSfxMuted ? "sfx off" : "sfx on"}
-            </button>
-          </div>
-        )}
+
+        {/* Safe frame: inset written by updateLayout before first paint. */}
+        <div
+          ref={safeFrameRef}
+          className="absolute pointer-events-none"
+        >
+          <ControlsHint visible={showControls && !isLoading && !activePopup} />
+          <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
+          <Minimap
+            onRegisterDraw={handleRegisterMinimapDraw}
+            bigMap={bigMap}
+            onOpenBigMap={() => setBigMap(true)}
+            onCloseBigMap={() => setBigMap(false)}
+          />
+          {musicStarted && (
+            <div className="absolute bottom-8 left-8 z-20 flex gap-2" style={{ pointerEvents: "auto" }}>
+              <button
+                onClick={toggleBgmMute}
+                className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+                title={isBgmMuted ? "Unmute music" : "Mute music"}
+              >
+                {isBgmMuted ? "♪ off" : "♪ on"}
+              </button>
+              <button
+                onClick={toggleSfxMute}
+                className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+                title={isSfxMuted ? "Unmute effects" : "Mute effects"}
+              >
+                {isSfxMuted ? "sfx off" : "sfx on"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
