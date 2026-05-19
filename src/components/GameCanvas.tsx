@@ -262,8 +262,6 @@ export default function GameCanvas() {
           }}
         />
 
-        {/* Full-screen overlays sit outside the safe frame so they cover the whole canvas. */}
-        <ExhibitOverlay popup={activePopup} onClose={handleClose} />
         <LoadingScreen visible={isLoading} />
 
         {/* Safe frame: inset written by updateLayout before first paint. */}
@@ -299,6 +297,10 @@ export default function GameCanvas() {
           )}
         </div>
       </div>
+
+      {/* ExhibitOverlay outside the scaled container so it occupies real viewport space
+          and its fixed positioning / scroll work correctly at any screen size. */}
+      <ExhibitOverlay popup={activePopup} onClose={handleClose} />
     </div>
   );
 }

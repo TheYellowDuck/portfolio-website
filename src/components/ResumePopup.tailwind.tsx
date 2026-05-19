@@ -66,20 +66,21 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={onClose}
         className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
       />
 
-      {/* Popup shell */}
-      <div className="fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 flex flex-col w-[min(860px,95vw)] max-h-[min(640px,92vh)]">
+      {/* Centered popup — max-height on motion div constrains flex; body scrolls inside */}
+      <div className="fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: "min(860px, 95vw)" }}
+      >
         <motion.div
           key="resume-popup"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="w-full h-full flex flex-col overflow-hidden rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)]"
-          style={{ maxHeight: "inherit" }}
+          className="w-full flex flex-col overflow-y-auto rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
+          style={{ maxHeight: "min(640px, 80vh)" }}
         >
           {/* ── Header ──────────────────────────────────────────────── */}
           <div className="shrink-0 px-5 py-4 pb-3 border-b border-[rgba(58,46,30,0.15)] bg-parchment">
@@ -156,7 +157,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
           </div>
 
           {/* ── Body ────────────────────────────────────────────────── */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 bg-parchment [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+          <div className="px-6 py-4 bg-parchment">
             {!data && !error && <LoadingState />}
             {error            && <ErrorState />}
 
