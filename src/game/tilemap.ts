@@ -95,7 +95,7 @@ const END_BUFFER      = 2;  // rows between end wall and farthest exhibit row
 const CONNECTOR_LEN   = 2;  // rows of narrow corridor between main hallway and each branch room
 const MIN_BRANCH_GAP  = 3;  // minimum floor tiles between adjacent branch walls
 const LEFT_MARGIN     = 2;  // hallway floor tiles west of first branch
-const RIGHT_MARGIN    = 7;  // hallway floor tiles east of last branch (desk space)
+const RIGHT_MARGIN    = 4;  // hallway floor tiles east of last branch (desk space)
 const DOORWAY_HALF    = 2;  // half-span; connector/doorway = DOORWAY_HALF*2+1 = 5 tiles wide
 
 // ─────────────────────────────────────────────────────────────────────────────

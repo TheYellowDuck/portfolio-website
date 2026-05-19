@@ -36,6 +36,8 @@ interface Particle {
   phase: number;
   freq: number;
   amp: number;
+  sortRow: number;  // y-sort row for depth ordering
+  maxAlpha: number; // peak opacity
 }
 
 function dirFromInput(dx: number, dy: number): Direction {
@@ -350,21 +352,26 @@ export class GameEngine {
       }
     }
     // Me-sprite blink
-    if (this.meBlinking) {
-      this.meBlinkDuration -= dt;
-      if (this.meBlinkDuration <= 0) {
-        this.meBlinking = false;
-        this.meBlinkTimer = 3 + Math.random() * 4;
-      }
-    } else {
-      this.meBlinkTimer -= dt;
-      if (this.meBlinkTimer <= 0) {
-        this.meBlinking = true;
-        this.meBlinkDuration = 0.12;
+    const flickering = this.flickerBurst.length > 0 || this.flickerSustainTimer > 0;
+
+    // Me-sprite blink — paused while flickering
+    if (!flickering) {
+      if (this.meBlinking) {
+        this.meBlinkDuration -= dt;
+        if (this.meBlinkDuration <= 0) {
+          this.meBlinking = false;
+          this.meBlinkTimer = 3 + Math.random() * 4;
+        }
+      } else {
+        this.meBlinkTimer -= dt;
+        if (this.meBlinkTimer <= 0) {
+          this.meBlinking = true;
+          this.meBlinkDuration = 0.12;
+        }
       }
     }
 
-    // Light flicker burst
+    // Light flicker burst — only starts when not blinking
     if (this.flickerSustainTimer > 0) {
       this.flickerSustainTimer -= dt;
       if (this.flickerSustainTimer <= 0) {
@@ -384,7 +391,7 @@ export class GameEngine {
           this.lightsOff = false;
         }
       }
-    } else {
+    } else if (!this.meBlinking) {
       this.flickerTimer -= dt;
       if (this.flickerTimer <= 0) {
         this.flickerTimer = 18 + Math.random() * 25;
@@ -526,6 +533,7 @@ export class GameEngine {
       phase: Math.random() * Math.PI * 2,
       freq: 0.35 + Math.random() * 0.55,
       amp: 8 + Math.random() * 14,
+      sortRow: 0, maxAlpha: 0.48,
     });
   }
 
@@ -533,6 +541,7 @@ export class GameEngine {
     const { player } = this;
     const footX = player.x + player.width / 2;
     const footY = player.y + player.height - 6 - TILE_SIZE / 4;
+    const sortRow = Math.floor((player.y + player.height - 0.01) / TILE_SIZE);
     for (let i = 0; i < 5; i++) {
       const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
       const speed = 15 + Math.random() * 45;
@@ -547,6 +556,7 @@ export class GameEngine {
         size: 1.5 + Math.random() * 2,
         r: Math.min(255, 201 + v), g: Math.min(255, 168 + v), b: Math.min(255, 124 + v),
         type: 'footstep', phase: 0, freq: 0, amp: 0,
+        sortRow, maxAlpha: 0.45,
       });
     }
   }
@@ -554,7 +564,13 @@ export class GameEngine {
   private spawnPedestalSparkle() {
     if (!this.currentNearby) return;
     const { row, col } = this.currentNearby;
-    const baseX = col * TILE_SIZE + TILE_SIZE / 2 + (Math.random() - 0.5) * TILE_SIZE * 0.9;
+    const pedestalCX = col * TILE_SIZE + TILE_SIZE / 2;
+    const pedestalCY = row * TILE_SIZE + TILE_SIZE / 2;
+    const playerCX = this.player.x + this.player.width / 2;
+    const playerCY = this.player.y + this.player.height / 2;
+    const dist = Math.hypot(playerCX - pedestalCX, playerCY - pedestalCY);
+    const proximity = Math.max(0, 1 - dist / (TILE_SIZE * 3));
+    const baseX = pedestalCX + (Math.random() - 0.5) * TILE_SIZE * 0.9;
     const baseY = row * TILE_SIZE + (Math.random() - 0.5) * TILE_SIZE * 0.6;
     const maxLife = 0.9 + Math.random() * 0.9;
     const isSage = Math.random() > 0.45;
@@ -566,6 +582,7 @@ export class GameEngine {
       size: 0.9 + Math.random() * 1.6,
       r: isSage ? 122 : 252, g: isSage ? 158 : 200, b: isSage ? 126 : 80,
       type: 'sparkle', phase: 0, freq: 0, amp: 0,
+      sortRow: row, maxAlpha: 0.3 + proximity * 0.55,
     });
   }
 
@@ -590,9 +607,10 @@ export class GameEngine {
     }
   }
 
-  private drawParticles(ctx: CanvasRenderingContext2D, camX: number, camY: number, viewW: number, viewH: number, layer: 'footstep' | 'sparkle' | 'dust') {
+  private drawParticles(ctx: CanvasRenderingContext2D, camX: number, camY: number, viewW: number, viewH: number, layer: 'footstep' | 'sparkle' | 'dust', atSortRow?: number) {
     for (const p of this.particles) {
       if (p.type !== layer) continue;
+      if (atSortRow !== undefined && p.sortRow !== atSortRow) continue;
       const sx = p.x - camX;
       const sy = p.y - camY;
       if (sx < -p.size * 4 || sx > viewW + p.size * 4 ||
@@ -602,11 +620,11 @@ export class GameEngine {
       if (p.type === 'dust') {
         const fadeIn  = Math.min(1, (1 - t) / 0.12);
         const fadeOut = Math.min(1, t / 0.18);
-        alpha = Math.min(fadeIn, fadeOut) * 0.48;
+        alpha = Math.min(fadeIn, fadeOut) * p.maxAlpha;
       } else if (p.type === 'footstep') {
-        alpha = t * 0.45;
+        alpha = t * p.maxAlpha;
       } else {
-        alpha = Math.sin(t * Math.PI) * 0.75;
+        alpha = Math.sin(t * Math.PI) * p.maxAlpha;
       }
       if (alpha <= 0) continue;
       if (p.type === 'sparkle') {
@@ -866,9 +884,9 @@ export class GameEngine {
         ctx.drawImage(activeMe, centerX - drawW / 2, sy, drawW, drawH);
       }
 
-      // Footstep particles — drawn at player depth, beneath the player sprite
-      if (renderParticles && sortRow === playerSortRow) {
-        this.drawParticles(ctx, camX, camY, viewW, viewH, 'footstep');
+      // Footstep particles — drawn at their captured sort row, beneath the player sprite
+      if (renderParticles) {
+        this.drawParticles(ctx, camX, camY, viewW, viewH, 'footstep', sortRow);
       }
 
       // Player
@@ -896,20 +914,7 @@ export class GameEngine {
           const screenX = col * TILE_SIZE - camX;
           const screenY = row * TILE_SIZE - camY;
 
-          if (currentNearby?.row === row && currentNearby?.col === col) {
-            ctx.save();
-            ctx.shadowColor = COLORS.SAGE;
-            ctx.shadowBlur = 40;
-            ctx.fillStyle = COLORS.SAGE_GLOW_FILL;
-            ctx.fillRect(screenX - 6, screenY - 6, TILE_SIZE + 12, TILE_SIZE + 12);
-            ctx.shadowBlur = 20;
-            ctx.strokeStyle = COLORS.SAGE_GLOW_STROKE;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-            ctx.restore();
-          }
-
-          const obj = objectMap[row][col];
+const obj = objectMap[row][col];
           if (obj === null) continue;
           if (obj === 1 && this.pedestalReady) {
             ctx.drawImage(this.pedestalSprite, screenX, screenY, TILE_SIZE, TILE_SIZE * 2);
@@ -920,9 +925,10 @@ export class GameEngine {
           }
         }
 
-        // Sparkles — drawn after the pedestal sprite, same depth row
-        if (renderParticles && currentNearby?.row === row) {
-          this.drawParticles(ctx, camX, camY, viewW, viewH, 'sparkle');
+        // Sparkles — drawn after the pedestal sprite at their stored sort row,
+        // independent of currentNearby so they fade out naturally after leaving range
+        if (renderParticles) {
+          this.drawParticles(ctx, camX, camY, viewW, viewH, 'sparkle', row);
         }
       }
     }

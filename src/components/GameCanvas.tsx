@@ -38,16 +38,7 @@ export default function GameCanvas() {
     if (musicStartedRef.current) return;
     musicStartedRef.current = true;
     setMusicStarted(true);
-    const howl = new Howl({
-      src: BG_MUSIC_SRCS, loop: true, volume: 0.1, html5: true,
-      onpause: () => {
-        setTimeout(() => {
-          if (musicStartedRef.current && bgMusicRef.current && !bgMusicRef.current.playing()) {
-            bgMusicRef.current.play();
-          }
-        }, 50);
-      },
-    });
+    const howl = new Howl({ src: BG_MUSIC_SRCS, loop: true, volume: 0.1 });
     bgMusicRef.current = howl;
     howl.play();
   }, []);
