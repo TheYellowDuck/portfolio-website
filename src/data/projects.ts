@@ -9,8 +9,15 @@ export interface ExhibitLink {
   url: string;
 }
 
+export interface SkillGroup {
+  category: string;
+  items: string[];
+}
+
 export interface ExhibitPopup {
   title?: string;
+  subtitle?: string;
+  date?: string;
   description?: string;
 
   // Add any links you want (GitHub, live demo, LinkedIn, etc.)
@@ -19,8 +26,8 @@ export interface ExhibitPopup {
   // Tech stack tags (optional)
   tech?: string[];
 
-  // Skills used — shown as a dedicated column in the popup body
-  skills?: string[];
+  // Skills used — shown as a dedicated column in the popup body, grouped by category
+  skills?: SkillGroup[];
 
   // Embed a playable demo, game, or CodeSandbox
   embedUrl?: string;
@@ -220,78 +227,48 @@ export const experienceExhibits: Exhibit[] = [
   {
     popup: {
       title: "Ford Motor Company",
-      description: "Software Engineering Co-op.",
-      tech: ["Python", "React", "TypeScript"],
+      subtitle: "Software Developer Intern",
+      date: "May 2026 – Present",
+      description: "Just getting started! Check back soon for updates on what I'm building.",
+      tech: ["Java", "Kotlin", "Android SDK", "XML", "Git"],
+      skills: [
+        { category: "Android", items: ["Coroutines", "MVVM", "JUnit", "REST APIs"] },
+        { category: "Tools",   items: ["Android Studio", "Gradle", "Jira", "Linux"] },
+        { category: "Practice", items: ["Agile/Scrum", "OOP", "Code Review"] },
+      ],
+      width: "700px",
     },
   },
   {
     popup: {
-      title: "Experience 2",
-      description: "Your description here.",
-      tech: [],
+      title: "University of British Columbia",
+      subtitle: "Undergraduate Research Assistant",
+      date: "Jun 2025 – Aug 2025",
+      description: "Worked under Dr. Martin McKeown and Prof. Z. Jane Wang at the Djavad Mowafaghian Centre for Brain Health, contributing to PIKA — an AI-driven Parkinson's care platform deployed at Vancouver Coastal Health. I owned development of two full-stack hand rehabilitation apps within the platform. HandEase gamifies rehab as a farming-style game where hand gestures control gameplay (finger tapping summons rain to water plants), making exercises feel engaging rather than clinical. Palm & Plant is the medical counterpart, designed for structured clinical sessions with detailed progress tracking. Both share the same core: a computer vision pipeline (OpenCV + MediaPipe) that detects 7 hand gestures at ~90% accuracy in real time (<100ms latency), running entirely on-device to meet PIPEDA and GDPR privacy requirements. I also built activity heatmap dashboards that cut practitioner monitoring overhead by 30%, giving clinicians a clearer picture of patient progress between appointments. Presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium, with projected deployment across hospitals in 10+ countries.",
+      tech: ["Python", "OpenCV", "MediaPipe", "NumPy", "Pandas", "Matplotlib"],
+      skills: [
+        { category: "AI & Vision",  items: ["Computer Vision", "Gesture Recognition", "Pose Estimation", "ML Inference", "Real-time Systems"] },
+        { category: "Research",     items: ["Custom Libraries", "Data Analysis", "Research"] },
+        { category: "Team",         items: ["Agile", "Weekly Standups", "Clinician Collaboration"] },
+      ],
+      width: "800px",
+      links: [
+        { label: "McKeown Lab – PIKA", url: "https://mckeownlab.ca/pika/index.html" },
+      ],
     },
   },
   {
     popup: {
-      title: "Experience 3",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 4",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 5",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 6",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 7",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 8",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 9",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 10",
-      description: "Your description here.",
-      tech: [],
-    },
-  },
-  {
-    popup: {
-      title: "Experience 11",
-      description: "Your description here.",
-      tech: [],
+      title: "Kumon Inc.",
+      subtitle: "Math & Reading Instructor",
+      date: "Aug 2021 – May 2024",
+      description: "Invited to join the team based on outstanding personal performance in Math and Literature. Mentored 100+ students across math and reading programs, adapting lessons to each student's individual pace and learning style. Marked homework, tracked progress, and delivered structured feedback that led to measurable improvements in test scores and classroom behavior.",
+      skills: [
+        { category: "Teaching",    items: ["1-on-1 Mentoring", "Curriculum Adaptation", "Lesson Planning", "Progress Tracking"] },
+        { category: "Soft Skills", items: ["Communication", "Patience", "Adaptability", "Leadership"] },
+        { category: "Management",  items: ["Classroom Management", "Feedback Delivery", "Student Assessment"] },
+      ],
+      width: "700px",
     },
   },
 ];

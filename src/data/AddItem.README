@@ -28,9 +28,11 @@
 //
 // interface ExhibitPopup {
 //   title?:       string;
+//   subtitle?:    string;          // shown below title in smaller muted text
+//   date?:        string;          // shown below subtitle in sage/green text
 //   description?: string;
 //   tech?:        string[];        // shown as pill tags
-//   skills?:      string[];        // shown as a dedicated column
+//   skills?:      { category: string; items: string[] }[];  // grouped column
 //   links?:       { label: string; url: string }[];
 //   embedUrl?:    string;          // renders an iframe in the popup
 //   width?:       string;          // e.g. "900px", "80vw"  (defaults provided)
@@ -48,6 +50,9 @@
 // Text popup only
 { popup: { title: "Hello", description: "Welcome to the museum." } },
 
+// Title + subtitle + date (e.g. experience entry)
+{ popup: { title: "Ford Motor Company", subtitle: "Software Developer Intern", date: "Jan 2025 – Apr 2025", description: "..." } },
+
 // Full project card
 {
   popup: {
@@ -61,13 +66,17 @@
   },
 },
 
-// Project with skills column
+// Project with skills column (groups are color-coded; category name is for your reference only)
 {
   popup: {
     title: "My Project",
     description: "A short description.",
     tech: ["Python", "FastAPI"],
-    skills: ["REST API design", "Data modeling", "CI/CD"],
+    skills: [
+      { category: "Technical",   items: ["REST API design", "Data modeling"] }, // sage green
+      { category: "Soft Skills", items: ["Communication", "Ownership"] },       // dusty blue
+      { category: "Tools",       items: ["Docker", "CI/CD"] },                  // terracotta
+    ],
     links: [{ label: "GitHub", url: "https://github.com/you/project" }],
   },
 },
