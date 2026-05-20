@@ -262,7 +262,7 @@ export const experienceExhibits: Exhibit[] = [
       title: "Kumon Inc.",
       subtitle: "Math & Reading Instructor",
       date: "Aug 2021 – May 2024",
-      description: "Invited to join the team based on outstanding personal performance in Math and Literature. Mentored 100+ students across math and reading programs, adapting lessons to each student's individual pace and learning style. Marked homework, tracked progress, and delivered structured feedback that led to measurable improvements in test scores and classroom behavior.",
+      description: "Recruited directly by the Kumon supervisor after standing out as a top-performing student in both Math and Literature — a distinction that made me more effective as an instructor from day one. Over three years, worked with 100+ students across a wide range of skill levels, adapting explanations on the fly to match each student's pace rather than following a rigid script. The core challenge was balancing class-wide flow with meaningful one-on-one attention — reading where each student was at, adjusting in the moment, and delivering feedback precise enough to move them forward without overwhelming them. Consistently saw improvement in both test results and student confidence over time.",
       skills: [
         { category: "Teaching",    items: ["1-on-1 Mentoring", "Curriculum Adaptation", "Lesson Planning", "Progress Tracking"] },
         { category: "Soft Skills", items: ["Communication", "Patience", "Adaptability", "Leadership"] },

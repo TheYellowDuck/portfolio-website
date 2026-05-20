@@ -241,10 +241,11 @@ export class GameEngine {
 
   setPaused(paused: boolean) {
     this.paused = paused;
+    this.input.clear();
     if (!paused) {
       this.currentNearby = null;
       this.interactCooldown = true;
-      setTimeout(() => { this.interactCooldown = false; }, 300);
+      setTimeout(() => { this.interactCooldown = false; }, 500);
       this.idleTimer = 0;
       this.idleFired = false;
     }

@@ -18,9 +18,13 @@ class InputManager {
     });
   }
 
-  // Call this in the game loop to check if a key is held
   isDown(key: string): boolean {
     return this.keys.has(key);
+  }
+
+  // Wipe all held-key state — call when pausing so no stale keys carry over on resume.
+  clear() {
+    this.keys.clear();
   }
 }
 
