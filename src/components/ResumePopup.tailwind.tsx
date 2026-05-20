@@ -18,21 +18,27 @@ function sectionLabel(title: string): string {
   ).join(" ");
 }
 
+let resumeCache: ResumeData | null = null;
+
 interface ResumePopupProps {
   onClose: () => void;
 }
 
 export default function ResumePopup({ onClose }: ResumePopupProps) {
-  const [data, setData]               = useState<ResumeData | null>(null);
+  const [data, setData]               = useState<ResumeData | null>(resumeCache);
   const [error, setError]             = useState(false);
-  const [activeTitle, setActiveTitle] = useState<string | null>(null);
+  const [activeTitle, setActiveTitle] = useState<string | null>(
+    resumeCache?.sections[0]?.title ?? null
+  );
 
   useEffect(() => {
+    if (resumeCache) return;
     fetch("/api/resume")
       .then((r) => r.json())
       .then((d) => {
         if (d.error) { setError(true); return; }
         const parsed = d as ResumeData;
+        resumeCache = parsed;
         setData(parsed);
         if (parsed.sections.length > 0) setActiveTitle(parsed.sections[0].title);
       })
@@ -46,13 +52,15 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
   useEffect(() => {
     if (!data) return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const prev = e.key === "ArrowLeft"  || e.key === "a" || e.key === "A";
+      const next = e.key === "ArrowRight" || e.key === "d" || e.key === "D";
+      if (!prev && !next) return;
       e.preventDefault();
-      const idx = data.sections.findIndex((s) => s.title === activeTitle);
-      const next = e.key === "ArrowLeft"
+      const idx     = data.sections.findIndex((s) => s.title === activeTitle);
+      const nextIdx = prev
         ? (idx - 1 + data.sections.length) % data.sections.length
         : (idx + 1) % data.sections.length;
-      setActiveTitle(data.sections[next].title);
+      setActiveTitle(data.sections[nextIdx].title);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -135,7 +143,8 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
             </div>
 
             {/* Tab bar */}
-            <div className="flex gap-1 mt-3 border-b border-[rgba(58,46,30,0.15)]">
+            <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgba(58,46,30,0.15)]">
+              <div className="flex gap-1">
               {(data?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
                 return (
@@ -153,6 +162,10 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                   </button>
                 );
               })}
+              </div>
+              <span className="font-mono text-[11px] text-walnut opacity-40 pb-1 shrink-0">
+                ← → or a / d to switch
+              </span>
             </div>
           </div>
 

@@ -37,7 +37,7 @@ export interface ExhibitPopup {
   height?: string;  // e.g. "600px", "70vh"
 
   // Special popup types
-  type?: "resume";
+  type?: "resume" | "transcript";
 }
 
 export interface Exhibit {
@@ -292,8 +292,7 @@ export const officeExhibits: Exhibit[] = [
   },
   {
     popup: {
-      title: "Education",
-      description: "University of Waterloo — Computer Science.",
+      type: "transcript",
     },
   },
   {

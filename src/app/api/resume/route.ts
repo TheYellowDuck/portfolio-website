@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import path from "path";
 import { PDFParse } from "pdf-parse";
 
@@ -197,18 +197,18 @@ function parseText(rawText: string): Pick<ResumeData, "name" | "contact" | "sect
 
 export async function GET() {
   try {
-    const pdfPath = path.join(
-      process.cwd(),
-      "public/assets/resume/George Zhang Resume - V8.pdf"
-    );
-    const buf = readFileSync(pdfPath);
+    const dir      = path.join(process.cwd(), "public/assets/resume");
+    const fileName = readdirSync(dir).find((f) => f.toLowerCase().endsWith(".pdf"));
+    if (!fileName) return NextResponse.json({ error: "No resume PDF found" }, { status: 404 });
+
+    const buf    = readFileSync(path.join(dir, fileName));
     const parser = new PDFParse({ data: new Uint8Array(buf), verbosity: 0 });
     const result = await parser.getText();
     const parsed = parseText(result.text);
 
     return NextResponse.json({
       ...parsed,
-      pdfPath: "/assets/resume/George Zhang Resume - V8.pdf",
+      pdfPath: `/assets/resume/${fileName}`,
     } satisfies ResumeData);
   } catch (err) {
     console.error("Resume parse error:", err);

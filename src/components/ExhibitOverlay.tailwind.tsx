@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup.tailwind";
+import TranscriptPopup from "./TranscriptPopup";
 
 const SKILL_GROUP_COLORS = [
   { bg: "rgba(122,158,126,0.12)", border: "rgba(122,158,126,0.45)" }, // sage green
@@ -24,7 +25,11 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
         <ResumePopup key="resume" onClose={onClose} />
       )}
 
-      {popup && popup.type !== "resume" && (
+      {popup && popup.type === "transcript" && (
+        <TranscriptPopup key="transcript" onClose={onClose} />
+      )}
+
+      {popup && popup.type !== "resume" && popup.type !== "transcript" && (
         <>
           {/* Backdrop */}
           <motion.div
