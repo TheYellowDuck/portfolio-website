@@ -182,7 +182,7 @@ export const archiveExhibits: Exhibit[] = [
       title: "LeetCode Stats",
       description: "Your competitive programming journey.",
       tech: ["C++", "Python"],
-      links: [{ label: "LeetCode Profile", url: "https://leetcode.com/you" }],
+      links: [{ label: "LeetCode Profile", url: "https://leetcode.com/u/georgezhang006" }],
     },
   },
   {
@@ -229,14 +229,15 @@ export const experienceExhibits: Exhibit[] = [
       title: "Ford Motor Company",
       subtitle: "Software Developer Intern",
       date: "May 2026 – Present",
-      description: "Just getting started! Check back soon for updates on what I'm building.",
-      tech: ["Java", "Kotlin", "Android SDK", "XML", "Git"],
+      description: "Working on Android Automotive OS (AAOS) development at Ford, contributing to the in-vehicle Car Dialer app for Ford's infotainment system. Work spans call management via the Android Telecom framework, Bluetooth Hands-Free Profile (HFP) integration, UI development across multi-module architecture, and unit testing with Robolectric.",
+      tech: ["Java", "Kotlin", "XML", "Android SDK", "Android Automotive OS", "Bash/Shell", "Groovy", "Git"],
       skills: [
-        { category: "Android", items: ["Coroutines", "MVVM", "JUnit", "REST APIs"] },
-        { category: "Tools",   items: ["Android Studio", "Gradle", "Jira", "Linux"] },
-        { category: "Practice", items: ["Agile/Scrum", "OOP", "Code Review"] },
+        { category: "Frameworks",  items: ["Dagger Hilt", "AndroidX/Jetpack", "LiveData", "ViewModel", "Android Telecom", "Robolectric", "JaCoCo"] },
+        { category: "Build & CI",  items: ["Gradle", "AOSP/Soong", "SonarQube", "ADB", "Docker"] },
+        { category: "Tools",       items: ["Android Studio", "Jira", "Ford SDK", "scrcpy"] },
+        { category: "Practice",    items: ["Unit Testing", "Code Review", "Multi-module Architecture", "Bluetooth/HFP", "Agile/Scrum", "OOP"] },
       ],
-      width: "700px",
+      width: "800px",
     },
   },
   {
@@ -309,21 +310,21 @@ export const giftShopExhibits: Exhibit[] = [
     popup: {
       title: "GitHub",
       description: "Check out my code.",
-      links: [{ label: "Open GitHub", url: "https://github.com/you" }],
+      links: [{ label: "Open GitHub", url: "https://github.com/TheYellowDuck" }],
     },
   },
   {
     popup: {
       title: "LinkedIn",
       description: "Let's connect!",
-      links: [{ label: "Open LinkedIn", url: "https://linkedin.com/in/you" }],
+      links: [{ label: "Open LinkedIn", url: "https://linkedin.com/in/iamgeorgezhang/" }],
     },
   },
   {
     popup: {
       title: "Email",
       description: "Reach out anytime.",
-      links: [{ label: "Send Email", url: "mailto:you@email.com" }],
+      links: [{ label: "Send Email", url: "mailto:gzhang06@outlook.com" }],
     },
   },
   {
