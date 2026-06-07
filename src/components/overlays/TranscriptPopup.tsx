@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { TranscriptData, SubjectGroup, CourseEntry } from "@/app/api/transcript/route";
+import type { TranscriptData, SubjectGroup, CourseEntry } from "@/types/transcript";
 import { experienceExhibits } from "@/data/projects";
 
 let transcriptCache: TranscriptData | null = null;

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
-import ResumePopup from "./ResumePopup.tailwind";
+import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
 
 const SKILL_GROUP_COLORS = [

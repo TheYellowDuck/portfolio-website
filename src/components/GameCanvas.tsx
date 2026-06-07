@@ -6,7 +6,7 @@ import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { Howl, Howler } from "howler";
 import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
-import ExhibitOverlay from "./ExhibitOverlay.tailwind";
+import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
 

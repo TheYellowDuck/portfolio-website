@@ -13,7 +13,7 @@ The portfolio should feel like wandering into a well-loved private library at go
 
 ### Color palette
 
-Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts) and surfaced as Tailwind tokens (`parchment`, `pine`, `walnut`, `sage`, etc.) in `globals.css`. The active overlay components (`ExhibitOverlay.tailwind.tsx`, `ResumePopup.tailwind.tsx`) consume these tokens exclusively — no hardcoded hex values.
+Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts) and surfaced as Tailwind tokens (`parchment`, `pine`, `walnut`, `sage`, etc.) in `globals.css`. The overlay components under `src/components/overlays/` consume these tokens exclusively — no hardcoded hex values.
 
 | Role | Value | Description |
 |------|-------|-------------|
@@ -65,11 +65,12 @@ Read this section first when picking up a new session.
 
 | File | Status | What it needs |
 |------|--------|---------------|
-| `src/components/HUD.tsx` | Empty stub | Room name label (Minimap and ControlsHint have been extracted as separate components) |
-| `src/game/player.ts` | Empty stub | Sprite animation, facing direction (movement is inline in `engine.ts`) |
-| `src/game/collision.ts` | Empty stub | Extracted collision logic (inline in `engine.ts` as `resolveCollisionX/Y`) |
+| `src/components/HUD.tsx` | Documented stub | Room-name title shown on room entry (the Minimap already surfaces the active branch label) |
 | `projects.ts` | Wired, placeholder content | Real project URLs, descriptions, experience entries, contact links |
-| `public/assets/audio/quack.mp3` | Missing file | Easter egg audio — add this file |
+| `public/assets/audio/quack.mp3` | **Missing file** | Easter-egg audio referenced by `projects.ts` — until it's added the easter egg 404s. (Ambient music, `footstep.wav`, and `interact.wav` are present.) |
+
+> `player.ts` and `collision.ts` are **no longer stubs** — the engine split moved real
+> logic into them. See the File Map below.
 
 ### Map Snapshot (`/map-snapshot`)
 
@@ -84,7 +85,6 @@ A developer-only page that renders the full museum map to a canvas for inspectio
 
 - **Never run `npm audit fix --force`** — it downgrades `next` to 9.x. The 2 moderate PostCSS advisories have no released fix; ignore them.
 - `INTERACTABLE_TILES` must be typed `Set<number>` explicitly — TypeScript narrows the inferred type to a literal union, breaking `.has(number)`.
-- `player.ts` and `collision.ts` are empty placeholders imported nowhere. Don't try to use them.
 - Map dimensions are auto-computed from `northBranches` / `southBranches` arrays in `tilemap.ts`. Never hardcode `ROWS` or `COLS` elsewhere.
 
 ---
@@ -117,20 +117,23 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────┐
-│                  REACT LAYER                     │
-│  GameCanvas.tsx ← listens for engine events      │
-│  ExhibitOverlay.tailwind.tsx  DialogBox.tsx  HUD.tsx │
-└──────────────────────┬──────────────────────────┘
-                       │ events: nearby / interact / leave
-┌──────────────────────┴──────────────────────────┐
-│                GAME ENGINE LAYER                 │
-│  engine.ts   → 60fps update + render loop        │
-│  input.ts    → held-key tracking                 │
-│  camera.ts   → snapTo on load, smooth follow     │
-│  tilemap.ts  → map data, 3 exported arrays       │
-│  interactables.ts → auto-scans map for exhibits  │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                      REACT LAYER                          │
+│  GameCanvas.tsx ← listens for engine events               │
+│  overlays/{ExhibitOverlay,ResumePopup,TranscriptPopup}    │
+│  Minimap · DialogBox · ControlsHint · LoadingScreen       │
+└────────────────────────┬─────────────────────────────────┘
+                         │ events: nearby / interact / leave / idle / active
+┌────────────────────────┴─────────────────────────────────┐
+│                   GAME ENGINE LAYER                       │
+│  engine.ts     → orchestration: 60fps loop, events        │
+│   ├ player.ts      movement · facing · animation          │
+│   ├ collision.ts   tile AABB resolution                   │
+│   ├ particles.ts   dust / footstep / sparkle pool         │
+│   ├ sprites.ts     sprite loading + readiness             │
+│   └ renderer.ts    3-pass y-sorted scene draw             │
+│  input.ts · camera.ts · tilemap.ts · interactables.ts     │
+└──────────────────────────────────────────────────────────┘
 ```
 
 **Key principle:** the game engine never imports React. They communicate only through the `onEvent` callback on `GameEngine`.
@@ -141,16 +144,21 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 
 ### `/src/game/`
 
+The engine is split into focused modules; `engine.ts` is now orchestration only.
+
 | File | Status | Purpose |
 |------|--------|---------|
-| `engine.ts` | ✅ | Main loop, movement, collision, interaction, 3-pass render, y-sort |
+| `engine.ts` | ✅ | Orchestration: 60fps loop, update tick, interaction events, ambient blink/flicker, public API |
+| `player.ts` | ✅ | Player state, movement (with per-axis collision), facing, walk/idle animation; `Direction` + anim constants |
+| `collision.ts` | ✅ | Tile-based AABB resolution (`isSolid`, `resolveCollisionX/Y`) over a rect |
+| `particles.ts` | ✅ | `ParticleSystem` — dust / footstep / sparkle pool (spawn · update · draw) |
+| `sprites.ts` | ✅ | `SpriteRegistry` — loads every sprite, tracks readiness, fires `onReady` |
+| `renderer.ts` | ✅ | `drawScene()` — 3-pass y-sorted render (floor/wall → entities → glow/dust) |
 | `input.ts` | ✅ | Held-key tracking via a `Set` |
 | `camera.ts` | ✅ | `snapTo()` on load + smooth `follow()` each frame |
 | `tilemap.ts` | ✅ | Map builder, object/solid constants, 3 exported maps, `branchLabels` |
-| `tile-ids.ts` | ✅ | `TILES` constant object — all tile ID definitions. Extracted from `tilemap.ts`. |
+| `tile-ids.ts` | ✅ | `TILES` constant object — all tile ID definitions |
 | `interactables.ts` | ✅ | Auto-scans `museumMap` for interactable tiles, links to exhibits |
-| `player.ts` | 🔲 Stub | Future sprite animation + facing direction |
-| `collision.ts` | 🔲 Stub | Future extracted collision logic |
 
 ### `/src/data/`
 
@@ -162,36 +170,52 @@ Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Key
 
 | File | Status | Purpose |
 |------|--------|---------|
-| `GameCanvas.tsx` | ✅ | Mounts canvas, creates engine, wires events, manages popup state |
+| `GameCanvas.tsx` | ✅ | Mounts canvas, creates engine, wires events, manages popup state + audio/mute toggles |
 | `app/map-snapshot/page.tsx` | ✅ | Developer tool — full-map render viewer with zoom/pan and PNG download |
-| `ExhibitOverlay.tailwind.tsx` | ✅ | **Active** — exhibit popup (Tailwind CSS); warm parchment theme, hover/focus states, backdrop blur |
-| `ResumePopup.tailwind.tsx` | ✅ | **Active** — resume popup (Tailwind CSS); tabbed sections, PDF download, themed scrollbar |
+| `overlays/ExhibitOverlay.tsx` | ✅ | Exhibit popup — text, tags, links, iframe; backdrop blur. Routes `type: "resume"` → ResumePopup and transcript exhibits → TranscriptPopup |
+| `overlays/ResumePopup.tsx` | ✅ | Resume popup — tabbed sections, PDF download, themed scrollbar; consumes `/api/resume` |
+| `overlays/TranscriptPopup.tsx` | ✅ | Transcript popup — subject-grouped courses; consumes `/api/transcript` |
+| `Minimap.tsx` | ✅ | Player-centered minimap — pre-rendered static map, player dot, branch labels, big-map (M) |
 | `DialogBox.tsx` | ✅ | "Press E to inspect" bottom prompt |
-| `Minimap.tsx` | ✅ | Player-centered minimap — pre-rendered static map, player dot, branch labels |
 | `ControlsHint.tsx` | ✅ | "WASD to move · Shift to sprint" overlay — fades out after first move |
 | `LoadingScreen.tsx` | ✅ | Splash screen with animated dots, fades out when assets are loaded |
-| `HUD.tsx` | 🔲 Stub | Room name label (Minimap and ControlsHint are separate components) |
-| `ExhibitOverlay.tsx` | 🗃 Reference | Original inline-style implementation — not wired into app |
-| `ResumePopup.tsx` | 🗃 Reference | Original inline-style implementation — not wired into app |
+| `HUD.tsx` | 🔲 Stub | Planned room-name title on room entry |
+
+> The original inline-style `ExhibitOverlay.tsx` / `ResumePopup.tsx` reference dups were
+> removed in the restructure; the (formerly `.tailwind`) active versions now live under
+> `overlays/` with plain names.
+
+### `/src/types/`
+
+Shared response types — imported by **both** the API route and its client component, so
+client code never imports from a server `route.ts`.
+
+| File | Purpose |
+|------|---------|
+| `resume.ts` | `ResumeData`, `ResumeSection`, `ResumeEntry`, `ContactInfo` |
+| `transcript.ts` | `TranscriptData`, `SubjectGroup`, `CourseEntry` |
 
 ### `/public/assets/`
 
 ```
 public/assets/
 ├── sprites/
-│   ├── character/    ← idle + walk cycle, 8 directions; states/ dir + metadata.json
-│   ├── floor/        ← 16 floor tile variants + 5 extra tile variants
-│   ├── wall-side/    ← 4 wall side variants (left, right, etc.)
-│   ├── wall-top/     ← 7 wall top variants (corner, cross, intersect, knub, etc.)
-│   ├── pedestal.png, pedestal-2.png, pedestal-3.png, pedestal-book.png
-│   ├── floor.png, floor2.png, floor3.png
-│   └── wall-side-left.png, wall-side-right.png, wall-top-corner.png, wall-top-cross.png, …
-├── ai-generated/ ← AI-generated sprite experiments (not wired into engine)
-├── tilesets/     ← Cute RPG Interior tileset present but not wired into engine
-├── maps/         ← Tiled JSON exports — not yet used
-├── resume/       ← George Zhang Resume - V8.pdf (served via /api/resume)
-└── audio/        ← directory exists but empty; quack.mp3 referenced by easter egg — add this file
+│   ├── character/   ← idle + walk cycle, 8 directions (states/animations/{idle,walk}/<dir>/)
+│   ├── wall-side/   ← horizontal wall variants (tile00–tile04) + wall-side-left/right
+│   ├── wall-top/    ← wall-top variants (tile00–tile06) + corner/cross/intersect/knub
+│   ├── floor2.png, floor3.png                     ← floor tiles in use
+│   ├── pedestal-book.png                          ← pedestal sprite in use
+│   └── me-2.png, me-blink.png, me-light-off.png   ← "me at desk" + blink/flicker frames
+├── resume/      ← resume PDF (served via /api/resume)
+├── transcript/  ← transcript PDF (served via /api/transcript)
+└── audio/       ← ambient music (.m4a/.ogg) · footstep.wav · interact.wav
+                   (quack.mp3, referenced by the easter egg, is still MISSING — add it)
 ```
+
+Unused art — AI-generated experiments, the Cute RPG tileset, and the empty `maps/` dir —
+was moved out of the build into top-level **`attic/assets/`** (see `attic/README.md`).
+A few unreferenced single sprites (`floor.png`, `pedestal{,-2,-3}.png`, `me.png`) remain
+under `sprites/` as possible alternates.
 
 ---
 
@@ -222,7 +246,7 @@ Tile IDs on the map encode which exhibit array to pull from. The auto-scanner in
 
 ---
 
-## Rendering Pipeline (`engine.ts`)
+## Rendering Pipeline (`renderer.ts`)
 
 Three passes per frame:
 
@@ -393,7 +417,7 @@ Exhibits beyond the slot count are ignored. The slot count equals `count` in the
 
 ## Sprite Roadmap
 
-Sprites are partially implemented. `engine.ts` uses `drawImage` for floor tiles, wall tiles, and pedestals. The player character has idle and walk animations in 8 directions. Remaining work is furniture, NPCs, and atmosphere.
+Sprites are partially implemented. `renderer.ts` uses `drawImage` for floor tiles, wall tiles, and pedestals (loaded by `sprites.ts`). The player character has idle and walk animations in 8 directions. Remaining work is furniture, NPCs, and atmosphere.
 
 ### Priority order
 
@@ -443,22 +467,22 @@ Sprites are partially implemented. `engine.ts` uses `drawImage` for floor tiles,
 - Light cone / radial overlay (multiply blend mode)
 - Cast shadow tile
 
-### Adding sprites to `engine.ts`
+### Adding sprites (`sprites.ts`)
 
-Sprite readiness is tracked via a `tracked()` helper inside the constructor. It increments `_spritesTotal` synchronously at registration time, then calls `_markLoaded()` when the image loads. `onReady` fires once `_spritesLoaded >= _spritesTotal`.
+Sprite readiness is tracked via a `tracked()` helper inside `SpriteRegistry`'s constructor. It increments the total synchronously at registration time, then calls `markLoaded()` when the image loads. `onReady` fires once loaded ≥ total (the engine forwards this to its own `onReady`).
 
-To add a new tracked sprite:
+To add a new tracked sprite, in `SpriteRegistry`:
 
 ```ts
 this.myNewSprite = tracked(new Image(), () => { this.myNewReady = true; });
 this.myNewSprite.src = url("/assets/sprites/my-new-sprite.png");
 ```
 
-The `url()` helper appends `?v=<cacheBust>` when the engine is constructed with a cache-busting token (used by `/map-snapshot`). No counter update needed — `_spritesTotal` adjusts automatically.
+The `url()` helper appends `?v=<cacheBust>` when the registry is constructed with a cache-busting token (used by `/map-snapshot`). No counter update needed — the total adjusts automatically.
 
-### Implementing sprites in `engine.ts`
+### Implementing sprites (`renderer.ts`)
 
-When sprites are ready, replace `ctx.fillRect` calls in the two render passes:
+In `drawScene`, draw the registry's sprites instead of `ctx.fillRect`:
 
 ```ts
 // Floor/wall pass — replace fillRect with:
@@ -501,6 +525,18 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 
 ---
 
+## API Routes & Embeds
+
+| Route | Purpose |
+|-------|---------|
+| `GET /api/resume` | Reads the newest PDF in `public/assets/resume/`, parses it with `pdf-parse` into structured `ResumeData` (sections → entries → bullets), returns JSON. `force-dynamic`, so swapping the PDF needs no rebuild. Rendered by `overlays/ResumePopup.tsx`. |
+| `GET /api/transcript` | Same pattern for `public/assets/transcript/` — parses courses into subject groups (`TranscriptData`). Rendered by `overlays/TranscriptPopup.tsx`. |
+| `GET /api/jar/[...slug]` | Proxy for playable `.jar` demos. `slug[0]` is a **base64url-encoded** URL; only `https://github.com/<owner>/<repo>/releases/download/…` is allowed (otherwise 403). Forwards `Range` headers so the in-browser Java runner (`public/java-runner.html`) can stream the archive. |
+
+Response types live in [`src/types/`](src/types/) and are shared by each route and its component.
+
+---
+
 ## Development Phases
 
 ### ✅ Phase 0 — Prerequisites
@@ -539,8 +575,9 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 
 ### ✅ Phase 5 — React Overlay UI
 
-- [x] `ExhibitOverlay.tailwind.tsx` — text, tags, links, iframe; Tailwind CSS with hover/focus states and backdrop blur
-- [x] `ResumePopup.tailwind.tsx` — tabbed resume viewer, PDF download, `/api/resume` integration; themed scrollbar
+- [x] `overlays/ExhibitOverlay.tsx` — text, tags, links, iframe; Tailwind CSS with hover/focus states and backdrop blur
+- [x] `overlays/ResumePopup.tsx` — tabbed resume viewer, PDF download, `/api/resume` integration; themed scrollbar
+- [x] `overlays/TranscriptPopup.tsx` — subject-grouped transcript viewer, `/api/transcript` integration
 - [x] `DialogBox.tsx` — "Press E" prompt
 - [x] Audio on interact (Howler.js wired — audio files still needed)
 - [x] Pause/unpause engine during popup

@@ -2,33 +2,13 @@ import { NextResponse } from "next/server";
 import { readFileSync, readdirSync } from "fs";
 import path from "path";
 import { PDFParse } from "pdf-parse";
+import type {
+  CourseEntry,
+  SubjectGroup,
+  TranscriptData,
+} from "@/types/transcript";
 
 export const dynamic = "force-dynamic";
-
-export interface CourseEntry {
-  code: string;
-  title: string;
-  credits?: number;
-  inProgress?: boolean;
-  term?: string; // e.g. "Spring 2025"
-  description?: string;
-}
-
-export interface SubjectGroup {
-  subject: string;
-  fullName: string;
-  courses: CourseEntry[];
-}
-
-export interface TranscriptData {
-  program?: string;
-  startTerm?: string;
-  currentTerm?: string;
-  currentLevel?: string;
-  currentFormOfStudy?: string;
-  groups: SubjectGroup[];
-  pdfPath: string;
-}
 
 const SUBJECT_NAMES: Record<string, string> = {
   AFM:    "Accounting & Financial Mgmt.",

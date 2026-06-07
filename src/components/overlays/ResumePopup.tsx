@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { ResumeData, ResumeEntry, ResumeSection } from "@/app/api/resume/route";
+import type { ResumeData, ResumeEntry, ResumeSection } from "@/types/resume";
 
 const DISPLAY_LABELS: Record<string, string> = {
   "WORK EXPERIENCE":         "Experience",

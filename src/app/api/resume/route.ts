@@ -2,37 +2,14 @@ import { NextResponse } from "next/server";
 import { readFileSync, readdirSync } from "fs";
 import path from "path";
 import { PDFParse } from "pdf-parse";
+import type {
+  ContactInfo,
+  ResumeEntry,
+  ResumeSection,
+  ResumeData,
+} from "@/types/resume";
 
 export const dynamic = "force-dynamic";
-
-export interface ContactInfo {
-  phone?: string;
-  email?: string;
-  linkedin?: string;
-  github?: string;
-}
-
-export interface ResumeEntry {
-  title: string;
-  subtitle?: string;
-  period?: string;
-  location?: string;
-  tech?: string[];
-  bullets: string[];
-}
-
-export interface ResumeSection {
-  title: string;
-  bullets?: string[];
-  entries?: ResumeEntry[];
-}
-
-export interface ResumeData {
-  name: string;
-  contact: ContactInfo;
-  sections: ResumeSection[];
-  pdfPath: string;
-}
 
 const SECTION_HEADERS = [
   "SKILLS",
