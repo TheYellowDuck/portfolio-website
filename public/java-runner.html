@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Java App</title>
+  <script>
+    if (!window.requestIdleCallback) {
+      window.requestIdleCallback = (cb, opts) => {
+        const start = Date.now();
+        return setTimeout(() => cb({
+          didTimeout: false,
+          timeRemaining: () => Math.max(0, 50 - (Date.now() - start)),
+        }), opts && opts.timeout ? opts.timeout : 1);
+      };
+      window.cancelIdleCallback = (id) => clearTimeout(id);
+    }
+  </script>
+  <script src="https://cjrtnc.leaningtech.com/4.3/loader.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #1a1a1a;
+      overflow: hidden;
+      position: relative;
+    }
+    #loading {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #aaa;
+      font-family: monospace;
+      font-size: 13px;
+      text-align: center;
+    }
+    .spinner {
+      display: block;
+      margin: 0 auto 10px;
+      width: 22px; height: 22px;
+      border: 2px solid #333;
+      border-top-color: #777;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #error {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #e07070;
+      font-family: monospace;
+      font-size: 13px;
+      text-align: center;
+      max-width: 420px;
+      line-height: 1.6;
+    }
+    .cheerpjNC::before, .cheerpjNC::after { content: none !important; }
+    #cj-credit {
+      position: fixed;
+      bottom: 7px; right: 10px;
+      font-family: monospace;
+      font-size: 10px;
+      color: rgba(180, 160, 120, 0.45);
+      pointer-events: none;
+      z-index: 9999;
+      letter-spacing: 0.04em;
+      display: none;
+    }
+    #upload-ui {
+      position: fixed;
+      top: 10px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    #upload-ui button {
+      background: rgba(20, 16, 8, 0.88);
+      border: 1px solid rgba(122, 158, 126, 0.55);
+      color: rgba(180, 160, 120, 0.9);
+      font-family: monospace;
+      font-size: 11px;
+      padding: 5px 14px;
+      cursor: pointer;
+      border-radius: 3px;
+      backdrop-filter: blur(6px);
+      letter-spacing: 0.04em;
+    }
+    #upload-ui button:hover { border-color: rgba(122, 158, 126, 0.9); }
+    #upload-fname {
+      font-family: monospace;
+      font-size: 10px;
+      color: rgba(122, 158, 126, 0.7);
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <span class="spinner"></span>
+    Starting Java runtime&hellip;
+  </div>
+  <div id="cj-credit">powered by CheerpJ</div>
+  <div id="upload-ui">
+    <button onclick="document.getElementById('file-input').click()">upload image</button>
+    <div id="upload-fname"></div>
+  </div>
+  <input id="file-input" type="file" accept="image/*" style="display:none">
+
+  <script>
+    // ── Banner suppression ──────────────────────────────────────────
+    (function () {
+      const credit = document.getElementById('cj-credit');
+      function suppress() {
+        document.querySelectorAll('a[href*="cheerpj"]').forEach(el => {
+          let target = el;
+          const display = document.getElementById('cheerpjDisplay');
+          if (display) {
+            let p = el;
+            while (p && p.parentElement !== display) p = p.parentElement;
+            if (p && p.parentElement === display) target = p;
+          }
+          target.style.setProperty('display', 'none', 'important');
+          credit.style.display = 'block';
+        });
+        document.getElementById('cheerpjDisplay')?.classList.remove('cheerpjNC');
+      }
+      new MutationObserver(suppress).observe(document.body, { childList: true, subtree: true });
+    })();
+
+    // ── Center Java window within the display ──────────────────────
+    (function () {
+      let layoutTimer = null;
+
+      function applyLayout(win) {
+        if (!win?.isConnected) return;
+        const x = parseFloat(win.style.left) || 0;
+        const y = parseFloat(win.style.top)  || 0;
+        const w = parseFloat(win.style.width);
+        const h = parseFloat(win.style.height);
+        if (!w || !h) return;
+        const display = document.getElementById('cheerpjDisplay');
+        if (display) {
+          display.style.setProperty('position', 'absolute', 'important');
+          display.style.setProperty('left', ((window.innerWidth  - w) / 2 - x) + 'px', 'important');
+          display.style.setProperty('top',  ((window.innerHeight - h) / 2 - y) + 'px', 'important');
+        }
+      }
+
+      function scheduleLayout() {
+        const display = document.getElementById('cheerpjDisplay');
+        if (!display) return;
+        const wins = Array.from(display.querySelectorAll(':scope > .cjWindow'))
+          .filter(w => w.style.display !== 'none' && parseFloat(w.style.width) > 0);
+        if (!wins.length) return;
+        clearTimeout(layoutTimer);
+        layoutTimer = setTimeout(() => applyLayout(wins[wins.length - 1]), 100);
+      }
+
+      const bodyObs = new MutationObserver(() => {
+        const display = document.getElementById('cheerpjDisplay');
+        if (!display) return;
+        bodyObs.disconnect();
+        new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            const isNew     = m.type === 'childList' && m.addedNodes.length > 0;
+            const isResized = m.type === 'attributes'
+              && m.target.classList?.contains('cjWindow')
+              && m.target.parentElement === display;
+            if (isNew || isResized) { scheduleLayout(); break; }
+          }
+        }).observe(display, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+        scheduleLayout();
+      });
+      bodyObs.observe(document.body, { childList: true });
+    })();
+  </script>
+
+  <script>
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const jarUrl = params.get('jar');
+
+      if (!jarUrl) {
+        document.getElementById('loading').remove();
+        document.body.innerHTML = '<div id="error">Error: no ?jar= parameter specified.</div>';
+        return;
+      }
+
+      const encoded = btoa(jarUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      const cheerpjPath = '/app/api/jar/' + encoded + '/app.jar';
+
+      try {
+        await cheerpjInit({ version: 17 });
+        document.getElementById('loading')?.remove();
+        document.getElementById('cj-credit').style.display = 'block';
+
+        if (params.get('upload') === '1') {
+          const ui = document.getElementById('upload-ui');
+          ui.style.display = 'flex';
+          document.getElementById('file-input').addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              cheerpjAddStringFile('/str/input', e.target.result);
+              document.getElementById('upload-fname').textContent = file.name;
+            };
+            reader.readAsBinaryString(file);
+          });
+        }
+
+        cheerpjCreateDisplay(window.innerWidth, window.innerHeight);
+        await cheerpjRunJar(cheerpjPath);
+      } catch (err) {
+        document.getElementById('loading')?.remove();
+        document.body.innerHTML =
+          '<div id="error">Failed to start Java app:<br>' +
+          (err?.message || String(err)) + '</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

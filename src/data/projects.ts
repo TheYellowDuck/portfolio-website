@@ -32,6 +32,9 @@ export interface ExhibitPopup {
   // Embed a playable demo, game, or CodeSandbox
   embedUrl?: string;
 
+  // Short demo video (autoplay loop, shown instead of embedUrl for local apps)
+  videoUrl?: string;  // e.g. "/videos/minesweeper.mp4"
+
   // Control popup size (defaults provided)
   width?: string;   // e.g. "900px", "80vw"
   height?: string;  // e.g. "600px", "70vh"
@@ -115,9 +118,20 @@ export const mainHallExhibits: Exhibit[] = [
   },
   {
     popup: {
-      title: "Featured Project 4",
-      description: "Your description here.",
-      tech: ["Next.js", "Tailwind"],
+      title: "Minesweeper",
+      description: "Java Swing Minesweeper with a built-in AI solver. Customizable board size and mine count, dark-themed UI with color-coded numbers. Auto Solve uses constraint propagation to pick the statistically safest tile at each step.",
+      tech: ["Java", "Swing"],
+      skills: [
+        { category: "Core",         items: ["OOP design", "Lambda expressions", "Semaphore (dialog flow)", "Custom Comparator", "Exception handling"] },
+        { category: "Swing / GUI",  items: ["JFrame / JDialog / JPanel", "Custom paintComponent", "MouseListener / ActionListener", "javax.swing.Timer", "Dynamic BufferedImage icons"] },
+        { category: "Graphics",     items: ["Bevel tile rendering", "Anti-aliasing (RenderingHints)", "BasicStroke line drawing", "Font metrics layout", "Dark-theme palette"] },
+        { category: "Algorithms",   items: ["Constraint propagation", "Mine probability estimation", "BFS flood-fill", "Random tie-breaking"] },
+        { category: "Tooling",      items: ["javac / jar", "jpackage native bundling", "Java module system", "GitHub CLI releases"] },
+      ],
+      width: "840px",
+      links: [
+        { label: "GitHub", url: "https://github.com/TheYellowDuck/minesweeper" },
+      ],
     },
   },
   {
@@ -194,30 +208,53 @@ export const archiveExhibits: Exhibit[] = [
   },
   {
     popup: {
-      title: "Side Project 1",
-      description: "Your description here.",
-      tech: ["Swift"],
+      title: "Image to ASCII",
+      description: "Converts images (JPG, PNG, GIF) to ASCII art in a Java Swing viewer. Zoom in/out via buttons, Ctrl+scroll, or Ctrl+=/−. Pan with drag, arrow keys, or two-finger scroll. Fit-to-window button, and saves a grayscale output image alongside the original.",
+      tech: ["Java", "Swing"],
+      skills: [
+        { category: "GUI",          items: ["JFrame / JScrollPane / JPanel", "JFileChooser", "Custom paintComponent", "InputMap / ActionMap shortcuts", "MouseAdapter (drag-to-pan)"] },
+        { category: "Image",        items: ["Pixel RGB manipulation", "Rec. 601 grayscale luma", "ImageIO file I/O", "Image scaling (Graphics2D)", "ASCII character mapping"] },
+        { category: "Rendering",    items: ["Off-screen BufferedImage cache", "Graphics2D antialiasing", "Bilinear / nearest-neighbor interp.", "Zoom & pan implementation"] },
+        { category: "Engineering",  items: ["SwingWorker background proc.", "EDT compliance", "Static SHADE_MAP lookup", "StringBuilder optimization"] },
+      ],
+      width: "800px",
+      links: [
+        { label: "GitHub", url: "https://github.com/TheYellowDuck/ImageToText" },
+      ],
     },
   },
   {
     popup: {
-      title: "Side Project 2",
-      description: "Your description here.",
-      tech: ["Rust"],
+      title: "Exorcist",
+      description: "An infinite climbing platformer. Jump between procedurally generated platforms, fight enemies, and climb as high as you can. Move, double jump, attack, and shield — 5 HP with 2 bonus overflow hearts, a stamina-based shield that blocks frontal attacks, and half-heart regen every 20 seconds. Enemies include the Wolf (fast, lunging), Golem (slow, tanky), Witch (ranged curse DoT), and Bat (free-flying). Height score is tracked and saved between sessions.",
+      tech: ["Java", "Swing"],
+      skills: [
+        { category: "Architecture", items: ["Entity inheritance hierarchy", "Thread-based game loop (60 FPS)", "Camera / viewport system", "Tile-based procedural world", "Custom collision detection"] },
+        { category: "Gameplay",     items: ["Gravity / double jump / knockback", "Stamina-based shield", "HP + overflow hearts", "Fall damage", "Half-heart regen"] },
+        { category: "Enemy AI",     items: ["FSM per enemy (patrol/chase/attack)", "Edge-safe pathfinding", "Ranged curse DoT (Witch)", "Aerial free-roam pursuit (Bat)", "Invincibility frames"] },
+        { category: "Graphics",     items: ["Sprite sheet parsing & animation", "AffineTransform flipping", "Alpha compositing", "HUD (hearts, shield bar)", "javax.sound.sampled audio"] },
+      ],
+      width: "800px",
+      links: [
+        { label: "GitHub", url: "https://github.com/TheYellowDuck/Exorcist" },
+      ],
     },
   },
   {
     popup: {
-      title: "Side Project 3",
-      description: "Your description here.",
-      tech: ["Go"],
-    },
-  },
-  {
-    popup: {
-      title: "Side Project 4",
-      description: "Your description here.",
-      tech: ["Java"],
+      title: "Go",
+      description: "A Go board game built in Java with Processing. Features Chinese rules scoring, ko rule detection, and 3D stone rendering.",
+      tech: ["Java", "Processing"],
+      skills: [
+        { category: "Algorithms",   items: ["BFS flood-fill (territory count)", "DFS liberty detection", "Ko rule state comparison", "Suicide prevention check", "Chinese area scoring + komi"] },
+        { category: "Game Logic",   items: ["Chinese rules engine", "Two-pass game end", "Real-time hover preview", "Win condition & declaration"] },
+        { category: "Graphics",     items: ["Layered 3D stone rendering", "Shadow / gradient / specular ellipses", "Territory overlay at game end", "19×19 grid & star points"] },
+        { category: "Java APIs",    items: ["Processing (PApplet)", "java.awt.Taskbar dock icon", "surface.setIcon() / PImage", "Mouse input via Processing"] },
+      ],
+      width: "800px",
+      links: [
+        { label: "GitHub", url: "https://github.com/TheYellowDuck/go-board-game" },
+      ],
     },
   },
 ];
