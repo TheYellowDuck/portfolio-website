@@ -1,5 +1,5 @@
-import GameCanvas from "@/components/GameCanvas";
+import SiteShell from "@/components/SiteShell";
 
 export default function Home() {
-  return <GameCanvas />;
+  return <SiteShell />;
 }

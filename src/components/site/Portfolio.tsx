@@ -1,0 +1,230 @@
+"use client";
+
+import { useState } from "react";
+import {
+  mainHallExhibits,
+  archiveExhibits,
+  experienceExhibits,
+  skillsExhibits,
+  officeExhibits,
+  giftShopExhibits,
+  type Exhibit,
+  type ExhibitPopup,
+} from "@/data/projects";
+import Hero from "./Hero";
+import Reveal from "./Reveal";
+import ProjectCard from "./ProjectCard";
+
+interface PortfolioProps {
+  onEnter: (rect?: DOMRect) => void;
+  onResume: () => void;
+  onTranscript: () => void;
+}
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const withPopup = (xs: Exhibit[]) => xs.filter((e): e is Required<Pick<Exhibit, "popup">> & Exhibit => !!e.popup?.title);
+
+function Section({ id, eyebrow, title, intro, children }: {
+  id: string; eyebrow: string; title: string; intro?: string; children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="mx-auto max-w-[1080px] scroll-mt-20 px-6 py-16 sm:py-24">
+      <Reveal>
+        <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-sage">{eyebrow}</p>
+        <h2 className="mt-3 font-sans text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
+        {intro && <p className="mt-3 max-w-[60ch] text-[15px] leading-relaxed text-walnut/70">{intro}</p>}
+      </Reveal>
+      <div className="mt-9 sm:mt-11">{children}</div>
+    </section>
+  );
+}
+
+export default function Portfolio({ onEnter, onResume, onTranscript }: PortfolioProps) {
+  const featured = withPopup(mainHallExhibits);
+  const archive = withPopup(archiveExhibits);
+  const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
+  const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
+  const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
+
+  return (
+    <div className="min-h-[100svh] bg-parchment text-walnut">
+      {/* Slim sticky nav */}
+      <nav className="sticky top-0 z-20 border-b border-[rgba(58,46,30,0.08)] bg-[rgba(254,249,236,0.82)] backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-3">
+          <a href="#top" className="font-mono text-[13px] font-semibold tracking-tight text-walnut">George Zhang</a>
+          <div className="hidden items-center gap-6 font-mono text-[12px] text-walnut/65 sm:flex">
+            <a href="#work" className="transition-colors hover:text-pine">Work</a>
+            <a href="#experience" className="transition-colors hover:text-pine">Experience</a>
+            <a href="#skills" className="transition-colors hover:text-pine">Skills</a>
+            <a href="#contact" className="transition-colors hover:text-pine">Contact</a>
+          </div>
+          <button
+            onClick={() => onEnter()}
+            className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+          >
+            Step inside →
+          </button>
+        </div>
+      </nav>
+
+      <div id="top" />
+      <Hero onEnter={onEnter} onResume={onResume} />
+
+      {/* ── Work ── */}
+      <Section id="work" eyebrow="The Collection" title="Selected Work"
+        intro="A few things I've built — games, tools, and research apps. Step inside the museum to see them on pedestals.">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {featured.map((e, i) => (
+            <Reveal key={i} delay={(i % 2) * 70}>
+              <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} />
+            </Reveal>
+          ))}
+        </div>
+
+        {archive.length > 0 && (
+          <>
+            <h3 className="mt-12 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/45">Archive</h3>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {archive.map((e, i) => (
+                <Reveal key={i} delay={(i % 3) * 60}>
+                  <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact />
+                </Reveal>
+              ))}
+            </div>
+          </>
+        )}
+      </Section>
+
+      {/* ── Experience ── */}
+      <Section id="experience" eyebrow="Curriculum Vitae" title="Experience">
+        <div className="relative ml-1 border-l border-[rgba(122,158,126,0.4)] pl-6 sm:pl-8">
+          {experienceExhibits.map((e, i) =>
+            e.popup ? <ExperienceItem key={i} popup={e.popup} /> : null
+          )}
+        </div>
+      </Section>
+
+      {/* ── Skills ── */}
+      <Section id="skills" eyebrow="The Toolkit" title="Skills">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {skillsExhibits.map((e, i) =>
+            e.popup ? (
+              <Reveal key={i} delay={(i % 3) * 60}>
+                <div className="h-full rounded-xl border border-[rgba(58,46,30,0.12)] bg-[#fffdf7] p-5">
+                  <h3 className="font-sans text-[16px] font-semibold text-pine">{e.popup.title}</h3>
+                  {e.popup.description && (
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-walnut/70">{e.popup.description}</p>
+                  )}
+                  {e.popup.tech && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {e.popup.tech.map((t) => (
+                        <span key={t} className="rounded border border-[rgba(122,158,126,0.4)] bg-[rgba(122,158,126,0.1)] px-2 py-0.5 font-mono text-[11px] text-pine">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Reveal>
+            ) : null
+          )}
+        </div>
+      </Section>
+
+      {/* ── About ── */}
+      <Section id="about" eyebrow="The Curator" title="About">
+        <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
+          <Reveal>
+            <div className="space-y-4 text-[15px] leading-relaxed text-walnut/85">
+              {aboutText && <p>{aboutText}</p>}
+              {interests && (
+                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-sage">Off the clock — </span>{interests}</p>
+              )}
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <div className="flex flex-col gap-3">
+              <button onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                Read résumé →
+              </button>
+              {hasTranscript && (
+                <button onClick={onTranscript} className="rounded-lg border border-[rgba(58,46,30,0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                  Education & transcript →
+                </button>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      </Section>
+
+      {/* ── Contact ── */}
+      <Section id="contact" eyebrow="Stay in touch" title="Let's talk">
+        <div className="flex flex-wrap gap-3">
+          {giftShopExhibits.map((e, i) => {
+            const link = e.popup?.links?.[0];
+            if (!link) return null;
+            return (
+              <Reveal key={i} delay={i * 50}>
+                <a
+                  href={link.url}
+                  target={link.url.startsWith("http") ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-5 py-2.5 font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                >
+                  {e.popup?.title} ↗
+                </a>
+              </Reveal>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* Footer */}
+      <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
+        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgba(58,46,30,0.1)] pt-6 font-mono text-[12px] text-walnut/45 sm:flex-row sm:items-center">
+          <span>© {new Date().getFullYear()} George Zhang · built with Next.js</span>
+          <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
+            Prefer to wander? Step inside the museum →
+          </button>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
+  const [open, setOpen] = useState(false);
+  const long = (popup.description?.length ?? 0) > 280;
+  return (
+    <Reveal>
+      <div className="relative pb-11 last:pb-0">
+        <span className="absolute -left-[33px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-sage bg-parchment sm:-left-[41px]" />
+        {popup.date && <p className="font-mono text-[12px] tracking-wide text-sage">{popup.date}</p>}
+        <h3 className="mt-1 font-sans text-[19px] font-semibold text-pine">{popup.title}</h3>
+        {popup.subtitle && <p className="text-[14px] text-walnut/70">{popup.subtitle}</p>}
+        {popup.description && (
+          <p className={`mt-2.5 max-w-[68ch] text-[14px] leading-relaxed text-walnut/80 ${long && !open ? "line-clamp-4" : ""}`}>
+            {popup.description}
+          </p>
+        )}
+        {long && (
+          <button onClick={() => setOpen((o) => !o)} className="mt-1.5 font-mono text-[12px] text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage">
+            {open ? "Show less" : "Read more"}
+          </button>
+        )}
+        {popup.tech && popup.tech.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {popup.tech.slice(0, 10).map((t) => (
+              <span key={t} className="rounded border border-[rgba(122,158,126,0.4)] bg-[rgba(122,158,126,0.1)] px-2 py-0.5 font-mono text-[11px] text-pine">{t}</span>
+            ))}
+          </div>
+        )}
+        {popup.links && popup.links.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            {popup.links.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="font-mono text-[13px] text-walnut/75 underline decoration-sage/40 underline-offset-4 transition-colors hover:text-pine hover:decoration-sage">{l.label} ↗</a>
+            ))}
+          </div>
+        )}
+      </div>
+    </Reveal>
+  );
+}

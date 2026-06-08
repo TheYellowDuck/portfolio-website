@@ -14,7 +14,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "George Zhang — Portfolio",
-  description: "Interactive museum portfolio — CS student at the University of Waterloo",
+  description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+  openGraph: {
+    title: "George Zhang — Portfolio",
+    description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+    type: "website",
+    siteName: "George Zhang",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "George Zhang — Portfolio",
+    description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+  },
 };
 
 // Lock the viewport for the canvas game: fit the device width, no pinch/double-tap

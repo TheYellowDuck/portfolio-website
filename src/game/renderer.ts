@@ -85,6 +85,8 @@ export function drawScene(
   glowAlpha: number,
   ambient: AmbientState,
   debugPhysics: boolean,
+  hidePlayer = false,
+  playerAlpha = 1,
   renderParticles = true,
 ): void {
   ctx.imageSmoothingEnabled = false;
@@ -259,8 +261,8 @@ export function drawScene(
       particles.draw(ctx, camX, camY, viewW, viewH, 'footstep', sortRow);
     }
 
-    // Player
-    if (sortRow === playerSortRow) {
+    // Player — drawn at playerAlpha so the portal transition can fade it in/out.
+    if (!hidePlayer && playerAlpha > 0 && sortRow === playerSortRow) {
       const drawH = TILE_SIZE * 4;
       const centerX = Math.round(player.x - camX + player.width / 2);
       const sy = Math.round(player.y - camY) - TILE_SIZE * 2.65;
@@ -269,6 +271,8 @@ export function drawScene(
         const drawW = drawH * (img.naturalWidth / img.naturalHeight);
         ctx.drawImage(img, centerX - drawW / 2, sy, drawW, drawH);
       };
+      ctx.save();
+      ctx.globalAlpha = playerAlpha;
       if (!player.isMoving && player.facing === 'north') {
         drawImg(sprites.northIdleSprite);
       } else {
@@ -276,6 +280,7 @@ export function drawScene(
         const frame = frames?.[player.animFrame];
         if (frame) drawImg(frame);
       }
+      ctx.restore();
     }
 
     // Objects and glow

@@ -16,6 +16,9 @@ const BG_MUSIC_SRCS = [
   "/assets/audio/Interior Birdecorator Explore_CUTE.m4a",
   "/assets/audio/Interior Birdecorator Explore_CUTE.ogg",
 ];
+const BG_VOL = 0.1;          // background-music target volume
+const BG_FADE_IN_MS = 900;   // fade up when the music first starts
+const BG_FADE_OUT_MS = 1200; // fade down when leaving the museum
 
 // SSR/pre-mount fallback — overwritten at mount with the actual viewport size.
 const BASE_W = 1920;
@@ -27,8 +30,35 @@ const BASE_H = 1080;
 // this many tiles — so a phone isn't over-zoomed in either orientation.
 const MIN_TILES_SHORT = 10;
 
-export default function GameCanvas() {
+interface GameCanvasProps {
+  /** Fires once the engine's sprites are loaded and the world is ready. */
+  onReady?: () => void;
+  /** Suppress the built-in splash (the portal transition is the loading visual). */
+  hideLoadingScreen?: boolean;
+  /** Opacity of the world canvas (the "game background"). */
+  worldOpacity?: number;
+  /** Opacity of the HUD chrome (minimap, hints, mute, touch controls). */
+  hudOpacity?: number;
+  /** Fade the engine player in/out (tweened over `fadeMs`). */
+  playerVisible?: boolean;
+  /** Fade duration for the above, in ms (0 = instant). */
+  fadeMs?: number;
+  /** When false (e.g. while leaving), the background music fades out. */
+  audible?: boolean;
+}
+
+export default function GameCanvas({
+  onReady,
+  hideLoadingScreen = false,
+  worldOpacity = 1,
+  hudOpacity = 1,
+  playerVisible = true,
+  fadeMs = 0,
+  audible = true,
+}: GameCanvasProps = {}) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const onReadyRef   = useRef(onReady);
+  useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   const engineRef    = useRef<GameEngine | null>(null);
   const howlCache    = useRef<Map<string, Howl>>(new Map());
   const footstepHowls = useRef<Howl[]>([]);
@@ -97,10 +127,19 @@ export default function GameCanvas() {
     if (musicStartedRef.current) return;
     musicStartedRef.current = true;
     setMusicStarted(true);
-    const howl = new Howl({ src: BG_MUSIC_SRCS, loop: true, volume: 0.1 });
+    // Start silent and fade up so the music eases in rather than popping.
+    const howl = new Howl({ src: BG_MUSIC_SRCS, loop: true, volume: 0 });
     bgMusicRef.current = howl;
     howl.play();
+    howl.fade(0, BG_VOL, BG_FADE_IN_MS);
   }, []);
+
+  // Fade the music down when leaving (audible → false), back up when audible again.
+  useEffect(() => {
+    const howl = bgMusicRef.current;
+    if (!howl) return;
+    howl.fade(howl.volume(), audible ? BG_VOL : 0, audible ? BG_FADE_IN_MS : BG_FADE_OUT_MS);
+  }, [audible]);
 
   const toggleBgmMute = useCallback(() => {
     setIsBgmMuted(prev => {
@@ -243,13 +282,35 @@ export default function GameCanvas() {
     engine.onReady = () => {
       setIsLoading(false);
       engine.setPaused(false);
+      onReadyRef.current?.();
     };
     engine.onPositionChange = (x, y) => minimapDrawRef.current?.(x, y);
     engine.start();
     engine.setPaused(true);
 
-    return () => engine.stop();
+    // On unmount (leaving the game), stop the loop and fully reset audio so the
+    // background music / SFX don't linger or double up when re-entering.
+    return () => { engine.stop(); Howler.unload(); };
   }, []);
+
+  // Fade the engine player in/out (the portal fades the world in first, then the
+  // player). Tweens engine.playerAlpha directly — no React re-renders per frame.
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const target = playerVisible ? 1 : 0;
+    if (fadeMs <= 0) { engine.playerAlpha = target; return; }
+    let raf = 0;
+    const from = engine.playerAlpha;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / fadeMs);
+      engine.playerAlpha = from + (target - from) * t;
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playerVisible, fadeMs]);
 
   return (
     // Outer: fills viewport, clips edges that zoom-fill pushes past screen boundary.
@@ -259,7 +320,7 @@ export default function GameCanvas() {
       <div
         ref={containerRef}
         className="absolute overflow-hidden origin-center"
-        style={{ top: "50%", left: "50%" }}
+        style={{ top: "50%", left: "50%", opacity: worldOpacity, transition: `opacity ${fadeMs}ms ease` }}
       >
         <canvas
           ref={canvasRef}
@@ -275,14 +336,19 @@ export default function GameCanvas() {
         />
       </div>
 
-      <LoadingScreen
-        visible={isLoading}
-        loaded={progress.loaded}
-        total={progress.total}
-      />
+      {!hideLoadingScreen && (
+        <LoadingScreen
+          visible={isLoading}
+          loaded={progress.loaded}
+          total={progress.total}
+        />
+      )}
 
       {/* HUD chrome — real viewport coordinates, never scaled with the world zoom. */}
-      <div className="fixed inset-2 z-10 pointer-events-none">
+      <div
+        className="fixed inset-2 z-10 pointer-events-none"
+        style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}
+      >
         <ControlsHint
           visible={showControls && !isLoading && !activePopup}
           isTouch={isTouch}
@@ -331,13 +397,16 @@ export default function GameCanvas() {
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />
 
       {/* On-screen controls for touch devices — virtual joystick + interact button.
-          Outside the scaled container so it sits in real (thumb-reachable) viewport space. */}
-      <TouchControls
-        visible={isTouch && !isLoading && !activePopup && !bigMap}
-        nearby={!!prompt}
-        onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
-        onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}
-      />
+          Outside the scaled container so it sits in real (thumb-reachable) viewport space.
+          Faded with the rest of the HUD during the portal transition. */}
+      <div style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}>
+        <TouchControls
+          visible={isTouch && !isLoading && !activePopup && !bigMap}
+          nearby={!!prompt}
+          onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
+          onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}
+        />
+      </div>
     </div>
   );
 }

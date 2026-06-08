@@ -78,6 +78,10 @@ export class GameEngine {
   public onPositionChange: ((x: number, y: number) => void) | null = null;
   public onFootstep: ((running: boolean) => void) | null = null;
   public debugPhysics = false;
+  // When true the player isn't drawn. `playerAlpha` (0–1) fades the player in/out
+  // during the site→game portal transition (the world fades in first, then the player).
+  public hidePlayer = false;
+  public playerAlpha = 1;
 
   /** Total tracked sprites (for a loading progress display). */
   get spritesTotal() { return this.sprites.total; }
@@ -326,6 +330,8 @@ export class GameEngine {
       this.glowAlpha,
       { lightsOff: this.lightsOff, meBlinking: this.meBlinking },
       this.debugPhysics,
+      this.hidePlayer,
+      this.playerAlpha,
     );
   }
 

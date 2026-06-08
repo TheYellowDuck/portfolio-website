@@ -9,10 +9,12 @@
 }
 
 html, body {
-  overflow: hidden;
+  overflow-x: hidden;          /* the site scrolls vertically; game locks scroll while active */
   overscroll-behavior: none;   /* no pull-to-refresh / scroll chaining on touch */
-  background: #1c1508;
+  background: #fef9ec;         /* parchment (site default); the game layer paints its own dark bg */
 }
+/* Set by SiteShell while the game is mounted so the page behind can't scroll. */
+body.game-active { overflow: hidden; }
 
 /* Warm halo for the on-screen interact button when near an exhibit:
    a steady golden glow plus an expanding ring pulse (button fill/text unchanged). */
