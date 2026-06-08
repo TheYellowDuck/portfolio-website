@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, PERSON } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,18 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "George Zhang — Portfolio",
-  description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "George Zhang — Portfolio",
-    description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
-    siteName: "George Zhang",
+    url: "/",
+    siteName: PERSON.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "George Zhang — Portfolio",
-    description: "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -49,7 +53,24 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: PERSON.name,
+              url: SITE_URL,
+              jobTitle: PERSON.jobTitle,
+              email: `mailto:${PERSON.email}`,
+              alumniOf: { "@type": "CollegeOrUniversity", name: PERSON.alumniOf },
+              sameAs: PERSON.sameAs,
+            }),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

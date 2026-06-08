@@ -6,14 +6,18 @@ interface ProjectCardProps {
   index: string;   // e.g. "01"
   popup: ExhibitPopup;
   compact?: boolean;
+  /** Open the full exhibit (grouped skills, playable demo, etc.). */
+  onOpen?: () => void;
 }
 
-export default function ProjectCard({ index, popup, compact = false }: ProjectCardProps) {
+export default function ProjectCard({ index, popup, compact = false, onOpen }: ProjectCardProps) {
   const hasDemo = !!(popup.embedUrl || popup.videoUrl);
+  // Only offer details when there's meaningfully more than the card already shows.
+  const hasMore = !!(popup.skills?.length || hasDemo);
   return (
     <article className="group flex flex-col rounded-xl border border-[rgba(58,46,30,0.12)] bg-[#fffdf7] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)]">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[11px] tracking-[0.22em] text-sage">No. {index}</span>
+        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
         {hasDemo && (
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-pine/70">
             ▶ playable
@@ -44,21 +48,27 @@ export default function ProjectCard({ index, popup, compact = false }: ProjectCa
         </div>
       )}
 
-      {popup.links && popup.links.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
-          {popup.links.map((l) => (
-            <a
-              key={l.url}
-              href={l.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-[13px] text-walnut/75 underline decoration-sage/40 underline-offset-4 transition-colors hover:text-pine hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
-            >
-              {l.label} ↗
-            </a>
-          ))}
-        </div>
-      )}
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
+        {hasMore && onOpen && (
+          <button
+            onClick={onOpen}
+            className="font-mono text-[13px] text-pine underline decoration-sage/50 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
+          >
+            Details →
+          </button>
+        )}
+        {popup.links?.map((l) => (
+          <a
+            key={l.url}
+            href={l.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[13px] text-walnut/75 underline decoration-sage/40 underline-offset-4 transition-colors hover:text-pine hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
+          >
+            {l.label} ↗
+          </a>
+        ))}
+      </div>
     </article>
   );
 }

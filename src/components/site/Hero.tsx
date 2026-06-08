@@ -21,7 +21,7 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
     <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
       {/* Left: identity */}
       <div className="flex-1">
-        <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-sage">
+        <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
           Portfolio · est. golden hour
         </p>
         <h1 className="mt-4 font-sans text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">

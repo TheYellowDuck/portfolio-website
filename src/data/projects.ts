@@ -49,6 +49,13 @@ export interface Exhibit {
 
   // Optional: show a popup. If missing, only audio plays.
   popup?: ExhibitPopup;
+
+  // Optional: NPC-style dialog — lines shown one at a time, advanced with E / tap.
+  dialog?: string[];
+
+  // Optional: shown on repeat interactions after `dialog` has played once.
+  // Each entry is one bit (1–2 lines); they cycle in order.
+  jokes?: string[][];
 }
 
 // ============================================================
@@ -370,6 +377,28 @@ export const giftShopExhibits: Exhibit[] = [
       description: "See how this museum was built.",
       links: [{ label: "View Source", url: "https://github.com/you/portfolio" }],
     },
+  },
+];
+
+// "Me at the desk" — the NPC in the hallway alcove. Interact to chat.
+export const meExhibit: Exhibit[] = [
+  {
+    dialog: [
+      "Oh — hey! Didn't hear you come in.",
+      "Welcome to the museum. I'm George — I built all of this.",
+      "Every pedestal in here holds something I've made. Poke around; press E on anything that glows.",
+      "There's a résumé by the entrance if you're the formal type, and my contact links are in the gift shop.",
+      "Thanks for stopping by. Genuinely means a lot.",
+      "Stick around — come bug me at the desk whenever.",
+    ],
+    jokes: [
+      ["I built a whole museum to avoid writing a normal portfolio.", "The math on that still doesn't check out."],
+      ["That fade you walked through to get here took me an afternoon.", "You blinked through it, didn't you."],
+      ["This desk is the one thing in here with no collision bugs.", "Please don't mention that to the pedestals."],
+      ["Everything in this room is real —", "except my composure in technical interviews."],
+      ["I almost added a loading bar.", "Then realized watching it would be the most honest part of the site."],
+      ["You're the third visitor today.", "The other two were me, checking the lighting."],
+    ],
   },
 ];
 

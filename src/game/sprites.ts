@@ -3,13 +3,14 @@
 // Every sprite the renderer might draw is registered here. `_total` is
 // incremented synchronously at registration and each image decrements via
 // `markLoaded()`; once all tracked sprites have loaded, `onReady` fires exactly
-// once. Character animation frames (idle/walk) are loaded but intentionally NOT
-// tracked — the scene draws fine without them and they stream in.
+// once. Character animation frames are NOT tracked and are loaded **lazily per
+// direction** via `frames()` (only the spawn-facing frames are pre-warmed), so
+// entering the game doesn't fetch all ~83 frames up front.
 //
 // `cacheBust` appends `?v=<token>` so /map-snapshot can bypass the browser
 // cache; the live game omits it and loads from cache normally.
 
-import { IDLE_DIRS, WALK_DIRS, IDLE_FRAMES, WALK_FRAMES, type Direction } from "./player";
+import { IDLE_FRAMES, WALK_FRAMES, type Direction } from "./player";
 
 export class SpriteRegistry {
   onReady: (() => void) | null = null;
@@ -41,9 +42,10 @@ export class SpriteRegistry {
   meBlinkReady = false;
   meLightOffSprite: HTMLImageElement;
   meLightOffReady = false;
-  idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
-  walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   northIdleSprite: HTMLImageElement = new Image();
+  private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
+  private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
+  private url!: (path: string) => string;
 
   private _loaded = 0;
   private _total = 0;
@@ -57,8 +59,25 @@ export class SpriteRegistry {
     if (this._loaded >= this._total) this.onReady?.();
   }
 
+  /** Lazily load (and cache) a facing direction's animation frames on first use. */
+  frames(state: "idle" | "walk", dir: Direction): HTMLImageElement[] {
+    const cache = state === "idle" ? this.idleSprites : this.walkSprites;
+    let arr = cache.get(dir);
+    if (!arr) {
+      const count = state === "idle" ? IDLE_FRAMES : WALK_FRAMES;
+      arr = [];
+      for (let i = 0; i < count; i++) {
+        const img = new Image();
+        img.src = this.url(`/assets/sprites/character/states/standing/animations/${state}/${dir}/frame_${String(i).padStart(3, "0")}.png`);
+        arr.push(img);
+      }
+      cache.set(dir, arr);
+    }
+    return arr;
+  }
+
   constructor(cacheBust?: string) {
-    const url = (path: string) => (cacheBust ? `${path}?v=${cacheBust}` : path);
+    const url = (this.url = (path: string) => (cacheBust ? `${path}?v=${cacheBust}` : path));
     // Register a sprite for readiness tracking: bump total now, then count it
     // exactly once on load OR error. Counting errors too is critical — without
     // it, a single failed/blocked sprite (e.g. mobile Safari hitting its image
@@ -117,25 +136,9 @@ export class SpriteRegistry {
     this.meLightOffSprite = tracked(new Image(), () => { this.meLightOffReady = true; });
     this.meLightOffSprite.src = url("/assets/sprites/me-light-off.png");
 
-    // Character animation frames — loaded untracked (scene renders without them).
-    for (const dir of IDLE_DIRS) {
-      const frames: HTMLImageElement[] = [];
-      for (let i = 0; i < IDLE_FRAMES; i++) {
-        const img = new Image();
-        img.src = url(`/assets/sprites/character/states/standing/animations/idle/${dir}/frame_${String(i).padStart(3, "0")}.png`);
-        frames.push(img);
-      }
-      this.idleSprites.set(dir, frames);
-    }
-    for (const dir of WALK_DIRS) {
-      const frames: HTMLImageElement[] = [];
-      for (let i = 0; i < WALK_FRAMES; i++) {
-        const img = new Image();
-        img.src = url(`/assets/sprites/character/states/standing/animations/walk/${dir}/frame_${String(i).padStart(3, "0")}.png`);
-        frames.push(img);
-      }
-      this.walkSprites.set(dir, frames);
-    }
     this.northIdleSprite.src = url("/assets/sprites/character/states/standing/rotations/north.png");
+    // Pre-warm the spawn-facing frames; other directions load on first use.
+    this.frames("idle", "east");
+    this.frames("walk", "east");
   }
 }

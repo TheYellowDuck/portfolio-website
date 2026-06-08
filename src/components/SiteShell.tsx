@@ -2,10 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { AnimatePresence } from "framer-motion";
 import Portfolio from "./site/Portfolio";
-import ResumePopup from "./overlays/ResumePopup";
-import TranscriptPopup from "./overlays/TranscriptPopup";
+import ExhibitOverlay from "./overlays/ExhibitOverlay";
+import type { ExhibitPopup } from "@/data/projects";
 
 // Game (engine + ~115 sprites) loads only when the visitor chooses to enter.
 const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
@@ -16,7 +15,6 @@ type Stage =
   | "site"
   | "in-fade" | "in-bg" | "in-player" | "game"
   | "out-hud" | "out-player" | "out-bg" | "out-fade";
-type Modal = null | "resume" | "transcript";
 
 const FADE_MS = 420;
 
@@ -34,7 +32,7 @@ function usePrefersReducedMotion() {
 
 export default function SiteShell() {
   const [stage, setStage] = useState<Stage>("site");
-  const [modal, setModal] = useState<Modal>(null);
+  const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
   // Game-layer opacity flag (mounts at 0, fades to 1) so the site visibly
   // cross-fades to the dark room rather than being covered instantly.
   const [gameOn, setGameOn] = useState(false);
@@ -56,13 +54,6 @@ export default function SiteShell() {
   }, [stage]);
   useEffect(() => () => document.body.classList.remove("game-active"), []);
 
-  // Esc closes whichever site modal is open.
-  useEffect(() => {
-    if (!modal) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setModal(null); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [modal]);
 
   // Start the background fade once the site has faded out AND the engine is ready.
   const maybeStartBg = useCallback(() => {
@@ -144,8 +135,9 @@ export default function SiteShell() {
       >
         <Portfolio
           onEnter={enterGame}
-          onResume={() => setModal("resume")}
-          onTranscript={() => setModal("transcript")}
+          onResume={() => setActivePopup({ type: "resume" })}
+          onTranscript={() => setActivePopup({ type: "transcript" })}
+          onOpenProject={(popup) => setActivePopup(popup)}
         />
       </div>
 
@@ -168,6 +160,19 @@ export default function SiteShell() {
         </div>
       )}
 
+      {/* Reassurance while the world loads on the dark (between the cross-fade and
+          the background fading in). */}
+      {stage === "in-fade" && (
+        <div
+          className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
+          style={{ opacity: gameOn ? 1 : 0, transition: `opacity ${fadeMs}ms ease` }}
+        >
+          <p className="font-mono text-[12px] uppercase tracking-[0.35em] text-[rgba(240,228,196,0.5)]">
+            entering the museum…
+          </p>
+        </div>
+      )}
+
       {/* Leave affordance while playing. */}
       {stage === "game" && (
         <button
@@ -179,11 +184,9 @@ export default function SiteShell() {
         </button>
       )}
 
-      {/* Site modals (resume / transcript) reuse the game's overlay components. */}
-      <AnimatePresence>
-        {modal === "resume" && <ResumePopup key="resume" onClose={() => setModal(null)} />}
-        {modal === "transcript" && <TranscriptPopup key="transcript" onClose={() => setModal(null)} />}
-      </AnimatePresence>
+      {/* Site detail modals reuse the game's exhibit overlay (text, tags, grouped
+          skills, links, embeds) — and route resume/transcript to their viewers. */}
+      <ExhibitOverlay popup={activePopup} onClose={() => setActivePopup(null)} />
     </>
   );
 }

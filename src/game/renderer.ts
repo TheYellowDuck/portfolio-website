@@ -276,8 +276,7 @@ export function drawScene(
       if (!player.isMoving && player.facing === 'north') {
         drawImg(sprites.northIdleSprite);
       } else {
-        const frames = (player.isMoving ? sprites.walkSprites : sprites.idleSprites).get(player.facing);
-        const frame = frames?.[player.animFrame];
+        const frame = sprites.frames(player.isMoving ? 'walk' : 'idle', player.facing)[player.animFrame];
         if (frame) drawImg(frame);
       }
       ctx.restore();

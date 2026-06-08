@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
@@ -19,6 +20,14 @@ interface ExhibitOverlayProps {
 }
 
 export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) {
+  // Esc closes whichever exhibit / resume / transcript popup is open.
+  useEffect(() => {
+    if (!popup) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [popup, onClose]);
+
   return (
     <AnimatePresence>
       {popup && popup.type === "resume" && (
@@ -31,12 +40,13 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
 
       {popup && popup.type !== "resume" && popup.type !== "transcript" && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — click to close */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={onClose}
             className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
           />
 
@@ -46,6 +56,9 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
           >
               <motion.div
                 key="popup"
+                role="dialog"
+                aria-modal="true"
+                aria-label={popup.title ?? "Exhibit"}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -74,6 +87,8 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                   </div>
                   <button
                     onClick={onClose}
+                    autoFocus
+                    aria-label="Close"
                     className="shrink-0 select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                   >
                     close [`]

@@ -1,5 +1,5 @@
-import { museumMap, TILE_SIZE, INTERACTABLE_TILES } from "./tilemap";
-import { Exhibit, roomRegistry } from "@/data/projects";
+import { museumMap, TILE_SIZE, INTERACTABLE_TILES, NPC_COL, NPC_ROW } from "./tilemap";
+import { Exhibit, roomRegistry, meExhibit } from "@/data/projects";
 
 export interface Interactable {
   col: number;
@@ -42,6 +42,13 @@ function buildInteractables(): Interactable[] {
 }
 
 export const interactables = buildInteractables();
+
+// "Me at the desk" — a standalone interactable (not a scanned tile). The anchor
+// the player triggers from is one row south of `row` (see getNearbyInteractable),
+// i.e. the hallway floor just below the desk.
+if (meExhibit[0]) {
+  interactables.push({ col: NPC_COL, row: NPC_ROW, tileType: -1, radius: 2.5, content: meExhibit[0] });
+}
 
 export function getNearbyInteractable(
   playerX: number,

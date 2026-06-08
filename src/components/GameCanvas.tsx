@@ -11,6 +11,7 @@ import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
 import TouchControls from "./TouchControls";
+import NpcDialog from "./NpcDialog";
 
 const BG_MUSIC_SRCS = [
   "/assets/audio/Interior Birdecorator Explore_CUTE.m4a",
@@ -68,6 +69,8 @@ export default function GameCanvas({
   const baseSizeRef  = useRef({ w: BASE_W, h: BASE_H });
 
   const minimapDrawRef  = useRef<((x: number, y: number) => void) | null>(null);
+  // Per-NPC interaction count → intro on first talk, jokes (cycled) thereafter.
+  const dialogVisitsRef = useRef<Map<Exhibit, number>>(new Map());
   const bgMusicRef      = useRef<Howl | null>(null);
   const musicStartedRef = useRef(false);
   const [isBgmMuted, setIsBgmMuted] = useState(false);
@@ -166,6 +169,7 @@ export default function GameCanvas({
   const [showControls, setShowControls] = useState(false);
   const [bigMap, setBigMap]             = useState(false);
   const [isTouch, setIsTouch]           = useState(false);
+  const [dialog, setDialog]             = useState<{ lines: string[]; idx: number } | null>(null);
 
   // Coarse pointer → show on-screen touch controls (also true in mobile emulation).
   useEffect(() => {
@@ -204,6 +208,20 @@ export default function GameCanvas({
     engineRef.current?.setPaused(false);
   }, []);
 
+  // NPC dialog: advance to the next line, or close (and unpause) on the last.
+  const advanceDialog = useCallback(() => {
+    setDialog((d) => {
+      if (!d) return null;
+      if (d.idx < d.lines.length - 1) return { lines: d.lines, idx: d.idx + 1 };
+      engineRef.current?.setPaused(false);
+      return null;
+    });
+  }, []);
+  const closeDialog = useCallback(() => {
+    setDialog(null);
+    engineRef.current?.setPaused(false);
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       startBgMusic();
@@ -217,6 +235,17 @@ export default function GameCanvas({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [activePopup, handleClose, startBgMusic]);
+
+  // While an NPC dialog is open: E / Enter / Space advances, Esc / ` closes.
+  useEffect(() => {
+    if (!dialog) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "`") { e.preventDefault(); closeDialog(); }
+      else if (e.key === "e" || e.key === "E" || e.key === "Enter" || e.key === " ") { e.preventDefault(); advanceDialog(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [dialog, advanceDialog, closeDialog]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -240,7 +269,7 @@ export default function GameCanvas({
 
     engine.onEvent = (event: GameEvent) => {
       switch (event.type) {
-        case "nearby":  setPrompt("Press E to inspect"); break;
+        case "nearby":  setPrompt((event.content.dialog || event.content.jokes) ? "Press E to talk" : "Press E to inspect"); break;
         case "leave":   setPrompt(null); break;
         case "idle":    setShowControls(true); break;
         case "active":  setShowControls(false); break;
@@ -269,6 +298,26 @@ export default function GameCanvas({
             setPrompt(null);
             setShowControls(false);
             engine.setPaused(true);
+          }
+          if (exhibit.dialog?.length || exhibit.jokes?.length) {
+            const visits = dialogVisitsRef.current.get(exhibit) ?? 0;
+            dialogVisitsRef.current.set(exhibit, visits + 1);
+            const hasIntro = !!exhibit.dialog?.length;
+            // First talk → intro; after that → cycle through the jokes.
+            let lines: string[] | undefined;
+            if (visits === 0 && hasIntro) {
+              lines = exhibit.dialog;
+            } else if (exhibit.jokes?.length) {
+              lines = exhibit.jokes[(hasIntro ? visits - 1 : visits) % exhibit.jokes.length];
+            } else {
+              lines = exhibit.dialog;
+            }
+            if (lines?.length) {
+              setDialog({ lines, idx: 0 });
+              setPrompt(null);
+              setShowControls(false);
+              engine.setPaused(true);
+            }
           }
           break;
         }
@@ -396,12 +445,19 @@ export default function GameCanvas({
           and its fixed positioning / scroll work correctly at any screen size. */}
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />
 
+      {/* NPC dialog (e.g. "me" at the desk) — sequential lines, advance on E / tap. */}
+      <NpcDialog
+        line={dialog ? dialog.lines[dialog.idx] : null}
+        hasNext={dialog ? dialog.idx < dialog.lines.length - 1 : false}
+        onAdvance={advanceDialog}
+      />
+
       {/* On-screen controls for touch devices — virtual joystick + interact button.
           Outside the scaled container so it sits in real (thumb-reachable) viewport space.
           Faded with the rest of the HUD during the portal transition. */}
       <div style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}>
         <TouchControls
-          visible={isTouch && !isLoading && !activePopup && !bigMap}
+          visible={isTouch && !isLoading && !activePopup && !bigMap && !dialog}
           nearby={!!prompt}
           onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
           onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}

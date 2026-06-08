@@ -74,6 +74,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        onClick={onClose}
         className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
       />
 
@@ -83,6 +84,9 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
       >
         <motion.div
           key="resume-popup"
+          role="dialog"
+          aria-modal="true"
+          aria-label={data?.name ?? "Résumé"}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
@@ -135,6 +139,8 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                 )}
                 <button
                   onClick={onClose}
+                  autoFocus
+                  aria-label="Close"
                   className="select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 >
                   close [`]

@@ -19,6 +19,7 @@ interface PortfolioProps {
   onEnter: (rect?: DOMRect) => void;
   onResume: () => void;
   onTranscript: () => void;
+  onOpenProject: (popup: ExhibitPopup) => void;
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -30,7 +31,7 @@ function Section({ id, eyebrow, title, intro, children }: {
   return (
     <section id={id} className="mx-auto max-w-[1080px] scroll-mt-20 px-6 py-16 sm:py-24">
       <Reveal>
-        <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-sage">{eyebrow}</p>
+        <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-pine">{eyebrow}</p>
         <h2 className="mt-3 font-sans text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
         {intro && <p className="mt-3 max-w-[60ch] text-[15px] leading-relaxed text-walnut/70">{intro}</p>}
       </Reveal>
@@ -39,7 +40,7 @@ function Section({ id, eyebrow, title, intro, children }: {
   );
 }
 
-export default function Portfolio({ onEnter, onResume, onTranscript }: PortfolioProps) {
+export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject }: PortfolioProps) {
   const featured = withPopup(mainHallExhibits);
   const archive = withPopup(archiveExhibits);
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
@@ -76,7 +77,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript }: Portfolio
         <div className="grid gap-4 sm:grid-cols-2">
           {featured.map((e, i) => (
             <Reveal key={i} delay={(i % 2) * 70}>
-              <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} />
+              <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
             </Reveal>
           ))}
         </div>
@@ -87,7 +88,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript }: Portfolio
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {archive.map((e, i) => (
                 <Reveal key={i} delay={(i % 3) * 60}>
-                  <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact />
+                  <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
                 </Reveal>
               ))}
             </div>
