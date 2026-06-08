@@ -49,6 +49,8 @@ export class GameEngine {
   private paused = false;
   private interactCooldown = false;
   private glowAlpha = 0;
+  // Analog movement vector from the on-screen joystick (each axis ~[-1, 1]).
+  private moveVec = { x: 0, y: 0 };
 
   // Spawn-cadence timers (game-state dependent — kept here, not in ParticleSystem).
   private footstepTimer = 0;
@@ -72,9 +74,13 @@ export class GameEngine {
 
   public onEvent: ((event: GameEvent) => void) | null = null;
   public onReady: (() => void) | null = null;
+  public onProgress: ((loaded: number, total: number) => void) | null = null;
   public onPositionChange: ((x: number, y: number) => void) | null = null;
   public onFootstep: ((running: boolean) => void) | null = null;
   public debugPhysics = false;
+
+  /** Total tracked sprites (for a loading progress display). */
+  get spritesTotal() { return this.sprites.total; }
 
   constructor(canvas: HTMLCanvasElement, cacheBust?: string) {
     this.canvas = canvas;
@@ -83,6 +89,7 @@ export class GameEngine {
     this.camera = new Camera(canvas.width, canvas.height);
     this.sprites = new SpriteRegistry(cacheBust);
     this.sprites.onReady = () => this.onReady?.();
+    this.sprites.onProgress = (loaded, total) => this.onProgress?.(loaded, total);
     this.particles = new ParticleSystem();
     this.player = new Player();
   }
@@ -92,6 +99,13 @@ export class GameEngine {
     this.canvas.height = height;
     this.camera.resize(width, height);
     this.camera.snapTo(this.player.centerX, this.player.centerY);
+  }
+
+  // Bridge for the on-screen joystick — set the analog movement vector (each
+  // axis roughly in [-1, 1]); the update loop reads it each frame. (0, 0) idles.
+  setMoveVector(x: number, y: number) {
+    this.moveVec.x = x;
+    this.moveVec.y = y;
   }
 
   triggerInteract() {
@@ -117,6 +131,8 @@ export class GameEngine {
   setPaused(paused: boolean) {
     this.paused = paused;
     this.input.clear();
+    this.moveVec.x = 0;
+    this.moveVec.y = 0;
     if (!paused) {
       this.currentNearby = null;
       this.interactCooldown = true;
@@ -161,7 +177,7 @@ export class GameEngine {
   private update(dt: number) {
     this.particles.update(dt);
 
-    const { isMoving, running } = this.player.move(this.input, dt);
+    const { isMoving, running } = this.player.move(this.input, dt, this.moveVec);
     const { player } = this;
 
     // Footsteps — kick up dust + emit the audio cue on a movement-speed cadence.

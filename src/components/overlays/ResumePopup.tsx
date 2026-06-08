@@ -144,7 +144,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
 
             {/* Tab bar */}
             <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgba(58,46,30,0.15)]">
-              <div className="flex gap-1">
+              <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {(data?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
                 return (
@@ -152,7 +152,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     key={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     className={[
-                      "font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
+                      "shrink-0 whitespace-nowrap font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
                       active
                         ? "bg-[rgba(122,158,126,0.15)] border-[rgba(122,158,126,0.5)] border-b-parchment text-pine opacity-100"
                         : "bg-transparent border-transparent text-walnut opacity-60 hover:opacity-80",
@@ -163,7 +163,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                 );
               })}
               </div>
-              <span className="font-mono text-[11px] text-walnut opacity-40 pb-1 shrink-0">
+              <span className="hidden sm:block font-mono text-[11px] text-walnut opacity-40 pb-1 shrink-0">
                 ← → or a / d to switch
               </span>
             </div>

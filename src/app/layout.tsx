@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "George Zhang — Portfolio",
   description: "Interactive museum portfolio — CS student at the University of Waterloo",
+};
+
+// Lock the viewport for the canvas game: fit the device width, no pinch/double-tap
+// zoom, and extend under notches (the touch controls pad themselves with safe-area insets).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#1c1508",
 };
 
 export default function RootLayout({

@@ -13,6 +13,7 @@ import { IDLE_DIRS, WALK_DIRS, IDLE_FRAMES, WALK_FRAMES, type Direction } from "
 
 export class SpriteRegistry {
   onReady: (() => void) | null = null;
+  onProgress: ((loaded: number, total: number) => void) | null = null;
 
   floorSprites: [HTMLImageElement, HTMLImageElement];
   floorSpritesLoaded = 0;
@@ -47,17 +48,32 @@ export class SpriteRegistry {
   private _loaded = 0;
   private _total = 0;
 
+  /** Number of tracked sprites (known synchronously after construction). */
+  get total() { return this._total; }
+
   private markLoaded() {
-    if (++this._loaded >= this._total) this.onReady?.();
+    this._loaded++;
+    this.onProgress?.(this._loaded, this._total);
+    if (this._loaded >= this._total) this.onReady?.();
   }
 
   constructor(cacheBust?: string) {
     const url = (path: string) => (cacheBust ? `${path}?v=${cacheBust}` : path);
-    // Register a sprite for readiness tracking: bump total now, run onLoad +
-    // markLoaded when the image actually loads.
+    // Register a sprite for readiness tracking: bump total now, then count it
+    // exactly once on load OR error. Counting errors too is critical — without
+    // it, a single failed/blocked sprite (e.g. mobile Safari hitting its image
+    // decode budget) would leave onReady unfired and hang the loading screen.
     const tracked = (img: HTMLImageElement, onLoad?: () => void): HTMLImageElement => {
       this._total++;
-      img.onload = () => { onLoad?.(); this.markLoaded(); };
+      let counted = false;
+      const done = (ok: boolean) => {
+        if (counted) return;
+        counted = true;
+        if (ok) onLoad?.();
+        this.markLoaded();
+      };
+      img.onload = () => done(true);
+      img.onerror = () => done(false);
       return img;
     };
 

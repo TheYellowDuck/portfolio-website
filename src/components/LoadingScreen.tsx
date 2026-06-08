@@ -2,9 +2,13 @@
 
 interface LoadingScreenProps {
   visible: boolean;
+  loaded: number;
+  total: number;
 }
 
-export default function LoadingScreen({ visible }: LoadingScreenProps) {
+export default function LoadingScreen({ visible, loaded, total }: LoadingScreenProps) {
+  const pct = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
+
   return (
     <div
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1c1508] transition-opacity duration-700 ${
@@ -23,6 +27,9 @@ export default function LoadingScreen({ visible }: LoadingScreenProps) {
           <span className="h-1.5 w-1.5 rounded-full bg-sage animate-bounce [animation-delay:150ms]" />
           <span className="h-1.5 w-1.5 rounded-full bg-sage animate-bounce [animation-delay:300ms]" />
         </div>
+        <p className="font-mono text-[11px] tracking-[0.2em] text-ink-3 uppercase">
+          {total > 0 ? `${pct}%` : "loading…"}
+        </p>
       </div>
     </div>
   );

@@ -27,18 +27,17 @@ const BIG_H = FULL_H + 2 * BIG_PAD;
 interface MinimapProps {
   onRegisterDraw: (fn: (x: number, y: number) => void) => void;
   bigMap: boolean;
+  isTouch?: boolean;
   onOpenBigMap: () => void;
   onCloseBigMap: () => void;
 }
 
-export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseBigMap }: MinimapProps) {
+export default function Minimap({ onRegisterDraw, bigMap, isTouch = false, onOpenBigMap, onCloseBigMap }: MinimapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bigCanvasRef = useRef<HTMLCanvasElement>(null);
   const lastPosRef = useRef({ x: PLAYER_SPAWN_COL * TILE_SIZE, y: PLAYER_SPAWN_ROW * TILE_SIZE });
   const bigMapRef = useRef(bigMap);
   const drawBigRef = useRef<((x: number, y: number) => void) | null>(null);
-
-  bigMapRef.current = bigMap;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -212,8 +211,10 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
     draw(PLAYER_SPAWN_COL * TILE_SIZE, PLAYER_SPAWN_ROW * TILE_SIZE);
   }, [onRegisterDraw]);
 
-  // Draw big canvas immediately when overlay opens (engine may not fire a position update soon).
+  // Mirror bigMap into a ref the long-lived draw closure reads, and draw the big
+  // canvas immediately when the overlay opens (engine may not fire a position update soon).
   useEffect(() => {
+    bigMapRef.current = bigMap;
     if (bigMap && drawBigRef.current) {
       drawBigRef.current(lastPosRef.current.x, lastPosRef.current.y);
     }
@@ -221,9 +222,16 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
 
   return (
     <>
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-1">
+      <div
+        className="absolute z-10 flex flex-col items-end gap-1"
+        style={
+          isTouch
+            ? { top: "calc(env(safe-area-inset-top, 0px) + 12px)", right: "calc(env(safe-area-inset-right, 0px) + 12px)" }
+            : { bottom: "1rem", right: "1rem" }
+        }
+      >
         <div
-          className="overflow-hidden rounded-2xl border border-[rgba(122,158,126,0.4)] bg-[#1c1508] shadow-[0_4px_20px_rgba(28,21,8,0.4)] opacity-85 cursor-pointer"
+          className="overflow-hidden rounded-2xl border border-[rgba(122,158,126,0.4)] bg-[#1c1508] shadow-[0_4px_20px_rgba(28,21,8,0.4)] opacity-85 cursor-pointer pointer-events-auto"
           onClick={onOpenBigMap}
         >
           <canvas
@@ -231,17 +239,17 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
             width={W}
             height={H}
             className="block [image-rendering:pixelated]"
-            style={{ width: `min(22vw, ${W}px)`, height: "auto" }}
+            style={{ width: `min(28vw, ${W}px)`, height: "auto" }}
           />
         </div>
         <p className="text-[rgba(200,178,130,0.4)] text-[10px] font-mono tracking-widest select-none pr-1">
-          M TO EXPAND
+          {isTouch ? "TAP TO EXPAND" : "M TO EXPAND"}
         </p>
       </div>
 
       {/* Overlay is always in DOM so bigCanvasRef is set on mount. Visibility toggled via opacity. */}
       <div
-        className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-150 ${bigMap ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-150 ${bigMap ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={onCloseBigMap}
       >
         <canvas
@@ -249,14 +257,23 @@ export default function Minimap({ onRegisterDraw, bigMap, onOpenBigMap, onCloseB
           width={BIG_W}
           height={BIG_H}
           className="block [image-rendering:pixelated]"
-          style={{
-            width: `min(48vw, calc(48vh * ${(BIG_W / BIG_H).toFixed(6)}))`,
-            height: `min(48vh, calc(48vw * ${(BIG_H / BIG_W).toFixed(6)}))`,
-          }}
+          style={
+            // Fit the whole map preserving aspect. On touch use most of the screen
+            // (a small centered box felt cramped); on desktop keep it ~half-screen.
+            isTouch
+              ? {
+                  width:  `min(94vw, calc(82vh * ${(BIG_W / BIG_H).toFixed(6)}))`,
+                  height: `min(82vh, calc(94vw * ${(BIG_H / BIG_W).toFixed(6)}))`,
+                }
+              : {
+                  width:  `min(48vw, calc(48vh * ${(BIG_W / BIG_H).toFixed(6)}))`,
+                  height: `min(48vh, calc(48vw * ${(BIG_H / BIG_W).toFixed(6)}))`,
+                }
+          }
           onClick={e => e.stopPropagation()}
         />
         <p className="mt-3 text-[rgba(200,178,130,0.45)] text-xs font-mono tracking-widest select-none">
-          M · CLICK TO CLOSE
+          {isTouch ? "TAP TO CLOSE" : "M · CLICK TO CLOSE"}
         </p>
       </div>
     </>

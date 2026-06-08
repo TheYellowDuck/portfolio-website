@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
+import { TILE_SIZE } from "@/game/tilemap";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { Howl, Howler } from "howler";
 import ControlsHint from "./ControlsHint";
@@ -9,15 +10,22 @@ import DialogBox from "./DialogBox";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
+import TouchControls from "./TouchControls";
 
 const BG_MUSIC_SRCS = [
   "/assets/audio/Interior Birdecorator Explore_CUTE.m4a",
   "/assets/audio/Interior Birdecorator Explore_CUTE.ogg",
 ];
 
-// SSR/pre-mount fallback — overwritten at mount with the actual window size.
+// SSR/pre-mount fallback — overwritten at mount with the actual viewport size.
 const BASE_W = 1920;
 const BASE_H = 1080;
+
+// World zoom: the engine renders at a fixed TILE_SIZE px/tile, then the canvas is
+// CSS-scaled by `s`. On-screen px/tile = TILE_SIZE * s. We never zoom past native
+// (s ≤ 1) but zoom out enough that the SHORTER viewport side always shows at least
+// this many tiles — so a phone isn't over-zoomed in either orientation.
+const MIN_TILES_SHORT = 10;
 
 export default function GameCanvas() {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
@@ -26,8 +34,7 @@ export default function GameCanvas() {
   const footstepHowls = useRef<Howl[]>([]);
   const scaleRef     = useRef(1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const safeFrameRef = useRef<HTMLDivElement>(null);
-  // Grow-only base size: starts at mount's window size, never shrinks.
+  // Render base size — recomputed from the viewport on every layout.
   const baseSizeRef  = useRef({ w: BASE_W, h: BASE_H });
 
   const minimapDrawRef  = useRef<((x: number, y: number) => void) | null>(null);
@@ -39,58 +46,47 @@ export default function GameCanvas() {
   const [musicStarted, setMusicStarted] = useState(false);
 
   // Layout is driven by direct DOM mutation — no setState means no cascading renders.
+  // Compute zoom + render base from the current viewport: cap on-screen zoom at
+  // native (s ≤ 1) but zoom out so the shorter side shows ≥ MIN_TILES_SHORT tiles.
+  // The base canvas is sized to exactly cover the viewport at scale s (no letterbox).
   const updateLayout = useCallback(() => {
-    const { w: bw, h: bh } = baseSizeRef.current;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const tilePx = Math.min(TILE_SIZE, Math.min(vw, vh) / MIN_TILES_SHORT);
+    const s = tilePx / TILE_SIZE;
+    const bw = Math.ceil(vw / s);
+    const bh = Math.ceil(vh / s);
 
-    // Grow the base if the window expanded beyond the initial size.
-    const newW = Math.max(bw, window.innerWidth);
-    const newH = Math.max(bh, window.innerHeight);
-    if (newW !== bw || newH !== bh) {
-      baseSizeRef.current = { w: newW, h: newH };
+    scaleRef.current = s;
+    const { w, h } = baseSizeRef.current;
+    if (bw !== w || bh !== h) {
+      baseSizeRef.current = { w: bw, h: bh };
       if (containerRef.current) {
-        containerRef.current.style.width      = `${newW}px`;
-        containerRef.current.style.height     = `${newH}px`;
-        containerRef.current.style.marginLeft = `${-newW / 2}px`;
-        containerRef.current.style.marginTop  = `${-newH / 2}px`;
+        containerRef.current.style.width      = `${bw}px`;
+        containerRef.current.style.height     = `${bh}px`;
+        containerRef.current.style.marginLeft = `${-bw / 2}px`;
+        containerRef.current.style.marginTop  = `${-bh / 2}px`;
       }
       if (canvasRef.current) {
-        canvasRef.current.width  = newW;
-        canvasRef.current.height = newH;
+        canvasRef.current.width  = bw;
+        canvasRef.current.height = bh;
       }
-      engineRef.current?.resize(newW, newH);
+      engineRef.current?.resize(bw, bh);
     }
-
-    const { w, h } = baseSizeRef.current;
-    const s = Math.max(window.innerWidth / w, window.innerHeight / h);
-    scaleRef.current = s;
-    const cx = Math.max(0, (w - window.innerWidth  / s) / 2);
-    const cy = Math.max(0, (h - window.innerHeight / s) / 2);
     if (containerRef.current) {
       containerRef.current.style.transform = `scale(${s})`;
     }
-    if (safeFrameRef.current) {
-      safeFrameRef.current.style.top    = `${cy + 8}px`;
-      safeFrameRef.current.style.right  = `${cx + 8}px`;
-      safeFrameRef.current.style.bottom = `${cy + 8}px`;
-      safeFrameRef.current.style.left   = `${cx + 8}px`;
-    }
   }, []);
 
-  // Runs before first paint — use screen dimensions as the fixed base so full-window
-  // users always get scale≈1 and small windows proportionally scale down.
+  // Runs before first paint, then on every resize / orientation change.
   useLayoutEffect(() => {
-    const bw = window.screen.width;
-    const bh = window.screen.height;
-    baseSizeRef.current = { w: bw, h: bh };
-    if (containerRef.current) {
-      containerRef.current.style.width      = `${bw}px`;
-      containerRef.current.style.height     = `${bh}px`;
-      containerRef.current.style.marginLeft = `${-bw / 2}px`;
-      containerRef.current.style.marginTop  = `${-bh / 2}px`;
-    }
     updateLayout();
     window.addEventListener("resize", updateLayout);
-    return () => window.removeEventListener("resize", updateLayout);
+    window.addEventListener("orientationchange", updateLayout);
+    return () => {
+      window.removeEventListener("resize", updateLayout);
+      window.removeEventListener("orientationchange", updateLayout);
+    };
   }, [updateLayout]);
 
   const handleRegisterMinimapDraw = useCallback((fn: (x: number, y: number) => void) => {
@@ -125,10 +121,28 @@ export default function GameCanvas() {
   }, []);
 
   const [isLoading, setIsLoading]       = useState(true);
+  const [progress, setProgress]         = useState({ loaded: 0, total: 0 });
   const [prompt, setPrompt]             = useState<string | null>(null);
   const [activePopup, setActivePopup]   = useState<ExhibitPopup | null>(null);
   const [showControls, setShowControls] = useState(false);
   const [bigMap, setBigMap]             = useState(false);
+  const [isTouch, setIsTouch]           = useState(false);
+
+  // Coarse pointer → show on-screen touch controls (also true in mobile emulation).
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    const update = () => setIsTouch(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  // Touch users may never fire a key or canvas click — start music on first touch.
+  useEffect(() => {
+    const onFirstPointer = () => startBgMusic();
+    window.addEventListener("pointerdown", onFirstPointer, { once: true });
+    return () => window.removeEventListener("pointerdown", onFirstPointer);
+  }, [startBgMusic]);
 
   useEffect(() => {
     const resume = () => {
@@ -222,17 +236,15 @@ export default function GameCanvas() {
       }
     };
 
-    let spritesReady = false;
-    let timerReady   = false;
-    const tryHide = () => {
-      if (spritesReady && timerReady) {
-        setIsLoading(false);
-        engineRef.current?.setPaused(false);
-      }
+    setProgress({ loaded: 0, total: engine.spritesTotal });
+    engine.onProgress = (loaded, total) => setProgress({ loaded, total });
+    // Lift the loading screen once every tracked sprite has resolved (load OR
+    // error, so it can't hang). The visitor can also tap "Enter" to start early.
+    engine.onReady = () => {
+      setIsLoading(false);
+      engine.setPaused(false);
     };
-    engine.onReady = () => { spritesReady = true; tryHide(); };
     engine.onPositionChange = (x, y) => minimapDrawRef.current?.(x, y);
-    setTimeout(() => { timerReady = true; tryHide(); }, 1500);
     engine.start();
     engine.setPaused(true);
 
@@ -242,8 +254,8 @@ export default function GameCanvas() {
   return (
     // Outer: fills viewport, clips edges that zoom-fill pushes past screen boundary.
     <div className="fixed inset-0 overflow-hidden bg-[#1c1508]">
-      {/* Inner: fixed reference resolution. Centered via absolute+negative-margin (reliable
-          cross-browser vs flex). Transform and safe-frame insets written by updateLayout. */}
+      {/* Scaled world: base canvas centered via absolute+negative-margin, CSS-scaled
+          by updateLayout. Only the canvas lives here so the HUD never scales with zoom. */}
       <div
         ref={containerRef}
         className="absolute overflow-hidden origin-center"
@@ -251,7 +263,7 @@ export default function GameCanvas() {
       >
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 block [image-rendering:pixelated]"
+          className="absolute inset-0 block [image-rendering:pixelated] touch-none"
           onClick={e => {
             startBgMusic();
             const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
@@ -261,46 +273,71 @@ export default function GameCanvas() {
             );
           }}
         />
+      </div>
 
-        <LoadingScreen visible={isLoading} />
+      <LoadingScreen
+        visible={isLoading}
+        loaded={progress.loaded}
+        total={progress.total}
+      />
 
-        {/* Safe frame: inset written by updateLayout before first paint. */}
-        <div
-          ref={safeFrameRef}
-          className="absolute pointer-events-none"
-        >
-          <ControlsHint visible={showControls && !isLoading && !activePopup} />
-          <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls} />
-          <Minimap
-            onRegisterDraw={handleRegisterMinimapDraw}
-            bigMap={bigMap}
-            onOpenBigMap={() => setBigMap(true)}
-            onCloseBigMap={() => setBigMap(false)}
-          />
-          {musicStarted && (
-            <div className="absolute bottom-8 left-8 z-20 flex gap-2" style={{ pointerEvents: "auto" }}>
-              <button
-                onClick={toggleBgmMute}
-                className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-                title={isBgmMuted ? "Unmute music" : "Mute music"}
-              >
-                {isBgmMuted ? "♪ off" : "♪ on"}
-              </button>
-              <button
-                onClick={toggleSfxMute}
-                className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-                title={isSfxMuted ? "Unmute effects" : "Mute effects"}
-              >
-                {isSfxMuted ? "sfx off" : "sfx on"}
-              </button>
-            </div>
-          )}
-        </div>
+      {/* HUD chrome — real viewport coordinates, never scaled with the world zoom. */}
+      <div className="fixed inset-2 z-10 pointer-events-none">
+        <ControlsHint
+          visible={showControls && !isLoading && !activePopup}
+          isTouch={isTouch}
+          message={isTouch ? "Drag to move · push to run · tap E to inspect" : undefined}
+        />
+        {/* On touch the glowing E button already signals "inspect", so the bottom
+            prompt is hidden to keep the thumb zone clear. */}
+        <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls && !isTouch} />
+        <Minimap
+          onRegisterDraw={handleRegisterMinimapDraw}
+          bigMap={bigMap}
+          isTouch={isTouch}
+          onOpenBigMap={() => setBigMap(true)}
+          onCloseBigMap={() => setBigMap(false)}
+        />
+        {musicStarted && (
+          <div
+            className="absolute z-20 flex gap-2"
+            style={{
+              pointerEvents: "auto",
+              ...(isTouch
+                ? { top: "calc(env(safe-area-inset-top, 0px) + 12px)", left: "calc(env(safe-area-inset-left, 0px) + 12px)" }
+                : { bottom: "2rem", left: "2rem" }),
+            }}
+          >
+            <button
+              onClick={toggleBgmMute}
+              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+              title={isBgmMuted ? "Unmute music" : "Mute music"}
+            >
+              {isBgmMuted ? "♪ off" : "♪ on"}
+            </button>
+            <button
+              onClick={toggleSfxMute}
+              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
+              title={isSfxMuted ? "Unmute effects" : "Mute effects"}
+            >
+              {isSfxMuted ? "sfx off" : "sfx on"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ExhibitOverlay outside the scaled container so it occupies real viewport space
           and its fixed positioning / scroll work correctly at any screen size. */}
       <ExhibitOverlay popup={activePopup} onClose={handleClose} />
+
+      {/* On-screen controls for touch devices — virtual joystick + interact button.
+          Outside the scaled container so it sits in real (thumb-reachable) viewport space. */}
+      <TouchControls
+        visible={isTouch && !isLoading && !activePopup && !bigMap}
+        nearby={!!prompt}
+        onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
+        onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}
+      />
     </div>
   );
 }

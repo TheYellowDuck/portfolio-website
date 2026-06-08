@@ -131,17 +131,22 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                     )}
                   </div>
                 ) : (
-                  /* ── TEXT layout: description fills space, links at bottom ── */
-                  <div className="flex-1 min-h-0 flex flex-col bg-parchment overflow-hidden">
+                  /* ── TEXT layout: single scrolling body so the description is always
+                       readable (no nested panes that can squeeze it) ── */
+                  <div className="flex-1 min-h-0 overflow-y-auto bg-parchment [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                     {(popup.description || popup.tech?.length || popup.skills?.length) && (
-                      <div className="flex-1 min-h-0 flex overflow-hidden">
+                      <div className="flex flex-col sm:flex-row">
                         {popup.description && (
-                          <p className="flex-1 min-h-0 overflow-y-auto m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4 [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                          <p className="flex-1 m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
                             {popup.description}
                           </p>
                         )}
                         {(popup.tech?.length || popup.skills?.length) ? (
-                          <div className="shrink-0 w-40 flex flex-col gap-1.5 px-4 py-4 border-l border-[rgba(58,46,30,0.1)] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                          <div className={`shrink-0 flex flex-row flex-wrap gap-1.5 ${
+                            popup.description
+                              ? "w-full sm:w-40 sm:flex-col px-5 sm:px-4 py-4 border-t sm:border-t-0 sm:border-l border-[rgba(58,46,30,0.1)]"
+                              : "w-full px-5 py-4"
+                          }`}>
                             {popup.tech?.map((t) => (
                               <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">
                                 {t}

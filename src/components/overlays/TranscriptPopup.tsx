@@ -15,13 +15,6 @@ function shortenProgram(program: string): string {
     .replace(/,\s*$/, "");
 }
 
-// "Co-op Work Term" → "Co-op" | "Enrolment" → "Study"
-function shortenStudy(form: string): string {
-  if (form.toLowerCase().includes("co-op")) return "Co-op";
-  if (form.toLowerCase().includes("enrolment")) return "Study";
-  return form;
-}
-
 // Match a transcript term ("Spring 2025") to an experience date string ("Jun 2025 – Aug 2025")
 const SEASON_MONTHS: Record<string, [number, number]> = {
   Fall: [8, 11], Winter: [0, 3], Spring: [4, 7], Summer: [4, 7],
@@ -52,6 +45,16 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
   const [cursorIdx, setCursorIdx]       = useState<number | null>(null);
   const [expandedCode, setExpandedCode] = useState<string | null>(null);
 
+  // Reset the keyboard cursor + expanded row when the active subject changes.
+  // Done during render (not in an effect) per the React "adjust state on prop
+  // change" pattern — avoids an extra commit and the set-state-in-effect lint.
+  const [prevSubject, setPrevSubject] = useState(activeSubject);
+  if (activeSubject !== prevSubject) {
+    setPrevSubject(activeSubject);
+    setCursorIdx(null);
+    setExpandedCode(null);
+  }
+
   useEffect(() => {
     if (transcriptCache) return;
     fetch("/api/transcript")
@@ -69,11 +72,6 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
   const group: SubjectGroup | undefined = data?.groups.find(
     (g) => g.subject === activeSubject
   );
-
-  useEffect(() => {
-    setCursorIdx(null);
-    setExpandedCode(null);
-  }, [activeSubject]);
 
   useEffect(() => {
     if (!data) return;
@@ -178,7 +176,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
             </div>
 
             {/* Row 2: boxed info card */}
-            <div className="flex items-stretch rounded-lg border border-[rgba(58,46,30,0.13)] overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-stretch rounded-lg border border-[rgba(58,46,30,0.13)] overflow-hidden">
               {/* Left: institution */}
               <div className="flex-1 px-4 py-3 flex flex-col justify-center">
                 <p className="m-0 font-mono text-[18px] text-pine font-bold">
@@ -193,7 +191,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
 
               {/* Right: dates */}
               {data && (
-                <div className="border-l border-[rgba(58,46,30,0.13)] px-4 py-3 flex flex-col justify-between gap-2.5 shrink-0">
+                <div className="border-t sm:border-t-0 sm:border-l border-[rgba(58,46,30,0.13)] px-4 py-3 flex flex-row sm:flex-col justify-between gap-2.5 shrink-0">
                   {data.startTerm && (
                     <div>
                       <span className="block font-mono text-[10px] text-walnut opacity-40 uppercase tracking-wide mb-0.5">
@@ -240,7 +238,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
                   );
                 })}
               </div>
-              <span className="font-mono text-[11px] text-walnut opacity-40 pb-1 shrink-0">
+              <span className="hidden sm:block font-mono text-[11px] text-walnut opacity-40 pb-1 shrink-0">
                 ← → a d · ↑ ↓ · enter
               </span>
             </div>

@@ -10,7 +10,20 @@
 
 html, body {
   overflow: hidden;
+  overscroll-behavior: none;   /* no pull-to-refresh / scroll chaining on touch */
   background: #1c1508;
+}
+
+/* Warm halo for the on-screen interact button when near an exhibit:
+   a steady golden glow plus an expanding ring pulse (button fill/text unchanged). */
+@keyframes interact-pulse {
+  0%   { box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.65), 0 0 0 0 rgba(240,206,120,0.55); }
+  70%  { box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.40), 0 0 0 18px rgba(240,206,120,0); }
+  100% { box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.65), 0 0 0 0 rgba(240,206,120,0); }
+}
+.interact-glow { animation: interact-pulse 1.7s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .interact-glow { animation: none; box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.6); }
 }
 
 @theme inline {
