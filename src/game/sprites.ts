@@ -43,6 +43,7 @@ export class SpriteRegistry {
   meLightOffSprite: HTMLImageElement;
   meLightOffReady = false;
   northIdleSprite: HTMLImageElement = new Image();
+  duckSheet: HTMLImageElement = new Image(); // easter-egg duck (untracked)
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private url!: (path: string) => string;
@@ -137,6 +138,7 @@ export class SpriteRegistry {
     this.meLightOffSprite.src = url("/assets/sprites/me-light-off.png");
 
     this.northIdleSprite.src = url("/assets/sprites/character/states/standing/rotations/north.png");
+    this.duckSheet.src = url("/assets/sprites/duck.png");
     // Pre-warm the spawn-facing frames; other directions load on first use.
     this.frames("idle", "east");
     this.frames("walk", "east");

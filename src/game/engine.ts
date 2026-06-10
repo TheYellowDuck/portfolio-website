@@ -27,6 +27,7 @@ import { Player } from "./player";
 import { SpriteRegistry } from "./sprites";
 import { ParticleSystem } from "./particles";
 import { drawScene } from "./renderer";
+import { Duck } from "./duck";
 
 export type GameEvent =
   | { type: "nearby"; content: Exhibit }
@@ -51,6 +52,12 @@ export class GameEngine {
   private glowAlpha = 0;
   // Analog movement vector from the on-screen joystick (each axis ~[-1, 1]).
   private moveVec = { x: 0, y: 0 };
+
+  // Easter-egg duck (started on first trigger). It floats over the EASTER_EGG
+  // marker tile; the tile *below* it is the solid "invisible pedestal".
+  private duck = new Duck();
+  private eggCol = -1;
+  private eggRow = -1;
 
   // Spawn-cadence timers (game-state dependent — kept here, not in ParticleSystem).
   private footstepTimer = 0;
@@ -96,6 +103,16 @@ export class GameEngine {
     this.sprites.onProgress = (loaded, total) => this.onProgress?.(loaded, total);
     this.particles = new ParticleSystem();
     this.player = new Player();
+
+    // Locate the easter-egg tile so the duck can appear there, and make it solid —
+    // the duck sits on an "invisible pedestal" the player can't walk through.
+    for (let r = 0; r < museumMap.length; r++) {
+      for (let c = 0; c < museumMap[0].length; c++) {
+        if (museumMap[r][c] === TILES.EASTER_EGG) { this.eggRow = r; this.eggCol = c; }
+      }
+    }
+    // Solid pedestal is the tile *below* the duck; the duck's own tile stays walkable.
+    if (this.eggCol >= 0) setSolidAt(this.eggCol, this.eggRow + 1, true);
   }
 
   resize(width: number, height: number) {
@@ -115,6 +132,7 @@ export class GameEngine {
   triggerInteract() {
     if (this.currentNearby && !this.interactCooldown) {
       this.onEvent?.({ type: "interact", content: this.currentNearby.content });
+      if (this.currentNearby.tileType === TILES.EASTER_EGG) this.duck.start();
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 500);
     }
@@ -127,6 +145,7 @@ export class GameEngine {
     const target = interactables.find(i => i.col === col && (i.row === row || i.row === row - 1));
     if (target) {
       this.onEvent?.({ type: "interact", content: target.content });
+      if (target.tileType === TILES.EASTER_EGG) this.duck.start();
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 500);
     }
@@ -180,6 +199,7 @@ export class GameEngine {
 
   private update(dt: number) {
     this.particles.update(dt);
+    this.duck.update(dt);
 
     const { isMoving, running } = this.player.move(this.input, dt, this.moveVec);
     const { player } = this;
@@ -244,6 +264,7 @@ export class GameEngine {
       const ePressed = this.input.isDown("e") || this.input.isDown("E") || this.input.isDown("Enter");
       if (ePressed && !this.interactCooldown) {
         this.onEvent?.({ type: "interact", content: nearby.content });
+        if (nearby.tileType === TILES.EASTER_EGG) this.duck.start();
         this.interactCooldown = true;
         setTimeout(() => { this.interactCooldown = false; }, 500);
       }
@@ -252,8 +273,9 @@ export class GameEngine {
       this.onEvent?.({ type: "leave" });
     }
 
-    // Sparkles rise from the pedestal while the player lingers nearby.
-    if (this.currentNearby) {
+    // Sparkles rise from the pedestal while the player lingers nearby (but not
+    // from the easter-egg duck).
+    if (this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG) {
       this.sparkleTimer -= dt;
       if (this.sparkleTimer <= 0) {
         this.sparkleTimer = 0.13;
@@ -332,8 +354,19 @@ export class GameEngine {
       this.debugPhysics,
       this.hidePlayer,
       this.playerAlpha,
+      this.drawDuck,
     );
   }
+
+  // y-sorted draw hook for the easter-egg duck: it sits on the egg tile, so it
+  // draws at that tile's sort row (the player passes in front when further south).
+  private drawDuck = (sortRow: number, camX: number, camY: number) => {
+    if (this.eggCol < 0 || sortRow !== this.eggRow) return;
+    const cx = (this.eggCol + 0.5) * TILE_SIZE - camX;           // centered in the marker tile
+    const cy = (this.eggRow + 0.5) * TILE_SIZE - camY;
+    const shadowY = (this.eggRow + 1.5) * TILE_SIZE - camY;      // centered in the solid tile below
+    this.duck.draw(this.ctx, this.sprites.duckSheet, cx, cy, shadowY, TILE_SIZE * 0.85);
+  };
 
   // Renders the full map (all tiles, all sprites) into destCanvas, sized
   // automatically. Call only after onReady. Player appears at spawn facing east.

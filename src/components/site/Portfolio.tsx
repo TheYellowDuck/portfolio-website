@@ -14,6 +14,8 @@ import {
 import Hero from "./Hero";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
+import ThemeToggle from "./ThemeToggle";
+import { useIsMac } from "@/lib/use-is-mac";
 
 interface PortfolioProps {
   onEnter: (rect?: DOMRect) => void;
@@ -41,6 +43,7 @@ function Section({ id, eyebrow, title, intro, children }: {
 }
 
 export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject }: PortfolioProps) {
+  const isMac = useIsMac();
   const featured = withPopup(mainHallExhibits);
   const archive = withPopup(archiveExhibits);
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
@@ -50,7 +53,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   return (
     <div className="min-h-[100svh] bg-parchment text-walnut">
       {/* Slim sticky nav */}
-      <nav className="sticky top-0 z-20 border-b border-[rgba(58,46,30,0.08)] bg-[rgba(254,249,236,0.82)] backdrop-blur-md">
+      <nav className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-3">
           <a href="#top" className="font-mono text-[13px] font-semibold tracking-tight text-walnut">George Zhang</a>
           <div className="hidden items-center gap-6 font-mono text-[12px] text-walnut/65 sm:flex">
@@ -59,12 +62,22 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             <a href="#skills" className="transition-colors hover:text-pine">Skills</a>
             <a href="#contact" className="transition-colors hover:text-pine">Contact</a>
           </div>
-          <button
-            onClick={() => onEnter()}
-            className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
-          >
-            Step inside →
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => window.dispatchEvent(new Event("command-palette:open"))}
+              aria-label="Open command palette"
+              className="hidden items-center rounded-md border border-[rgb(var(--c-line-rgb)_/_0.15)] px-2 py-1 font-mono text-[11px] text-walnut/55 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 sm:flex"
+            >
+              {isMac ? "⌘K" : "Ctrl K"}
+            </button>
+            <button
+              onClick={() => onEnter()}
+              className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+            >
+              Step inside →
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -111,7 +124,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           {skillsExhibits.map((e, i) =>
             e.popup ? (
               <Reveal key={i} delay={(i % 3) * 60}>
-                <div className="h-full rounded-xl border border-[rgba(58,46,30,0.12)] bg-[#fffdf7] p-5">
+                <div className="h-full rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5">
                   <h3 className="font-sans text-[16px] font-semibold text-pine">{e.popup.title}</h3>
                   {e.popup.description && (
                     <p className="mt-1.5 text-[13px] leading-relaxed text-walnut/70">{e.popup.description}</p>
@@ -137,7 +150,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             <div className="space-y-4 text-[15px] leading-relaxed text-walnut/85">
               {aboutText && <p>{aboutText}</p>}
               {interests && (
-                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-sage">Off the clock — </span>{interests}</p>
+                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-pine">Off the clock — </span>{interests}</p>
               )}
             </div>
           </Reveal>
@@ -147,7 +160,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
                 Read résumé →
               </button>
               {hasTranscript && (
-                <button onClick={onTranscript} className="rounded-lg border border-[rgba(58,46,30,0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                <button onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                   Education & transcript →
                 </button>
               )}
@@ -180,7 +193,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
-        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgba(58,46,30,0.1)] pt-6 font-mono text-[12px] text-walnut/45 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/45 sm:flex-row sm:items-center">
           <span>© {new Date().getFullYear()} George Zhang · built with Next.js</span>
           <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
             Prefer to wander? Step inside the museum →

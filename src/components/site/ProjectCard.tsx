@@ -15,7 +15,7 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
   // Only offer details when there's meaningfully more than the card already shows.
   const hasMore = !!(popup.skills?.length || hasDemo);
   return (
-    <article className="group flex flex-col rounded-xl border border-[rgba(58,46,30,0.12)] bg-[#fffdf7] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)]">
+    <article className="group flex flex-col rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)]">
       <div className="flex items-baseline justify-between gap-3">
         <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
         {hasDemo && (

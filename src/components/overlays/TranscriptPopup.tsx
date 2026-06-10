@@ -164,7 +164,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
           style={{ maxHeight: "min(580px, 80vh)" }}
         >
           {/* Header */}
-          <div className="shrink-0 px-5 pt-4 pb-0 border-b border-[rgba(58,46,30,0.15)] bg-parchment">
+          <div className="shrink-0 px-5 pt-4 pb-0 border-b border-[rgb(var(--c-line-rgb)_/_0.15)] bg-parchment">
 
             {/* Row 1: title + close */}
             <div className="flex justify-between items-center mb-3">
@@ -175,14 +175,14 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
                 onClick={onClose}
                 autoFocus
                 aria-label="Close"
-                className="select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                className="select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
               >
                 close [`]
               </button>
             </div>
 
             {/* Row 2: boxed info card */}
-            <div className="flex flex-col sm:flex-row sm:items-stretch rounded-lg border border-[rgba(58,46,30,0.13)] overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-stretch rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.13)] overflow-hidden">
               {/* Left: institution */}
               <div className="flex-1 px-4 py-3 flex flex-col justify-center">
                 <p className="m-0 font-mono text-[18px] text-pine font-bold">
@@ -197,7 +197,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
 
               {/* Right: dates */}
               {data && (
-                <div className="border-t sm:border-t-0 sm:border-l border-[rgba(58,46,30,0.13)] px-4 py-3 flex flex-row sm:flex-col justify-between gap-2.5 shrink-0">
+                <div className="border-t sm:border-t-0 sm:border-l border-[rgb(var(--c-line-rgb)_/_0.13)] px-4 py-3 flex flex-row sm:flex-col justify-between gap-2.5 shrink-0">
                   {data.startTerm && (
                     <div>
                       <span className="block font-mono text-[10px] text-walnut opacity-40 uppercase tracking-wide mb-0.5">
@@ -223,7 +223,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
             </div>
 
             {/* Subject tabs + nav hint */}
-            <div className="flex items-end justify-between gap-2 mt-4 border-b border-[rgba(58,46,30,0.15)]">
+            <div className="flex items-end justify-between gap-2 mt-4 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
               <div className="flex gap-1 flex-wrap">
                 {(data?.groups ?? []).map((g) => {
                   const active = g.subject === activeSubject;
@@ -331,7 +331,7 @@ function CourseTable({
             onClick={() => { onSelect?.(i); if (c.description) onToggle?.(c.code); }}
             className={[
               "flex gap-3 py-2.5 font-mono rounded transition-colors",
-              i < courses.length - 1 ? "border-b border-[rgba(58,46,30,0.08)]" : "",
+              i < courses.length - 1 ? "border-b border-[rgb(var(--c-line-rgb)_/_0.08)]" : "",
               isCursor ? "bg-[rgba(122,158,126,0.1)]" : "",
               c.description ? "cursor-pointer" : "",
             ].join(" ")}

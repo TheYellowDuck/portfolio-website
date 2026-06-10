@@ -1,10 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Portfolio from "./site/Portfolio";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
-import type { ExhibitPopup } from "@/data/projects";
+import CommandPalette, { type Command } from "./site/CommandPalette";
+import KonamiEasterEgg from "./site/KonamiEasterEgg";
+import { mainHallExhibits, archiveExhibits, giftShopExhibits, type ExhibitPopup } from "@/data/projects";
+import { getPopupBySlug, slugForPopup } from "@/lib/exhibit-slugs";
+import { PERSON } from "@/lib/site";
 
 // Game (engine + ~115 sprites) loads only when the visitor chooses to enter.
 const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
@@ -86,6 +90,54 @@ export default function SiteShell() {
     setStage("out-hud");
   }, [stage, reduceMotion]);
 
+  // Deep links: a modal is reflected in the URL hash (#slug) so it's shareable,
+  // bookmarkable, and closable with the Back button.
+  const openPopup = useCallback((popup: ExhibitPopup) => {
+    setActivePopup(popup);
+    const slug = slugForPopup(popup);
+    if (slug && decodeURIComponent(window.location.hash.slice(1)) !== slug) {
+      window.history.pushState(null, "", "#" + slug);
+    }
+  }, []);
+  const closePopup = useCallback(() => {
+    setActivePopup(null);
+    if (window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
+  // Open the matching exhibit from the hash on load, and follow Back/Forward + nav.
+  useEffect(() => {
+    const sync = () => setActivePopup(getPopupBySlug(decodeURIComponent(window.location.hash.slice(1))));
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+
+  // Command palette (⌘K) actions: jump to sections, open docs, enter the game, copy email.
+  const paletteCommands = useMemo<Command[]>(() => {
+    const scrollTo = (id: string) => () => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const email =
+      giftShopExhibits.flatMap((e) => e.popup?.links ?? []).find((l) => l.url.startsWith("mailto:"))?.url.replace("mailto:", "") ??
+      PERSON.email;
+    const actions: Command[] = [
+      { id: "enter", label: "Step inside the museum", hint: "Game", keywords: "play explore pixel", run: () => enterGame() },
+      { id: "resume", label: "Open résumé", hint: "Doc", keywords: "cv", run: () => openPopup({ type: "resume" }) },
+      { id: "transcript", label: "Education & transcript", hint: "Doc", keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
+      { id: "email", label: "Copy email address", hint: "Contact", keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
+    ];
+    const projects: Command[] = [...mainHallExhibits, ...archiveExhibits]
+      .filter((e) => e.popup?.title)
+      .map((e) => ({ id: "p-" + (slugForPopup(e.popup!) ?? e.popup!.title!), label: e.popup!.title!, hint: "Project", run: () => openPopup(e.popup!) }));
+    const sections: Command[] = [
+      { id: "s-work", label: "Selected Work", hint: "Section", run: scrollTo("work") },
+      { id: "s-exp", label: "Experience", hint: "Section", run: scrollTo("experience") },
+      { id: "s-skills", label: "Skills", hint: "Section", run: scrollTo("skills") },
+      { id: "s-about", label: "About", hint: "Section", run: scrollTo("about") },
+      { id: "s-contact", label: "Contact", hint: "Section", run: scrollTo("contact") },
+    ];
+    return [...actions, ...projects, ...sections];
+  }, [enterGame, openPopup]);
+
   // Sequence each stage on a timer matched to the CSS fade duration.
   useEffect(() => {
     const next = (s: Stage, ms = FADE_MS) => {
@@ -135,9 +187,9 @@ export default function SiteShell() {
       >
         <Portfolio
           onEnter={enterGame}
-          onResume={() => setActivePopup({ type: "resume" })}
-          onTranscript={() => setActivePopup({ type: "transcript" })}
-          onOpenProject={(popup) => setActivePopup(popup)}
+          onResume={() => openPopup({ type: "resume" })}
+          onTranscript={() => openPopup({ type: "transcript" })}
+          onOpenProject={openPopup}
         />
       </div>
 
@@ -145,7 +197,7 @@ export default function SiteShell() {
           run inside (background canvas → player → HUD). */}
       {gameMounted && (
         <div
-          className="fixed inset-0 z-40 bg-[#1c1508]"
+          className="game-warm fixed inset-0 z-40 bg-[#1c1508]"
           style={{ opacity: gameOn ? 1 : 0, transition: `opacity ${fadeMs}ms ease` }}
         >
           <GameCanvas
@@ -177,7 +229,7 @@ export default function SiteShell() {
       {stage === "game" && (
         <button
           onClick={exitGame}
-          className="fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-4 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+          className="game-warm fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-4 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
         >
           ← Leave museum
@@ -186,7 +238,13 @@ export default function SiteShell() {
 
       {/* Site detail modals reuse the game's exhibit overlay (text, tags, grouped
           skills, links, embeds) — and route resume/transcript to their viewers. */}
-      <ExhibitOverlay popup={activePopup} onClose={() => setActivePopup(null)} />
+      <ExhibitOverlay popup={activePopup} onClose={closePopup} />
+
+      {/* ⌘K command palette (site only). */}
+      <CommandPalette commands={paletteCommands} enabled={stage === "site"} />
+
+      {/* Konami code easter egg (site only, so it doesn't fire while walking with arrows). */}
+      <KonamiEasterEgg enabled={stage === "site"} />
     </>
   );
 }

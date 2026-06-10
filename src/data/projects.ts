@@ -405,8 +405,9 @@ export const meExhibit: Exhibit[] = [
 // Tile 16 — EASTER EGGS
 export const easterEggExhibits: Exhibit[] = [
   {
-    // Audio only — no popup
-    audio: "/assets/audio/quack.mp3",
+    // Audio only — no popup. Gain is reduced in the file; the ?v query is a
+    // cache-buster so the browser can't serve a previously cached louder copy.
+    audio: "/assets/audio/quack.mp3?v=4",
   },
   // {
   //   // Audio + popup

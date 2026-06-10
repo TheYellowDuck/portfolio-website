@@ -11,10 +11,38 @@
 html, body {
   overflow-x: hidden;          /* the site scrolls vertically; game locks scroll while active */
   overscroll-behavior: none;   /* no pull-to-refresh / scroll chaining on touch */
-  background: #fef9ec;         /* parchment (site default); the game layer paints its own dark bg */
+  background: var(--c-bg);     /* themeable; the game layer paints its own dark bg */
 }
+/* Smooth in-page navigation (command palette + nav anchors), motion-safe. */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 /* Set by SiteShell while the game is mounted so the page behind can't scroll. */
 body.game-active { overflow: hidden; }
+
+/* ── Light / dark theme tokens ───────────────────────────────────────────────
+   The site flips with .dark on <html>. The game UI stays warm regardless of the
+   site theme: the .game-warm subtree re-asserts the light values, so the museum
+   is always parchment-and-lamplight. Scoping the reset to the game layer (not
+   <body>) keeps the site's theme stable during the enter/leave cross-fade.
+   Borders use --c-line-rgb so their alphas swap with the theme. */
+:root, .game-warm {
+  --c-bg: #fef9ec;
+  --c-bg-rgb: 254 249 236;
+  --c-text: #3a2e1e;
+  --c-accent: #4a7a44;
+  --c-surface: #fffdf7;
+  --c-line-rgb: 58 46 30;
+  color-scheme: light;
+}
+html.dark {
+  --c-bg: #15110b;
+  --c-bg-rgb: 21 17 11;
+  --c-text: #e9e0cc;
+  --c-accent: #a6ccaa;
+  --c-surface: #1f180f;
+  --c-line-rgb: 236 227 207;
+  color-scheme: dark;
+}
 
 /* Warm halo for the on-screen interact button when near an exhibit:
    a steady golden glow plus an expanding ring pulse (button fill/text unchanged). */
@@ -27,6 +55,16 @@ body.game-active { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .interact-glow { animation: none; box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.6); }
 }
+
+/* Konami easter egg: ducks drifting + swaying down (per-duck --sway / --spin), plus a toast. */
+@keyframes konami-fall {
+  0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  25%  { transform: translate3d(var(--sway, 16px), 28vh, 0) rotate(var(--spin, 10deg)); }
+  50%  { transform: translate3d(calc(var(--sway, 16px) * -0.7), 56vh, 0) rotate(calc(var(--spin, 10deg) * -0.8)); }
+  75%  { transform: translate3d(calc(var(--sway, 16px) * 0.5), 84vh, 0) rotate(var(--spin, 10deg)); }
+  100% { transform: translate3d(0, 116vh, 0) rotate(0deg); }
+}
+@keyframes konami-toast { 0% { opacity: 0; } 10%, 85% { opacity: 1; } 100% { opacity: 0; } }
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
@@ -48,8 +86,10 @@ body.game-active { overflow: hidden; }
   --color-sage:     #7a9e7e;
   --color-sage-2:   #5a8260;
 
-  /* warm popup palette (parchment theme) */
-  --color-parchment: #fef9ec;
-  --color-pine:      #4a7a44;
-  --color-walnut:    #3a2e1e;
+  /* themeable palette — resolves to light or dark via the --c-* runtime vars
+     above (and back to warm inside the game via body.game-active). */
+  --color-parchment: var(--c-bg);
+  --color-pine:      var(--c-accent);
+  --color-walnut:    var(--c-text);
+  --color-surface:   var(--c-surface);
 }

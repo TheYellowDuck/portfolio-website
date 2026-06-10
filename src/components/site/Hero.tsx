@@ -66,7 +66,7 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
         >
           <div
             ref={doorRef}
-            className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-[rgba(58,46,30,0.18)] shadow-[0_18px_50px_rgba(28,21,8,0.28)] transition-transform duration-300 group-hover:-translate-y-1"
+            className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-[rgb(var(--c-line-rgb)_/_0.18)] shadow-[0_18px_50px_rgba(28,21,8,0.28)] transition-transform duration-300 group-hover:-translate-y-1"
             style={{ background: "radial-gradient(125% 90% at 50% 22%, #2c2310 0%, #1c1508 68%)" }}
           >
             {/* Lamplight spilling from above */}

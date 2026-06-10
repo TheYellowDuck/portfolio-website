@@ -3,7 +3,10 @@
 import { useRef, useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { GameEngine, GameEvent } from "@/game/engine";
 import { TILE_SIZE } from "@/game/tilemap";
+import { interactables } from "@/game/interactables";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
+import { slugForPopup } from "@/lib/exhibit-slugs";
+import { loadDiscovered, saveDiscovered, loadAudioPrefs, saveAudioPrefs } from "@/lib/museum-prefs";
 import { Howl, Howler } from "howler";
 import ControlsHint from "./ControlsHint";
 import DialogBox from "./DialogBox";
@@ -20,6 +23,7 @@ const BG_MUSIC_SRCS = [
 const BG_VOL = 0.1;          // background-music target volume
 const BG_FADE_IN_MS = 900;   // fade up when the music first starts
 const BG_FADE_OUT_MS = 1200; // fade down when leaving the museum
+const QUACK_VOLUME = 1;      // quack gain is baked into the file (already ~¼ of the raw clip)
 
 // SSR/pre-mount fallback — overwritten at mount with the actual viewport size.
 const BASE_W = 1920;
@@ -30,6 +34,9 @@ const BASE_H = 1080;
 // (s ≤ 1) but zoom out enough that the SHORTER viewport side always shows at least
 // this many tiles — so a phone isn't over-zoomed in either orientation.
 const MIN_TILES_SHORT = 10;
+
+// Inspectable exhibits (pedestals with a popup) — the denominator for "discovered".
+const TOTAL_EXHIBITS = interactables.filter((i) => i.content.popup).length;
 
 interface GameCanvasProps {
   /** Fires once the engine's sprites are loaded and the world is ready. */
@@ -73,10 +80,21 @@ export default function GameCanvas({
   const dialogVisitsRef = useRef<Map<Exhibit, number>>(new Map());
   const bgMusicRef      = useRef<Howl | null>(null);
   const musicStartedRef = useRef(false);
-  const [isBgmMuted, setIsBgmMuted] = useState(false);
-  const [isSfxMuted, setIsSfxMuted] = useState(false);
-  const sfxMutedRef = useRef(false);
   const [musicStarted, setMusicStarted] = useState(false);
+
+  // Audio volumes (0–1), persisted. Refs mirror the state for use inside the
+  // engine's play callbacks; the file is client-only so localStorage is safe.
+  const [initialAudio] = useState(loadAudioPrefs);
+  const [musicVol, setMusicVol] = useState(initialAudio.music);
+  const [sfxVol, setSfxVol]     = useState(initialAudio.sfx);
+  const musicVolRef = useRef(initialAudio.music);
+  const sfxVolRef   = useRef(initialAudio.sfx);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Exhibits discovered (inspected), persisted.
+  const [initialDiscovered] = useState(loadDiscovered);
+  const discoveredRef = useRef(initialDiscovered);
+  const [discoveredCount, setDiscoveredCount] = useState(initialDiscovered.size);
 
   // Layout is driven by direct DOM mutation — no setState means no cascading renders.
   // Compute zoom + render base from the current viewport: cap on-screen zoom at
@@ -134,32 +152,28 @@ export default function GameCanvas({
     const howl = new Howl({ src: BG_MUSIC_SRCS, loop: true, volume: 0 });
     bgMusicRef.current = howl;
     howl.play();
-    howl.fade(0, BG_VOL, BG_FADE_IN_MS);
+    howl.fade(0, BG_VOL * musicVolRef.current, BG_FADE_IN_MS);
   }, []);
 
   // Fade the music down when leaving (audible → false), back up when audible again.
   useEffect(() => {
     const howl = bgMusicRef.current;
     if (!howl) return;
-    howl.fade(howl.volume(), audible ? BG_VOL : 0, audible ? BG_FADE_IN_MS : BG_FADE_OUT_MS);
+    howl.fade(howl.volume(), audible ? BG_VOL * musicVolRef.current : 0, audible ? BG_FADE_IN_MS : BG_FADE_OUT_MS);
   }, [audible]);
 
-  const toggleBgmMute = useCallback(() => {
-    setIsBgmMuted(prev => {
-      const next = !prev;
-      if (bgMusicRef.current) bgMusicRef.current.mute(next);
-      return next;
-    });
+  // Volume sliders (0–1), persisted. SFX is applied per-play (see engine.onEvent);
+  // music is applied live to the running track.
+  const applyMusicVol = useCallback((v: number) => {
+    musicVolRef.current = v;
+    setMusicVol(v);
+    saveAudioPrefs({ music: v, sfx: sfxVolRef.current });
+    bgMusicRef.current?.volume(BG_VOL * v);
   }, []);
-
-  const toggleSfxMute = useCallback(() => {
-    setIsSfxMuted(prev => {
-      const next = !prev;
-      sfxMutedRef.current = next;
-      howlCache.current.forEach(h => h.mute(next));
-      footstepHowls.current.forEach(h => h.mute(next));
-      return next;
-    });
+  const applySfxVol = useCallback((v: number) => {
+    sfxVolRef.current = v;
+    setSfxVol(v);
+    saveAudioPrefs({ music: musicVolRef.current, sfx: v });
   }, []);
 
   const [isLoading, setIsLoading]       = useState(true);
@@ -260,11 +274,11 @@ export default function GameCanvas({
 
     engine.onFootstep = () => {
       if (!footstepHowls.current.length) {
-        const h = new Howl({ src: ["/assets/audio/footstep.wav"], volume: 0.15 });
-        h.mute(sfxMutedRef.current);
-        footstepHowls.current = [h];
+        footstepHowls.current = [new Howl({ src: ["/assets/audio/footstep.wav"] })];
       }
-      footstepHowls.current[0].play();
+      const h = footstepHowls.current[0];
+      h.volume(0.15 * sfxVolRef.current);
+      h.play();
     };
 
     engine.onEvent = (event: GameEvent) => {
@@ -278,19 +292,19 @@ export default function GameCanvas({
           {
             let howl = howlCache.current.get("__interact__");
             if (!howl) {
-              howl = new Howl({ src: ["/assets/audio/interact.wav"], volume: 0.05 });
-              howl.mute(sfxMutedRef.current);
+              howl = new Howl({ src: ["/assets/audio/interact.wav"] });
               howlCache.current.set("__interact__", howl);
             }
+            howl.volume(0.05 * sfxVolRef.current);
             howl.play();
           }
           if (exhibit.audio) {
             let howl = howlCache.current.get(exhibit.audio);
             if (!howl) {
               howl = new Howl({ src: [exhibit.audio] });
-              howl.mute(sfxMutedRef.current);
               howlCache.current.set(exhibit.audio, howl);
             }
+            howl.volume(QUACK_VOLUME * sfxVolRef.current);
             howl.play();
           }
           if (exhibit.popup) {
@@ -298,6 +312,13 @@ export default function GameCanvas({
             setPrompt(null);
             setShowControls(false);
             engine.setPaused(true);
+            // Mark this exhibit discovered (persisted).
+            const slug = slugForPopup(exhibit.popup);
+            if (slug && !discoveredRef.current.has(slug)) {
+              discoveredRef.current.add(slug);
+              setDiscoveredCount(discoveredRef.current.size);
+              saveDiscovered(discoveredRef.current);
+            }
           }
           if (exhibit.dialog?.length || exhibit.jokes?.length) {
             const visits = dialogVisitsRef.current.get(exhibit) ?? 0;
@@ -415,9 +436,20 @@ export default function GameCanvas({
           onOpenBigMap={() => setBigMap(true)}
           onCloseBigMap={() => setBigMap(false)}
         />
+        {/* Exhibits-discovered counter (desktop; the screen is too tight on touch). */}
+        {!isTouch && !isLoading && (
+          <div
+            className="absolute left-0 top-0 rounded-2xl border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-3 py-1.5 font-mono text-[12px] text-walnut/85 shadow-[0_4px_20px_rgba(28,21,8,0.15)]"
+            style={{ pointerEvents: "none" }}
+            title="Exhibits inspected"
+          >
+            ✦ {discoveredCount} / {TOTAL_EXHIBITS} discovered
+          </div>
+        )}
+
         {musicStarted && (
           <div
-            className="absolute z-20 flex gap-2"
+            className="absolute z-20"
             style={{
               pointerEvents: "auto",
               ...(isTouch
@@ -426,19 +458,25 @@ export default function GameCanvas({
             }}
           >
             <button
-              onClick={toggleBgmMute}
+              onClick={() => setShowSettings((s) => !s)}
+              aria-label="Audio settings"
+              aria-expanded={showSettings}
               className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-              title={isBgmMuted ? "Unmute music" : "Mute music"}
             >
-              {isBgmMuted ? "♪ off" : "♪ on"}
+              ⚙ sound
             </button>
-            <button
-              onClick={toggleSfxMute}
-              className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
-              title={isSfxMuted ? "Unmute effects" : "Mute effects"}
-            >
-              {isSfxMuted ? "sfx off" : "sfx on"}
-            </button>
+            {showSettings && (
+              <div
+                className={`absolute w-52 rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.97)] p-3.5 shadow-[0_8px_30px_rgba(28,21,8,0.3)] ${
+                  isTouch ? "left-0 top-full mt-2" : "bottom-full left-0 mb-2"
+                }`}
+              >
+                <VolumeSlider label="Music" value={musicVol} onChange={applyMusicVol} />
+                <div className="mt-3">
+                  <VolumeSlider label="Effects" value={sfxVol} onChange={applySfxVol} />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -466,5 +504,26 @@ export default function GameCanvas({
         />
       </div>
     </div>
+  );
+}
+
+function VolumeSlider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <label className="block select-none">
+      <span className="flex items-center justify-between font-mono text-[12px] text-walnut/70">
+        <span>{label}</span>
+        <span className="text-walnut/45">{Math.round(value * 100)}%</span>
+      </span>
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.01}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-label={`${label} volume`}
+        className="mt-1.5 w-full cursor-pointer accent-sage"
+      />
+    </label>
   );
 }

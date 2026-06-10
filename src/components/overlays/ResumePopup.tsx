@@ -95,7 +95,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
           style={{ maxHeight: "min(640px, 80vh)" }}
         >
           {/* ── Header ──────────────────────────────────────────────── */}
-          <div className="shrink-0 px-5 py-4 pb-3 border-b border-[rgba(58,46,30,0.15)] bg-parchment">
+          <div className="shrink-0 px-5 py-4 pb-3 border-b border-[rgb(var(--c-line-rgb)_/_0.15)] bg-parchment">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="m-0 font-mono text-[24px] text-pine tracking-[1px]">
@@ -141,7 +141,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                   onClick={onClose}
                   autoFocus
                   aria-label="Close"
-                  className="select-none bg-transparent border border-[rgba(58,46,30,0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgba(58,46,30,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                  className="select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 >
                   close [`]
                 </button>
@@ -149,7 +149,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
             </div>
 
             {/* Tab bar */}
-            <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgba(58,46,30,0.15)]">
+            <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
               <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {(data?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
@@ -215,7 +215,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
 
 function EntryCard({ entry }: { entry: ResumeEntry }) {
   return (
-    <div className="mb-6 pb-5 border-b border-[rgba(58,46,30,0.15)]">
+    <div className="mb-6 pb-5 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
       <div className="flex justify-between items-start flex-wrap gap-x-3 gap-y-0.5">
         <span className="font-mono text-[14px] font-bold text-pine">
           {entry.title}

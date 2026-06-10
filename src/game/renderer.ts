@@ -87,6 +87,9 @@ export function drawScene(
   debugPhysics: boolean,
   hidePlayer = false,
   playerAlpha = 1,
+  // Hook to draw loose, y-sorted entities (the easter-egg duck) interleaved with
+  // the scene. Called once per sort row so the player can pass in front of/behind them.
+  drawEntities?: (sortRow: number, camX: number, camY: number) => void,
   renderParticles = true,
 ): void {
   ctx.imageSmoothingEnabled = false;
@@ -281,6 +284,9 @@ export function drawScene(
       }
       ctx.restore();
     }
+
+    // Loose y-sorted entities (easter-egg duck) — interleaved at their sort row.
+    drawEntities?.(sortRow, camX, camY);
 
     // Objects and glow
     if (inRange) {
