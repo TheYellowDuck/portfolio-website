@@ -43,7 +43,7 @@ export default function Reveal({ children, className = "", delay = 0 }: RevealPr
   return (
     <div
       ref={ref}
-      className={className}
+      className={`reveal-anim ${className}`}
       style={{
         opacity: 0,
         transform: "translateY(18px)",

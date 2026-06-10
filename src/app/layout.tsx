@@ -53,6 +53,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Without JS the scroll-reveal content never un-hides, so force it visible. */}
+        <noscript>
+          <style dangerouslySetInnerHTML={{ __html: ".reveal-anim{opacity:1!important;transform:none!important}" }} />
+        </noscript>
+      </head>
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"

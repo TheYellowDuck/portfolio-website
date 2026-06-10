@@ -373,6 +373,8 @@ export default function GameCanvas({
       >
         <canvas
           ref={canvasRef}
+          role="img"
+          aria-label="Interactive pixel-art museum. Walk with WASD or arrow keys; press E near a glowing exhibit to inspect it. All content is also on the main site."
           className="absolute inset-0 block [image-rendering:pixelated] touch-none"
           onClick={e => {
             startBgMusic();
