@@ -201,6 +201,12 @@ export default function GameCanvas({
     return () => window.removeEventListener("pointerdown", onFirstPointer);
   }, [startBgMusic]);
 
+  // Entering the game is itself a user gesture (the "Step inside" click that mounts
+  // this component), so the page is activated — start the music on mount rather than
+  // waiting for an interaction inside the game. The pointer/heartbeat paths above
+  // remain as fallbacks if the browser defers the first play.
+  useEffect(() => { startBgMusic(); }, [startBgMusic]);
+
   useEffect(() => {
     const resume = () => {
       if (Howler.ctx?.state === "suspended") Howler.ctx.resume();
@@ -359,8 +365,16 @@ export default function GameCanvas({
     engine.setPaused(true);
 
     // On unmount (leaving the game), stop the loop and fully reset audio so the
-    // background music / SFX don't linger or double up when re-entering.
-    return () => { engine.stop(); Howler.unload(); };
+    // background music / SFX don't linger or double up when re-entering. Clearing the
+    // music refs lets a remount start a fresh track — without it, React Strict Mode's
+    // double-invoke (and re-entering) would unload the track yet leave the "started"
+    // guard set, so the next start no-ops and you get silence.
+    return () => {
+      engine.stop();
+      Howler.unload();
+      musicStartedRef.current = false;
+      bgMusicRef.current = null;
+    };
   }, []);
 
   // Fade the engine player in/out (the portal fades the world in first, then the
@@ -435,15 +449,25 @@ export default function GameCanvas({
           isTouch={isTouch}
           onOpenBigMap={() => setBigMap(true)}
           onCloseBigMap={() => setBigMap(false)}
+          onWalkToTile={(c, r) => engineRef.current?.walkToTile(c, r)}
         />
-        {/* Exhibits-discovered counter (desktop; the screen is too tight on touch). */}
-        {!isTouch && !isLoading && (
+        {/* Exhibits-discovered counter. Desktop: full pill, top-left. Touch: a compact
+            pill under the centered "Leave" button. Hidden while a dialog/overlay is up. */}
+        {!isLoading && !activePopup && !bigMap && !dialog && (
           <div
-            className="absolute left-0 top-0 rounded-2xl border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-3 py-1.5 font-mono text-[12px] text-walnut/85 shadow-[0_4px_20px_rgba(28,21,8,0.15)]"
-            style={{ pointerEvents: "none" }}
+            className="absolute z-10 rounded-2xl border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-3 py-1.5 font-mono text-[12px] text-walnut/85 shadow-[0_4px_20px_rgba(28,21,8,0.15)]"
+            style={
+              isTouch
+                // Sit just under the centered "Leave museum" button (top-left is the
+                // sound button, top-right the minimap).
+                ? { pointerEvents: "none", top: "calc(env(safe-area-inset-top, 0px) + 46px)", left: "50%", transform: "translateX(-50%)" }
+                : { pointerEvents: "none", left: 0, top: 0 }
+            }
             title="Exhibits inspected"
           >
-            ✦ {discoveredCount} / {TOTAL_EXHIBITS} discovered
+            {isTouch
+              ? `✦ ${discoveredCount}/${TOTAL_EXHIBITS}`
+              : `✦ ${discoveredCount} / ${TOTAL_EXHIBITS} discovered`}
           </div>
         )}
 

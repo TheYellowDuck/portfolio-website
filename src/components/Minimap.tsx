@@ -30,9 +30,11 @@ interface MinimapProps {
   isTouch?: boolean;
   onOpenBigMap: () => void;
   onCloseBigMap: () => void;
+  /** Tap a tile on the expanded map → walk the player there. */
+  onWalkToTile?: (col: number, row: number) => void;
 }
 
-export default function Minimap({ onRegisterDraw, bigMap, isTouch = false, onOpenBigMap, onCloseBigMap }: MinimapProps) {
+export default function Minimap({ onRegisterDraw, bigMap, isTouch = false, onOpenBigMap, onCloseBigMap, onWalkToTile }: MinimapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bigCanvasRef = useRef<HTMLCanvasElement>(null);
   const lastPosRef = useRef({ x: PLAYER_SPAWN_COL * TILE_SIZE, y: PLAYER_SPAWN_ROW * TILE_SIZE });
@@ -270,10 +272,23 @@ export default function Minimap({ onRegisterDraw, bigMap, isTouch = false, onOpe
                   height: `min(48vh, calc(48vw * ${(BIG_H / BIG_W).toFixed(6)}))`,
                 }
           }
-          onClick={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mapX = (e.clientX - rect.left) * (BIG_W / rect.width) - BIG_PAD;
+            const mapY = (e.clientY - rect.top) * (BIG_H / rect.height) - BIG_PAD;
+            const col = Math.floor(mapX / SCALE);
+            const row = Math.floor(mapY / SCALE);
+            // Ignore taps outside the museum (padding / VOID tiles) — nothing to walk to.
+            const inBounds = col >= 0 && col < MAP_COLS && row >= 0 && row < MAP_ROWS;
+            if (inBounds && museumMap[row][col] !== TILES.VOID) {
+              onWalkToTile?.(col, row);
+              onCloseBigMap();
+            }
+          }}
         />
         <p className="mt-3 text-[rgba(200,178,130,0.45)] text-xs font-mono tracking-widest select-none">
-          {isTouch ? "TAP TO CLOSE" : "M · CLICK TO CLOSE"}
+          {isTouch ? "TAP A SPOT TO WALK THERE" : "CLICK A SPOT TO WALK · M TO CLOSE"}
         </p>
       </div>
     </>

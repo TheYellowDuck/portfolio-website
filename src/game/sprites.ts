@@ -10,7 +10,7 @@
 // `cacheBust` appends `?v=<token>` so /map-snapshot can bypass the browser
 // cache; the live game omits it and loads from cache normally.
 
-import { IDLE_FRAMES, WALK_FRAMES, type Direction } from "./player";
+import { IDLE_FRAMES, WALK_FRAMES, IDLE_DIRS, WALK_DIRS, type Direction } from "./player";
 
 export class SpriteRegistry {
   onReady: (() => void) | null = null;
@@ -44,6 +44,9 @@ export class SpriteRegistry {
   meLightOffReady = false;
   northIdleSprite: HTMLImageElement = new Image();
   duckSheet: HTMLImageElement = new Image(); // easter-egg duck (untracked)
+  /** Last player frame that actually decoded — the renderer falls back to it so
+   *  the character never blinks out while a new direction's frames lazy-load. */
+  lastPlayerFrame: HTMLImageElement | null = null;
   private idleSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private walkSprites: Map<Direction, HTMLImageElement[]> = new Map();
   private url!: (path: string) => string;
@@ -60,21 +63,36 @@ export class SpriteRegistry {
     if (this._loaded >= this._total) this.onReady?.();
   }
 
-  /** Lazily load (and cache) a facing direction's animation frames on first use. */
-  frames(state: "idle" | "walk", dir: Direction): HTMLImageElement[] {
+  private loadFrames(
+    state: "idle" | "walk",
+    dir: Direction,
+    track?: (img: HTMLImageElement) => HTMLImageElement,
+  ): HTMLImageElement[] {
     const cache = state === "idle" ? this.idleSprites : this.walkSprites;
     let arr = cache.get(dir);
     if (!arr) {
       const count = state === "idle" ? IDLE_FRAMES : WALK_FRAMES;
       arr = [];
       for (let i = 0; i < count; i++) {
-        const img = new Image();
+        const img = track ? track(new Image()) : new Image();
         img.src = this.url(`/assets/sprites/character/states/standing/animations/${state}/${dir}/frame_${String(i).padStart(3, "0")}.png`);
         arr.push(img);
       }
       cache.set(dir, arr);
     }
     return arr;
+  }
+
+  /** Lazily load (and cache) a facing direction's animation frames on first use. */
+  frames(state: "idle" | "walk", dir: Direction): HTMLImageElement[] {
+    return this.loadFrames(state, dir);
+  }
+
+  /** Warm every direction's frames (call once the game is interactive) so the
+   *  first turn to a new facing is already decoded — no lazy-load fallback. */
+  prewarmAll() {
+    for (const dir of WALK_DIRS) this.loadFrames("walk", dir);
+    for (const dir of IDLE_DIRS) this.loadFrames("idle", dir);
   }
 
   constructor(cacheBust?: string) {
@@ -139,8 +157,11 @@ export class SpriteRegistry {
 
     this.northIdleSprite.src = url("/assets/sprites/character/states/standing/rotations/north.png");
     this.duckSheet.src = url("/assets/sprites/duck.png");
-    // Pre-warm the spawn-facing frames; other directions load on first use.
-    this.frames("idle", "east");
-    this.frames("walk", "east");
+    // Pre-warm AND track the spawn-facing (east) frames, so onReady doesn't fire
+    // until the player can actually be drawn — otherwise the first game load shows
+    // a blank player that "reloads" once its frames decode. Other directions stay
+    // lazy (loaded on first use / prewarmAll).
+    this.loadFrames("idle", "east", tracked);
+    this.loadFrames("walk", "east", tracked);
   }
 }

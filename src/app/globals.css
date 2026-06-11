@@ -129,13 +129,25 @@ html.dark {
 
 /* Konami easter egg: ducks drifting + swaying down (per-duck --sway / --spin), plus a toast. */
 @keyframes konami-fall {
-  0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  0%   { transform: translate3d(0, -16vh, 0) rotate(0deg); }
   25%  { transform: translate3d(var(--sway, 16px), 28vh, 0) rotate(var(--spin, 10deg)); }
   50%  { transform: translate3d(calc(var(--sway, 16px) * -0.7), 56vh, 0) rotate(calc(var(--spin, 10deg) * -0.8)); }
   75%  { transform: translate3d(calc(var(--sway, 16px) * 0.5), 84vh, 0) rotate(var(--spin, 10deg)); }
   100% { transform: translate3d(0, 116vh, 0) rotate(0deg); }
 }
 @keyframes konami-toast { 0% { opacity: 0; } 10%, 85% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Touch controls hint. Portrait: float well above the joystick/interact buttons.
+   Landscape: the viewport is short, so floating high collides with the top HUD —
+   instead sit low in the center gap between the corner controls, narrowed so it
+   can't reach them. */
+.controls-hint-touch { bottom: calc(env(safe-area-inset-bottom, 0px) + 196px); }
+@media (orientation: landscape) {
+  .controls-hint-touch {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+    max-width: 230px;
+  }
+}
 
 @theme inline {
   --font-sans: var(--font-geist-sans);

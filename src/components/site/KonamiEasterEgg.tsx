@@ -72,7 +72,9 @@ export default function KonamiEasterEgg({ enabled = true }: { enabled?: boolean 
             imageRendering: "pixelated",
             ["--sway" as string]: `${d.sway.toFixed(1)}px`,
             ["--spin" as string]: `${d.spin.toFixed(1)}deg`,
-            animation: `konami-fall ${d.dur.toFixed(2)}s ease-in-out ${d.delay.toFixed(2)}s forwards`,
+            // `both` so the start delay holds the 0% state (above the viewport) and
+            // the duck falls in — without it, delayed ducks park at top:0 then vanish.
+            animation: `konami-fall ${d.dur.toFixed(2)}s ease-in-out ${d.delay.toFixed(2)}s both`,
           } as React.CSSProperties}
         />
       ))}

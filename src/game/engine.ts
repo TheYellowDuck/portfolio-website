@@ -28,6 +28,7 @@ import { SpriteRegistry } from "./sprites";
 import { ParticleSystem } from "./particles";
 import { drawScene } from "./renderer";
 import { Duck } from "./duck";
+import { findPath, findPathToward, smoothPath, type Cell } from "./pathfinding";
 
 export type GameEvent =
   | { type: "nearby"; content: Exhibit }
@@ -52,6 +53,10 @@ export class GameEngine {
   private glowAlpha = 0;
   // Analog movement vector from the on-screen joystick (each axis ~[-1, 1]).
   private moveVec = { x: 0, y: 0 };
+
+  // Click-to-move: remaining waypoints the player auto-walks to (manual input cancels).
+  private path: Cell[] | null = null;
+  private pathStuck = 0;
 
   // Easter-egg duck (started on first trigger). It floats over the EASTER_EGG
   // marker tile; the tile *below* it is the solid "invisible pedestal".
@@ -87,8 +92,10 @@ export class GameEngine {
   public debugPhysics = false;
   // When true the player isn't drawn. `playerAlpha` (0–1) fades the player in/out
   // during the site→game portal transition (the world fades in first, then the player).
+  // Starts at 0 (hidden) so the player isn't flashed on screen before the transition's
+  // player-reveal stage tweens it in — otherwise first load shows a brief load/fade/reload.
   public hidePlayer = false;
-  public playerAlpha = 1;
+  public playerAlpha = 0;
 
   /** Total tracked sprites (for a loading progress display). */
   get spritesTotal() { return this.sprites.total; }
@@ -111,7 +118,14 @@ export class GameEngine {
         if (museumMap[r][c] === TILES.EASTER_EGG) { this.eggRow = r; this.eggCol = c; }
       }
     }
-    // Solid pedestal is the tile *below* the duck; the duck's own tile stays walkable.
+    // The duck's solid "pedestal" (the tile below it) is added only when the egg is
+    // triggered — see triggerDuck() — so before then the spot is fully walkable.
+  }
+
+  // First easter-egg trigger: start the duck and add its physics (the solid tile
+  // below it). Idempotent — duck.start() and setSolidAt() both no-op if repeated.
+  private triggerDuck() {
+    this.duck.start();
     if (this.eggCol >= 0) setSolidAt(this.eggCol, this.eggRow + 1, true);
   }
 
@@ -132,27 +146,63 @@ export class GameEngine {
   triggerInteract() {
     if (this.currentNearby && !this.interactCooldown) {
       this.onEvent?.({ type: "interact", content: this.currentNearby.content });
-      if (this.currentNearby.tileType === TILES.EASTER_EGG) this.duck.start();
+      if (this.currentNearby.tileType === TILES.EASTER_EGG) this.triggerDuck();
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 500);
     }
   }
 
   clickAt(screenX: number, screenY: number) {
-    if (this.paused || this.interactCooldown) return;
+    if (this.paused) return;
     const col = Math.floor((screenX + this.camera.x) / TILE_SIZE);
     const row = Math.floor((screenY + this.camera.y) / TILE_SIZE);
     const target = interactables.find(i => i.col === col && (i.row === row || i.row === row - 1));
     if (target) {
+      if (this.interactCooldown) return;
       this.onEvent?.({ type: "interact", content: target.content });
-      if (target.tileType === TILES.EASTER_EGG) this.duck.start();
+      if (target.tileType === TILES.EASTER_EGG) this.triggerDuck();
       this.interactCooldown = true;
       setTimeout(() => { this.interactCooldown = false; }, 500);
+      return;
     }
+    // Click-to-move: walk to the clicked tile if it's reachable. Start from the
+    // tile under the player's feet (the rect's bottom — its ground contact).
+    const start = {
+      col: Math.floor(this.player.centerX / TILE_SIZE),
+      row: Math.floor(this.player.centerY / TILE_SIZE),
+    };
+    const raw = findPath(start, { col, row });
+    if (raw && raw.length) { this.path = smoothPath(start, raw); this.pathStuck = 0; }
+  }
+
+  private hasManualInput(): boolean {
+    const i = this.input;
+    return i.isDown("w") || i.isDown("a") || i.isDown("s") || i.isDown("d")
+      || i.isDown("ArrowUp") || i.isDown("ArrowDown") || i.isDown("ArrowLeft") || i.isDown("ArrowRight");
+  }
+
+  // Steer the player's collision box (its center) toward the next waypoint's tile
+  // center as a walk-speed move vector; pop waypoints once reached. Centering the
+  // box keeps clearance on every side so it can't catch on a wall corner, and the
+  // tight reach still lands the player on the tile's center.
+  private followPath(): { x: number; y: number } {
+    const WALK = 0.6;                 // joystick magnitude → walk (below the run rim)
+    const REACH = TILE_SIZE * 0.14;
+    while (this.path && this.path.length) {
+      const wp = this.path[0];
+      const dx = (wp.col + 0.5) * TILE_SIZE - this.player.centerX;
+      const dy = (wp.row + 0.5) * TILE_SIZE - this.player.centerY;
+      const d = Math.hypot(dx, dy);
+      if (d < REACH) { this.path.shift(); continue; }
+      return { x: (dx / d) * WALK, y: (dy / d) * WALK };
+    }
+    this.path = null;
+    return { x: 0, y: 0 };
   }
 
   setPaused(paused: boolean) {
     this.paused = paused;
+    this.path = null;
     this.input.clear();
     this.moveVec.x = 0;
     this.moveVec.y = 0;
@@ -179,6 +229,21 @@ export class GameEngine {
     this.camera.snapTo(this.player.centerX, this.player.centerY);
     this.lastTime = performance.now();
     this.loop(this.lastTime);
+    // Warm the other facings shortly after entry (deferred so it doesn't compete
+    // with the tracked first-load decode) — keeps turning flicker-free.
+    setTimeout(() => this.sprites.prewarmAll(), 1200);
+  }
+
+  /** Walk to a specific tile (e.g. tapped on the minimap). If the tile is blocked,
+   *  head to the nearest reachable open tile around it instead. */
+  walkToTile(col: number, row: number) {
+    if (this.paused) return;
+    const start = {
+      col: Math.floor(this.player.centerX / TILE_SIZE),
+      row: Math.floor(this.player.centerY / TILE_SIZE),
+    };
+    const raw = findPathToward(start, { col, row });
+    if (raw && raw.length) { this.path = smoothPath(start, raw); this.pathStuck = 0; }
   }
 
   stop() {
@@ -201,8 +266,20 @@ export class GameEngine {
     this.particles.update(dt);
     this.duck.update(dt);
 
-    const { isMoving, running } = this.player.move(this.input, dt, this.moveVec);
+    // Click-to-move: manual input (keyboard or joystick) cancels the auto-walk;
+    // otherwise steer toward the active path's next waypoint.
+    if (this.path && (this.hasManualInput() || this.moveVec.x !== 0 || this.moveVec.y !== 0)) {
+      this.path = null;
+    }
+    const moveVec = this.path ? this.followPath() : this.moveVec;
+    const { isMoving, running } = this.player.move(this.input, dt, moveVec);
     const { player } = this;
+
+    // If collision fully blocks the auto-walk, give up rather than grind a wall.
+    if (this.path) {
+      if (isMoving) this.pathStuck = 0;
+      else if ((this.pathStuck += dt) > 0.4) this.path = null;
+    }
 
     // Footsteps — kick up dust + emit the audio cue on a movement-speed cadence.
     if (isMoving) {
@@ -264,7 +341,7 @@ export class GameEngine {
       const ePressed = this.input.isDown("e") || this.input.isDown("E") || this.input.isDown("Enter");
       if (ePressed && !this.interactCooldown) {
         this.onEvent?.({ type: "interact", content: nearby.content });
-        if (nearby.tileType === TILES.EASTER_EGG) this.duck.start();
+        if (nearby.tileType === TILES.EASTER_EGG) this.triggerDuck();
         this.interactCooldown = true;
         setTimeout(() => { this.interactCooldown = false; }, 500);
       }

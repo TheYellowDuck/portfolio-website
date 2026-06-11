@@ -276,12 +276,15 @@ export function drawScene(
       };
       ctx.save();
       ctx.globalAlpha = playerAlpha;
-      if (!player.isMoving && player.facing === 'north') {
-        drawImg(sprites.northIdleSprite);
-      } else {
-        const frame = sprites.frames(player.isMoving ? 'walk' : 'idle', player.facing)[player.animFrame];
-        if (frame) drawImg(frame);
-      }
+      let frame: HTMLImageElement | null =
+        !player.isMoving && player.facing === 'north'
+          ? sprites.northIdleSprite
+          : sprites.frames(player.isMoving ? 'walk' : 'idle', player.facing)[player.animFrame] ?? null;
+      // If the chosen frame hasn't decoded yet (lazy per-direction load), reuse the
+      // last good one so the character holds a pose instead of blinking out.
+      if (frame && frame.complete && frame.naturalWidth > 0) sprites.lastPlayerFrame = frame;
+      else frame = sprites.lastPlayerFrame;
+      if (frame) drawImg(frame);
       ctx.restore();
     }
 
