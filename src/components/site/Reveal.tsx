@@ -6,14 +6,22 @@ interface RevealProps {
   children: React.ReactNode;
   className?: string;
   delay?: number; // ms
+  /** Entrance that fits what's revealed: lift (content), fade (headers), slide (timeline). */
+  variant?: "up" | "fade" | "left";
 }
 
+const FROM: Record<NonNullable<RevealProps["variant"]>, string> = {
+  up: "translateY(18px)",
+  fade: "translateY(7px)",
+  left: "translateX(-22px)",
+};
+
 /**
- * Fade + lift content in when it scrolls into view (once). Reveals by mutating the
- * element's style directly (the effect-updates-the-DOM pattern — no React state),
- * and reveals immediately under prefers-reduced-motion.
+ * Fade content in when it scrolls into view (once), with a per-context entrance.
+ * Reveals by mutating the element's style directly (the effect-updates-the-DOM
+ * pattern — no React state), and reveals immediately under prefers-reduced-motion.
  */
-export default function Reveal({ children, className = "", delay = 0 }: RevealProps) {
+export default function Reveal({ children, className = "", delay = 0, variant = "up" }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,7 +54,7 @@ export default function Reveal({ children, className = "", delay = 0 }: RevealPr
       className={`reveal-anim ${className}`}
       style={{
         opacity: 0,
-        transform: "translateY(18px)",
+        transform: FROM[variant],
         transition: `opacity 550ms ease-out ${delay}ms, transform 550ms ease-out ${delay}ms`,
       }}
     >

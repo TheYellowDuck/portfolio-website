@@ -32,7 +32,7 @@ export default function Error({
           Try again
         </button>
         <button
-          onClick={() => window.location.assign("/")}
+          onClick={() => window.location.reload()}
           className="rounded-full border border-[rgba(58,46,30,0.2)] px-5 py-2 text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
         >
           Reload

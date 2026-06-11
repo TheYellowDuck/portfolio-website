@@ -13,11 +13,17 @@ html, body {
   overscroll-behavior: none;   /* no pull-to-refresh / scroll chaining on touch */
   background: var(--c-bg);     /* themeable; the game layer paints its own dark bg */
 }
+/* Always reserve the scrollbar gutter so centered content doesn't shift left/right
+   when the vertical scrollbar appears as the page settles on load. */
+html { scrollbar-gutter: stable; }
 /* Smooth in-page navigation (command palette + nav anchors), motion-safe. */
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-/* Set by SiteShell while the game is mounted so the page behind can't scroll. */
+/* While the game is mounted, fully lock the page and drop the reserved gutter — the
+   fixed game layer fills the viewport, so nothing behind it should scroll or show a
+   gutter strip. (html is the scroll container here, so locking body alone isn't enough.) */
 body.game-active { overflow: hidden; }
+html:has(body.game-active) { overflow: hidden; scrollbar-gutter: auto; }
 
 /* ── Light / dark theme tokens ───────────────────────────────────────────────
    The site flips with .dark on <html>. The game UI stays warm regardless of the
@@ -56,6 +62,71 @@ html.dark {
   .interact-glow { animation: none; box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.6); }
 }
 
+/* Smooth light/dark swap — `.theme-transition` is added to <html> only during the
+   toggle (then removed), so colors cross-fade without slowing normal hover states. */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease,
+    fill 0.35s ease, box-shadow 0.35s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition, .theme-transition * { transition: none !important; }
+}
+
+/* Brief intro curtain — covers the first paint (hiding header hydration flicker),
+   then fades to reveal the site. Pure CSS so it runs even before JS hydrates.
+   Reduced-motion skips it. */
+.intro-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-bg);
+  pointer-events: none;
+  animation: intro-curtain 1.25s ease forwards;
+}
+@keyframes intro-curtain {
+  0%, 64%  { opacity: 1; }
+  100%     { opacity: 0; visibility: hidden; }
+}
+
+.intro-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+/* Warm lamp glow blooming behind the name. */
+.intro-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 460px; height: 460px;
+  margin: -230px 0 0 -230px;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(240, 206, 120, 0.34), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  animation: intro-glow-in 0.8s ease forwards;
+}
+.intro-eyebrow { opacity: 0; animation: intro-rise 0.55s ease 0.1s forwards; }
+.intro-name    { opacity: 0; animation: intro-rise 0.6s ease 0.2s forwards; }
+.intro-line {
+  width: 84px; height: 2px; border-radius: 2px;
+  background: #7a9e7e;
+  transform: scaleX(0);
+  animation: intro-line 0.5s ease 0.34s forwards;
+}
+@keyframes intro-glow-in { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+@keyframes intro-rise    { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes intro-line    { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) { .intro-curtain { display: none; } }
+
 /* Konami easter egg: ducks drifting + swaying down (per-duck --sway / --spin), plus a toast. */
 @keyframes konami-fall {
   0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); }
@@ -68,6 +139,7 @@ html.dark {
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
   --font-system-mono: ui-monospace, Menlo, Monaco, "Cascadia Code", "Segoe UI Mono", "Roboto Mono", monospace;
 

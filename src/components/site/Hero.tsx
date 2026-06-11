@@ -24,10 +24,10 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
         <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
           Portfolio · est. golden hour
         </p>
-        <h1 className="mt-4 font-sans text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
+        <h1 className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
           George Zhang
         </h1>
-        <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed text-walnut/75">
+        <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
           CS at the University of Waterloo, building thoughtful software — from
           Android Automotive at Ford to computer-vision rehab tools and a few too
           many games.

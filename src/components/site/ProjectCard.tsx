@@ -25,12 +25,12 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
         )}
       </div>
 
-      <h3 className="mt-2 font-sans text-[19px] font-semibold leading-snug text-pine">
+      <h3 className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
         {popup.title}
       </h3>
 
       {popup.description && (
-        <p className={`mt-2 flex-1 font-sans text-[14px] leading-relaxed text-walnut/80 ${compact ? "line-clamp-3" : "line-clamp-4"}`}>
+        <p className={`mt-2 flex-1 font-sans text-[14px] leading-relaxed dark:leading-[1.72] text-walnut/80 ${compact ? "line-clamp-3" : "line-clamp-4"}`}>
           {popup.description}
         </p>
       )}

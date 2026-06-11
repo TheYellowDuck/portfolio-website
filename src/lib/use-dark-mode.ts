@@ -17,8 +17,11 @@ export function useDarkMode() {
   );
 }
 
-/** Toggle + persist the theme. */
+/** Toggle + persist the theme, with a brief cross-fade of all themed colors. */
 export function setDarkMode(dark: boolean) {
-  document.documentElement.classList.toggle("dark", dark);
+  const root = document.documentElement;
+  root.classList.add("theme-transition");
+  root.classList.toggle("dark", dark);
   try { localStorage.setItem("museum:theme", dark ? "dark" : "light"); } catch { /* ignore */ }
+  window.setTimeout(() => root.classList.remove("theme-transition"), 400);
 }

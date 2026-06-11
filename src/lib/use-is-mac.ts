@@ -7,10 +7,7 @@ const detect = () =>
   typeof navigator !== "undefined" &&
   /mac|iphone|ipad|ipod/i.test(navigator.platform || navigator.userAgent || "");
 
-/**
- * True on macOS/iOS — for showing ⌘ vs Ctrl in shortcut hints. Hydration-safe
- * (server renders the non-Mac default, client corrects after mount).
- */
+/** True on macOS/iOS — for showing ⌘ vs Ctrl in shortcut hints. */
 export function useIsMac() {
   return useSyncExternalStore(noop, detect, () => false);
 }
