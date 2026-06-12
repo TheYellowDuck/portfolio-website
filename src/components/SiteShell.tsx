@@ -46,6 +46,8 @@ export default function SiteShell() {
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
   const scrollYRef = useRef(0);
+  const stageRef = useRef(stage);
+  useEffect(() => { stageRef.current = stage; }, [stage]);
 
   // Lock page scroll while off the plain site; restore scroll on return.
   useEffect(() => {
@@ -57,6 +59,63 @@ export default function SiteShell() {
     }
   }, [stage]);
   useEffect(() => () => document.body.classList.remove("game-active"), []);
+
+  // Keep a long-open tab from going stale after a new deploy. Two safeguards:
+  //  • a lazily-loaded chunk 404s (its hash changed in the new build) → reload once;
+  //  • on refocus, if a newer build is live AND we're on the site (not mid-game) → reload.
+  useEffect(() => {
+    const KEY = "museum:stale-reload";
+    const SCROLL_KEY = "museum:restore-scroll";
+    // A freshness reload should be invisible — land the visitor back where they were.
+    try {
+      const y = sessionStorage.getItem(SCROLL_KEY);
+      if (y !== null) {
+        sessionStorage.removeItem(SCROLL_KEY);
+        requestAnimationFrame(() => window.scrollTo(0, Number(y) || 0));
+      }
+    } catch { /* ignore */ }
+    const reloadFresh = () => {
+      try { sessionStorage.setItem(SCROLL_KEY, String(window.scrollY)); } catch { /* ignore */ }
+      window.location.reload();
+    };
+    const isChunkError = (m?: string | null) =>
+      !!m && /ChunkLoadError|Loading chunk \d+ failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(m);
+    const reloadOnce = () => {
+      if (sessionStorage.getItem(KEY)) return; // already tried — don't loop on a genuine failure
+      sessionStorage.setItem(KEY, "1");
+      reloadFresh();
+    };
+    const onError = (e: ErrorEvent) => { if (isChunkError(e.message)) reloadOnce(); };
+    const onRejection = (e: PromiseRejectionEvent) => {
+      const r = e.reason as { message?: string } | string | undefined;
+      if (isChunkError(typeof r === "string" ? r : r?.message)) reloadOnce();
+    };
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    // Stayed up without a chunk error — let a *future* stale deploy reload again.
+    const clearGuard = window.setTimeout(() => sessionStorage.removeItem(KEY), 8000);
+
+    // Compare the first hashed build chunk; it changes on every deploy.
+    const marker = (html: string) => html.match(/\/_next\/static\/[^"']+?\.js/)?.[0] ?? null;
+    const loaded = document.querySelector('script[src*="/_next/static/"]')?.getAttribute("src") ?? null;
+    const checkFresh = async () => {
+      if (document.visibilityState !== "visible" || stageRef.current !== "site" || !loaded) return;
+      try {
+        const live = marker(await (await fetch("/", { cache: "no-store" })).text());
+        if (live && live !== loaded) reloadFresh();
+      } catch { /* offline or blocked — leave the tab as-is */ }
+    };
+    document.addEventListener("visibilitychange", checkFresh);
+    window.addEventListener("focus", checkFresh);
+
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+      window.clearTimeout(clearGuard);
+      document.removeEventListener("visibilitychange", checkFresh);
+      window.removeEventListener("focus", checkFresh);
+    };
+  }, []);
 
 
   // Start the background fade once the site has faded out AND the engine is ready.
