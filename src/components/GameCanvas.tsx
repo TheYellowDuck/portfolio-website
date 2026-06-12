@@ -202,6 +202,13 @@ export default function GameCanvas({
   const [bigMap, setBigMap]             = useState(false);
   const [isTouch, setIsTouch]           = useState(false);
   const [dialog, setDialog]             = useState<{ lines: string[]; idx: number } | null>(null);
+  // Mirror of `dialog` readable from the (mount-time) engine event handler.
+  const dialogRef = useRef(false);
+  useEffect(() => { dialogRef.current = !!dialog; }, [dialog]);
+  // Latest player position, and where the player stood when a dialog opened — used to
+  // close the conversation only once they've actually walked a few px away.
+  const lastPosRef = useRef({ x: 0, y: 0 });
+  const dialogOpenPosRef = useRef({ x: 0, y: 0 });
 
   // Coarse pointer → show on-screen touch controls (also true in mobile emulation).
   useEffect(() => {
@@ -297,13 +304,11 @@ export default function GameCanvas({
     setDialog((d) => {
       if (!d) return null;
       if (d.idx < d.lines.length - 1) return { lines: d.lines, idx: d.idx + 1 };
-      engineRef.current?.setPaused(false);
-      return null;
+      return null; // end of dialog (the engine was never paused for it)
     });
   }, []);
   const closeDialog = useCallback(() => {
-    setDialog(null);
-    engineRef.current?.setPaused(false);
+    setDialog(null); // the engine isn't paused for dialogs, so nothing to resume
   }, []);
 
   useEffect(() => {
@@ -320,7 +325,9 @@ export default function GameCanvas({
     return () => window.removeEventListener("keydown", onKey);
   }, [activePopup, handleClose, startBgMusic]);
 
-  // While an NPC dialog is open: E / Enter / Space advances, Esc / ` closes.
+  // While an NPC dialog is open: E / Enter / Space advances, Esc / ` closes. Movement
+  // isn't handled here — the engine (never paused for dialogs) moves the player and the
+  // "active" event closes the dialog, so you simply walk away.
   useEffect(() => {
     if (!dialog) return;
     const onKey = (e: KeyboardEvent) => {
@@ -358,6 +365,7 @@ export default function GameCanvas({
         case "idle":    setShowControls(true); break;
         case "active":  setShowControls(false); break;
         case "interact": {
+          if (dialogRef.current) break; // mid-conversation: E advances the dialog, not re-interact
           const exhibit: Exhibit = event.content;
           {
             let howl = howlCache.current.get("__interact__");
@@ -409,10 +417,12 @@ export default function GameCanvas({
               lines = exhibit.dialog;
             }
             if (lines?.length) {
+              // Talking does NOT pause the engine — the player can walk away, which
+              // closes the dialog (see onPositionChange) once they move off this spot.
+              dialogOpenPosRef.current = { ...lastPosRef.current };
               setDialog({ lines, idx: 0 });
               setPrompt(null);
               setShowControls(false);
-              engine.setPaused(true);
             }
           }
           break;
@@ -429,7 +439,16 @@ export default function GameCanvas({
       engine.setPaused(false);
       onReadyRef.current?.();
     };
-    engine.onPositionChange = (x, y) => minimapDrawRef.current?.(x, y);
+    engine.onPositionChange = (x, y) => {
+      minimapDrawRef.current?.(x, y);
+      lastPosRef.current = { x, y };
+      // Walk away from a conversation: close once they've moved a few px from where
+      // the dialog opened (this fires every frame, so a plain check would close it instantly).
+      if (dialogRef.current &&
+          Math.hypot(x - dialogOpenPosRef.current.x, y - dialogOpenPosRef.current.y) > 6) {
+        setDialog(null);
+      }
+    };
     engine.start();
     engine.setPaused(true);
 
@@ -509,7 +528,8 @@ export default function GameCanvas({
             in. The prompt is desktop-only — on touch the glowing E button signals inspect. */}
         <BottomHint
           kind={
-            showControls && !isLoading && !activePopup ? "controls"
+            dialog ? null /* the NPC dialog owns the bottom while talking */
+              : showControls && !isLoading && !activePopup ? "controls"
               : prompt && !activePopup && !isTouch ? "prompt"
               : null
           }
@@ -529,8 +549,9 @@ export default function GameCanvas({
           onWalkToTile={(c, r) => engineRef.current?.walkToTile(c, r)}
         />
         {/* Exhibits-discovered counter. Desktop: full pill, top-left. Touch: a compact
-            pill under the centered "Leave" button. Hidden while a dialog/overlay is up. */}
-        {!isLoading && !activePopup && !bigMap && !dialog && (
+            pill under the centered "Leave" button. Hidden under the full-screen overlay
+            or map, but kept up during a (bottom-anchored) dialog. */}
+        {!isLoading && !activePopup && !bigMap && (
           <div
             className="absolute z-10 rounded-2xl border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-3 py-1.5 font-mono text-[12px] text-walnut/85 shadow-[0_4px_20px_rgba(28,21,8,0.15)]"
             style={
@@ -594,6 +615,7 @@ export default function GameCanvas({
         line={dialog ? dialog.lines[dialog.idx] : null}
         hasNext={dialog ? dialog.idx < dialog.lines.length - 1 : false}
         onAdvance={advanceDialog}
+        isTouch={isTouch}
       />
 
       {/* On-screen controls for touch devices — virtual joystick + interact button.
@@ -601,7 +623,7 @@ export default function GameCanvas({
           Faded with the rest of the HUD during the portal transition. */}
       <div style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}>
         <TouchControls
-          visible={isTouch && !isLoading && !activePopup && !bigMap && !dialog}
+          visible={isTouch && !isLoading && !activePopup && !bigMap}
           nearby={!!prompt}
           onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
           onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}

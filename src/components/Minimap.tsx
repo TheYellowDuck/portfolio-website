@@ -241,7 +241,8 @@ export default function Minimap({ onRegisterDraw, bigMap, isTouch = false, onOpe
             width={W}
             height={H}
             className="block [image-rendering:pixelated]"
-            style={{ width: `min(28vw, ${W}px)`, height: "auto" }}
+            // vh cap keeps it small in landscape (short viewport) where 28vw is huge.
+            style={{ width: `min(28vw, 24vh, ${W}px)`, height: "auto" }}
           />
         </div>
         <p className="text-[rgba(200,178,130,0.4)] text-[10px] font-mono tracking-widest select-none pr-1">

@@ -149,6 +149,21 @@ html.dark {
   }
 }
 
+/* NPC dialog on touch. Portrait: float above the bottom controls. Landscape: the
+   viewport is short, so sit low and fill the gap between the joystick (left) and the
+   interact button (right). (translate:none cancels the Tailwind x-centering; Framer
+   Motion's transform:translateY for the fade-in is a separate property and survives.) */
+.npc-dialog-touch { bottom: calc(env(safe-area-inset-bottom, 0px) + 176px); }
+@media (orientation: landscape) {
+  .npc-dialog-touch {
+    left: calc(env(safe-area-inset-left, 0px) + 176px);
+    right: calc(env(safe-area-inset-right, 0px) + 128px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    width: auto;
+    translate: none;
+  }
+}
+
 /* "Lamps warm up" — one-shot warm vignette when the museum is fully discovered. */
 .curator-glow {
   background: radial-gradient(circle at 50% 56%, transparent 40%, rgba(240, 206, 120, 0.42) 100%);
