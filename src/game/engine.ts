@@ -37,6 +37,20 @@ export type GameEvent =
   | { type: "idle" }
   | { type: "active" };
 
+// Ambient wash: a slow, always-warm "golden hour" drift — honey → amber → ember →
+// candlelit dusk → back. Stays cozy (never cools to night). Colors drawn from
+// color-hex.com's "Sunset Hues and Golden Hour" palette (#F2C460 / #D98748).
+// Each stop is [phase 0..1, r, g, b, alpha]; the wash is painted over the scene.
+const DAY_CYCLE_SECONDS = 240;
+const TINT_STOPS: [number, number, number, number, number][] = [
+  [0.00, 242, 196,  96, 0.07], // golden hour — warm honey  #F2C460
+  [0.28, 217, 135,  72, 0.12], // late afternoon — amber    #D98748
+  [0.52, 194, 100,  60, 0.17], // sunset — warm ember
+  [0.74, 158,  84,  54, 0.21], // candlelit dusk — lamplit, still warm
+  [0.90, 217, 135,  72, 0.12], // glow returning — amber
+  [1.00, 242, 196,  96, 0.07], // loop back to golden hour
+];
+
 export class GameEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -53,6 +67,9 @@ export class GameEngine {
   private glowAlpha = 0;
   // Analog movement vector from the on-screen joystick (each axis ~[-1, 1]).
   private moveVec = { x: 0, y: 0 };
+
+  // Seconds elapsed in-game, driving the day/night ambient wash (see currentTint).
+  private gameClock = 0;
 
   // Click-to-move: remaining waypoints the player auto-walks to (manual input cancels).
   private path: Cell[] | null = null;
@@ -263,6 +280,7 @@ export class GameEngine {
   };
 
   private update(dt: number) {
+    this.gameClock += dt;
     this.particles.update(dt);
     this.duck.update(dt);
 
@@ -416,6 +434,17 @@ export class GameEngine {
     }
   }
 
+  // Interpolated time-of-day wash color for the current moment in the day cycle.
+  private currentTint(): string {
+    const p = (this.gameClock / DAY_CYCLE_SECONDS) % 1;
+    let i = 0;
+    while (i < TINT_STOPS.length - 1 && p > TINT_STOPS[i + 1][0]) i++;
+    const a = TINT_STOPS[i], b = TINT_STOPS[i + 1];
+    const t = (p - a[0]) / ((b[0] - a[0]) || 1);
+    const L = (x: number, y: number) => x + (y - x) * t;
+    return `rgba(${Math.round(L(a[1], b[1]))}, ${Math.round(L(a[2], b[2]))}, ${Math.round(L(a[3], b[3]))}, ${L(a[4], b[4]).toFixed(3)})`;
+  }
+
   private render() {
     drawScene(
       this.ctx,
@@ -427,7 +456,7 @@ export class GameEngine {
       this.canvas.height,
       this.player,
       this.glowAlpha,
-      { lightsOff: this.lightsOff, meBlinking: this.meBlinking },
+      { lightsOff: this.lightsOff, meBlinking: this.meBlinking, tint: this.currentTint() },
       this.debugPhysics,
       this.hidePlayer,
       this.playerAlpha,

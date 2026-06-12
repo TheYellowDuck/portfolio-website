@@ -149,6 +149,19 @@ html.dark {
   }
 }
 
+/* "Lamps warm up" — one-shot warm vignette when the museum is fully discovered. */
+.curator-glow {
+  background: radial-gradient(circle at 50% 56%, transparent 40%, rgba(240, 206, 120, 0.42) 100%);
+  /* Fades up with the note's bloom, then holds (forwards) — it's unmounted only
+     when the note is closed, so the warm framing stays for the whole read. */
+  animation: curator-glow 0.9s ease forwards;
+}
+@keyframes curator-glow {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .curator-glow { display: none; } }
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-bricolage);

@@ -8,8 +8,7 @@ import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { slugForPopup } from "@/lib/exhibit-slugs";
 import { loadDiscovered, saveDiscovered, loadAudioPrefs, saveAudioPrefs } from "@/lib/museum-prefs";
 import { Howl, Howler } from "howler";
-import ControlsHint from "./ControlsHint";
-import DialogBox from "./DialogBox";
+import BottomHint from "./BottomHint";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
@@ -37,6 +36,21 @@ const MIN_TILES_SHORT = 10;
 
 // Inspectable exhibits (pedestals with a popup) — the denominator for "discovered".
 const TOTAL_EXHIBITS = interactables.filter((i) => i.content.popup).length;
+
+// The "Curator" reward: a hidden placard revealed once every exhibit is inspected.
+const CURATOR_REWARD: ExhibitPopup = {
+  title: "Curator's Note",
+  subtitle: "You've seen every exhibit",
+  description:
+    "Most visitors wander a room or two — you walked the whole museum. Thank you for taking the time. " +
+    "I built this place because a page of bullet points never felt like enough; I wanted somewhere you " +
+    "could actually step into the work. If any of it stuck with you, I'd genuinely love to hear from you. — George",
+  links: [
+    { label: "Email", url: "mailto:gzhang06@outlook.com" },
+    { label: "LinkedIn", url: "https://linkedin.com/in/iamgeorgezhang/" },
+    { label: "GitHub", url: "https://github.com/TheYellowDuck" },
+  ],
+};
 
 interface GameCanvasProps {
   /** Fires once the engine's sprites are loaded and the world is ready. */
@@ -95,6 +109,10 @@ export default function GameCanvas({
   const [initialDiscovered] = useState(loadDiscovered);
   const discoveredRef = useRef(initialDiscovered);
   const [discoveredCount, setDiscoveredCount] = useState(initialDiscovered.size);
+  // "Curator" completion reward: a warm glow flash, then the note is revealed when
+  // the last exhibit's popup is closed.
+  const [curatorGlow, setCuratorGlow] = useState(false);
+  const rewardPendingRef = useRef(false);
 
   // Layout is driven by direct DOM mutation — no setState means no cascading renders.
   // Compute zoom + render base from the current viewport: cap on-screen zoom at
@@ -207,6 +225,35 @@ export default function GameCanvas({
   // remain as fallbacks if the browser defers the first play.
   useEffect(() => { startBgMusic(); }, [startBgMusic]);
 
+  // Dev-only shortcuts (no-op in production): Shift+R resets discovered exhibits,
+  // Shift+C marks every exhibit discovered and previews the curator reward.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    const allSlugs = interactables
+      .filter((i) => i.content.popup)
+      .map((i) => slugForPopup(i.content.popup!))
+      .filter((s): s is string => !!s);
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.shiftKey) return;
+      if (e.code === "KeyR") {
+        discoveredRef.current = new Set();
+        setDiscoveredCount(0);
+        saveDiscovered(discoveredRef.current);
+      } else if (e.code === "KeyC") {
+        discoveredRef.current = new Set(allSlugs);
+        setDiscoveredCount(discoveredRef.current.size);
+        saveDiscovered(discoveredRef.current);
+        rewardPendingRef.current = false;
+        setCuratorGlow(true);
+        setActivePopup(CURATOR_REWARD);
+        engineRef.current?.setPaused(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    console.info("[dev] Shift+R = reset exhibits · Shift+C = complete + show reward");
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   useEffect(() => {
     const resume = () => {
       if (Howler.ctx?.state === "suspended") Howler.ctx.resume();
@@ -224,7 +271,24 @@ export default function GameCanvas({
   }, []);
 
   const handleClose = useCallback(() => {
+    // Closing the final exhibit drops you back into the museum, "lamps warm up", and
+    // then the curator's note pops up after a short beat. Closing the note returns as
+    // normal.
+    if (rewardPendingRef.current) {
+      rewardPendingRef.current = false;
+      setActivePopup(null);
+      engineRef.current?.setPaused(false);
+      // After a beat back in the museum, the lamps warm up AND the note blooms in
+      // together. The glow then holds — it's cleared only when the note is closed.
+      window.setTimeout(() => {
+        setCuratorGlow(true);
+        setActivePopup(CURATOR_REWARD);
+        engineRef.current?.setPaused(true);
+      }, 1500);
+      return;
+    }
     setActivePopup(null);
+    setCuratorGlow(false);   // closing the note (or any popup) clears the warm glow
     engineRef.current?.setPaused(false);
   }, []);
 
@@ -324,6 +388,11 @@ export default function GameCanvas({
               discoveredRef.current.add(slug);
               setDiscoveredCount(discoveredRef.current.size);
               saveDiscovered(discoveredRef.current);
+              // Just inspected the final exhibit → the curator's note reveals after the
+              // player closes this popup (see handleClose).
+              if (discoveredRef.current.size === TOTAL_EXHIBITS) {
+                rewardPendingRef.current = true;
+              }
             }
           }
           if (exhibit.dialog?.length || exhibit.jokes?.length) {
@@ -435,14 +504,22 @@ export default function GameCanvas({
         className="fixed inset-2 z-10 pointer-events-none"
         style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}
       >
-        <ControlsHint
-          visible={showControls && !isLoading && !activePopup}
+        {/* One bottom-center hint. The idle controls hint takes priority over the
+            interactable prompt, and `mode="wait"` fades one fully out before the other
+            in. The prompt is desktop-only — on touch the glowing E button signals inspect. */}
+        <BottomHint
+          kind={
+            showControls && !isLoading && !activePopup ? "controls"
+              : prompt && !activePopup && !isTouch ? "prompt"
+              : null
+          }
+          message={
+            showControls && !isLoading && !activePopup
+              ? (isTouch ? "Drag to move · push to run · tap E to inspect" : "WASD to move · Shift to sprint")
+              : (prompt ?? "")
+          }
           isTouch={isTouch}
-          message={isTouch ? "Drag to move · push to run · tap E to inspect" : undefined}
         />
-        {/* On touch the glowing E button already signals "inspect", so the bottom
-            prompt is hidden to keep the thumb zone clear. */}
-        <DialogBox message={prompt || ""} visible={!!prompt && !activePopup && !showControls && !isTouch} />
         <Minimap
           onRegisterDraw={handleRegisterMinimapDraw}
           bigMap={bigMap}
@@ -505,9 +582,12 @@ export default function GameCanvas({
         )}
       </div>
 
+      {/* "Lamps warm up" — a one-shot warm glow on inspecting the final exhibit. */}
+      {curatorGlow && <div className="curator-glow pointer-events-none fixed inset-0 z-[55]" aria-hidden />}
+
       {/* ExhibitOverlay outside the scaled container so it occupies real viewport space
           and its fixed positioning / scroll work correctly at any screen size. */}
-      <ExhibitOverlay popup={activePopup} onClose={handleClose} />
+      <ExhibitOverlay popup={activePopup} onClose={handleClose} gentle={activePopup === CURATOR_REWARD} />
 
       {/* NPC dialog (e.g. "me" at the desk) — sequential lines, advance on E / tap. */}
       <NpcDialog

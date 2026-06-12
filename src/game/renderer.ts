@@ -39,6 +39,8 @@ export interface RenderPlayer {
 export interface AmbientState {
   lightsOff: boolean;
   meBlinking: boolean;
+  /** Time-of-day ambient wash (an rgba string) painted over the whole scene. */
+  tint?: string;
 }
 
 // 'left', 'middle', 'right', or null for non-horizontal wall tiles.
@@ -344,6 +346,12 @@ export function drawScene(
   }
 
   if (renderParticles) particles.draw(ctx, camX, camY, viewW, viewH, 'dust');
+
+  // Time-of-day ambient wash over the whole scene (golden hour → dusk → night → dawn).
+  if (ambient.tint) {
+    ctx.fillStyle = ambient.tint;
+    ctx.fillRect(0, 0, viewW, viewH);
+  }
 
   // Debug: solid-tile outlines + entity boxes drawn on top of everything (VOID excluded)
   if (debugPhysics) {

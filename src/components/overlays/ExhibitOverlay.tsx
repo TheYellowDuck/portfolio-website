@@ -17,9 +17,11 @@ const SKILL_GROUP_COLORS = [
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
   onClose: () => void;
+  /** Ease in slowly (used for the curator reward, which should bloom rather than snap). */
+  gentle?: boolean;
 }
 
-export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) {
+export default function ExhibitOverlay({ popup, onClose, gentle = false }: ExhibitOverlayProps) {
   // Esc closes whichever exhibit / resume / transcript popup is open.
   useEffect(() => {
     if (!popup) return;
@@ -46,6 +48,7 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: gentle ? 0.8 : 0.2 }}
             onClick={onClose}
             className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
           />
@@ -59,10 +62,10 @@ export default function ExhibitOverlay({ popup, onClose }: ExhibitOverlayProps) 
                 role="dialog"
                 aria-modal="true"
                 aria-label={popup.title ?? "Exhibit"}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: gentle ? 0.94 : 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                transition={gentle ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] } : { type: "spring", damping: 30, stiffness: 400 }}
                 className="w-full flex flex-col overflow-y-auto rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
                 style={{ maxHeight: (popup.embedUrl || popup.videoUrl) ? "95vh" : "min(460px, 72vh)" }}
               >
