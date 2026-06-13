@@ -111,8 +111,11 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
         {archive.length > 0 && (
           <>
-            <h3 className="mt-12 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/45">Archive</h3>
-            <div className="mt-5">
+            {/* In-section divider. Sub-division gap = mt-24 (96px) = half the section-to-section
+                gap (sections are py-24, so 96+96=192px between them). Visibly tighter than a full
+                section break, but one consistent value to reuse for any in-section division. */}
+            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/45">Archive</h3>
+            <div className="mt-6">
               <Masonry sm={2} lg={3} weights={archive.map((e) => cardWeight(e.popup as ExhibitPopup))} items={archive.map((e, i) => (
                 <Reveal key={i} delay={(i % 3) * 60}>
                   <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
@@ -125,7 +128,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* ── Experience ── */}
       <Section id="experience" eyebrow="Curriculum Vitae" title="Experience">
-        <div className="relative ml-1 space-y-8 border-l border-[rgba(122,158,126,0.4)] pl-6 sm:pl-8">
+        <div className="relative ml-1 space-y-12 border-l border-[rgba(122,158,126,0.4)] pl-6 sm:pl-8">
           {experienceExhibits.map((e, i) =>
             e.popup ? <ExperienceItem key={i} popup={e.popup} /> : null
           )}
@@ -230,7 +233,7 @@ function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
   const long = (popup.description?.length ?? 0) > 280;
   return (
     <Reveal variant="left">
-      <div className="relative pb-11 last:pb-0">
+      <div className="relative">
         <span className="absolute -left-[24.5px] top-1.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-sage bg-parchment sm:-left-[32.5px]" />
         {popup.date && <p className="font-mono text-[12px] tracking-wide text-sage">{popup.date}</p>}
         <h3 className="mt-1 font-display text-[19px] font-semibold text-pine">{popup.title}</h3>
