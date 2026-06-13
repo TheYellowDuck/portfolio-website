@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
+import { Geist, Geist_Mono, Bricolage_Grotesque, Pixelify_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
 import "./globals.css";
@@ -21,6 +21,13 @@ const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+});
+
+// Pixel face for in-game canvas labels (exhibit names) so they sit naturally in the pixel-art
+// museum instead of clashing as smooth modern text.
+const pixel = Pixelify_Sans({
+  variable: "--font-pixel",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -69,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} ${pixel.variable} h-full antialiased`}
     >
       <head>
         {/* Apply the saved/system theme before paint to avoid a light flash. */}

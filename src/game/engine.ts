@@ -90,6 +90,8 @@ export class GameEngine {
   private idleTimer = 0;
   private idleFired = false;
   private currentNearby: Interactable | null = null;
+  private labelAlpha = 0; // fades the floating exhibit-name label in/out
+  private labelFont = '500 16px ui-monospace, monospace'; // set from --font-pixel in the constructor
 
   // Ambient "me at desk" animation state.
   private meBlinkTimer = 3 + Math.random() * 2;
@@ -120,6 +122,11 @@ export class GameEngine {
   constructor(canvas: HTMLCanvasElement, cacheBust?: string) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
+    // Pixel font for the exhibit-name label — read the resolved family from the CSS var and
+    // preload it so the first label doesn't flash a fallback face.
+    const pixelFam = getComputedStyle(document.documentElement).getPropertyValue("--font-pixel").trim();
+    this.labelFont = `500 16px ${pixelFam ? pixelFam + ", " : ""}ui-monospace, monospace`;
+    document.fonts?.load(this.labelFont).catch(() => {});
     this.input = new InputManager();
     this.camera = new Camera(canvas.width, canvas.height);
     this.sprites = new SpriteRegistry(cacheBust);
@@ -368,6 +375,10 @@ export class GameEngine {
       this.onEvent?.({ type: "leave" });
     }
 
+    // The exhibit's name floats in above it while you're standing at it (not the secret duck).
+    const labelOn = !!(this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && this.currentNearby.content.popup?.title);
+    this.labelAlpha += ((labelOn ? 1 : 0) - this.labelAlpha) * Math.min(1, dt * 14);
+
     // Sparkles rise from the pedestal while the player lingers nearby (but not
     // from the easter-egg duck).
     if (this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG) {
@@ -462,6 +473,32 @@ export class GameEngine {
       this.playerAlpha,
       this.drawDuck,
     );
+    this.drawExhibitLabel();
+  }
+
+  // Floating name above the exhibit you're standing at — just text (dark-outlined for
+  // legibility over the floor), no plaque.
+  private drawExhibitLabel() {
+    const near = this.currentNearby;
+    if (this.labelAlpha < 0.02 || !near || near.tileType === TILES.EASTER_EGG) return;
+    const title = near.content.popup?.title;
+    if (!title) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = this.labelAlpha;
+    ctx.font = this.labelFont;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const cx = Math.round((near.col + 0.5) * TILE_SIZE - this.camera.x);
+    // The pedestal sprite draws from its row downward, so the book's top is at the row line —
+    // sit just above it. Pure cross-fade, no vertical movement.
+    const cy = Math.round(near.row * TILE_SIZE - this.camera.y) - 2;
+    // Crisp 2px drop-shadow (no blur) so it reads as pixel art, then the label.
+    ctx.fillStyle = "rgba(26,18,8,0.55)";
+    ctx.fillText(title, cx, cy + 2);
+    ctx.fillStyle = "#fdf3da";
+    ctx.fillText(title, cx, cy);
+    ctx.restore();
   }
 
   // y-sorted draw hook for the easter-egg duck: it sits on the egg tile, so it
