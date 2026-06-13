@@ -46,8 +46,6 @@ export default function SiteShell() {
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
   const scrollYRef = useRef(0);
-  const stageRef = useRef(stage);
-  useEffect(() => { stageRef.current = stage; }, [stage]);
 
   // Lock page scroll while off the plain site; restore scroll on return.
   useEffect(() => {
@@ -60,9 +58,11 @@ export default function SiteShell() {
   }, [stage]);
   useEffect(() => () => document.body.classList.remove("game-active"), []);
 
-  // Keep a long-open tab from going stale after a new deploy. Two safeguards:
-  //  • a lazily-loaded chunk 404s (its hash changed in the new build) → reload once;
-  //  • on refocus, if a newer build is live AND we're on the site (not mid-game) → reload.
+  // Keep a long-open tab from *breaking* after a new deploy, without ever refreshing
+  // the page out from under the visitor: if a lazily-loaded chunk 404s because its
+  // hash changed in the newer build, reload once (seamlessly, restoring scroll).
+  // We deliberately do NOT version-check on tab refocus — re-entering the tab must
+  // never reload the page.
   useEffect(() => {
     const KEY = "museum:stale-reload";
     const SCROLL_KEY = "museum:restore-scroll";
@@ -95,25 +95,10 @@ export default function SiteShell() {
     // Stayed up without a chunk error — let a *future* stale deploy reload again.
     const clearGuard = window.setTimeout(() => sessionStorage.removeItem(KEY), 8000);
 
-    // Compare the first hashed build chunk; it changes on every deploy.
-    const marker = (html: string) => html.match(/\/_next\/static\/[^"']+?\.js/)?.[0] ?? null;
-    const loaded = document.querySelector('script[src*="/_next/static/"]')?.getAttribute("src") ?? null;
-    const checkFresh = async () => {
-      if (document.visibilityState !== "visible" || stageRef.current !== "site" || !loaded) return;
-      try {
-        const live = marker(await (await fetch("/", { cache: "no-store" })).text());
-        if (live && live !== loaded) reloadFresh();
-      } catch { /* offline or blocked — leave the tab as-is */ }
-    };
-    document.addEventListener("visibilitychange", checkFresh);
-    window.addEventListener("focus", checkFresh);
-
     return () => {
       window.removeEventListener("error", onError);
       window.removeEventListener("unhandledrejection", onRejection);
       window.clearTimeout(clearGuard);
-      document.removeEventListener("visibilitychange", checkFresh);
-      window.removeEventListener("focus", checkFresh);
     };
   }, []);
 

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import FaviconSwitcher from "@/components/FaviconSwitcher";
 import "./globals.css";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, PERSON } from "@/lib/site";
 
@@ -37,6 +39,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+  },
+  // Tab favicon: <FaviconSwitcher> swaps a PNG by the in-app theme so Chrome/Firefox
+  // flip the tab live (each palette is a distinct URL, which forces a re-rasterize; an
+  // SVG @media icon does NOT re-render the cached tab bitmap, and Safari can't change a
+  // favicon by any method). The static PNG here is the initial / no-JS / Safari icon.
+  icons: {
+    icon: { url: "/icon-light", type: "image/png", sizes: "512x512" },
+    apple: "/apple-icon",
   },
 };
 
@@ -90,6 +100,8 @@ export default function RootLayout({
           }}
         />
         {children}
+        <FaviconSwitcher />
+        <Analytics />
       </body>
     </html>
   );

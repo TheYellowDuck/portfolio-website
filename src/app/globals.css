@@ -9,9 +9,15 @@
 }
 
 html, body {
+  background: var(--c-bg);     /* themeable; the game layer paints its own dark bg */
+}
+/* Clip horizontal overflow + suppress pull-to-refresh on the page scroll container
+   (<html>) ONLY. Putting overflow-x on <body> too makes the body a scroll container
+   whose content fits exactly, so it can't scroll — and overscroll-behavior:none then
+   stops the wheel/trackpad from chaining up to <html>, killing vertical scrolling. */
+html {
   overflow-x: hidden;          /* the site scrolls vertically; game locks scroll while active */
   overscroll-behavior: none;   /* no pull-to-refresh / scroll chaining on touch */
-  background: var(--c-bg);     /* themeable; the game layer paints its own dark bg */
 }
 /* Always reserve the scrollbar gutter so centered content doesn't shift left/right
    when the vertical scrollbar appears as the page settles on load. */

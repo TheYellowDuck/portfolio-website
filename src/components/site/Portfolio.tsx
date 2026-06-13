@@ -53,6 +53,13 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
   return (
     <div className="min-h-[100svh] bg-parchment text-walnut">
+      {/* Keyboard skip link — first focusable element, revealed on focus. */}
+      <a
+        href="#main-content"
+        className="sr-only rounded-md border border-[rgba(122,158,126,0.6)] bg-parchment px-4 py-2 font-mono text-[13px] text-pine shadow-lg focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:outline-none focus:ring-2 focus:ring-sage/50"
+      >
+        Skip to content
+      </a>
       {/* Slim sticky nav */}
       <nav className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-4">
@@ -82,8 +89,9 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         </div>
       </nav>
 
-      <div id="top" />
-      <Hero onEnter={onEnter} onResume={onResume} />
+      <main id="main-content" tabIndex={-1} className="outline-none">
+        <div id="top" />
+        <Hero onEnter={onEnter} onResume={onResume} />
 
       {/* ── Work ── */}
       <Section id="work" eyebrow="The Collection" title="Selected Work"
@@ -192,6 +200,8 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           })}
         </div>
       </Section>
+
+      </main>
 
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
@@ -22,12 +22,37 @@ interface ExhibitOverlayProps {
 }
 
 export default function ExhibitOverlay({ popup, onClose, gentle = false }: ExhibitOverlayProps) {
-  // Esc closes whichever exhibit / resume / transcript popup is open.
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // While a popup is open: Esc closes it, focus moves into the dialog and is trapped
+  // there (Tab wraps), and focus returns to the trigger on close.
   useEffect(() => {
     if (!popup) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const restoreTo = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      modalRef.current
+        ? Array.from(
+            modalRef.current.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((el) => el.offsetParent !== null)
+        : [];
+    const raf = requestAnimationFrame(() => modalRef.current?.focus());
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const f = focusables();
+      if (f.length === 0) { e.preventDefault(); modalRef.current?.focus(); return; }
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", onKey);
+      restoreTo?.focus?.();
+    };
   }, [popup, onClose]);
 
   return (
@@ -59,6 +84,8 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
           >
               <motion.div
                 key="popup"
+                ref={modalRef}
+                tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
                 aria-label={popup.title ?? "Exhibit"}
@@ -66,7 +93,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={gentle ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] } : { type: "spring", damping: 30, stiffness: 400 }}
-                className="w-full flex flex-col overflow-y-auto rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
+                className="w-full flex flex-col overflow-y-auto rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] outline-none [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
                 style={{ maxHeight: (popup.embedUrl || popup.videoUrl) ? "95vh" : "min(460px, 72vh)" }}
               >
                 {/* Header — fixed, never scrolls */}
