@@ -15,6 +15,7 @@ import Hero from "./Hero";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
+import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
 import Masonry from "./Masonry";
 import { useIsMac } from "@/lib/use-is-mac";
 
@@ -127,25 +128,27 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* ── Skills ── */}
       <Section id="skills" eyebrow="The Toolkit" title="Skills">
-        <Masonry sm={2} lg={3} items={skillsExhibits.flatMap((e, i) =>
-            e.popup ? [(
+        <Masonry sm={2} lg={3} items={skillsExhibits.flatMap((e, i) => {
+            if (!e.popup) return [];
+            const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
+            return [(
               <Reveal key={i} delay={(i % 3) * 60}>
-                <div className="rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5">
-                  <h3 className="font-display text-[16px] font-semibold text-pine">{e.popup.title}</h3>
+                <div className="rounded-xl border bg-surface p-5" style={{ borderColor: c.border }}>
+                  <h3 className="font-display text-[16px] font-semibold" style={{ color: c.solid }}>{e.popup.title}</h3>
                   {e.popup.description && (
                     <p className="mt-1.5 text-[13px] leading-relaxed dark:leading-[1.72] text-walnut/70">{e.popup.description}</p>
                   )}
                   {e.popup.tech && (
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {e.popup.tech.map((t) => (
-                        <span key={t} className="rounded border border-[rgba(122,158,126,0.4)] bg-[rgba(122,158,126,0.1)] px-2 py-0.5 font-mono text-[11px] text-pine">{t}</span>
+                        <span key={t} className="rounded border px-2 py-0.5 font-mono text-[11px] text-walnut/85" style={{ background: c.bg, borderColor: c.border }}>{t}</span>
                       ))}
                     </div>
                   )}
                 </div>
               </Reveal>
-            )] : []
-          )} />
+            )];
+          })} />
       </Section>
 
       {/* ── About ── */}

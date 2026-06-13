@@ -14,8 +14,29 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
   const hasDemo = !!(popup.embedUrl || popup.videoUrl);
   // Only offer details when there's meaningfully more than the card already shows.
   const hasMore = !!(popup.skills?.length || hasDemo);
+  const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
+  const hasMedia = !!(popup.videoUrl || ytId);
   return (
     <article className="group flex flex-col rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)]">
+      {/* Demo preview — local video autoplays muted; a YouTube embed shows its thumbnail. */}
+      {hasMedia && (
+        <button
+          onClick={onOpen}
+          aria-label="Open demo"
+          className="relative mb-4 block aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+        >
+          {popup.videoUrl ? (
+            <video src={popup.videoUrl} className="h-full w-full object-cover" muted loop autoPlay playsInline />
+          ) : (
+            <>
+              <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(https://img.youtube.com/vi/${ytId}/hqdefault.jpg)` }} />
+              <span className="absolute inset-0 flex items-center justify-center bg-black/15 transition-colors group-hover:bg-black/5">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 pl-0.5 text-[15px] text-walnut shadow-lg">▶</span>
+              </span>
+            </>
+          )}
+        </button>
+      )}
       <div className="flex items-baseline justify-between gap-3">
         <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
         {hasDemo && (

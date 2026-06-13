@@ -5,14 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
+import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
 
-const SKILL_GROUP_COLORS = [
-  { bg: "rgba(122,158,126,0.12)", border: "rgba(122,158,126,0.45)" }, // sage green
-  { bg: "rgba(107,138,174,0.12)", border: "rgba(107,138,174,0.45)" }, // dusty blue
-  { bg: "rgba(185,130,90,0.12)",  border: "rgba(185,130,90,0.45)"  }, // terracotta
-  { bg: "rgba(172,148,89,0.12)",  border: "rgba(172,148,89,0.45)"  }, // amber
-  { bg: "rgba(148,115,160,0.12)", border: "rgba(148,115,160,0.45)" }, // mauve
-];
+// YouTube embeds don't autoplay/loop without params — add them so the popup video
+// plays muted on a loop (like the card preview); viewers can unmute via the controls.
+function embedSrc(url: string) {
+  const m = url.match(/youtube\.com\/embed\/([\w-]+)/);
+  if (!m) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&playlist=${m[1]}&rel=0&modestbranding=1`;
+}
 
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
@@ -80,7 +81,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
 
           {/* Centered popup — max-height on motion div constrains flex; body scrolls inside */}
           <div className="fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: `min(${popup.width ?? "500px"}, 92vw)` }}
+            style={{ width: `min(${popup.width ?? ((popup.videoUrl || popup.embedUrl) ? "760px" : "560px")}, 92vw)` }}
           >
               <motion.div
                 key="popup"
@@ -93,11 +94,11 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={gentle ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] } : { type: "spring", damping: 30, stiffness: 400 }}
-                className="w-full flex flex-col overflow-y-auto rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] outline-none [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
-                style={{ maxHeight: (popup.embedUrl || popup.videoUrl) ? "95vh" : "min(460px, 72vh)" }}
+                className="w-full flex flex-col overflow-y-auto sm:overflow-hidden rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] outline-none [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
+                style={{ maxHeight: (popup.embedUrl || popup.videoUrl) ? "min(560px, 82vh)" : "min(460px, 72vh)" }}
               >
                 {/* Header — fixed, never scrolls */}
-                <div className="shrink-0 flex justify-between items-start gap-4 px-5 py-3 bg-parchment border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
+                <div className="sticky top-0 z-10 shrink-0 flex justify-between items-start gap-4 px-5 py-3 bg-parchment border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
                   <div className="flex-1">
                     {popup.title && (
                       <h2 className="m-0 font-mono text-[22px] text-pine">
@@ -125,103 +126,58 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                   </button>
                 </div>
 
-                {(popup.videoUrl || popup.embedUrl) ? (
-                  /* ── MEDIA layout: video or iframe → description → links ── */
-                  <div className="flex flex-col">
-                    {popup.videoUrl ? (
-                      <video
-                        src={popup.videoUrl}
-                        className="shrink-0 w-full aspect-video bg-black"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                      />
-                    ) : (
-                      <iframe
-                        src={popup.embedUrl}
-                        className="shrink-0 w-full aspect-video border-0 bg-black"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-                      />
-                    )}
-
-                    {(popup.description || popup.tech?.length) && (
-                      <div className="shrink-0 overflow-y-auto border-t border-[rgb(var(--c-line-rgb)_/_0.1)] px-5 py-3 [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]" style={{ maxHeight: "7rem" }}>
-                        {popup.tech?.length ? (
-                          <div className="flex flex-wrap gap-1.5 mb-2">
-                            {popup.tech.map((t) => (
-                              <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">
-                                {t}
-                              </span>
-                            ))}
-                          </div>
+                {/* Body — on desktop the left column (video over description) scrolls on its
+                    own and the skills side column scrolls separately; on mobile it all scrolls
+                    together in the dialog. Links stay pinned at the bottom. */}
+                <div className="flex flex-col sm:flex-1 sm:min-h-0">
+                  {(popup.description || popup.tech?.length || popup.skills?.length || popup.videoUrl || popup.embedUrl) && (
+                    <div className="flex flex-col sm:flex-row sm:flex-1 sm:min-h-0 sm:overflow-hidden">
+                      {/* Left — video above description, scroll together */}
+                      <div className="flex-1 min-w-0 flex flex-col sm:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                        {popup.videoUrl ? (
+                          <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
+                        ) : popup.embedUrl ? (
+                          <iframe src={embedSrc(popup.embedUrl ?? "")} className="shrink-0 w-full aspect-video border-0 bg-black"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
                         ) : null}
                         {popup.description && (
-                          <p className="m-0 font-mono text-[13px] text-walnut leading-[1.7]">
+                          <p className="m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
                             {popup.description}
                           </p>
                         )}
                       </div>
-                    )}
-
-                    {popup.links && popup.links.length > 0 && (
-                      <div className="shrink-0 flex flex-wrap gap-2.5 px-5 py-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)]">
-                        {popup.links.map((link) => (
-                          <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
-                            className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
-                            {link.label} →
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* ── TEXT layout: single scrolling body so the description is always
-                       readable (no nested panes that can squeeze it) ── */
-                  <div className="flex-1 min-h-0 overflow-y-auto bg-parchment [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
-                    {(popup.description || popup.tech?.length || popup.skills?.length) && (
-                      <div className="flex flex-col sm:flex-row">
-                        {popup.description && (
-                          <p className="flex-1 m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
-                            {popup.description}
-                          </p>
-                        )}
-                        {(popup.tech?.length || popup.skills?.length) ? (
-                          <div className={`shrink-0 flex flex-row flex-wrap gap-1.5 ${
-                            popup.description
-                              ? "w-full sm:w-40 sm:flex-col px-5 sm:px-4 py-4 border-t sm:border-t-0 sm:border-l border-[rgb(var(--c-line-rgb)_/_0.1)]"
-                              : "w-full px-5 py-4"
-                          }`}>
-                            {popup.tech?.map((t) => (
-                              <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">
-                                {t}
+                      {/* Right — skills side column, scrolls separately on desktop */}
+                      {(popup.tech?.length || popup.skills?.length) ? (
+                        <div className="shrink-0 w-full sm:w-48 flex flex-row sm:flex-col flex-wrap sm:flex-nowrap gap-1.5 px-5 sm:px-4 py-4 border-t sm:border-t-0 sm:border-l border-[rgb(var(--c-line-rgb)_/_0.1)] sm:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                          {!popup.skills?.length && popup.tech?.map((t) => (
+                            <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">
+                              {t}
+                            </span>
+                          ))}
+                          {popup.skills?.flatMap((group, i) => {
+                            const color = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
+                            return group.items.map((item) => (
+                              <span key={item} className="font-mono text-[11px] text-walnut rounded px-2 py-0.5 border" style={{ background: color.bg, borderColor: color.border }}>
+                                {item}
                               </span>
-                            ))}
-                            {popup.skills?.flatMap((group, i) => {
-                              const color = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
-                              return group.items.map((item) => (
-                                <span key={item} className="font-mono text-[11px] text-walnut rounded px-2 py-0.5 border" style={{ background: color.bg, borderColor: color.border }}>
-                                  {item}
-                                </span>
-                              ));
-                            })}
-                          </div>
-                        ) : null}
-                      </div>
-                    )}
+                            ));
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
 
-                    {popup.links && popup.links.length > 0 && (
-                      <div className="shrink-0 flex flex-wrap gap-2.5 px-5 py-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)]">
-                        {popup.links.map((link) => (
-                          <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
-                            className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
-                            {link.label} →
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                  {popup.links && popup.links.length > 0 && (
+                    <div className="shrink-0 flex flex-wrap gap-2.5 px-5 py-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)]">
+                      {popup.links.map((link) => (
+                        <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
+                          className="inline-block font-mono text-[13px] text-walnut no-underline bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-4 py-2 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                          {link.label} →
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </motion.div>
           </div>
         </>
