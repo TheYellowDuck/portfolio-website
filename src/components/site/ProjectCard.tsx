@@ -6,25 +6,25 @@ interface ProjectCardProps {
   index: string;   // e.g. "01"
   popup: ExhibitPopup;
   compact?: boolean;
-  /** Open the full exhibit (grouped skills, playable demo, etc.). */
+  /** Open the full exhibit (grouped skills, demo, etc.). The whole card triggers this. */
   onOpen?: () => void;
 }
 
 export default function ProjectCard({ index, popup, compact = false, onOpen }: ProjectCardProps) {
-  const hasDemo = !!(popup.embedUrl || popup.videoUrl);
-  // Only offer details when there's meaningfully more than the card already shows.
-  const hasMore = !!(popup.skills?.length || hasDemo);
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
-    <article className="group flex flex-col rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)]">
+    <article
+      onClick={onOpen}
+      role={onOpen ? "button" : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      aria-label={onOpen ? `Open ${popup.title ?? "project"}` : undefined}
+      onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } : undefined}
+      className={`group flex flex-col rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 ${onOpen ? "cursor-pointer" : ""}`}
+    >
       {/* Demo preview — local video autoplays muted; a YouTube embed shows its thumbnail. */}
       {hasMedia && (
-        <button
-          onClick={onOpen}
-          aria-label="Open demo"
-          className="relative mb-4 block aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
-        >
+        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
           {popup.videoUrl ? (
             <video src={popup.videoUrl} className="h-full w-full object-cover" muted loop autoPlay playsInline />
           ) : (
@@ -35,16 +35,10 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
               </span>
             </>
           )}
-        </button>
+        </div>
       )}
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
-        {hasDemo && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-pine/70">
-            ▶ playable
-          </span>
-        )}
-      </div>
+
+      <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
 
       <h3 className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
         {popup.title}
@@ -69,27 +63,22 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
-        {hasMore && onOpen && (
-          <button
-            onClick={onOpen}
-            className="font-mono text-[13px] text-pine underline decoration-sage/50 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
-          >
-            Details →
-          </button>
-        )}
-        {popup.links?.map((l) => (
-          <a
-            key={l.url}
-            href={l.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-[13px] text-walnut/75 underline decoration-sage/40 underline-offset-4 transition-colors hover:text-pine hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
-          >
-            {l.label} ↗
-          </a>
-        ))}
-      </div>
+      {popup.links && popup.links.length > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
+          {popup.links.map((l) => (
+            <a
+              key={l.url}
+              href={l.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="font-mono text-[13px] text-walnut/75 underline decoration-sage/40 underline-offset-4 transition-colors hover:text-pine hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
+            >
+              {l.label} ↗
+            </a>
+          ))}
+        </div>
+      )}
     </article>
   );
 }

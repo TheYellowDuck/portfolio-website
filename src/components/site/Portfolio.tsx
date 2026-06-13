@@ -48,6 +48,12 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   const isMac = useIsMac();
   const featured = withPopup(mainHallExhibits);
   const archive = withPopup(archiveExhibits);
+  // Height estimates for masonry balancing, so columns pack evenly (no exposed seam).
+  // A project card with a demo/thumbnail (aspect-video) is ~twice the height of one without.
+  const cardWeight = (popup: ExhibitPopup) => (popup.videoUrl || popup.embedUrl ? 2 : 1);
+  // A skill card's height is driven by its pill count (≈ rows) plus title/description.
+  const skillWeight = (popup: ExhibitPopup) =>
+    1 + (popup.description ? 1.4 : 0) + Math.ceil((popup.tech?.length ?? 0) / 3.5) * 0.8;
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
   const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
   const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
@@ -97,7 +103,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       {/* ── Work ── */}
       <Section id="work" eyebrow="The Collection" title="Selected Work"
         intro="A few things I've built — games, tools, and research apps. Step inside the museum to see them on pedestals.">
-        <Masonry sm={2} lg={2} items={featured.map((e, i) => (
+        <Masonry sm={2} lg={2} weights={featured.map((e) => cardWeight(e.popup as ExhibitPopup))} items={featured.map((e, i) => (
           <Reveal key={i} delay={(i % 2) * 70}>
             <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
           </Reveal>
@@ -107,7 +113,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           <>
             <h3 className="mt-12 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/45">Archive</h3>
             <div className="mt-5">
-              <Masonry sm={2} lg={3} items={archive.map((e, i) => (
+              <Masonry sm={2} lg={3} weights={archive.map((e) => cardWeight(e.popup as ExhibitPopup))} items={archive.map((e, i) => (
                 <Reveal key={i} delay={(i % 3) * 60}>
                   <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
                 </Reveal>
@@ -128,7 +134,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* ── Skills ── */}
       <Section id="skills" eyebrow="The Toolkit" title="Skills">
-        <Masonry sm={2} lg={3} items={skillsExhibits.flatMap((e, i) => {
+        <Masonry sm={2} lg={3} weights={skillsExhibits.filter((e) => e.popup).map((e) => skillWeight(e.popup as ExhibitPopup))} items={skillsExhibits.flatMap((e, i) => {
             if (!e.popup) return [];
             const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
             return [(
