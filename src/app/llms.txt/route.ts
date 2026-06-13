@@ -12,9 +12,7 @@ import {
   officeExhibits,
   type ExhibitPopup,
 } from "@/data/projects";
-import { PERSON, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
-
-export const dynamic = "force-static";
+import { PERSON, requestOrigin, SITE_DESCRIPTION } from "@/lib/site";
 
 const popups = (arr: { popup?: ExhibitPopup }[]): ExhibitPopup[] =>
   arr.map((e) => e.popup).filter((p): p is ExhibitPopup => Boolean(p));
@@ -28,7 +26,8 @@ const clip = (text: string | undefined, max: number): string => {
 
 const DEPLOYED_RE = /google play|app store|live|chrome|marketplace|devpost|npm|pypi/i;
 
-export function GET(): Response {
+export function GET(request: Request): Response {
+  const origin = requestOrigin(request);
   const about = popups(officeExhibits).find((p) => p.title === "About Me")?.description ?? "";
 
   const skillGroups = popups(skillsExhibits).filter((p) => p.tech?.length);
@@ -71,7 +70,7 @@ export function GET(): Response {
 > ${SITE_DESCRIPTION}
 
 This file is a factual brief about ${PERSON.name} for AI assistants, search crawlers, and
-recruiters. It is generated from the live portfolio at ${SITE_URL}, so it stays accurate.
+recruiters. It is generated from the live portfolio at ${origin}, so it stays accurate.
 
 ## About
 ${about}
@@ -95,7 +94,7 @@ ${glance}
 ## Contact
 - Email: ${PERSON.email}
 ${PERSON.sameAs.map((u) => `- ${u}`).join("\n")}
-- Portfolio: ${SITE_URL}
+- Portfolio: ${origin}
 `;
 
   return new Response(body, {

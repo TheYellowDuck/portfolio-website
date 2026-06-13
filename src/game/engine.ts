@@ -37,6 +37,12 @@ export type GameEvent =
   | { type: "idle" }
   | { type: "active" };
 
+// Name shown by the floating exhibit label. Most exhibits have a popup title; the résumé and
+// transcript pedestals are type-only (no title), so give them a friendly name. null = no label.
+const TYPE_LABELS: Record<string, string> = { resume: "Résumé", transcript: "Education" };
+const exhibitLabel = (popup: Exhibit["popup"]): string | null =>
+  popup?.title ?? (popup?.type ? TYPE_LABELS[popup.type] ?? null : null);
+
 // Ambient wash: a slow, always-warm "golden hour" drift — honey → amber → ember →
 // candlelit dusk → back. Stays cozy (never cools to night). Colors drawn from
 // color-hex.com's "Sunset Hues and Golden Hour" palette (#F2C460 / #D98748).
@@ -376,7 +382,7 @@ export class GameEngine {
     }
 
     // The exhibit's name floats in above it while you're standing at it (not the secret duck).
-    const labelOn = !!(this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && this.currentNearby.content.popup?.title);
+    const labelOn = !!(this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && exhibitLabel(this.currentNearby.content.popup));
     this.labelAlpha += ((labelOn ? 1 : 0) - this.labelAlpha) * Math.min(1, dt * 14);
 
     // Sparkles rise from the pedestal while the player lingers nearby (but not
@@ -481,7 +487,7 @@ export class GameEngine {
   private drawExhibitLabel() {
     const near = this.currentNearby;
     if (this.labelAlpha < 0.02 || !near || near.tileType === TILES.EASTER_EGG) return;
-    const title = near.content.popup?.title;
+    const title = exhibitLabel(near.content.popup);
     if (!title) return;
     const ctx = this.ctx;
     ctx.save();
