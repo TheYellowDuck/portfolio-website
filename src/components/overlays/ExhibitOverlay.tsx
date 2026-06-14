@@ -32,10 +32,12 @@ function youtubeWatchUrl(url: string): string | null {
 function YoutubeEmbed({ embedUrl }: { embedUrl: string }) {
   const videoId = youtubeVideoId(embedUrl);
   const watchUrl = youtubeWatchUrl(embedUrl);
-  const [reachable, setReachable] = useState<boolean | null>(null);
+  // Derived initial state (no parseable id → unavailable) so the effect never setStates synchronously;
+  // the key={embedUrl} on the usage remounts this on a video change, re-running the initializer.
+  const [reachable, setReachable] = useState<boolean | null>(videoId ? null : false);
 
   useEffect(() => {
-    if (!videoId) { setReachable(false); return; }
+    if (!videoId) return;
     const img = new Image();
     const timer = setTimeout(() => setReachable(false), 4000);
     img.onload = () => { clearTimeout(timer); setReachable(true); };
@@ -230,7 +232,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                         {popup.videoUrl ? (
                           <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
                         ) : popup.embedUrl ? (
-                          <YoutubeEmbed embedUrl={popup.embedUrl} />
+                          <YoutubeEmbed key={popup.embedUrl} embedUrl={popup.embedUrl} />
                         ) : null}
                         {/* Live LeetCode + DMOJ stats for the Competitive Programming / The Grind exhibits. */}
                         {/competitive programming|the grind/i.test(popup.title ?? "") && (
