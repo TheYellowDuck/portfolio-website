@@ -115,7 +115,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             {/* In-section divider. Sub-division gap = mt-24 (96px) = half the section-to-section
                 gap (sections are py-24, so 96+96=192px between them). Visibly tighter than a full
                 section break, but one consistent value to reuse for any in-section division. */}
-            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/45">Archive</h3>
+            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">Archive</h3>
             <div className="mt-6">
               <Masonry sm={2} lg={3} weights={archive.map((e) => cardWeight(e.popup as ExhibitPopup))} items={archive.map((e, i) => (
                 <Reveal key={i} delay={(i % 3) * 60}>
@@ -224,13 +224,13 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
-        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/45 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
           <span>© {new Date().getFullYear()} George Zhang · built with Next.js</span>
           <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
             Prefer to wander? Step inside the museum →
           </button>
         </div>
-        <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/35">
+        <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/70">
           Inside the museum, your anonymous movement is briefly recorded so future visitors can watch it
           drift by as a glowing wisp. No accounts, no personal data — just footsteps.
         </p>

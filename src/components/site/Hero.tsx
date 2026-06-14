@@ -61,7 +61,6 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
       <div className="flex flex-1 flex-col items-center md:items-end">
         <button
           onClick={() => onEnter(doorRef.current?.getBoundingClientRect())}
-          aria-label="Step inside the interactive museum"
           className="group relative w-full max-w-[360px] focus-visible:outline-none"
         >
           <div
@@ -77,7 +76,7 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
             {/* Floor line */}
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
             {/* Character standing in the doorway */}
-            <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 transition-transform duration-300 group-hover:scale-105">
+            <div aria-hidden className="absolute bottom-[18%] left-1/2 -translate-x-1/2 transition-transform duration-300 group-hover:scale-105">
               <PixelCharacter state="idle" dir="south" size={132} />
             </div>
             {/* Invitation */}
@@ -90,10 +89,10 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
               </span>
             </div>
           </div>
-          <p className="mt-3 text-center font-mono text-[12px] text-walnut/45 md:text-right">
-            an explorable, pixel-art version
-          </p>
         </button>
+        <p className="mt-3 w-full max-w-[360px] text-center font-mono text-[12px] text-walnut/70 md:text-right">
+          an explorable, pixel-art version
+        </p>
       </div>
     </header>
   );

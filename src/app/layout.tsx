@@ -58,13 +58,14 @@ export const metadata: Metadata = {
   },
 };
 
-// Lock the viewport for the canvas game: fit the device width, no pinch/double-tap
-// zoom, and extend under notches (the touch controls pad themselves with safe-area insets).
+// Fit the device width and extend under notches (the touch controls pad themselves with safe-area
+// insets). Pinch/double-tap zoom stays enabled for accessibility — the default landing is the web
+// portfolio, and the canvas game's own touch handlers manage in-game gestures on the canvas itself.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
   themeColor: "#1c1508",
 };
