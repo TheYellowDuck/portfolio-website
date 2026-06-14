@@ -49,7 +49,7 @@ export default function OpengraphImage() {
               fontFamily: "ui-monospace, monospace",
             }}
           >
-            georgezhang
+            georgezhang.ca
           </div>
         </div>
 
