@@ -86,9 +86,10 @@ export default function RootLayout({
             __html: "(function(){try{var t=localStorage.getItem('museum:theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();",
           }}
         />
-        {/* Without JS the scroll-reveal content never un-hides, so force it visible. */}
+        {/* Without JS the scroll-reveal content never un-hides and the intro curtain never lifts,
+            so force the content visible and drop the curtain. */}
         <noscript>
-          <style dangerouslySetInnerHTML={{ __html: ".reveal-anim{opacity:1!important;transform:none!important}" }} />
+          <style dangerouslySetInnerHTML={{ __html: ".reveal-anim{opacity:1!important;transform:none!important}.intro-curtain{display:none!important}" }} />
         </noscript>
       </head>
       <body className="min-h-full flex flex-col">

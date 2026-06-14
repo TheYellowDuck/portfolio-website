@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Portfolio from "./site/Portfolio";
+import IntroCurtain from "./site/IntroCurtain";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
 import KonamiEasterEgg from "./site/KonamiEasterEgg";
@@ -247,17 +248,9 @@ export default function SiteShell() {
 
   return (
     <>
-      {/* Brief intro curtain — masks the first-paint header flicker, then fades to
-          reveal the site: the museum "lights coming up" (warm lamp glow blooms,
-          name + label + underline stage in). Pure CSS; skipped under reduced motion. */}
-      <div className="intro-curtain" aria-hidden>
-        <div className="intro-stage">
-          <span className="intro-glow" />
-          <p className="intro-eyebrow font-mono text-[11px] uppercase tracking-[0.4em] text-pine">Portfolio · est. golden hour</p>
-          <h1 className="intro-name font-display text-[clamp(28px,6vw,46px)] font-semibold tracking-tight text-walnut">George Zhang</h1>
-          <span className="intro-line" />
-        </div>
-      </div>
+      {/* Intro curtain — masks first paint, then lifts once web fonts are ready (not on a timer).
+          The "lights coming up": warm lamp glow blooms, name + label + underline stage in. */}
+      <IntroCurtain />
 
       {/* Site layer — plain flow (sticky nav + scroll unaffected); fades out under the game. */}
       <div

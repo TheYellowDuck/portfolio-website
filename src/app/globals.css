@@ -85,9 +85,9 @@ html.dark {
   .theme-transition, .theme-transition * { transition: none !important; }
 }
 
-/* Brief intro curtain — covers the first paint (hiding header hydration flicker),
-   then fades to reveal the site. Pure CSS so it runs even before JS hydrates.
-   Reduced-motion skips it. */
+/* Intro curtain — covers the first paint (hiding header hydration flicker), then lifts once web
+   fonts are ready (IntroCurtain.tsx adds --out), not on a fixed timer. Reduced-motion + no-JS
+   skip it (below / via layout's <noscript>). */
 .intro-curtain {
   position: fixed;
   inset: 0;
@@ -97,11 +97,12 @@ html.dark {
   justify-content: center;
   background: var(--c-bg);
   pointer-events: none;
-  animation: intro-curtain 1.25s ease forwards;
+  opacity: 1;
 }
-@keyframes intro-curtain {
-  0%, 64%  { opacity: 1; }
-  100%     { opacity: 0; visibility: hidden; }
+.intro-curtain--out {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 600ms ease, visibility 0s linear 600ms;
 }
 
 .intro-stage {
