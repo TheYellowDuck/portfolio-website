@@ -259,7 +259,12 @@ async function scanRepo(repo) {
       for (const sign of TOOL_SIGNS) if (paths.some((p) => p.toLowerCase().includes(sign.match))) skills.add(sign.skill);
       // A committed demo video. Small ones we self-host into /public (see main); big ones
       // fall back to the README's YouTube embed. Prefer a file named "demo".
-      const vids = paths.filter((p) => /\.(mp4|webm|mov)$/i.test(p));
+      // This repo (the portfolio itself) downloads *other* projects' demo videos into public/videos/,
+      // so when it scans itself it must not adopt one as its own demo. Detect "self" by a marker file
+      // unique to this repo (the sync script / its generated data) and skip that folder ONLY for it —
+      // other projects that legitimately keep a demo under public/videos/ are unaffected.
+      const isSelfRepo = paths.includes("scripts/sync-github.mjs") || paths.includes("src/data/github.generated.ts");
+      const vids = paths.filter((p) => /\.(mp4|webm|mov)$/i.test(p) && !(isSelfRepo && /(^|\/)public\/videos\//i.test(p)));
       const vid = vids.find((p) => /demo/i.test(p)) || vids[0];
       if (vid) {
         videoRawUrl = `https://raw.githubusercontent.com/${owner}/${name}/${repo.default_branch}/${vid.split("/").map(encodeURIComponent).join("/")}`;
@@ -301,6 +306,7 @@ async function scanRepo(repo) {
 function extractMedia(md) {
   const out = { links: [] };
   if (!md) return out;
+  md = md.replace(/```[\s\S]*?```/g, "");   // drop fenced code blocks — example URLs there aren't real links
   const urls = [...md.matchAll(/https?:\/\/[^\s)"'\]<>]+/g)].map((m) => m[0].replace(/[.,;:!]+$/, ""));
   const seen = new Set();
   for (const url of urls) {

@@ -216,7 +216,7 @@ export const giftShopExhibits: Exhibit[] = [
     popup: {
       title: "This Portfolio's Source",
       description: "See how this museum was built.",
-      links: [{ label: "View Source", url: "https://github.com/you/portfolio" }],
+      links: [{ label: "View Source", url: "https://github.com/TheYellowDuck/portfolio-website" }],
     },
   },
 ];

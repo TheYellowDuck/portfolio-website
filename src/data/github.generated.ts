@@ -128,18 +128,13 @@ export const generatedMainHall: Exhibit[] = [
       "links": [
         {
           "label": "Live",
-          "url": "https://portfolio-website-smoky-one-92.vercel.app"
+          "url": "https://georgezhang.ca"
         },
         {
           "label": "GitHub",
           "url": "https://github.com/TheYellowDuck/portfolio-website"
-        },
-        {
-          "label": "Live Demo",
-          "url": "https://my-game.vercel.app"
         }
-      ],
-      "videoUrl": "/videos/portfolio-website.mp4"
+      ]
     }
   },
   {
@@ -1706,6 +1701,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Soft Skills",
       "tech": [
+        "Collaboration",
         "Technical Writing"
       ]
     }
@@ -1730,5 +1726,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 17,
-  "syncedAt": "2026-06-14T16:34:32.319Z"
+  "syncedAt": "2026-06-14T17:41:54.354Z"
 };
