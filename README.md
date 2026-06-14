@@ -11,7 +11,7 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 - **Explorable museum** — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press **E** to inspect glowing exhibits.
 - **Ghost trails (multiplayer presence)** — other visitors appear as drifting wisps that wander between exhibits and linger to "view" them; their paths are recorded, stored, and replayed back to future visitors.
 - **Live, self-updating content** — GitHub repos populate Projects + Skills and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.
-- **Dynamic documents** — résumé and transcript PDFs are parsed on the fly into structured, themed popups.
+- **Dynamic documents** — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.
 - **Atmosphere** — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg.
 
 ## How It Works
@@ -35,11 +35,11 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 - Multiplayer presence — visitor movement paths recorded, persisted, and replayed as autonomous "ghost" wisps driven by an exhibit-visiting state machine
 - Real-time animation — sprite walk cycles, eased camera follow, hover/bob motion, and a breathing additive glow
 - React and Next.js (App Router) — a server-rendered web portfolio with a seamless camera-pan handoff into the lazy-loaded canvas game
-- REST API and route handlers — dynamic endpoints for ghost storage and on-the-fly PDF parsing
+- REST API and route handlers — dynamic endpoints for ghost storage and serving parsed résumé/transcript JSON
 - Redis with Upstash REST API — append-and-trim list storage for visitor paths, with per-IP rate limiting and graceful degradation
 - External API integration — LeetCode GraphQL, the DMOJ API, and the GitHub REST API normalized into static site data
 - CI/CD and automation — a scheduled GitHub Actions cron that syncs project/skills/stats data and commits it, plus a CI test gate and Dependabot
-- PDF parsing — résumé and transcript PDFs extracted into structured data with the pdf-parse library
+- PDF parsing — résumé and transcript PDFs extracted into structured data at build time with the pdf-parse library
 - Accessibility and performance — `prefers-reduced-motion` handling, a lazy-loaded game bundle, and daily CDN caching
 - TypeScript — a fully typed engine and React application end to end
 
@@ -50,7 +50,7 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 - Framer Motion (popup animation), Howler.js (audio)
 - Upstash Redis (REST API) for ghost-trail storage
 - Node.js sync scripts, GitHub Actions, Dependabot
-- pdf-parse (résumé / transcript parsing), Vercel (hosting, Web Analytics, Speed Insights)
+- pdf-parse (build-time résumé / transcript parsing), Vercel (hosting, Web Analytics, Speed Insights)
 - LeetCode GraphQL API, DMOJ API, GitHub REST API
 - Aseprite / LibreSprite (pixel-art sprites)
 
@@ -122,7 +122,7 @@ Colors are defined in [`src/styles/theme.ts`](src/styles/theme.ts) and surfaced 
 ```
 src/
 ├── app/                Next.js App Router
-│   ├── api/            route handlers — resume/transcript PDF parsing, ghost storage, .jar proxy
+│   ├── api/            route handlers — résumé/transcript JSON, ghost storage, .jar proxy
 │   ├── map-snapshot/   dev tool — renders the full museum to a canvas with PNG export
 │   └── opengraph-image.tsx   generated social share card
 ├── components/
@@ -278,8 +278,8 @@ All exhibit content lives in [`src/data/projects.ts`](src/data/projects.ts) as p
 
 | Route | Purpose |
 |-------|---------|
-| `GET /api/resume` | Reads the newest PDF in `public/assets/resume/`, parses it with `pdf-parse` into structured `ResumeData`, returns JSON. `force-dynamic`, so swapping the PDF needs no rebuild. |
-| `GET /api/transcript` | Same pattern for `public/assets/transcript/` — parses courses into subject groups. |
+| `GET /api/resume` | Serves `resume.generated.json` — the résumé PDF parsed into structured `ResumeData` at build time by `scripts/sync-docs.mts`, so no `pdf-parse`/pdfjs runs in the serverless function (pdfjs crashes there on the missing browser `DOMMatrix`). Re-run `npm run sync:docs` after swapping the PDF. |
+| `GET /api/transcript` | Same pattern → `transcript.generated.json` (courses grouped by subject, UWFlow descriptions baked in at sync time). |
 | `GET /api/jar/[...slug]` | Proxy for playable `.jar` demos. `slug[0]` is a **base64url-encoded** URL; only `https://github.com/<owner>/<repo>/releases/download/…` is allowed (else 403). Forwards `Range` headers so the in-browser Java runner can stream the archive. |
 | `GET` · `POST /api/ghosts` | Anonymous visitor movement paths for the ghost wisps. `POST` validates + per-IP rate-limits a path and stores it; `GET` returns the most-recent paths (CDN-cached daily). Backed by **Upstash Redis**; **degrades to procedural wisps** when Upstash isn't configured. |
 
@@ -301,6 +301,7 @@ Response types live in [`src/types/`](src/types/) and are shared by each route a
 
 - `npm run sync:github` → scans repos → `src/data/github.generated.ts` (Projects + Skills).
 - `npm run sync:cp-stats` → LeetCode + DMOJ → `src/data/cp-stats.generated.json` (with last-good fallback so a transient block never wipes the numbers).
+- `npm run sync:docs` → résumé + transcript PDFs → `src/data/{resume,transcript}.generated.json`, so the API routes serve static JSON instead of running pdfjs in the serverless runtime.
 
 Both run from GitHub's IPs rather than the deployment's, sidestepping the Cloudflare bot-blocking LeetCode applies to datacenter IPs. See [`scripts/GITHUB_SYNC.md`](scripts/GITHUB_SYNC.md) for the tunable knobs.
 
