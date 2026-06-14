@@ -23,6 +23,10 @@ const COURSE_START_RE   = /^([A-Z]{2,6})\s+(\d{1,4}[A-Z]?)\s+(.*)/;
 const TERM_HEADER_RE    = /^(Fall|Winter|Spring|Summer)\s+(\d{4})$/;
 const LEVEL_RE          = /^Level:\s+(\w+)\s+Form Of Study:\s+(.+)/;
 const PROGRAM_RE        = /^Program:\s+(.+)/;
+// Footer sections printed after all courses (Milestones, Scholarships & Awards, "End of … Transcript").
+// Stop parsing courses here so their text isn't swallowed into the last course's title. A multi-page
+// transcript's "-- 1 of 2 --" page break is deliberately NOT a terminator.
+const TRANSCRIPT_END_RE = /^(Milestones|Scholarships?\s+and\s+Awards|End of\b.*Transcript)/i;
 
 const TRAIL_WITH_GRADE_RE =
   /\s+(\d+\.\d{2})\s+(\d+\.\d{2})\s+(?:\d{1,3}|CR|NCR|DNW|WD|WF)\s*$/;
@@ -71,6 +75,9 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
   }
 
   for (const line of lines) {
+    // Past the last course a footer section begins — stop before it bleeds into a course title.
+    if (TRANSCRIPT_END_RE.test(line)) { flush(); break; }
+
     // Term header
     const termMatch = line.match(TERM_HEADER_RE);
     if (termMatch) {

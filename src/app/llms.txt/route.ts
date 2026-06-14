@@ -12,7 +12,31 @@ import {
   officeExhibits,
   type ExhibitPopup,
 } from "@/data/projects";
+import resumeJson from "@/data/resume.generated.json";
+import cpStats from "@/data/cp-stats.generated.json";
+import type { ResumeData } from "@/types/resume";
 import { PERSON, requestOrigin, SITE_DESCRIPTION } from "@/lib/site";
+
+// Pull the high-signal extras (education, awards, competitive-programming numbers) out of the
+// build-time-parsed résumé + CP data, so the brief leads with what recruiters scan for.
+const resumeData = resumeJson as ResumeData;
+const eduSection = resumeData.sections.find((s) => /education/i.test(s.title));
+const education = (eduSection?.entries ?? [])
+  .map((e) => `- ${e.title}${e.subtitle ? ` — ${e.subtitle}` : ""}${e.period ? ` (${e.period})` : ""}`)
+  .join("\n");
+const awardsSection = resumeData.sections.find((s) => /award|achievement|honou?r/i.test(s.title));
+const awards = (awardsSection?.bullets ?? [])
+  .map((b) => `- ${b.replace(/\s*\|\s*/, " — ")}`)
+  .join("\n");
+const cp = [
+  cpStats.leetcode &&
+    `- LeetCode: ${cpStats.leetcode.total} solved (${cpStats.leetcode.easy} easy · ${cpStats.leetcode.medium} medium · ${cpStats.leetcode.hard} hard)`,
+  cpStats.dmoj &&
+    `- DMOJ: ${cpStats.dmoj.solved} solved${cpStats.dmoj.points ? `, ${cpStats.dmoj.points} points` : ""}`,
+]
+  .filter(Boolean)
+  .join("\n");
+const cpTotal = (cpStats.leetcode?.total ?? 0) + (cpStats.dmoj?.solved ?? 0);
 
 const popups = (arr: { popup?: ExhibitPopup }[]): ExhibitPopup[] =>
   arr.map((e) => e.popup).filter((p): p is ExhibitPopup => Boolean(p));
@@ -63,6 +87,8 @@ export function GET(request: Request): Response {
     current ? `- Currently ${current.subtitle} at ${current.title}${current.date ? ` (${current.date})` : ""}.` : "",
     deployed.length ? `- Shipped & deployed products: ${deployed.join(", ")}.` : "",
     featuredPopups.length ? `- ${featuredPopups.length} featured projects${areas.length ? `, spanning ${areas.slice(0, 8).join(", ")}` : ""}.` : "",
+    cpTotal ? `- ${cpTotal}+ competitive-programming problems solved across LeetCode + DMOJ.` : "",
+    awards ? `- ${awardsSection?.bullets?.length ?? 0} competition honors incl. ICPC, AIME, RoboCup.` : "",
   ].filter(Boolean).join("\n");
 
   const body = `# ${PERSON.name} — ${PERSON.jobTitle}
@@ -75,7 +101,7 @@ recruiters. It is generated from the live portfolio at ${origin}, so it stays ac
 ## About
 ${about}
 
-## Open to
+${education ? `## Education\n${education}\n\n` : ""}## Open to
 Software engineering internships, co-ops, and new-grad roles.${areas.length ? ` Demonstrated areas: ${areas.slice(0, 10).join(", ")}.` : ""}
 
 ## Experience
@@ -85,7 +111,7 @@ ${experience}
 ${featured}
 ${archive ? `\nAlso in the archive: ${archive}.` : ""}
 
-## Core skills
+${cp ? `## Competitive programming\n${cp}\n\n` : ""}${awards ? `## Awards & achievements\n${awards}\n\n` : ""}## Core skills
 ${skills}
 
 ## At a glance (for recruiters)
@@ -95,6 +121,7 @@ ${glance}
 - Email: ${PERSON.email}
 ${PERSON.sameAs.map((u) => `- ${u}`).join("\n")}
 - Portfolio: ${origin}
+- Résumé (PDF): ${origin}${encodeURI(resumeData.pdfPath)}
 `;
 
   return new Response(body, {

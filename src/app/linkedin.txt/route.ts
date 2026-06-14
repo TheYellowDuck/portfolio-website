@@ -12,7 +12,16 @@ import {
   officeExhibits,
   type ExhibitPopup,
 } from "@/data/projects";
+import resumeJson from "@/data/resume.generated.json";
+import transcriptJson from "@/data/transcript.generated.json";
+import type { ResumeData } from "@/types/resume";
+import type { TranscriptData } from "@/types/transcript";
 import { PERSON, requestOrigin } from "@/lib/site";
+
+// Build-time-parsed résumé + transcript supply the LinkedIn sections that aren't on the site:
+// Education, Honors & Awards, and Courses.
+const resumeData = resumeJson as ResumeData;
+const transcriptData = transcriptJson as TranscriptData;
 
 const popups = (arr: { popup?: ExhibitPopup }[]): ExhibitPopup[] =>
   arr.map((e) => e.popup).filter((p): p is ExhibitPopup => Boolean(p));
@@ -126,6 +135,46 @@ export function GET(request: Request): Response {
     .map((s, i) => `${String(i + 1).padStart(2, " ")}. ${s}`)
     .join("\n");
 
+  // ── Education ──
+  const education = (resumeData.sections.find((s) => /education/i.test(s.title))?.entries ?? [])
+    .map((e, i) => {
+      const { start, end } = parseDates(e.period);
+      return [
+        `[${i + 1}] ${e.title}`,
+        e.subtitle ? `    Degree:    ${e.subtitle}` : "",
+        transcriptData.program ? `    Program:   ${transcriptData.program}` : "",
+        `    Dates:     ${start || "[start]"} – ${end}`,
+        e.location ? `    Location:  ${e.location}` : "",
+      ].filter(Boolean).join("\n");
+    })
+    .join(`\n\n${HR}\n\n`);
+
+  // ── Honors & Awards (each résumé bullet is "Title | detail") ──
+  const honors = (resumeData.sections.find((s) => /award|achievement|honou?r/i.test(s.title))?.bullets ?? [])
+    .map((b, i) => {
+      const [title, detail] = b.split(/\s*\|\s*/);
+      return `[${i + 1}] ${title}${detail ? `\n    ${detail}` : ""}`;
+    })
+    .join("\n\n");
+
+  // ── Courses (academic subjects, technical first; PD/COOP work-terms aren't real courses) ──
+  const TECH = ["CS", "MATH", "STAT", "CO", "PHYS"];
+  const cleanTitle = (t?: string) => (t ?? "").replace(/\s+/g, " ").trim().slice(0, 72);
+  const courses = [...transcriptData.groups]
+    .filter((g) => !["PD", "COOP"].includes(g.subject))
+    .sort((a, b) => (TECH.indexOf(a.subject) + 1 || 99) - (TECH.indexOf(b.subject) + 1 || 99))
+    .flatMap((g) =>
+      g.courses.map((c) => `- ${c.code}${c.title ? ` — ${cleanTitle(c.title)}` : ""}${c.inProgress ? " (in progress)" : ""}`),
+    )
+    .join("\n");
+
+  // ── Featured (links to pin to the top of the profile) ──
+  const featuredLinks = [
+    `- Interactive portfolio: ${origin}`,
+    `- Résumé (PDF): ${origin}${encodeURI(resumeData.pdfPath)}`,
+    ...PERSON.sameAs.filter((u) => /github/i.test(u)).map((u) => `- GitHub: ${u}`),
+  ].join("\n");
+
   const body = `LINKEDIN UPDATE PACK — ${PERSON.name}
 Generated ${today} from ${origin}
 
@@ -152,6 +201,12 @@ ${RULE}
 ${experience}
 
 ${RULE}
+EDUCATION   ·   Profile → Add section → Education   ·   one entry each
+${RULE}
+
+${education}
+
+${RULE}
 PROJECTS   ·   Profile → Add section → Recommended → Projects   ·   one entry each
 ${RULE}
 
@@ -162,6 +217,24 @@ SKILLS   ·   Profile → Add section → Skills   ·   add in this order (first
 ${RULE}
 
 ${skillList}
+
+${RULE}
+HONORS & AWARDS   ·   Profile → Add section → Recommended → Honors & awards   ·   one entry each
+${RULE}
+
+${honors}
+
+${RULE}
+COURSES   ·   Profile → Add section → Recommended → Courses   ·   add the relevant ones
+${RULE}
+
+${courses}
+
+${RULE}
+FEATURED   ·   Profile → Add section → Featured → Add a link   ·   pin your best work to the top
+${RULE}
+
+${featuredLinks}
 `;
 
   return new Response(body, {
