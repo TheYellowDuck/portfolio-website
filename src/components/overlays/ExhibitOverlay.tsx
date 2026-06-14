@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
@@ -18,9 +18,63 @@ function embedSrc(url: string) {
   return `${base}${base.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&playlist=${m[1]}&rel=0&modestbranding=1`;
 }
 
+function youtubeVideoId(url: string): string | null {
+  return url.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]+)/)?.[1] ?? null;
+}
+
 function youtubeWatchUrl(url: string): string | null {
-  const m = url.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]+)/);
-  return m ? `https://www.youtube.com/watch?v=${m[1]}` : null;
+  const id = youtubeVideoId(url);
+  return id ? `https://www.youtube.com/watch?v=${id}` : null;
+}
+
+// Probes YouTube reachability by loading a thumbnail — fails fast if GFW blocks it.
+// Shows the iframe when reachable; shows a text fallback + watch link when blocked.
+function YoutubeEmbed({ embedUrl }: { embedUrl: string }) {
+  const videoId = youtubeVideoId(embedUrl);
+  const watchUrl = youtubeWatchUrl(embedUrl);
+  const [reachable, setReachable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!videoId) { setReachable(false); return; }
+    const img = new Image();
+    const timer = setTimeout(() => setReachable(false), 4000);
+    img.onload = () => { clearTimeout(timer); setReachable(true); };
+    img.onerror = () => { clearTimeout(timer); setReachable(false); };
+    img.src = `https://img.youtube.com/vi/${videoId}/default.jpg?_=${Date.now()}`;
+    return () => { clearTimeout(timer); img.onload = null; img.onerror = null; };
+  }, [videoId]);
+
+  return (
+    <>
+      <div className="relative shrink-0 w-full aspect-video">
+        {reachable !== true && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/5">
+            {reachable === false && (
+              <>
+                <span className="font-mono text-[12px] text-walnut/40">Video unavailable in your region</span>
+                {watchUrl && (
+                  <a href={watchUrl} target="_blank" rel="noopener noreferrer"
+                    className="font-mono text-[12px] text-sage hover:text-walnut transition-colors">
+                    Watch on YouTube ↗
+                  </a>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        {reachable === true && (
+          <iframe src={embedSrc(embedUrl)} className="absolute inset-0 w-full h-full border-0 bg-black"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
+        )}
+      </div>
+      {reachable === true && watchUrl && (
+        <a href={watchUrl} target="_blank" rel="noopener noreferrer"
+          className="self-end px-5 pt-1 pb-0 font-mono text-[11px] text-walnut/50 hover:text-walnut transition-colors">
+          Watch on YouTube ↗
+        </a>
+      )}
+    </>
+  );
 }
 
 // Popup width, in priority order:
@@ -176,16 +230,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                         {popup.videoUrl ? (
                           <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
                         ) : popup.embedUrl ? (
-                          <>
-                            <iframe src={embedSrc(popup.embedUrl ?? "")} className="shrink-0 w-full aspect-video border-0 bg-black"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
-                            {youtubeWatchUrl(popup.embedUrl) && (
-                              <a href={youtubeWatchUrl(popup.embedUrl)!} target="_blank" rel="noopener noreferrer"
-                                className="self-end px-5 pt-1 pb-0 font-mono text-[11px] text-walnut/50 hover:text-walnut transition-colors">
-                                Watch on YouTube ↗
-                              </a>
-                            )}
-                          </>
+                          <YoutubeEmbed embedUrl={popup.embedUrl} />
                         ) : null}
                         {/* Live LeetCode + DMOJ stats for the Competitive Programming / The Grind exhibits. */}
                         {/competitive programming|the grind/i.test(popup.title ?? "") && (
