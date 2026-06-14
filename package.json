@@ -2,9 +2,6 @@
   "name": "portfolio-website",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "sync:github": "node scripts/sync-github.mjs",
-    "sync:cp-stats": "node scripts/sync-cp-stats.mjs"
+    "sync:cp-stats": "node scripts/sync-cp-stats.mjs",
+    "sync:docs": "node --experimental-strip-types scripts/sync-docs.mts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -20,7 +18,6 @@
     "framer-motion": "^12.38.0",
     "howler": "^2.2.4",
     "next": "^16.2.9",
-    "pdf-parse": "^2.4.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -33,6 +30,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.2.9",
+    "pdf-parse": "^2.4.5",
     "tailwindcss": "^4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.8"
