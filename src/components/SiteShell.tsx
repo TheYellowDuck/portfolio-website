@@ -184,29 +184,31 @@ export default function SiteShell() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
 
-  // Command palette (⌘K) actions: jump to sections, open docs, enter the game, copy email.
+  // Command palette (⌘K), grouped into subsections: Go to (sections) · Projects · Actions.
   const paletteCommands = useMemo<Command[]>(() => {
     const scrollTo = (id: string) => () => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
     const email =
       giftShopExhibits.flatMap((e) => e.popup?.links ?? []).find((l) => l.url.startsWith("mailto:"))?.url.replace("mailto:", "") ??
       PERSON.email;
-    const actions: Command[] = [
-      { id: "enter", label: "Step inside the museum", hint: "Game", keywords: "play explore pixel", run: () => enterGame() },
-      { id: "resume", label: "Open résumé", hint: "Doc", keywords: "cv", run: () => openPopup({ type: "resume" }) },
-      { id: "transcript", label: "Education & transcript", hint: "Doc", keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
-      { id: "email", label: "Copy email address", hint: "Contact", keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
+    const sections: Command[] = [
+      { id: "s-top", label: "Home", group: "Go to", keywords: "top hero intro start", run: scrollTo("top") },
+      { id: "s-work", label: "Selected Work", group: "Go to", keywords: "projects portfolio", run: scrollTo("work") },
+      { id: "s-exp", label: "Experience", group: "Go to", keywords: "work jobs", run: scrollTo("experience") },
+      { id: "s-skills", label: "Skills", group: "Go to", keywords: "tech stack", run: scrollTo("skills") },
+      { id: "s-about", label: "About", group: "Go to", keywords: "bio me", run: scrollTo("about") },
+      { id: "s-cp", label: "Competitive Programming", group: "Go to", keywords: "leetcode dmoj problems grind", run: scrollTo("competitive") },
+      { id: "s-contact", label: "Contact", group: "Go to", keywords: "email reach", run: scrollTo("contact") },
     ];
     const projects: Command[] = [...mainHallExhibits, ...archiveExhibits]
       .filter((e) => e.popup?.title)
-      .map((e) => ({ id: "p-" + (slugForPopup(e.popup!) ?? e.popup!.title!), label: e.popup!.title!, hint: "Project", run: () => openPopup(e.popup!) }));
-    const sections: Command[] = [
-      { id: "s-work", label: "Selected Work", hint: "Section", run: scrollTo("work") },
-      { id: "s-exp", label: "Experience", hint: "Section", run: scrollTo("experience") },
-      { id: "s-skills", label: "Skills", hint: "Section", run: scrollTo("skills") },
-      { id: "s-about", label: "About", hint: "Section", run: scrollTo("about") },
-      { id: "s-contact", label: "Contact", hint: "Section", run: scrollTo("contact") },
+      .map((e) => ({ id: "p-" + (slugForPopup(e.popup!) ?? e.popup!.title!), label: e.popup!.title!, group: "Projects", run: () => openPopup(e.popup!) }));
+    const actions: Command[] = [
+      { id: "enter", label: "Step inside the museum", group: "Actions", hint: "Game", keywords: "play explore pixel", run: () => enterGame() },
+      { id: "resume", label: "Open résumé", group: "Actions", hint: "Doc", keywords: "cv", run: () => openPopup({ type: "resume" }) },
+      { id: "transcript", label: "Education & transcript", group: "Actions", hint: "Doc", keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
+      { id: "email", label: "Copy email address", group: "Actions", hint: "Contact", keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
     ];
-    return [...actions, ...projects, ...sections];
+    return [...sections, ...projects, ...actions];
   }, [enterGame, openPopup]);
 
   // Sequence each stage on a timer matched to the CSS fade duration.

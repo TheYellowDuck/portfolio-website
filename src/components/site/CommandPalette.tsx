@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface Command {
   id: string;
   label: string;
-  hint?: string;       // right-aligned tag, e.g. "Project"
+  group?: string;      // subsection header, e.g. "Projects" — items are listed under it
+  hint?: string;       // right-aligned tag, e.g. "Doc"
   keywords?: string;   // extra search terms
   run: () => void;
 }
@@ -45,7 +46,7 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
     const q = query.trim().toLowerCase();
     if (!q) return commands;
     return commands.filter((c) =>
-      `${c.label} ${c.hint ?? ""} ${c.keywords ?? ""}`.toLowerCase().includes(q),
+      `${c.label} ${c.group ?? ""} ${c.hint ?? ""} ${c.keywords ?? ""}`.toLowerCase().includes(q),
     );
   }, [commands, query]);
 
@@ -87,20 +88,29 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
           {results.length === 0 && (
             <p className="px-5 py-6 text-center font-mono text-[13px] text-walnut/45">No matches</p>
           )}
-          {results.map((c, i) => (
-            <button
-              key={c.id}
-              data-sel={i === selClamped}
-              onClick={() => run(c)}
-              onMouseMove={() => setSel(i)}
-              className={`flex w-full items-center justify-between gap-3 px-5 py-2.5 text-left text-[14px] transition-colors ${
-                i === selClamped ? "bg-[rgba(122,158,126,0.16)] text-pine" : "text-walnut/80"
-              }`}
-            >
-              <span>{c.label}</span>
-              {c.hint && <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-walnut/40">{c.hint}</span>}
-            </button>
-          ))}
+          {results.map((c, i) => {
+            const showHeader = c.group && c.group !== results[i - 1]?.group;
+            return (
+              <Fragment key={c.id}>
+                {showHeader && (
+                  <p className={`px-5 pb-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-walnut/45 ${i === 0 ? "pt-1" : "mt-1 border-t border-[rgb(var(--c-line-rgb)_/_0.07)] pt-3"}`}>
+                    {c.group}
+                  </p>
+                )}
+                <button
+                  data-sel={i === selClamped}
+                  onClick={() => run(c)}
+                  onMouseMove={() => setSel(i)}
+                  className={`flex w-full items-center justify-between gap-3 py-2 pl-8 pr-5 text-left text-[14px] transition-colors ${
+                    i === selClamped ? "bg-[rgba(122,158,126,0.16)] text-pine" : "text-walnut/80"
+                  }`}
+                >
+                  <span>{c.label}</span>
+                  {c.hint && <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-walnut/40">{c.hint}</span>}
+                </button>
+              </Fragment>
+            );
+          })}
         </div>
         <div className="flex items-center gap-4 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] px-5 py-2 font-mono text-[11px] text-walnut/40">
           <span>↑↓ navigate</span><span>↵ open</span><span>esc close</span>
