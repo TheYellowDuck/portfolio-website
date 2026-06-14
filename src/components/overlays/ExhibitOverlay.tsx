@@ -10,10 +10,17 @@ import CpStats from "@/components/CpStats";
 
 // YouTube embeds don't autoplay/loop without params — add them so the popup video
 // plays muted on a loop (like the card preview); viewers can unmute via the controls.
+// Use youtube-nocookie.com to reduce fingerprinting (helps VPN users avoid the bot check).
 function embedSrc(url: string) {
-  const m = url.match(/youtube\.com\/embed\/([\w-]+)/);
+  const m = url.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]+)/);
   if (!m) return url;
-  return `${url}${url.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&playlist=${m[1]}&rel=0&modestbranding=1`;
+  const base = url.replace("youtube.com/embed/", "youtube-nocookie.com/embed/");
+  return `${base}${base.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&playlist=${m[1]}&rel=0&modestbranding=1`;
+}
+
+function youtubeWatchUrl(url: string): string | null {
+  const m = url.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]+)/);
+  return m ? `https://www.youtube.com/watch?v=${m[1]}` : null;
 }
 
 // Popup width, in priority order:
@@ -169,8 +176,16 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                         {popup.videoUrl ? (
                           <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
                         ) : popup.embedUrl ? (
-                          <iframe src={embedSrc(popup.embedUrl ?? "")} className="shrink-0 w-full aspect-video border-0 bg-black"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
+                          <>
+                            <iframe src={embedSrc(popup.embedUrl ?? "")} className="shrink-0 w-full aspect-video border-0 bg-black"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
+                            {youtubeWatchUrl(popup.embedUrl) && (
+                              <a href={youtubeWatchUrl(popup.embedUrl)!} target="_blank" rel="noopener noreferrer"
+                                className="self-end px-5 pt-1 pb-0 font-mono text-[11px] text-walnut/50 hover:text-walnut transition-colors">
+                                Watch on YouTube ↗
+                              </a>
+                            )}
+                          </>
                         ) : null}
                         {/* Live LeetCode + DMOJ stats for the Competitive Programming / The Grind exhibits. */}
                         {/competitive programming|the grind/i.test(popup.title ?? "") && (
