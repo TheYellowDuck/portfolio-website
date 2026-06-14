@@ -6,6 +6,7 @@ import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
 import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
+import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
 
 // YouTube embeds don't autoplay/loop without params — add them so the popup video
@@ -230,7 +231,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                       {/* Left — video above description; scrolls on its own only when roomy */}
                       <div className="flex-1 min-w-0 flex flex-col roomy:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                         {popup.videoUrl ? (
-                          <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
+                          <video src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline controls />
                         ) : popup.embedUrl ? (
                           <YoutubeEmbed key={popup.embedUrl} embedUrl={popup.embedUrl} />
                         ) : null}

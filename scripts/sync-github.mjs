@@ -11,6 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 import { config, DEP_SKILLS, TOOL_SIGNS, DOMAIN_RULES, SKILL_CATEGORY } from "./github-sync.config.mjs";
 
 // Named tech we'll recognise if a README's "Tech Stack / Built With" section lists
@@ -84,6 +85,37 @@ async function downloadVideos(queue) {
     done++; render();
   }));
   process.stdout.write(`\n  ${ok}/${total} videos ready${ok < total ? ` — ${total - ok} failed, re-run to retry` : ""}.\n`);
+  generatePosters();
+}
+
+// A poster (first frame ~1s in) for each self-hosted video → public/videos/posters/<name>.jpg, used
+// as the <video poster> so the preview shows a real frame instead of a black rectangle where autoplay
+// is blocked (some mobile browsers, e.g. Xiaomi/MIUI). Needs ffmpeg — present on GitHub runners and
+// most dev machines; if it's missing the step is skipped (videos just lose their poster fallback).
+function generatePosters() {
+  if (!fs.existsSync(VIDEO_DIR)) return;
+  const vids = fs.readdirSync(VIDEO_DIR).filter((f) => /\.(mp4|webm|mov)$/i.test(f));
+  const posterDir = path.join(VIDEO_DIR, "posters");
+  if (vids.length) fs.mkdirSync(posterDir, { recursive: true });
+  let made = 0;
+  for (const v of vids) {
+    const out = path.join(posterDir, v.replace(/\.[^.]+$/, ".jpg"));
+    if (fs.existsSync(out)) continue;
+    try {
+      execFileSync("ffmpeg", ["-ss", "00:00:01", "-i", path.join(VIDEO_DIR, v),
+        "-frames:v", "1", "-vf", "scale=640:-2", "-q:v", "4", "-y", out], { stdio: "ignore" });
+      made++;
+    } catch {
+      console.warn("  posters: ffmpeg unavailable or failed — skipping (videos keep working, just no poster).");
+      break;
+    }
+  }
+  // Prune posters whose video is gone.
+  if (fs.existsSync(posterDir)) {
+    const keep = new Set(vids.map((v) => v.replace(/\.[^.]+$/, ".jpg")));
+    for (const p of fs.readdirSync(posterDir)) if (p.endsWith(".jpg") && !keep.has(p)) fs.rmSync(path.join(posterDir, p));
+  }
+  if (made) console.log(`  posters: generated ${made}.`);
 }
 const API = "https://api.github.com";
 const HEADERS = {

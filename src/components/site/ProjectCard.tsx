@@ -1,6 +1,7 @@
 "use client";
 
 import type { ExhibitPopup } from "@/data/projects";
+import { videoPoster } from "@/lib/video";
 
 interface ProjectCardProps {
   index: string;   // e.g. "01"
@@ -26,7 +27,7 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
       {hasMedia && (
         <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
           {popup.videoUrl ? (
-            <video src={popup.videoUrl} className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata" />
+            <video src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata" />
           ) : (
             <>
               <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(https://img.youtube.com/vi/${ytId}/hqdefault.jpg)` }} />
