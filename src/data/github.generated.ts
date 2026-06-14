@@ -5,6 +5,145 @@ import type { Exhibit } from "./projects";
 export const generatedMainHall: Exhibit[] = [
   {
     "popup": {
+      "title": "Portfolio Website",
+      "description": "An interactive personal portfolio with two faces: a fast, content-first web portfolio at /, and a lazy-loaded pixel-art museum game you can step into — built on a custom HTML5 Canvas game engine with a 60fps requestAnimationFrame loop, tile-based AABB collision, A\\ pathfinding, particle systems, and a procedurally generated map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source. Other visitors drift through the museum as warm glowing \"ghost\" wisps — a lightweight multiplayer-presence feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) refreshes automatically through a daily GitHub Actions pipeline. Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Upstash Redis. Dual experience — a fast static web portfolio and an explorable canvas museum, both driven by one projects.ts content source (edit once, both update).; Seamless portal — a continuous camera-pan transition hands off from the DOM site into the game and back, with a prefers-reduced-motion crossfade fallback.; Explorable museum — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press E to inspect glowing exhibits.; Ghost trails (multiplayer presence) — other visitors appear as drifting wisps that wander between exhibits and linger to \"view\" them; their paths are recorded, stored, and replayed back to future visitors.; Live, self-updating content — GitHub repos populate Projects + Skills and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.; Dynamic documents — résumé and transcript PDFs are parsed on the fly into structured, themed popups.; Atmosphere — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg. Engine ↔ React split. A standalone canvas GameEngine runs the 60fps game loop and never imports React; it talks to the UI only through an onEvent callback. The web portfolio (SiteShell / Portfolio) is server-rendered for instant load, and the heavier GameCanvas is lazy-mounted only once a visitor steps inside. Rendering & world. The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is procedurally generated from a list of branch definitions, so adding a room is one array entry. Movement uses tile-based AABB collision detection decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run A\\ pathfinding — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass. Ghost trails. The engine samples the player's path; on leave it's POSTed to a route handler and stored in Redis (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a GhostSystem replays them as additive-blended particle wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured. Data pipeline. A daily GitHub Actions cron scans the owner's repos (languages, dependency manifests, READMEs, demo videos) and fetches LeetCode (GraphQL) + DMOJ stats, committing them as static data the site reads — so the live site never makes those third-party calls at runtime. A CI workflow gates every PR on tsc + lint + tests, and Dependabot keeps dependencies current. Game engine architecture — a decoupled 60fps requestAnimationFrame game loop with fixed delta-time updates, kept entirely separate from React; HTML5 Canvas rendering — a three-pass, y-sorted scene draw for top-down 2.5D depth sorting;",
+      "tech": [
+        "TypeScript",
+        "JavaScript",
+        "GitHub Actions",
+        "Vitest",
+        "Framer Motion",
+        "Next.js",
+        "React",
+        "ESLint",
+        "Tailwind",
+        "R",
+        "GraphQL",
+        "REST",
+        "Game engine architecture",
+        "HTML5 Canvas rendering",
+        "Collision detection & physics",
+        "A\\ pathfinding",
+        "Particle systems",
+        "Procedural generation",
+        "Multiplayer presence",
+        "Real-time animation",
+        "React and Next.js (App Router)",
+        "REST API and route handlers",
+        "Redis with Upstash REST API",
+        "External API integration",
+        "CI/CD and automation",
+        "PDF parsing",
+        "Accessibility and performance"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "TypeScript",
+            "JavaScript"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "Next.js",
+            "React"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "TypeScript",
+            "GitHub Actions",
+            "Vitest",
+            "ESLint",
+            "Tailwind"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "A\\ pathfinding",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Multiplayer presence",
+            "Real-time animation",
+            "Networking"
+          ]
+        },
+        {
+          "category": "Game AI",
+          "items": [
+            "Procedural generation",
+            "Game AI"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "HTML5 Canvas rendering"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Game engine architecture"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "CI/CD and automation",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Framer Motion",
+            "R",
+            "GraphQL",
+            "REST",
+            "Collision detection & physics",
+            "Particle systems",
+            "React and Next.js (App Router)",
+            "REST API and route handlers",
+            "Redis with Upstash REST API",
+            "External API integration",
+            "PDF parsing",
+            "Accessibility and performance",
+            "Web Development",
+            "Backend / APIs",
+            "Game Development",
+            "Automation / Scraping",
+            "Game Physics"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "Live",
+          "url": "https://portfolio-website-smoky-one-92.vercel.app"
+        },
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/portfolio-website"
+        },
+        {
+          "label": "Live Demo",
+          "url": "https://my-game.vercel.app"
+        }
+      ],
+      "videoUrl": "/videos/portfolio-website.mp4"
+    }
+  },
+  {
+    "popup": {
       "title": "Robotics",
       "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
       "tech": [
@@ -1486,6 +1625,8 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "TypeScript",
+        "JavaScript",
         "Python",
         "Java",
         "CSS",
@@ -1525,6 +1666,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
+        "React",
+        "Next.js",
         "Swing",
         "Jetpack Compose",
         "SDL2"
@@ -1548,6 +1691,10 @@ export const generatedSkills: Exhibit[] = [
         "GitHub Actions",
         "Make",
         "CMake",
+        "Tailwind",
+        "Vitest",
+        "ESLint",
+        "TypeScript",
         "Gradle",
         "pip",
         "JUnit",
@@ -1567,9 +1714,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
+        "Framer Motion",
+        "R",
+        "GraphQL",
+        "REST",
         "Pillow",
         "Requests",
-        "R",
         "OpenGL",
         "Go"
       ]
@@ -1579,6 +1729,6 @@ export const generatedSkills: Exhibit[] = [
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
-  "repoCount": 16,
-  "syncedAt": "2026-06-14T15:22:19.107Z"
+  "repoCount": 17,
+  "syncedAt": "2026-06-14T16:34:32.319Z"
 };
