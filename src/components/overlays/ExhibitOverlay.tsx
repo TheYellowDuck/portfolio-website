@@ -15,6 +15,27 @@ function embedSrc(url: string) {
   return `${url}${url.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&playlist=${m[1]}&rel=0&modestbranding=1`;
 }
 
+// Popup width, in priority order:
+//   1. explicit `width` — honored as-is (escape hatch).
+//   2. experience popups (identified by a role subtitle + date) — always render wider, a
+//      deliberate setting so every experience matches regardless of how much it lists.
+//   3. media popups — take the max, for the video.
+//   4. everything else — scales with how much is inside (skill/tech chips + description), up to MAX_W.
+// Always wrapped in `min(…, 92vw)` so it stays fluid on small screens and live-reflows on resize;
+// height (vh maxHeight) and the body's internal scroll are handled separately below.
+const MIN_W = 500;
+const MAX_W = 760;          // cap for the auto content-scaling
+const EXPERIENCE_W = 800;   // experience popups always render wider than projects
+function popupWidth(p: ExhibitPopup): string {
+  if (p.width) return `min(${p.width}, 92vw)`;
+  if (p.subtitle && p.date) return `min(${EXPERIENCE_W}px, 92vw)`;
+  if (p.videoUrl || p.embedUrl) return `min(${MAX_W}px, 92vw)`;
+  const chips = p.skills?.length ? p.skills.reduce((n, g) => n + g.items.length, 0) : (p.tech?.length ?? 0);
+  const desc = Math.min(p.description?.length ?? 0, 600);
+  const w = Math.min(MAX_W, Math.round(MIN_W + chips * 5 + desc * 0.12));
+  return `min(${w}px, 92vw)`;
+}
+
 interface ExhibitOverlayProps {
   popup: ExhibitPopup | null;
   onClose: () => void;
@@ -38,7 +59,9 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
             ),
           ).filter((el) => el.offsetParent !== null)
         : [];
-    const raf = requestAnimationFrame(() => modalRef.current?.focus());
+    // preventScroll: focusing a taller-than-viewport card would otherwise scroll the overlay and
+    // push the header off the top. We want it to open at the top, header visible.
+    const raf = requestAnimationFrame(() => modalRef.current?.focus({ preventScroll: true }));
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") { onClose(); return; }
       if (e.key !== "Tab") return;
@@ -79,10 +102,13 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
             className="fixed inset-0 z-20 bg-[rgba(28,21,8,0.72)] backdrop-blur-sm"
           />
 
-          {/* Centered popup — max-height on motion div constrains flex; body scrolls inside */}
-          <div className="fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: `min(${popup.width ?? ((popup.videoUrl || popup.embedUrl) ? "760px" : "560px")}, 92vw)` }}
-          >
+          {/* Scroll container — centers the popup; on a small/short screen (narrower or shorter
+              than "roomy") the WHOLE popup, header included, scrolls as one unit. On a roomy screen
+              the card caps its height and the two columns scroll on their own. Click the gap to close. */}
+          <div className="fixed inset-0 z-30 overflow-y-auto overscroll-contain" onClick={onClose}>
+            {/* my-auto on the card (not items-center) so it centers when it fits but top-aligns when
+                taller than the viewport — keeping the header reachable instead of clipped above. */}
+            <div className="flex min-h-full justify-center p-2 sm:p-4">
               <motion.div
                 key="popup"
                 ref={modalRef}
@@ -94,11 +120,13 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={gentle ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] } : { type: "spring", damping: 30, stiffness: 400 }}
-                className="w-full flex flex-col overflow-y-auto sm:overflow-hidden rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] outline-none [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]"
-                style={{ maxHeight: (popup.embedUrl || popup.videoUrl) ? "min(560px, 82vh)" : "min(460px, 72vh)" }}
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: popupWidth(popup) }}
+                className={`my-auto flex flex-col rounded-lg border-2 border-sage bg-parchment shadow-[0_8px_40px_rgba(28,21,8,0.35)] outline-none [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent] roomy:overflow-hidden ${(popup.embedUrl || popup.videoUrl) ? "roomy:max-h-[min(560px,82vh)]" : "roomy:max-h-[min(460px,72vh)]"}`}
               >
-                {/* Header — fixed, never scrolls */}
-                <div className="sticky top-0 z-10 shrink-0 flex justify-between items-start gap-4 px-5 py-3 bg-parchment border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
+                {/* Header — sticky only on roomy screens (columns scroll under it); on small/short
+                    screens it scrolls with the unit, so the title is part of the scroll. */}
+                <div className="roomy:sticky roomy:top-0 z-10 shrink-0 flex justify-between items-start gap-4 px-5 py-3 bg-parchment border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
                   <div className="flex-1">
                     {popup.title && (
                       <h2 className="m-0 font-mono text-[22px] text-pine">
@@ -118,7 +146,6 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                   </div>
                   <button
                     onClick={onClose}
-                    autoFocus
                     aria-label="Close"
                     className="shrink-0 select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                   >
@@ -129,11 +156,11 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 {/* Body — on desktop the left column (video over description) scrolls on its
                     own and the skills side column scrolls separately; on mobile it all scrolls
                     together in the dialog. Links stay pinned at the bottom. */}
-                <div className="flex flex-col sm:flex-1 sm:min-h-0">
+                <div className="flex flex-col roomy:flex-1 roomy:min-h-0">
                   {(popup.description || popup.tech?.length || popup.skills?.length || popup.videoUrl || popup.embedUrl) && (
-                    <div className="flex flex-col sm:flex-row sm:flex-1 sm:min-h-0 sm:overflow-hidden">
-                      {/* Left — video above description, scroll together */}
-                      <div className="flex-1 min-w-0 flex flex-col sm:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                    <div className="flex flex-col roomy:flex-row roomy:flex-1 roomy:min-h-0 roomy:overflow-hidden">
+                      {/* Left — video above description; scrolls on its own only when roomy */}
+                      <div className="flex-1 min-w-0 flex flex-col roomy:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                         {popup.videoUrl ? (
                           <video src={popup.videoUrl} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline />
                         ) : popup.embedUrl ? (
@@ -146,9 +173,10 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                           </p>
                         )}
                       </div>
-                      {/* Right — skills side column, scrolls separately on desktop */}
+                      {/* Right — skills column: a horizontal tag row when stacked, a separately-
+                          scrolling side column only when roomy */}
                       {(popup.tech?.length || popup.skills?.length) ? (
-                        <div className="shrink-0 w-full sm:w-48 flex flex-row sm:flex-col flex-wrap sm:flex-nowrap gap-1.5 px-5 sm:px-4 py-4 border-t sm:border-t-0 sm:border-l border-[rgb(var(--c-line-rgb)_/_0.1)] sm:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                        <div className="shrink-0 w-full roomy:w-48 flex flex-row roomy:flex-col flex-wrap roomy:flex-nowrap gap-1.5 px-5 roomy:px-4 py-4 border-t roomy:border-t-0 roomy:border-l border-[rgb(var(--c-line-rgb)_/_0.1)] roomy:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                           {!popup.skills?.length && popup.tech?.map((t) => (
                             <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">
                               {t}
@@ -179,6 +207,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                   )}
                 </div>
               </motion.div>
+            </div>
           </div>
         </>
       )}

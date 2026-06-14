@@ -117,7 +117,8 @@ export default function SiteShell() {
     maybeStartBg();
   }, [maybeStartBg]);
 
-  const enterGame = useCallback(() => {
+  // Begin entering the museum (the staged fade) — transition only, no history push.
+  const startEnter = useCallback(() => {
     if (stage !== "site") return;
     scrollYRef.current = window.scrollY;
     gameReadyRef.current = false;
@@ -128,11 +129,36 @@ export default function SiteShell() {
     setStage("in-fade");
   }, [stage, reduceMotion]);
 
+  const enterGame = useCallback(() => {
+    if (stage !== "site") return;
+    // Push a marked history entry (preserving Next's router state) with no URL change, so the
+    // browser/device Back button leaves the museum and Forward walks back in — invisibly, and
+    // clear of the #slug popup deep-link system.
+    window.history.pushState({ ...window.history.state, museum: true }, "");
+    startEnter();
+  }, [stage, startEnter]);
+
   const exitGame = useCallback(() => {
-    if (stage !== "game") return;
+    if (stage === "site" || stage.startsWith("out")) return; // already on the site, or already leaving
     if (reduceMotion) { setGameOn(false); setStage("site"); return; }
     setStage("out-hud");
   }, [stage, reduceMotion]);
+
+  // The in-game Leave button goes through history.back() so it shares one path with the Back
+  // button and the history stack stays consistent (and Forward can still re-enter afterwards).
+  const requestExitGame = useCallback(() => { window.history.back(); }, []);
+
+  // Back/Forward across the museum entry → leave / re-enter the game. Direction comes from the
+  // entry's own state: landing on the museum-marked entry enters, landing off it leaves. Each
+  // call no-ops via its own stage guard when it doesn't apply (e.g. popup-hash navigation).
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      if (e.state?.museum) startEnter();
+      else exitGame();
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [startEnter, exitGame]);
 
   // Deep links: a modal is reflected in the URL hash (#slug) so it's shareable,
   // bookmarkable, and closable with the Back button.
@@ -217,6 +243,7 @@ export default function SiteShell() {
   const hudOpacity = stage === "game" ? 1 : 0;
   const fadeMs = reduceMotion ? 0 : FADE_MS;
   const audible = !stage.startsWith("out"); // fade music out across the leave stages
+  const leaving = stage.startsWith("out");  // an open exhibit popup fades out first as we leave
 
   return (
     <>
@@ -264,6 +291,7 @@ export default function SiteShell() {
             playerVisible={playerVisible}
             fadeMs={fadeMs}
             audible={audible}
+            leaving={leaving}
           />
         </div>
       )}
@@ -284,7 +312,7 @@ export default function SiteShell() {
       {/* Leave affordance while playing. */}
       {stage === "game" && (
         <button
-          onClick={exitGame}
+          onClick={requestExitGame}
           className="game-warm fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-4 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
         >

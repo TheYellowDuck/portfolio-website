@@ -16,8 +16,8 @@ import TouchControls from "./TouchControls";
 import NpcDialog from "./NpcDialog";
 
 const BG_MUSIC_SRCS = [
-  "/assets/audio/Interior Birdecorator Explore_CUTE.m4a",
-  "/assets/audio/Interior Birdecorator Explore_CUTE.ogg",
+  "/assets/audio/museum-theme.m4a",
+  "/assets/audio/museum-theme.ogg",
 ];
 const BG_VOL = 0.1;          // background-music target volume
 const BG_FADE_IN_MS = 900;   // fade up when the music first starts
@@ -67,6 +67,8 @@ interface GameCanvasProps {
   fadeMs?: number;
   /** When false (e.g. while leaving), the background music fades out. */
   audible?: boolean;
+  /** True once the leave-to-site fade has begun, so an open exhibit popup closes out first. */
+  leaving?: boolean;
 }
 
 export default function GameCanvas({
@@ -77,6 +79,7 @@ export default function GameCanvas({
   playerVisible = true,
   fadeMs = 0,
   audible = true,
+  leaving = false,
 }: GameCanvasProps = {}) {
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const onReadyRef   = useRef(onReady);
@@ -608,7 +611,9 @@ export default function GameCanvas({
 
       {/* ExhibitOverlay outside the scaled container so it occupies real viewport space
           and its fixed positioning / scroll work correctly at any screen size. */}
-      <ExhibitOverlay popup={activePopup} onClose={handleClose} gentle={activePopup === CURATOR_REWARD} />
+      {/* While leaving, pass null so AnimatePresence fades the popup out first (it sits in real
+          viewport space, so it wouldn't fade with the world otherwise). */}
+      <ExhibitOverlay popup={leaving ? null : activePopup} onClose={handleClose} gentle={activePopup === CURATOR_REWARD} />
 
       {/* NPC dialog (e.g. "me" at the desk) — sequential lines, advance on E / tap. */}
       <NpcDialog

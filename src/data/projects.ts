@@ -111,9 +111,7 @@ export const experienceExhibits: Exhibit[] = [
         { category: "Build & CI",  items: ["Gradle", "AOSP/Soong", "SonarQube", "ADB", "Docker"] },
         { category: "Tools",       items: ["Android Studio", "Jira", "Ford SDK", "scrcpy"] },
         { category: "Practice",    items: ["Unit Testing", "Code Review", "Multi-module Architecture", "Bluetooth/HFP", "Agile/Scrum", "OOP"] },
-      ],
-      width: "800px",
-    },
+      ],    },
   },
   {
     popup: {
@@ -126,9 +124,7 @@ export const experienceExhibits: Exhibit[] = [
         { category: "AI & Vision",  items: ["Computer Vision", "Gesture Recognition", "Pose Estimation", "ML Inference", "Real-time Systems"] },
         { category: "Research",     items: ["Custom Libraries", "Data Analysis", "Research"] },
         { category: "Team",         items: ["Agile", "Weekly Standups", "Clinician Collaboration"] },
-      ],
-      width: "800px",
-      links: [
+      ],      links: [
         { label: "McKeown Lab – PIKA", url: "https://mckeownlab.ca/pika/index.html" },
       ],
     },
@@ -143,9 +139,7 @@ export const experienceExhibits: Exhibit[] = [
         { category: "Teaching",    items: ["1-on-1 Mentoring", "Curriculum Adaptation", "Lesson Planning", "Progress Tracking"] },
         { category: "Soft Skills", items: ["Communication", "Patience", "Adaptability", "Leadership"] },
         { category: "Management",  items: ["Classroom Management", "Feedback Delivery", "Student Assessment"] },
-      ],
-      width: "700px",
-    },
+      ],    },
   },
 ];
 
@@ -163,7 +157,7 @@ export const officeExhibits: Exhibit[] = [
   {
     popup: {
       title: "About Me",
-      description: "CS student at the University of Waterloo. Builder, problem solver. Currently on co-op at Ford.",
+      description: "My mom signed me up for a summer Java course over Zoom — AP Computer Science, mostly to get me to stop playing video games. It backfired beautifully: I got hooked on building things instead, and now I build an unreasonable number of games anyway. I'm a CS student at the University of Waterloo, and what really gets me is figuring out how something works and then making something people can actually use — lately that's been Android Automotive at Ford and computer-vision rehab tools at a UBC research lab. Longer term I'm aiming for the deep end — the large-scale systems, AI, and quant work that the biggest tech, research, and trading firms are built on — and I'm at my best with a genuinely hard problem in front of me. Off the clock I'm usually on a snowboard, partway up a climbing wall, or somewhere new.",
     },
   },
   {
@@ -174,7 +168,7 @@ export const officeExhibits: Exhibit[] = [
   {
     popup: {
       title: "Interests",
-      description: "Game dev, pixel art, open source, music.",
+      description: "Snowboarding and skiing in winter, climbing and hiking the rest of the year, and travelling somewhere new whenever I can — usually chasing good coffee and food along the way. Otherwise: board games and chess, a rotating lineup of film and anime, books, music, and building games and little open-source side projects for the fun of it.",
     },
   },
 ];

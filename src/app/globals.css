@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* "Roomy" = enough room for the exhibit popup's side-by-side, independently-scrolling columns
+   (wide AND tall). Below this (narrow OR short screens) the popup scrolls as one unit instead. */
+@custom-variant roomy (@media (min-width: 640px) and (min-height: 600px));
+
 @layer base {
   * {
     margin: 0;
