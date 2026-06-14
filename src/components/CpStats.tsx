@@ -52,10 +52,14 @@ function StatCard({
       <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[11px] text-walnut/60">
         {rating != null && (
           <span
-            className="rounded border px-1.5 py-0.5 font-medium"
+            className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-medium"
             style={{ color: tierColor(rating), borderColor: `${tierColor(rating)}66`, background: `${tierColor(rating)}1a` }}
           >
-            ⚔ {rating.toLocaleString()}{ratingNote ? ` · ${ratingNote}` : ""}
+            {/* trend-up SVG — the ⚔ glyph renders as a colored emoji on mobile */}
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3 17l5-5 4 4 8-8" />
+            </svg>
+            {rating.toLocaleString()}{ratingNote ? ` · ${ratingNote}` : ""}
           </span>
         )}
         {children}

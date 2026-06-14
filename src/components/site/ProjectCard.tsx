@@ -31,7 +31,12 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
             <>
               <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(https://img.youtube.com/vi/${ytId}/hqdefault.jpg)` }} />
               <span className="absolute inset-0 flex items-center justify-center bg-black/15 transition-colors group-hover:bg-black/5">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 pl-0.5 text-[15px] text-walnut shadow-lg">▶</span>
+                {/* Inline SVG play triangle — the ▶ glyph renders as a colored emoji on mobile. */}
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-walnut shadow-lg">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="ml-0.5">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
               </span>
             </>
           )}
