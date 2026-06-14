@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Bricolage_Grotesque, Pixelify_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
 import "./globals.css";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, PERSON } from "@/lib/site";
@@ -109,6 +110,7 @@ export default function RootLayout({
         {children}
         <FaviconSwitcher />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

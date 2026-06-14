@@ -419,6 +419,135 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Ai File Organizer",
+      "description": "A command-line tool that automatically sorts messy folders into a clean, hierarchical category tree using either a free offline semantic-embedding model or a bring-your-own-key Large Language Model — Claude, GPT, Gemini, or any OpenAI-compatible provider. It combines multi-provider LLM classification (with vision-based image understanding, prompt caching, structured JSON outputs, concurrent requests, and exponential-backoff retries) with crash-safe file operations (append-only journaling and one-click undo), secret-safe API key management, and content extraction from PDF, Word, PowerPoint, Excel, and images via OCR. Two interchangeable backends — a free, fully offline embedding classifier (sentence-transformers), or a bring-your-own-key LLM for higher accuracy.; Every major provider through one key — Anthropic Claude, OpenAI, Google Gemini, Groq, Mistral, DeepSeek, Together, OpenRouter, a local Ollama server, or any custom OpenAI-compatible endpoint.; Vision-based image sorting — image files are sent to multimodal models and classified by what they actually show, not just their filename.; Token-frugal LLM mode — request batching, Anthropic prompt caching, content truncation, and schema-constrained outputs keep cost low; each run prints a token/cache-hit summary.; Concurrent classification — batches run in parallel with a cache-warming first request, plus automatic retry/backoff on rate limits and server errors.; LLM category discovery — let the model propose a category tree from your own files, or supply a custom tree as JSON/YAML.; Crash-safe organization — every move is journaled to disk as it happens and an undo script is generated even if the run is interrupted; dry-run and copy modes included.; Secret-safe keys — API keys come from the environment, a gitignored .env, or a hidden prompt; they are masked in output and never written to config, logs, or undo scripts.; Privacy controls — exclude sensitive files via .organizerignore or --exclude globs, a notice before any data leaves your machine, and a fully offline mode.; Spend guard — a pre-run token estimate and a hard file-count cap prevent surprise bills.; Low-confidence Review folder — uncertain placements are quarantined instead of mis-filed.; Interactive setup wizard plus content extraction for PDF, DOCX, PPTX, XLSX, images (OCR), and text/code files. Files flow through a four-stage pipeline: scan → extract → classify → move. 1. Scan discovers files recursively, skipping hidden/system files and anything matched by a .organizerignore file or --exclude glob. 2. Extract pulls text from each file using a format-specific extractor (PDF, Word, PowerPoint, Excel, image OCR, or plain text), with character-encoding detection. 3. Classify assigns each file a path in a hierarchical category tree using the selected backend. 4. Move relocates (or copies) files into the destination tree, recording every operation to a crash-safe journal and emitting an undo script. Classification backends. The local backend embeds filenames and content with sentence-transformers and matches them to category descriptions by cosine similarity, walking the tree level by level and falling back to an \"Other\" folder when confidence drops below a per-node threshold — entirely offline, no key, no network. The LLM backend instead asks a language model to place each file directly into the tree, which handles messy or ambiguous files far better. Token frugality. The LLM backend classifies many files per request so the (large, fixed) category tree is sent once per batch rather than once per file. On Anthropic that tree lives in a cached system prompt (cachecontrol: ephemeral), so every batch after the first is dramatically cheaper. Responses are constrained with JSON-schema structured outputs (with defensive parsing as a fallback for providers that only support JSON-object mode), and per-file content is truncated to a short snippet. Vision.",
+      "tech": [
+        "Python",
+        "GitHub Actions",
+        "Make",
+        "pip",
+        "NumPy",
+        "scikit-learn",
+        "PyTorch",
+        "Pillow",
+        "Requests",
+        "Computer Vision",
+        "Concurrency",
+        "Testing",
+        "LLM application development",
+        "Provider abstraction (strategy pattern)",
+        "Prompt caching",
+        "Structured outputs",
+        "Computer vision / multimodal AI",
+        "Semantic embeddings",
+        "Hierarchical classification",
+        "Concurrency & multithreading",
+        "Thread-safe state",
+        "Rate-limit handling",
+        "Fault tolerance",
+        "Crash-safe file operations",
+        "Secrets management",
+        "Content extraction",
+        "CLI design",
+        "Cost engineering",
+        "Privacy engineering",
+        "Automatic dependency management",
+        "Packaging",
+        "Automated testing",
+        "CI/CD",
+        "Design patterns"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "scikit-learn",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "Make",
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Computer Vision",
+            "Computer vision / multimodal AI",
+            "Machine Learning"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Concurrency & multithreading",
+            "Thread-safe state"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Provider abstraction (strategy pattern)",
+            "Design patterns",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Packaging",
+            "Automated testing",
+            "CI/CD",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Pillow",
+            "Requests",
+            "LLM application development",
+            "Prompt caching",
+            "Structured outputs",
+            "Semantic embeddings",
+            "Hierarchical classification",
+            "Rate-limit handling",
+            "Fault tolerance",
+            "Crash-safe file operations",
+            "Secrets management",
+            "Content extraction",
+            "CLI design",
+            "Cost engineering",
+            "Privacy engineering",
+            "Automatic dependency management",
+            "Data Analysis",
+            "Backend / APIs"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/ai-file-organizer"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Image To Text",
       "description": "A desktop Java application that converts raster images into ASCII art in real time. Built from scratch with a fully custom Swing GUI, an off-screen rendering pipeline for O(1) scroll/zoom, background processing via SwingWorker, and smooth zoom/pan interaction. The app takes any JPG, PNG, or GIF image, converts each pixel to a grayscale luminance value using the Rec. 601 standard, and maps it to one of 70 ASCII characters ordered by visual density (Paul Bourke gradient). The result is rendered into a scrollable, zoomable panel and the intermediate grayscale image is saved to disk automatically. Conversion reads pixels directly from a BufferedImage (getRGB), computes per-pixel luminance with the Rec. 601 luma coefficients (0.299R + 0.587G + 0.114B), and maps each value through a static lookup table to one of 70 density-ordered ASCII characters. The hot pixel loop uses a StringBuilder for O(n) assembly, and the whole conversion runs on a SwingWorker so the UI never blocks. The rendered ASCII is drawn once into an off-screen buffer, so scrolling and zooming stay O(1) regardless of image size — nearest-neighbor interpolation keeps it crisp when zoomed in, bilinear keeps it smooth when zoomed out. Interaction is handled with a MouseAdapter for drag-to-pan (using screen coordinates for stable deltas) and getPreciseWheelRotation for smooth Ctrl+scroll zoom, with an InputMap/ActionMap shortcut system scoped to the focused window. Swing GUI from scratch — custom layouts, components, and event handling; Multithreading & concurrency — SwingWorker keeps the UI responsive during conversion; Off-screen rendering — pre-rendered BufferedImage makes scroll and zoom O(1) at any image size; Image processing — pixel-level RGB manipulation via getRGB / setRGB; Grayscale conversion — Rec. 601 luma coefficients (0.299R + 0.587G + 0.114B); Algorithm/data-structure use — static lookup table for the brightness → character mapping; Image scaling — SCALESMOOTH downscaling with zoom-aware nearest-neighbor / bilinear interpolation; Keyboard shortcut system — InputMap / ActionMap with WHENINFOCUSEDWINDOW scope; Performance optimization — StringBuilder over concatenation in hot pixel loops for O(n); Pan & zoom UX — drag-to-pan, precise Ctrl+scroll zoom, and fit-to-window on every transform; Layout management — responsive nested BorderLayout so zoom controls stay visible at any width; Error handling — IOException propagation with user-facing dialogs, no silent failures; Object-oriented design — separate converter, text panel, and prompt components; JAR packaging — distributed as a standalone runnable JAR Java 17+; Java Swing / AWT (BufferedImage, Graphics2D, SwingWorker, InputMap / ActionMap, MouseAdapter); Packaged as a standalone runnable JAR (ImageToText.jar)",
       "tech": [
@@ -522,6 +651,95 @@ export const generatedMainHall: Exhibit[] = [
 ];
 
 export const generatedArchive: Exhibit[] = [
+  {
+    "popup": {
+      "title": "PONG",
+      "description": "A fully playable Pong game built in Java with Swing, featuring local two-player multiplayer and a single-player mode against a predictive AI that simulates the ball's full trajectory — including wall bounces — to anticipate where it will land. https://github.com/user-attachments/assets/54ef0b10-a559-49a8-9805-efe1b83df394 Single-player mode — AI that simulates the ball's full trajectory (including wall bounces) to predict its landing position, with a speed cap and randomised error margin so it's challenging but beatable; Two-player local multiplayer — both players share the keyboard; Physics-based ball mechanics — bounce angle depends on where the ball strikes the paddle; ball speed increases 5% per volley up to a maximum, rewarding longer rallies; Clean menu UI with keyboard navigation The game runs on a javax.swing.Timer firing at 60 FPS on the Event Dispatch Thread, so updates and repaints stay smooth without ever blocking the EDT with Thread.sleep. Ball physics are vector-based: each return angle is computed from the hit position relative to the paddle centre (rel × 60°), so edge hits produce steep angles and centre hits produce flat returns, with the velocity decomposed via cos/sin. Speed builds 5% per volley up to a hard cap (MAXSPEED), making long rallies progressively harder to control. The AI opponent projects where the ball will land by running a frame-by-frame physics simulation (predictBallY) that mirrors the wall-bounce logic. To stay beatable, it recomputes its target only every ~15 frames, applies a ±25px position error, moves slightly slower than the player, and drifts back to centre when the ball is travelling away — so it can be consistently beaten by pushing the ball into the corners at high speed. Object-oriented design — game state, rendering, and input separated across classes; Event-driven programming — Java Swing event dispatch and key handling; Game loop architecture — javax.swing.Timer at 60 FPS, no blocking on the EDT; Game physics — vector velocity, trigonometric bounce angles, per-volley speed ramping; Collision detection — ball-versus-paddle and ball-versus-wall response; Game AI — predictive opponent via frame-by-frame trajectory simulation; Vector math & trigonometry — cos/sin angle decomposition from paddle hit position; 2D rendering — custom Graphics drawing of paddles, ball, scores, and menu; Input handling — multi-key state tracking and keyboard menu navigation; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, JFrame, Graphics, javax.swing.Timer); Java Platform Module System (module-info.java, requires java.desktop); Packaged as a runnable modular JAR (PONG.jar)",
+      "tech": [
+        "Java",
+        "Game Physics",
+        "Game AI",
+        "Swing",
+        "Object-oriented design",
+        "Event-driven programming",
+        "Game loop architecture",
+        "Game physics",
+        "Collision detection",
+        "Vector math & trigonometry",
+        "2D rendering",
+        "Input handling",
+        "Java Platform Module System",
+        "JAR packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Java"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "Swing"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Networking"
+          ]
+        },
+        {
+          "category": "Game AI",
+          "items": [
+            "Game AI"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "2D rendering"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Game loop architecture",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "JAR packaging"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Game Physics",
+            "Event-driven programming",
+            "Game physics",
+            "Collision detection",
+            "Vector math & trigonometry",
+            "Input handling",
+            "Java Platform Module System",
+            "Game Development",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/PONG"
+        }
+      ],
+      "videoUrl": "/videos/PONG.mp4"
+    }
+  },
   {
     "popup": {
       "title": "Cockroach",
@@ -791,95 +1009,6 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "videoUrl": "/videos/minesweeper.mp4"
-    }
-  },
-  {
-    "popup": {
-      "title": "PONG",
-      "description": "A fully playable Pong game built in Java with Swing, featuring local two-player multiplayer and a single-player mode against a predictive AI that simulates the ball's full trajectory — including wall bounces — to anticipate where it will land. https://github.com/user-attachments/assets/54ef0b10-a559-49a8-9805-efe1b83df394 Single-player mode — AI that simulates the ball's full trajectory (including wall bounces) to predict its landing position, with a speed cap and randomised error margin so it's challenging but beatable; Two-player local multiplayer — both players share the keyboard; Physics-based ball mechanics — bounce angle depends on where the ball strikes the paddle; ball speed increases 5% per volley up to a maximum, rewarding longer rallies; Clean menu UI with keyboard navigation The game runs on a javax.swing.Timer firing at 60 FPS on the Event Dispatch Thread, so updates and repaints stay smooth without ever blocking the EDT with Thread.sleep. Ball physics are vector-based: each return angle is computed from the hit position relative to the paddle centre (rel × 60°), so edge hits produce steep angles and centre hits produce flat returns, with the velocity decomposed via cos/sin. Speed builds 5% per volley up to a hard cap (MAXSPEED), making long rallies progressively harder to control. The AI opponent projects where the ball will land by running a frame-by-frame physics simulation (predictBallY) that mirrors the wall-bounce logic. To stay beatable, it recomputes its target only every ~15 frames, applies a ±25px position error, moves slightly slower than the player, and drifts back to centre when the ball is travelling away — so it can be consistently beaten by pushing the ball into the corners at high speed. Object-oriented design — game state, rendering, and input separated across classes; Event-driven programming — Java Swing event dispatch and key handling; Game loop architecture — javax.swing.Timer at 60 FPS, no blocking on the EDT; Game physics — vector velocity, trigonometric bounce angles, per-volley speed ramping; Collision detection — ball-versus-paddle and ball-versus-wall response; Game AI — predictive opponent via frame-by-frame trajectory simulation; Vector math & trigonometry — cos/sin angle decomposition from paddle hit position; 2D rendering — custom Graphics drawing of paddles, ball, scores, and menu; Input handling — multi-key state tracking and keyboard menu navigation; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, JFrame, Graphics, javax.swing.Timer); Java Platform Module System (module-info.java, requires java.desktop); Packaged as a runnable modular JAR (PONG.jar)",
-      "tech": [
-        "Java",
-        "Game Physics",
-        "Game AI",
-        "Swing",
-        "Object-oriented design",
-        "Event-driven programming",
-        "Game loop architecture",
-        "Game physics",
-        "Collision detection",
-        "Vector math & trigonometry",
-        "2D rendering",
-        "Input handling",
-        "Java Platform Module System",
-        "JAR packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Java"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "Swing"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Networking"
-          ]
-        },
-        {
-          "category": "Game AI",
-          "items": [
-            "Game AI"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "2D rendering"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Game loop architecture",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "JAR packaging"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Game Physics",
-            "Event-driven programming",
-            "Game physics",
-            "Collision detection",
-            "Vector math & trigonometry",
-            "Input handling",
-            "Java Platform Module System",
-            "Game Development",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/PONG"
-        }
-      ],
-      "videoUrl": "/videos/PONG.mp4"
     }
   },
   {
@@ -1372,7 +1501,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Concepts",
       "tech": [
         "Computer Vision",
+        "Machine Learning",
+        "Data Analysis",
         "Web Development",
+        "Backend / APIs",
         "Game Development",
         "Mobile Development",
         "DevOps",
@@ -1401,9 +1533,20 @@ export const generatedSkills: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "ML / Data",
+      "tech": [
+        "NumPy",
+        "scikit-learn",
+        "PyTorch"
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Tools",
       "tech": [
         "GitHub Actions",
+        "Make",
         "CMake",
         "Gradle",
         "pip",
@@ -1424,6 +1567,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
+        "Pillow",
+        "Requests",
         "R",
         "OpenGL",
         "Go"
@@ -1434,6 +1579,6 @@ export const generatedSkills: Exhibit[] = [
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
-  "repoCount": 15,
-  "syncedAt": "2026-06-13T18:57:10.932Z"
+  "repoCount": 16,
+  "syncedAt": "2026-06-14T15:22:19.107Z"
 };

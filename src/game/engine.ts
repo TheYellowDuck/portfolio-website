@@ -29,6 +29,9 @@ import { ParticleSystem } from "./particles";
 import { drawScene } from "./renderer";
 import { Duck } from "./duck";
 import { findPath, findPathToward, smoothPath, type Cell } from "./pathfinding";
+import { GhostSystem } from "./ghosts";
+
+const MAX_REC_PAIRS = 500;  // cap the player's recorded path (x,y pairs) so an idle tab can't bloat it
 
 export type GameEvent =
   | { type: "nearby"; content: Exhibit }
@@ -71,6 +74,12 @@ export class GameEngine {
   private paused = false;
   private interactCooldown = false;
   private glowAlpha = 0;
+
+  // Other visitors drifting through as glowing wisps, and the player's own path being recorded to
+  // seed them. Recording is sampled only while moving and capped (see MAX_REC_PAIRS).
+  private ghosts = new GhostSystem();
+  private recPts: number[] = [];
+  private recTimer = 0;
   // Analog movement vector from the on-screen joystick (each axis ~[-1, 1]).
   private moveVec = { x: 0, y: 0 };
 
@@ -171,6 +180,18 @@ export class GameEngine {
   setMoveVector(x: number, y: number) {
     this.moveVec.x = x;
     this.moveVec.y = y;
+  }
+
+  // Other visitors to replay as ghosts (excluding the current session), and this session's own path.
+  setGhosts(recordings: { id: string; pts: number[] }[], ownId: string) {
+    this.ghosts.load(recordings, ownId);
+  }
+  // prefers-reduced-motion: freeze the wisps to a quiet glow instead of constant drifting.
+  setGhostsReducedMotion(on: boolean) {
+    this.ghosts.setReducedMotion(on);
+  }
+  getRecording(): number[] {
+    return this.recPts;
   }
 
   triggerInteract() {
@@ -287,6 +308,7 @@ export class GameEngine {
     if (!this.paused) {
       this.update(deltaTime);
     }
+    this.ghosts.update(deltaTime);   // wisps drift on even while a popup pauses the player
     this.render();
 
     this.animationFrameId = requestAnimationFrame(this.loop);
@@ -397,6 +419,18 @@ export class GameEngine {
       this.sparkleTimer = 0;
     }
 
+    // Record own path (centres) to seed other visitors' ghosts — only while moving, and capped, so
+    // an idle/overnight tab never grows it. (update() is skipped while paused, so popups don't add.)
+    this.recTimer += dt;
+    if (this.recTimer >= 0.12 && this.recPts.length < MAX_REC_PAIRS * 2) {
+      this.recTimer = 0;
+      const x = Math.round(player.centerX), y = Math.round(player.centerY);
+      const n = this.recPts.length;
+      if (n === 0 || Math.hypot(x - this.recPts[n - 2], y - this.recPts[n - 1]) > 3) {
+        this.recPts.push(x, y);
+      }
+    }
+
     this.onPositionChange?.(player.x, player.y);
   }
 
@@ -477,10 +511,19 @@ export class GameEngine {
       this.debugPhysics,
       this.hidePlayer,
       this.playerAlpha,
-      this.drawDuck,
+      this.drawEntities,
     );
+    // Wisps occluded by a wall get a faint silhouette laid over the top so they read through it.
+    this.ghosts.renderOccludedHints(this.ctx, Math.round(this.camera.x), Math.round(this.camera.y));
     this.drawExhibitLabel();
   }
+
+  // y-sorted entity hook handed to drawScene: the easter-egg duck and the ghost wisps, both drawn
+  // at their own sort row so walls further south occlude them like any other entity.
+  private drawEntities = (sortRow: number, camX: number, camY: number) => {
+    this.drawDuck(sortRow, camX, camY);
+    this.ghosts.renderRow(this.ctx, sortRow, camX, camY);
+  };
 
   // Floating name above the exhibit you're standing at — just text (dark-outlined for
   // legibility over the floor), no plaque.

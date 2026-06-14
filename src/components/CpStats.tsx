@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import cpStatsJson from "@/data/cp-stats.generated.json";
 
 interface LeetCode {
   total: number; easy: number; medium: number; hard: number;
   ranking: number | null; contestRating: number | null; contestBadge: string | null; url: string;
 }
 interface Dmoj { solved: number; points: number | null; rating: number | null; url: string; }
-interface CpData { leetcode: LeetCode | null; dmoj: Dmoj | null }
 
-// Module-level cache so the portfolio section and the exhibit popup share one fetch.
-let cache: CpData | null = null;
+// Built daily by scripts/sync-cp-stats.mjs (the same GitHub Action that syncs projects), so the page
+// serves these statically — no runtime LeetCode fetch from a datacenter IP that Cloudflare would block.
+const STATS = cpStatsJson as { leetcode: LeetCode | null; dmoj: Dmoj | null };
 
 const DIFF: { label: string; color: string; val: (l: LeetCode) => number }[] = [
   { label: "Easy", color: "#3a9b6e", val: (l) => l.easy },
@@ -64,51 +64,39 @@ function StatCard({
   );
 }
 
-/** Live LeetCode + DMOJ stats, fetched from /api/cp-stats (cached/revalidated daily server-side). */
+/** LeetCode + DMOJ stats, served from a static file synced daily by the GitHub Action. */
 export default function CpStats() {
-  const [data, setData] = useState<CpData | null>(cache);
-
-  useEffect(() => {
-    if (cache) return;
-    let live = true;
-    fetch("/api/cp-stats")
-      .then((r) => r.json())
-      .then((d: CpData) => { cache = d; if (live) setData(d); })
-      .catch(() => {});
-    return () => { live = false; };
-  }, []);
-
-  const lc = data?.leetcode;
-  const dm = data?.dmoj;
-  if (data && !lc && !dm) return null; // both unavailable — show nothing rather than an empty shell
+  const lc = STATS.leetcode;
+  const dm = STATS.dmoj;
+  if (!lc && !dm) return null; // both unavailable — show nothing rather than an empty shell
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      {(!data || lc) && (
+      {lc && (
         <StatCard
           label="LeetCode"
-          href={lc?.url ?? "https://leetcode.com/u/georgezhang006/"}
-          big={lc?.total ?? null}
+          href={lc.url}
+          big={lc.total}
           unit="solved"
-          meta={lc?.ranking != null ? `rank #${lc.ranking.toLocaleString()}` : undefined}
-          rating={lc?.contestRating}
-          ratingNote={lc?.contestBadge}
+          meta={lc.ranking != null ? `rank #${lc.ranking.toLocaleString()}` : undefined}
+          rating={lc.contestRating}
+          ratingNote={lc.contestBadge}
         >
           <span className="flex gap-3">
             {DIFF.map((d) => (
-              <span key={d.label} style={{ color: d.color }}>{d.label} {lc ? d.val(lc) : "—"}</span>
+              <span key={d.label} style={{ color: d.color }}>{d.label} {d.val(lc)}</span>
             ))}
           </span>
         </StatCard>
       )}
-      {(!data || dm) && (
+      {dm && (
         <StatCard
           label="DMOJ"
-          href={dm?.url ?? "https://dmoj.ca/user/georgezhang006"}
-          big={dm?.solved ?? null}
+          href={dm.url}
+          big={dm.solved}
           unit="solved"
-          meta={dm?.points != null ? `${dm.points.toLocaleString()} pts` : undefined}
-          rating={dm?.rating}
+          meta={dm.points != null ? `${dm.points.toLocaleString()} pts` : undefined}
+          rating={dm.rating}
         >
           CCC · DMOPC · & more
         </StatCard>

@@ -415,6 +415,36 @@ const HARD_AREAS = ["AI & ML", "Algorithms & DS", "Concurrency & Networking", "3
 const MEDIUM_AREAS = ["Game AI", "UI & 2D"];
 const BASIC_AREAS = ["Architecture & Design", "Testing & Delivery"];
 const SYSTEMS_LANGS = new Set(["C", "C++", "Rust", "Assembly"]); // low-level langs signal harder engineering
+// Engineering domains the concept buckets don't otherwise credit: backend/API and data work is
+// substantive (and recruiter-relevant) but maps to no "hard" concept bucket, so a deep server/data/AI
+// tool was scoring near-zero on difficulty for exactly the work that makes it strong. Credit it from
+// the inferred domains. (Only domains with NO HARD/MEDIUM bucket are here — e.g. Security, Distributed
+// and Compilers are deliberately omitted since their buckets already score them, to avoid double-count.)
+const DOMAIN_DIFFICULTY = {
+  "Backend / APIs": 3,
+  "Data Analysis": 3,
+  "Mobile Development": 2,
+  "Automation / Scraping": 1.5,
+};
+// Domains we deliberately don't difficulty-score: ubiquitous (Web) or already credited through their
+// sub-areas (a game's Game AI / Physics buckets). Listed so the coverage audit below stays silent on
+// them — anything NOT here and NOT credited is a real gap and gets warned about.
+const DIFFICULTY_LIGHT = new Set(["Web Development", "Game Development", "Game Physics"]);
+
+// Guardrail against future scoring gaps: every domain in DOMAIN_RULES must earn difficulty credit
+// either through a HARD/MEDIUM/BASIC concept bucket or an explicit DOMAIN_DIFFICULTY entry (or be
+// marked intentionally-light). If someone adds a new domain later and forgets to weight it, this
+// warns on the next sync so it never silently scores zero the way Backend/Data once did.
+function auditDomainCoverage() {
+  const credited = new Set([...HARD_AREAS, ...MEDIUM_AREAS, ...BASIC_AREAS]);
+  const gaps = DOMAIN_RULES.map((r) => r.skill).filter((d) => {
+    const bucket = CONCEPT_BUCKETS.find((b) => b.re.test(d));
+    return !(bucket && credited.has(bucket.name)) && !(d in DOMAIN_DIFFICULTY) && !DIFFICULTY_LIGHT.has(d);
+  });
+  if (gaps.length) {
+    console.warn(`\n  ⚠ Scoring gap — these domains earn no difficulty credit (add to DOMAIN_DIFFICULTY,\n    give them a concept bucket, or list them in DIFFICULTY_LIGHT): ${gaps.join(", ")}`);
+  }
+}
 // Practice / exercise / learning collections — not portfolio projects, so they're discounted.
 const COLLECTION_RE = /^learn|competitive.?program|leetcode|hackerrank|advent.?of.?code|\bkata\b|^exercis|playground|sandbox|boilerplate|\bstarter\b|\btemplate\b|coursework|^assignment|^notes$|cheat.?sheet|practice.?problem/i;
 function significance(repo, scan, domains, popup) {
@@ -427,7 +457,8 @@ function significance(repo, scan, domains, popup) {
     HARD_AREAS.filter((c) => itemsIn(c) > 0).length * 6 +
     MEDIUM_AREAS.filter((c) => itemsIn(c) > 0).length * 3 +
     BASIC_AREAS.filter((c) => itemsIn(c) > 0).length * 1.5 +
-    Math.min(concepts, 18) * 0.3;
+    Math.min(concepts, 18) * 0.3 +
+    (domains || []).reduce((s, d) => s + (DOMAIN_DIFFICULTY[d] || 0), 0);  // backend/data/mobile/scraping
   // Scope — code actually written (language bytes, NOT repo.size which is inflated by videos).
   const scope = Math.log2((scan.codeBytes || 0) / 1024 + 1) * 1.8;
   const breadth = scan.languages.length * 1.5 + scan.languages.filter((l) => SYSTEMS_LANGS.has(l)).length * 2; // polyglot + low-level bonus
@@ -550,6 +581,10 @@ async function main() {
   const byScore = [...exhibits].sort((a, b) => b._score - a._score);
   const threshold = config.featuredThreshold ?? 30;
   const isFeatured = (e) => e._featured || e._score >= threshold;
+
+  // Flag any domain that would score zero difficulty (so future taxonomy additions can't silently
+  // recreate the Backend/Data gap).
+  auditDomainCoverage();
 
   // Show the ranking + score breakdown so it's clear why each repo landed where.
   console.log(`\n  Significance ranking (score ≥ ${threshold} → Projects, else Archive):`);

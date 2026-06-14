@@ -1,0 +1,38 @@
+# Dependabot — automated dependency updates.
+#
+# Routine minor/patch bumps are batched into ONE weekly PR to keep noise low; major bumps arrive as
+# their own PRs so you can do them deliberately (read changelogs, test — never blanket-accept majors).
+# Your build / tsc / lint / tests validate each PR — merge the green ones.
+#
+# This file enables *version* updates. To also get advisory-driven *security* PRs (e.g. the current
+# Next.js App Router fix), turn on "Dependabot alerts" + "Dependabot security updates" once in
+# GitHub → repo Settings → Code security — those toggles can't be set from this file.
+version: 2
+updates:
+  # App dependencies (npm). Repo root is the Next.js app, so directory is "/".
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Toronto
+    open-pull-requests-limit: 8
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # One batched PR for all safe (non-major) updates; majors stay separate and deliberate.
+      npm-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+
+  # Keep the GitHub Actions used by the sync workflow current too (checkout, setup-node, …).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore(actions)"

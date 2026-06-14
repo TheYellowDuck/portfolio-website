@@ -1,0 +1,29 @@
+name: CI
+
+# Validates every PR (including Dependabot's) and pushes to the default branch with the same checks
+# you run locally — types, lint, tests. Vercel separately builds a preview, so this stays fast and
+# doesn't duplicate the full build. Merge a PR only when this is green.
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test

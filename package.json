@@ -8,13 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "sync:github": "node scripts/sync-github.mjs"
+    "sync:github": "node scripts/sync-github.mjs",
+    "sync:cp-stats": "node scripts/sync-cp-stats.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "framer-motion": "^12.38.0",
     "howler": "^2.2.4",
-    "next": "^16.2.4",
+    "next": "^16.2.9",
     "pdf-parse": "^2.4.5",
     "react": "19.2.4",
     "react-dom": "19.2.4"
@@ -27,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "^16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.8"

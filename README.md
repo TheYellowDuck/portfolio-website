@@ -1,6 +1,69 @@
 # Museum Portfolio
 
-A 2D pixel-art museum where visitors control a character walking through themed rooms, interacting with exhibits that showcase projects, skills, experience, and contact info. Built with Next.js 16, TypeScript, Tailwind CSS, and HTML5 Canvas.
+An interactive personal portfolio with two faces: a fast, content-first **web portfolio** at `/`, and a lazy-loaded **pixel-art museum game** you can step into — built on a custom **HTML5 Canvas game engine** with a 60fps `requestAnimationFrame` loop, **tile-based AABB collision**, **A\* pathfinding**, **particle systems**, and a **procedurally generated** map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source.
+
+Other visitors drift through the museum as warm glowing **"ghost" wisps** — a lightweight **multiplayer-presence** feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) **refreshes automatically** through a daily **GitHub Actions** pipeline. Built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Tailwind CSS**, and **Upstash Redis**.
+
+## Features
+
+- **Dual experience** — a fast static web portfolio and an explorable canvas museum, both driven by one `projects.ts` content source (edit once, both update).
+- **Seamless portal** — a continuous camera-pan transition hands off from the DOM site into the game and back, with a `prefers-reduced-motion` crossfade fallback.
+- **Explorable museum** — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press **E** to inspect glowing exhibits.
+- **Ghost trails (multiplayer presence)** — other visitors appear as drifting wisps that wander between exhibits and linger to "view" them; their paths are recorded, stored, and replayed back to future visitors.
+- **Live, self-updating content** — GitHub repos populate Projects + Skills and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.
+- **Dynamic documents** — résumé and transcript PDFs are parsed on the fly into structured, themed popups.
+- **Atmosphere** — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg.
+
+## How It Works
+
+**Engine ↔ React split.** A standalone canvas `GameEngine` runs the 60fps game loop and never imports React; it talks to the UI only through an `onEvent` callback. The web portfolio (`SiteShell` / `Portfolio`) is server-rendered for instant load, and the heavier `GameCanvas` is lazy-mounted only once a visitor steps inside.
+
+**Rendering & world.** The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is **procedurally generated** from a list of branch definitions, so adding a room is one array entry. Movement uses **tile-based AABB collision detection** decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run **A\* pathfinding** — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass.
+
+**Ghost trails.** The engine samples the player's path; on leave it's `POST`ed to a route handler and stored in **Redis** (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a `GhostSystem` replays them as additive-blended **particle** wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured.
+
+**Data pipeline.** A daily **GitHub Actions** cron scans the owner's repos (languages, dependency manifests, READMEs, demo videos) and fetches LeetCode (GraphQL) + DMOJ stats, committing them as static data the site reads — so the live site never makes those third-party calls at runtime. A CI workflow gates every PR on `tsc` + lint + tests, and Dependabot keeps dependencies current.
+
+## Skills Demonstrated
+
+- Game engine architecture — a decoupled 60fps `requestAnimationFrame` game loop with fixed delta-time updates, kept entirely separate from React
+- HTML5 Canvas rendering — a three-pass, y-sorted scene draw for top-down 2.5D depth sorting
+- Collision detection & physics — tile-based AABB resolution with per-axis wall sliding, decoupled from tile type
+- A\* pathfinding — 8-directional grid search with diagonal corner-cut prevention and string-pulled path smoothing (click-to-move and ghost navigation)
+- Particle systems — a pooled effects system for dust, footsteps, sparkles, and additive-blended "wisp" particles
+- Procedural generation — the museum map (rooms, doorways, walls) auto-derived from branch definitions via an adjacency wall-stamping pass
+- Multiplayer presence — visitor movement paths recorded, persisted, and replayed as autonomous "ghost" wisps driven by an exhibit-visiting state machine
+- Real-time animation — sprite walk cycles, eased camera follow, hover/bob motion, and a breathing additive glow
+- React and Next.js (App Router) — a server-rendered web portfolio with a seamless camera-pan handoff into the lazy-loaded canvas game
+- REST API and route handlers — dynamic endpoints for ghost storage and on-the-fly PDF parsing
+- Redis with Upstash REST API — append-and-trim list storage for visitor paths, with per-IP rate limiting and graceful degradation
+- External API integration — LeetCode GraphQL, the DMOJ API, and the GitHub REST API normalized into static site data
+- CI/CD and automation — a scheduled GitHub Actions cron that syncs project/skills/stats data and commits it, plus a CI test gate and Dependabot
+- PDF parsing — résumé and transcript PDFs extracted into structured data with the pdf-parse library
+- Accessibility and performance — `prefers-reduced-motion` handling, a lazy-loaded game bundle, and daily CDN caching
+- TypeScript — a fully typed engine and React application end to end
+
+## Tech Stack
+
+- TypeScript, Next.js 16 (App Router), React 19
+- HTML5 Canvas (game rendering), Tailwind CSS 4
+- Framer Motion (popup animation), Howler.js (audio)
+- Upstash Redis (REST API) for ghost-trail storage
+- Node.js sync scripts, GitHub Actions, Dependabot
+- pdf-parse (résumé / transcript parsing), Vercel (hosting, Web Analytics, Speed Insights)
+- LeetCode GraphQL API, DMOJ API, GitHub REST API
+- Aseprite / LibreSprite (pixel-art sprites)
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The web portfolio loads first; click **Step inside** to enter the museum. Move with **WASD** / **arrow keys** (or click-to-move / the touch joystick), press **E** or **Enter** near a glowing pedestal to open it, and **Esc** to close.
+
+> **Deploying?** Ghost trails need two Upstash Redis env vars and the data sync runs on a GitHub Action — see [Live Data, Deployment & Environment](#live-data-deployment--environment) below.
 
 ---
 
@@ -83,34 +146,9 @@ A developer-only page that renders the full museum map to a canvas for inspectio
 
 ### Known constraints
 
-- **Never run `npm audit fix --force`** — it downgrades `next` to 9.x. The 2 moderate PostCSS advisories have no released fix; ignore them.
+- **Never run `npm audit fix --force`** — it force-downgrades `next` to 9.x and breaks the build. `next` is pinned to the patched 16.2.x line (the high-severity App Router advisory is fixed); the remaining moderate PostCSS advisories are transitive through Next, build-time only, and not reachable at runtime here. They clear when Next bumps its bundled postcss — Dependabot will surface that.
 - `INTERACTABLE_TILES` must be typed `Set<number>` explicitly — TypeScript narrows the inferred type to a literal union, breaking `.has(number)`.
 - Map dimensions are auto-computed from `northBranches` / `southBranches` arrays in `tilemap.ts`. Never hardcode `ROWS` or `COLS` elsewhere.
-
----
-
-## Getting Started
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000). Use **WASD** or **Arrow Keys** to move. Press **E** or **Enter** near a glowing pedestal to open it. Press **Esc** to close.
-
----
-
-## Tech Stack
-
-| Tool | Purpose |
-|------|---------|
-| **Next.js 16** | Framework, routing, SSR, deployment |
-| **TypeScript** | Type safety across game engine + React |
-| **Tailwind CSS** | Styling for overlay UI |
-| **HTML5 Canvas** | Game rendering (tilemap, objects, sprites) |
-| **Framer Motion** | Popup enter/exit animations |
-| **Howler.js** | Audio playback (SFX, ambient) |
-| **Aseprite / LibreSprite** | Pixel art sprites — character, walls, floor, pedestals in use |
 
 ---
 
@@ -532,8 +570,39 @@ ctx.drawImage(playerSheet, srcX, srcY, 16, 16, screenX, screenY, TILE_SIZE, TILE
 | `GET /api/resume` | Reads the newest PDF in `public/assets/resume/`, parses it with `pdf-parse` into structured `ResumeData` (sections → entries → bullets), returns JSON. `force-dynamic`, so swapping the PDF needs no rebuild. Rendered by `overlays/ResumePopup.tsx`. |
 | `GET /api/transcript` | Same pattern for `public/assets/transcript/` — parses courses into subject groups (`TranscriptData`). Rendered by `overlays/TranscriptPopup.tsx`. |
 | `GET /api/jar/[...slug]` | Proxy for playable `.jar` demos. `slug[0]` is a **base64url-encoded** URL; only `https://github.com/<owner>/<repo>/releases/download/…` is allowed (otherwise 403). Forwards `Range` headers so the in-browser Java runner (`public/java-runner.html`) can stream the archive. |
+| `GET` · `POST /api/ghosts` | Anonymous visitor movement paths for the museum's "ghost" wisps. `POST` validates + per-IP rate-limits a path and stores it; `GET` returns the most-recent 15 (CDN-cached daily). Backed by **Upstash Redis** (REST API); **degrades to procedural wisps** when Upstash isn't configured. |
 
-Response types live in [`src/types/`](src/types/) and are shared by each route and its component.
+Response types live in [`src/types/`](src/types/) and are shared by each route and its component. Competitive-programming stats (LeetCode + DMOJ) and GitHub projects are **not** runtime routes — they're synced to static files by the daily GitHub Action (see below).
+
+---
+
+## Live Data, Deployment & Environment
+
+### Environment variables
+
+| Variable | Scope | Purpose |
+|----------|-------|---------|
+| `UPSTASH_REDIS_REST_URL` | server-only (Vercel + local `.env`) | Upstash Redis REST endpoint for ghost-trail storage. **Without it, ghosts fall back to procedural wisps** — the site still works. |
+| `UPSTASH_REDIS_REST_TOKEN` | server-only | Auth token for the above. **Never** prefix either with `NEXT_PUBLIC_`. In the Vercel dashboard, paste values **without** surrounding quotes. |
+| `GH_TOKEN` | local only | Lifts the GitHub API rate limit for `npm run sync:github` locally. The scheduled Action uses the built-in `GITHUB_TOKEN` and needs no secret. |
+
+### Daily data sync (GitHub Action)
+
+`.github/workflows/sync-github.yml` runs daily (and on demand via "Run workflow"), committing refreshed data so the live site reads it statically and never calls these APIs at runtime:
+
+- `npm run sync:github` → scans repos → `src/data/github.generated.ts` (Projects + Skills).
+- `npm run sync:cp-stats` → LeetCode + DMOJ → `src/data/cp-stats.generated.json` (with last-good fallback so a transient block never wipes the numbers).
+
+Both run from GitHub's IPs rather than the deployment's, sidestepping the Cloudflare bot-blocking LeetCode applies to datacenter IPs. See [`scripts/GITHUB_SYNC.md`](scripts/GITHUB_SYNC.md) for the project-sync knobs.
+
+### CI & dependencies
+
+- `.github/workflows/ci.yml` gates every PR (and pushes to `main`) on **typecheck + lint + tests**.
+- `.github/dependabot.yml` opens weekly batched update PRs; enable **Dependabot alerts + security updates** in repo Settings for advisory PRs.
+
+### Deploying to Vercel
+
+Import the repo (root directory = default), add the two `UPSTASH_*` vars for Production (unquoted, no `NEXT_PUBLIC_`), and deploy — the app degrades gracefully without them. Vercel Web Analytics + Speed Insights are wired in `layout.tsx`; enable them in the project dashboard.
 
 ---
 

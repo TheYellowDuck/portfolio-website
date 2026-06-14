@@ -1,7 +1,9 @@
-name: Sync GitHub projects
+name: Sync data (GitHub projects + CP stats)
 
-# Re-scans your repos and regenerates src/data/github.generated.ts. Runs daily and
-# on-demand. Uses the built-in GITHUB_TOKEN (public-repo read) — no secret to set up.
+# Re-scans your repos → src/data/github.generated.ts, and fetches LeetCode + DMOJ →
+# src/data/cp-stats.generated.json (from GitHub's IPs, which Cloudflare doesn't block
+# the way it can Vercel's). Runs daily and on-demand. Uses the built-in GITHUB_TOKEN
+# (public-repo read) for the repo scan — no secret to set up; the CP-stats fetch needs none.
 on:
   schedule:
     - cron: "0 6 * * *" # daily at 06:00 UTC
@@ -24,14 +26,20 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/sync-github.mjs
 
+      - name: Sync CP stats (LeetCode + DMOJ)
+        run: node scripts/sync-cp-stats.mjs
+
       - name: Commit if anything changed
         run: |
-          git add src/data/github.generated.ts public/videos
+          git add src/data/github.generated.ts src/data/cp-stats.generated.json public/videos
           if git diff --cached --quiet; then
             echo "No changes to project data or videos."
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: sync GitHub projects [skip ci]"
+            # No "[skip ci]" — that string makes Vercel skip the deploy, so the refreshed data would
+            # never reach the live site. This workflow only runs on schedule/dispatch (not on push),
+            # and GITHUB_TOKEN pushes don't trigger workflows, so there's no self-trigger loop.
+            git commit -m "chore: sync GitHub projects"
             git push
           fi

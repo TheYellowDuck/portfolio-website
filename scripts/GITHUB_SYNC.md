@@ -58,3 +58,11 @@ GitHub API ──> scripts/sync-github.mjs ──> src/data/github.generated.ts
 
 `github.generated.ts` is committed so the site builds without network access; the
 Action just keeps it fresh. Don't hand-edit it — use `overrides` instead.
+
+## Sibling: competitive-programming stats
+
+The same workflow also runs `scripts/sync-cp-stats.mjs` (`npm run sync:cp-stats`), which fetches
+LeetCode (GraphQL) + DMOJ into `src/data/cp-stats.generated.json` the same way — committed static
+data, refreshed daily, no token needed. Running it from GitHub's IPs (not the deployment's) avoids
+the Cloudflare bot-blocking LeetCode applies to datacenter IPs, and it keeps the last-good value if a
+fetch fails so a transient block never blanks the numbers.

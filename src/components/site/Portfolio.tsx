@@ -230,6 +230,10 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             Prefer to wander? Step inside the museum →
           </button>
         </div>
+        <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/35">
+          Inside the museum, your anonymous movement is briefly recorded so future visitors can watch it
+          drift by as a glowing wisp. No accounts, no personal data — just footsteps.
+        </p>
       </footer>
     </div>
   );

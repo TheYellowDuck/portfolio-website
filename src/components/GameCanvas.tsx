@@ -88,6 +88,11 @@ export default function GameCanvas({
   const onReadyRef   = useRef(onReady);
   useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   const engineRef    = useRef<GameEngine | null>(null);
+  // Per-session id so a visitor never sees their own ghost in the same session; submitted-once guard.
+  const [sessionId] = useState(() =>
+    typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+  );
+  const ghostSubmittedRef = useRef(false);
   const howlCache    = useRef<Map<string, Howl>>(new Map());
   const footstepHowls = useRef<Howl[]>([]);
   const scaleRef     = useRef(1);
@@ -228,6 +233,16 @@ export default function GameCanvas({
     update();
     mq.addEventListener?.("change", update);
     return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  // Honor prefers-reduced-motion for the drifting ghosts — freeze them to a quiet glow (and react if
+  // the user toggles the OS setting while the museum is open).
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => engineRef.current?.setGhostsReducedMotion(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
   }, []);
 
   // Touch users may never fire a key or canvas click — start music on first touch.
@@ -380,6 +395,14 @@ export default function GameCanvas({
     const engine = new GameEngine(canvas);
     engine.debugPhysics = false;
     engineRef.current = engine;
+    engine.setGhostsReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+    // Other visitors to replay as drifting ghosts (excluding this session). Falls back to procedural
+    // wanderers when there are none yet / the store isn't configured — the room is never empty.
+    fetch("/api/ghosts")
+      .then((r) => r.json())
+      .then((d) => engine.setGhosts(Array.isArray(d?.recordings) ? d.recordings : [], sessionId))
+      .catch(() => engine.setGhosts([], sessionId));
 
     engine.onFootstep = () => {
       if (!footstepHowls.current.length) {
@@ -494,7 +517,25 @@ export default function GameCanvas({
       musicStartedRef.current = false;
       bgMusicRef.current = null;
     };
-  }, []);
+  }, [sessionId]);
+
+  // Submit this session's recorded path once on leave — on unmount (leaving the museum) and on tab
+  // close (pagehide, via sendBeacon). Skipped if the visitor barely moved.
+  useEffect(() => {
+    const submit = () => {
+      if (ghostSubmittedRef.current) return;
+      const pts = engineRef.current?.getRecording();
+      if (!pts || pts.length < 6) return;
+      ghostSubmittedRef.current = true;
+      const body = JSON.stringify({ id: sessionId, pts });
+      try {
+        if (navigator.sendBeacon) navigator.sendBeacon("/api/ghosts", new Blob([body], { type: "application/json" }));
+        else fetch("/api/ghosts", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
+      } catch { /* best-effort */ }
+    };
+    window.addEventListener("pagehide", submit);
+    return () => { window.removeEventListener("pagehide", submit); submit(); };
+  }, [sessionId]);
 
   // Fade the engine player in/out (the portal fades the world in first, then the
   // player). Tweens engine.playerAlpha directly — no React re-renders per frame.
