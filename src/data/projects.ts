@@ -171,6 +171,22 @@ export const officeExhibits: Exhibit[] = [
       description: "Snowboarding and skiing in winter, climbing and hiking the rest of the year, and travelling somewhere new whenever I can — usually chasing good coffee and food along the way. Otherwise: board games and chess, a rotating lineup of film and anime, books, music, and building games and little open-source side projects for the fun of it.",
     },
   },
+  {
+    popup: {
+      title: "Skills",
+      description: "The full toolkit behind everything here — languages, frameworks, tools, and the concepts the projects are built on.",
+      skills: skillsExhibits
+        .map((e) => ({ category: e.popup?.title ?? "", items: e.popup?.tech ?? [] }))
+        .filter((g) => g.category && g.items.length > 0),
+    },
+  },
+  {
+    popup: {
+      title: "The Grind",
+      description: "Competitive programming — a few hundred problems deep across LeetCode, the Canadian Computing Competition (CCC), and DMOPC.",
+      width: "700px",
+    },
+  },
 ];
 
 // Tile 15 — GIFT SHOP / CONTACT

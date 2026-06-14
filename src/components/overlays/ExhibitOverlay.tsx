@@ -6,6 +6,7 @@ import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
 import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
+import CpStats from "@/components/CpStats";
 
 // YouTube embeds don't autoplay/loop without params — add them so the popup video
 // plays muted on a loop (like the card preview); viewers can unmute via the controls.
@@ -110,7 +111,11 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 taller than the viewport — keeping the header reachable instead of clipped above. */}
             <div className="flex min-h-full justify-center p-2 sm:p-4">
               <motion.div
-                key="popup"
+                // Key on the popup identity so swapping one popup straight to another (e.g. the
+                // queued curator's note after closing an exhibit) remounts the card and plays its
+                // enter animation, instead of a flat in-place content swap. The backdrop key is
+                // constant, so the dim persists across the swap (no flash).
+                key={popup.title ?? "exhibit"}
                 ref={modalRef}
                 tabIndex={-1}
                 role="dialog"
@@ -167,15 +172,45 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                           <iframe src={embedSrc(popup.embedUrl ?? "")} className="shrink-0 w-full aspect-video border-0 bg-black"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" />
                         ) : null}
+                        {/* Live LeetCode + DMOJ stats for the Competitive Programming / The Grind exhibits. */}
+                        {/competitive programming|the grind/i.test(popup.title ?? "") && (
+                          <div className="px-5 pt-4">
+                            <CpStats />
+                          </div>
+                        )}
                         {popup.description && (
                           <p className="m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
                             {popup.description}
                           </p>
                         )}
+                        {/* The "Skills" exhibit shows its grouped skills as the main content
+                            (full width, by category) rather than in the narrow side column. */}
+                        {popup.title === "Skills" && popup.skills && (
+                          <div className="flex flex-col gap-4 px-5 pb-4">
+                            {popup.skills.map((group, i) => {
+                              const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
+                              return (
+                                <div key={group.category}>
+                                  <h3 className="m-0 mb-2 font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: c.solid }}>
+                                    {group.category}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {group.items.map((item) => (
+                                      <span key={item} className="font-mono text-[11px] text-walnut/85 rounded border px-2 py-0.5" style={{ background: c.bg, borderColor: c.border }}>
+                                        {item}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                       {/* Right — skills column: a horizontal tag row when stacked, a separately-
-                          scrolling side column only when roomy */}
-                      {(popup.tech?.length || popup.skills?.length) ? (
+                          scrolling side column only when roomy. The "Skills" exhibit renders its
+                          skills as main content above, so it has no side column. */}
+                      {popup.title !== "Skills" && (popup.tech?.length || popup.skills?.length) ? (
                         <div className="shrink-0 w-full roomy:w-48 flex flex-row roomy:flex-col flex-wrap roomy:flex-nowrap gap-1.5 px-5 roomy:px-4 py-4 border-t roomy:border-t-0 roomy:border-l border-[rgb(var(--c-line-rgb)_/_0.1)] roomy:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                           {!popup.skills?.length && popup.tech?.map((t) => (
                             <span key={t} className="font-mono text-[11px] text-pine bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.5)] rounded px-2 py-0.5">

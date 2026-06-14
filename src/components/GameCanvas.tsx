@@ -52,6 +52,9 @@ const CURATOR_REWARD: ExhibitPopup = {
   ],
 };
 
+// A breath back in the museum between consecutive popups, so queued ones don't appear back-to-back.
+const POPUP_GAP_MS = 700;
+
 interface GameCanvasProps {
   /** Fires once the engine's sprites are loaded and the world is ready. */
   onReady?: () => void;
@@ -116,6 +119,11 @@ export default function GameCanvas({
   // the last exhibit's popup is closed.
   const [curatorGlow, setCuratorGlow] = useState(false);
   const rewardPendingRef = useRef(false);
+  // Single-popup stage with a queue: only one exhibit popup shows at a time; the rest (including
+  // the curator's note) wait their turn so none overwrites another. activePopupRef mirrors
+  // activePopup for the engine's event callback; queueRef holds what's waiting.
+  const activePopupRef = useRef<ExhibitPopup | null>(null);
+  const queueRef = useRef<ExhibitPopup[]>([]);
 
   // Layout is driven by direct DOM mutation — no setState means no cascading renders.
   // Compute zoom + render base from the current viewport: cap on-screen zoom at
@@ -254,6 +262,7 @@ export default function GameCanvas({
         setDiscoveredCount(discoveredRef.current.size);
         saveDiscovered(discoveredRef.current);
         rewardPendingRef.current = false;
+        activePopupRef.current = CURATOR_REWARD;
         setCuratorGlow(true);
         setActivePopup(CURATOR_REWARD);
         engineRef.current?.setPaused(true);
@@ -280,27 +289,47 @@ export default function GameCanvas({
     };
   }, []);
 
+  // Display a popup now: mirror it to the ref, pause the world, hide the HUD, and (for the note)
+  // bloom the curator glow. The queue decides *whether* to show now or wait — see below.
+  const present = useCallback((popup: ExhibitPopup) => {
+    activePopupRef.current = popup;
+    setActivePopup(popup);
+    setPrompt(null);
+    setShowControls(false);
+    if (popup === CURATOR_REWARD) setCuratorGlow(true);
+    engineRef.current?.setPaused(true);
+  }, []);
+  // Stable handle so the engine's one-time onEvent closure can present without re-running setup.
+  const presentRef = useRef(present);
+
   const handleClose = useCallback(() => {
-    // Closing the final exhibit drops you back into the museum, "lamps warm up", and
-    // then the curator's note pops up after a short beat. Closing the note returns as
-    // normal.
-    if (rewardPendingRef.current) {
-      rewardPendingRef.current = false;
-      setActivePopup(null);
-      engineRef.current?.setPaused(false);
-      // After a beat back in the museum, the lamps warm up AND the note blooms in
-      // together. The glow then holds — it's cleared only when the note is closed.
-      window.setTimeout(() => {
-        setCuratorGlow(true);
-        setActivePopup(CURATOR_REWARD);
-        engineRef.current?.setPaused(true);
-      }, 1500);
-      return;
-    }
+    activePopupRef.current = null;
     setActivePopup(null);
     setCuratorGlow(false);   // closing the note (or any popup) clears the warm glow
+
+    // Completing the museum: the curator's note reveals after a beat in the gallery. If the player
+    // opens anything during that beat it shows first and the note falls in behind it (queued); if
+    // the note is already up, a newly-opened popup waits behind it. Either way nothing is lost.
+    if (rewardPendingRef.current) {
+      rewardPendingRef.current = false;
+      window.setTimeout(() => {
+        if (activePopupRef.current) queueRef.current.push(CURATOR_REWARD);
+        else present(CURATOR_REWARD);
+      }, 1500);
+    }
+
+    // Hand control back for a beat, then bring the next queued popup in — a gap between popups
+    // rather than back-to-back. If the player opens something during the gap, the queued one falls
+    // in behind it (re-queued).
     engineRef.current?.setPaused(false);
-  }, []);
+    const next = queueRef.current.shift();
+    if (next) {
+      window.setTimeout(() => {
+        if (activePopupRef.current) queueRef.current.push(next);
+        else present(next);
+      }, POPUP_GAP_MS);
+    }
+  }, [present]);
 
   // NPC dialog: advance to the next line, or close (and unpause) on the last.
   const advanceDialog = useCallback(() => {
@@ -389,10 +418,9 @@ export default function GameCanvas({
             howl.play();
           }
           if (exhibit.popup) {
-            setActivePopup(exhibit.popup);
-            setPrompt(null);
-            setShowControls(false);
-            engine.setPaused(true);
+            // Show now, or queue behind whatever's already open (the queue prevents races).
+            if (activePopupRef.current) queueRef.current.push(exhibit.popup);
+            else presentRef.current(exhibit.popup);
             // Mark this exhibit discovered (persisted).
             const slug = slugForPopup(exhibit.popup);
             if (slug && !discoveredRef.current.has(slug)) {

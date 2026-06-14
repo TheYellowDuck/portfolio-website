@@ -17,6 +17,7 @@ import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
 import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
 import Masonry from "./Masonry";
+import CpStats from "@/components/CpStats";
 import { useIsMac } from "@/lib/use-is-mac";
 
 interface PortfolioProps {
@@ -158,6 +159,12 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
               </Reveal>
             )];
           })} />
+      </Section>
+
+      {/* ── Competitive Programming — live stats from LeetCode + DMOJ ── */}
+      <Section id="competitive" eyebrow="The Grind" title="Competitive Programming"
+        intro="Problem-solving, pulled live from LeetCode and DMOJ.">
+        <Reveal><CpStats /></Reveal>
       </Section>
 
       {/* ── About ── */}
