@@ -149,12 +149,17 @@ export function GET(request: Request): Response {
     })
     .join(`\n\n${HR}\n\n`);
 
-  // ── Honors & Awards (each résumé bullet is "Title | detail") ──
-  const honors = (resumeData.sections.find((s) => /award|achievement|honou?r/i.test(s.title))?.bullets ?? [])
-    .map((b, i) => {
+  // ── Honors & Awards (curated résumé awards + scholarships from the transcript footer) ──
+  const awardBullets = resumeData.sections.find((s) => /award|achievement|honou?r/i.test(s.title))?.bullets ?? [];
+  const honorEntries: { title: string; detail?: string }[] = [
+    ...awardBullets.map((b) => {
       const [title, detail] = b.split(/\s*\|\s*/);
-      return `[${i + 1}] ${title}${detail ? `\n    ${detail}` : ""}`;
-    })
+      return { title, detail };
+    }),
+    ...(transcriptData.scholarships ?? []).map((title) => ({ title })),
+  ];
+  const honors = honorEntries
+    .map((e, i) => `[${i + 1}] ${e.title}${e.detail ? `\n    ${e.detail}` : ""}`)
     .join("\n\n");
 
   // ── Courses (academic subjects, technical first; PD/COOP work-terms aren't real courses) ──

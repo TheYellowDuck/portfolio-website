@@ -13,21 +13,27 @@ import {
   type ExhibitPopup,
 } from "@/data/projects";
 import resumeJson from "@/data/resume.generated.json";
+import transcriptJson from "@/data/transcript.generated.json";
 import cpStats from "@/data/cp-stats.generated.json";
 import type { ResumeData } from "@/types/resume";
+import type { TranscriptData } from "@/types/transcript";
 import { PERSON, requestOrigin, SITE_DESCRIPTION } from "@/lib/site";
 
 // Pull the high-signal extras (education, awards, competitive-programming numbers) out of the
 // build-time-parsed résumé + CP data, so the brief leads with what recruiters scan for.
 const resumeData = resumeJson as ResumeData;
+const transcriptData = transcriptJson as TranscriptData;
 const eduSection = resumeData.sections.find((s) => /education/i.test(s.title));
 const education = (eduSection?.entries ?? [])
   .map((e) => `- ${e.title}${e.subtitle ? ` — ${e.subtitle}` : ""}${e.period ? ` (${e.period})` : ""}`)
   .join("\n");
 const awardsSection = resumeData.sections.find((s) => /award|achievement|honou?r/i.test(s.title));
-const awards = (awardsSection?.bullets ?? [])
-  .map((b) => `- ${b.replace(/\s*\|\s*/, " — ")}`)
-  .join("\n");
+// Merge the curated résumé awards with the scholarships pulled from the transcript footer.
+const awardItems = [
+  ...(awardsSection?.bullets ?? []).map((b) => b.replace(/\s*\|\s*/, " — ")),
+  ...(transcriptData.scholarships ?? []),
+];
+const awards = awardItems.map((a) => `- ${a}`).join("\n");
 const cp = [
   cpStats.leetcode &&
     `- LeetCode: ${cpStats.leetcode.total} solved (${cpStats.leetcode.easy} easy · ${cpStats.leetcode.medium} medium · ${cpStats.leetcode.hard} hard)`,
@@ -88,7 +94,7 @@ export function GET(request: Request): Response {
     deployed.length ? `- Shipped & deployed products: ${deployed.join(", ")}.` : "",
     featuredPopups.length ? `- ${featuredPopups.length} featured projects${areas.length ? `, spanning ${areas.slice(0, 8).join(", ")}` : ""}.` : "",
     cpTotal ? `- ${cpTotal}+ competitive-programming problems solved across LeetCode + DMOJ.` : "",
-    awards ? `- ${awardsSection?.bullets?.length ?? 0} competition honors incl. ICPC, AIME, RoboCup.` : "",
+    awardItems.length ? `- ${awardItems.length} honors & scholarships — incl. ICPC, AIME, RoboCup & the President's Scholarship of Distinction.` : "",
   ].filter(Boolean).join("\n");
 
   const body = `# ${PERSON.name} — ${PERSON.jobTitle}

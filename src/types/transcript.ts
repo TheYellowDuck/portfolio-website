@@ -24,5 +24,7 @@ export interface TranscriptData {
   currentLevel?: string;
   currentFormOfStudy?: string;
   groups: SubjectGroup[];
+  /** Scholarships & awards from the transcript footer, e.g. "… Scholarship of Distinction (2025)". */
+  scholarships?: string[];
   pdfPath: string;
 }

@@ -23,10 +23,13 @@ const COURSE_START_RE   = /^([A-Z]{2,6})\s+(\d{1,4}[A-Z]?)\s+(.*)/;
 const TERM_HEADER_RE    = /^(Fall|Winter|Spring|Summer)\s+(\d{4})$/;
 const LEVEL_RE          = /^Level:\s+(\w+)\s+Form Of Study:\s+(.+)/;
 const PROGRAM_RE        = /^Program:\s+(.+)/;
-// Footer sections printed after all courses (Milestones, Scholarships & Awards, "End of … Transcript").
-// Stop parsing courses here so their text isn't swallowed into the last course's title. A multi-page
-// transcript's "-- 1 of 2 --" page break is deliberately NOT a terminator.
-const TRANSCRIPT_END_RE = /^(Milestones|Scholarships?\s+and\s+Awards|End of\b.*Transcript)/i;
+// Footer sections printed after all courses: Milestones, then Scholarships & Awards, then "End of …
+// Transcript". Stop parsing courses at the footer so its text isn't swallowed into the last course's
+// title, but capture the scholarships. A multi-page "-- 1 of 2 --" page break is NOT a terminator.
+const FOOTER_START_RE       = /^(Milestones|Scholarships?\s+and\s+Awards)\b/i;
+const SCHOLARSHIP_HEADER_RE = /^Scholarships?\s+and\s+Awards/i;
+const TRANSCRIPT_END_RE     = /^End of\b.*Transcript/i;
+const SCHOLARSHIP_RE        = /^(\d{4})\s+(.+)/; // a footer line like "2025 … Scholarship of Distinction"
 
 const TRAIL_WITH_GRADE_RE =
   /\s+(\d+\.\d{2})\s+(\d+\.\d{2})\s+(?:\d{1,3}|CR|NCR|DNW|WD|WF)\s*$/;
@@ -59,6 +62,10 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
 
   let currentParserTerm: string | undefined;
 
+  const scholarships: string[] = [];
+  let inFooter = false;
+  let inScholarships = false;
+
   function flush() {
     if (!pending) return;
     const title = pending.titleParts.join(" ").trim();
@@ -75,8 +82,24 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
   }
 
   for (const line of lines) {
-    // Past the last course a footer section begins — stop before it bleeds into a course title.
+    // End of the transcript — stop entirely.
     if (TRANSCRIPT_END_RE.test(line)) { flush(); break; }
+
+    // A footer section begins after the last course (Milestones, then Scholarships & Awards). Stop
+    // course parsing so it doesn't bleed into the last course's title; capture the scholarships.
+    if (FOOTER_START_RE.test(line)) {
+      flush();
+      inFooter = true;
+      inScholarships = SCHOLARSHIP_HEADER_RE.test(line);
+      continue;
+    }
+    if (inFooter) {
+      if (inScholarships) {
+        const m = line.match(SCHOLARSHIP_RE);
+        if (m) scholarships.push(`${m[2].trim()} (${m[1]})`);
+      }
+      continue;
+    }
 
     // Term header
     const termMatch = line.match(TERM_HEADER_RE);
@@ -174,5 +197,8 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
       courses: cs.sort((a, b) => a.code.localeCompare(b.code)),
     }));
 
-  return { program, startTerm, currentTerm, currentLevel, currentFormOfStudy, groups };
+  return {
+    program, startTerm, currentTerm, currentLevel, currentFormOfStudy, groups,
+    scholarships: scholarships.length ? scholarships : undefined,
+  };
 }
