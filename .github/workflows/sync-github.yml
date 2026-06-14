@@ -29,9 +29,16 @@ jobs:
       - name: Sync CP stats (LeetCode + DMOJ)
         run: node scripts/sync-cp-stats.mjs
 
+      # sync:docs needs pdf-parse, so install deps first (the other sync scripts are dependency-free).
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync docs (résumé + transcript PDFs → JSON)
+        run: npm run sync:docs
+
       - name: Commit if anything changed
         run: |
-          git add src/data/github.generated.ts src/data/cp-stats.generated.json public/videos
+          git add src/data/github.generated.ts src/data/cp-stats.generated.json src/data/resume.generated.json src/data/transcript.generated.json public/videos
           if git diff --cached --quiet; then
             echo "No changes to project data or videos."
           else

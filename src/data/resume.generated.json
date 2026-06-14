@@ -1,0 +1,116 @@
+{
+  "name": "George Zhang",
+  "contact": {
+    "phone": "(778) 682-9123",
+    "email": "gzhang06@outlook.com",
+    "linkedin": "linkedin.com/in/iamgeorgezhang/",
+    "github": "https://github.com/TheYellowDuck"
+  },
+  "sections": [
+    {
+      "title": "SKILLS",
+      "bullets": [
+        "Languages: Python, Java, C/C++, Kotlin, HTML, SQL",
+        "Frameworks & Libraries: OpenCV, MediaPipe, Numpy, Android SDK, Room Persistence Library",
+        "Tools & Platforms: Git, Linux, Google Play Console, Android Studio",
+        "Concepts: Algorithms & Data Structures, Object-Oriented Design, Computer Vision, Full-Stack Development"
+      ]
+    },
+    {
+      "title": "EDUCATION",
+      "entries": [
+        {
+          "title": "University of Waterloo",
+          "period": "Sep 2024 – May 2029",
+          "bullets": [],
+          "subtitle": "Bachelor of Computer Science",
+          "location": "Waterloo, ON"
+        }
+      ]
+    },
+    {
+      "title": "WORK EXPERIENCE",
+      "entries": [
+        {
+          "title": "Undergraduate Research Assistant",
+          "period": "Jun 2025 – Aug 2025",
+          "bullets": [
+            "Took charge of the development of two full-stack applications including HandEase and Palm & Plant to assist in Parkinson's rehabilitation, projecting to aid medically patients in hospitals across 10+ countries.",
+            "Developed a computer vision pipeline using Python, OpenCV, and MediaPipe – AI hand library to detect and collect rehabilitation data on 7 hand exercise gestures of patients, resulting in ~90% accuracy for medical analysis.",
+            "Optimized Apps to run in real time (<100ms latency) on local hardware, delivering immediate results and feedback to create polished and consistent user experiences.",
+            "Designed dashboards with activity heatmap and daily metrics using Python to improve monitoring efficiency for practitioners by 30% and streamline long-term medical care for patients.",
+            "Led end-to-end project lifecycle from requirements, development, testing, and deployment, which was presented in the 11th Singapore International Parkinson Disease & Movement Disorders Symposium.",
+            "Engineered 10 applications with 4 team members and updated weekly progress to clinicians at the Djavad Mowafaghian Centre for Brain Health, receiving positive reviews."
+          ],
+          "subtitle": "University of British Columbia",
+          "location": "Vancouver, BC"
+        },
+        {
+          "title": "Math & Reading Instructor",
+          "period": "Aug 2021 – May 2024",
+          "bullets": [
+            "Invited by Kumon Supervisor to join their team due to outstanding performance in Math and Literature",
+            "Mentored 100+ students in math/reading, marked their homework, adapted lessons to individual needs, and provided optimal and precise guidance",
+            "Managed class flow and delivered feedback according to students personal understanding and performance, leading to students’ significant improvement in tests and classroom behavior"
+          ],
+          "subtitle": "Kumon Inc.",
+          "location": "Vancouver, BC"
+        }
+      ]
+    },
+    {
+      "title": "PROJECTS",
+      "entries": [
+        {
+          "title": "My Fridge App",
+          "tech": [
+            "Kotlin",
+            "Android SDK",
+            "Room Database"
+          ],
+          "period": "Jun 2023 – Aug 2023",
+          "bullets": [
+            "Designed an Android application managing fridge inventory and published on Google Play, reducing food waste by 20% and inducing healthy eating habits.",
+            "Implemented Room DB + push notifications reminding users of expiry dates and track shopping lists with >95% reliability, constructing efficient food usage and enhancing shopping experiences."
+          ]
+        },
+        {
+          "title": "RoboCup Junior Maze Rescue - Captain",
+          "tech": [
+            "Python",
+            "OpenMV",
+            "LiDAR",
+            "Algorithms"
+          ],
+          "period": "Jun 2022 – Jul 2023",
+          "bullets": [
+            "Architected a prioritized maze navigation algorithm with modified Dijkstra’s and LiDAR-based positioning for multi-level point-based maps.",
+            "Facilitated CV logic for letter and color detection with >90% accuracy, reacting to maze events effectively.",
+            "Designed a robot achieving 85% maze success rate and completing runs <2 mins, which led team to place 2nd in the Supergroup Category and 17th in the Individual Component out of 50+ teams at RoboCup International 2023."
+          ]
+        },
+        {
+          "title": "Game Development Portfolio",
+          "tech": [
+            "Java"
+          ],
+          "period": "Feb 2021 – Jul 2022",
+          "bullets": [
+            "Created 3 Java games of ~3000 LOC to strengthen OOP/design skills, and implemented DFS group capture for Go, randomized cascade reveal for Minesweeper, and custom 2D physics in platformer parkour game."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "AWARDS AND ACHIEVEMENTS",
+      "bullets": [
+        "International Collegiate Programming Contest Local Competition (Waterloo) | Rank 28 out of ~100",
+        "RoboCup International Junior Maze Rescue | 2nd Place Supergroup, 17th Individual",
+        "Avogadro’s Chemistry Contest | Certificate of Distinction",
+        "AIME (American Invitational Mathematics Examination) Qualifier (top >10% of 150,000)",
+        "COMC (Canadian Open Mathematics Challenge) Distinction"
+      ]
+    }
+  ],
+  "pdfPath": "/assets/resume/George Zhang Resume - V8.pdf"
+}
