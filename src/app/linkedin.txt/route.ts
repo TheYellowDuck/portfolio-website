@@ -6,8 +6,6 @@
 // Not linked from the UI and marked noindex: it's a personal utility, not content.
 import {
   mainHallExhibits,
-  archiveExhibits,
-  skillsExhibits,
   experienceExhibits,
   officeExhibits,
   type ExhibitPopup,
@@ -104,8 +102,8 @@ export function GET(request: Request): Response {
     })
     .join(`\n\n${HR}\n\n`);
 
-  // ── Projects (featured + archive) ──
-  const projects = popups([...mainHallExhibits, ...archiveExhibits])
+  // ── Projects (featured only — the sync's top-scored work; the archive is left off) ──
+  const projects = popups(mainHallExhibits)
     .filter((p) => p.title)
     .map((p, i) => {
       const url = primaryLink(p);
@@ -121,17 +119,17 @@ export function GET(request: Request): Response {
     })
     .join(`\n\n${HR}\n\n`);
 
-  // ── Skills (flatten the site's aggregate skill groups, de-dupe, cap 50) ──
-  const seen = new Set<string>();
-  const allSkills: string[] = [];
-  for (const g of popups(skillsExhibits)) {
-    for (const s of g.tech ?? []) {
-      const k = s.toLowerCase();
-      if (!seen.has(k)) { seen.add(k); allSkills.push(s); }
-    }
-  }
-  const skillList = allSkills
-    .slice(0, 50)
+  // ── Skills (curated for LinkedIn) ──
+  // The highest-signal skills under LinkedIn's exact (autocomplete-matching) names, in priority
+  // order — the first 3 become the pinned skills. A tight ~22 beats all 50; the long tail
+  // (Processing, SDL2, Make, R, …) is real but low-signal for recruiter search, so it's left off.
+  const skillList = [
+    "Python", "Java", "C++", "Computer Vision", "Machine Learning",
+    "Data Structures", "Algorithms", "TypeScript", "JavaScript", "React.js",
+    "Next.js", "Android Development", "Kotlin", "Object-Oriented Programming (OOP)",
+    "REST APIs", "Full-Stack Development", "Game Development", "NumPy", "PyTorch",
+    "Tailwind CSS", "Git", "C (Programming Language)",
+  ]
     .map((s, i) => `${String(i + 1).padStart(2, " ")}. ${s}`)
     .join("\n");
 
@@ -162,12 +160,12 @@ export function GET(request: Request): Response {
     .map((e, i) => `[${i + 1}] ${e.title}${e.detail ? `\n    ${e.detail}` : ""}`)
     .join("\n\n");
 
-  // ── Courses (academic subjects, technical first; PD/COOP work-terms aren't real courses) ──
-  const TECH = ["CS", "MATH", "STAT", "CO", "PHYS"];
+  // ── Courses (just the technical core — CS/MATH/STAT/CO; breadth electives left off) ──
+  const TECH = ["CS", "MATH", "STAT", "CO"];
   const cleanTitle = (t?: string) => (t ?? "").replace(/\s+/g, " ").trim().slice(0, 72);
   const courses = [...transcriptData.groups]
-    .filter((g) => !["PD", "COOP"].includes(g.subject))
-    .sort((a, b) => (TECH.indexOf(a.subject) + 1 || 99) - (TECH.indexOf(b.subject) + 1 || 99))
+    .filter((g) => TECH.includes(g.subject))
+    .sort((a, b) => TECH.indexOf(a.subject) - TECH.indexOf(b.subject))
     .flatMap((g) =>
       g.courses.map((c) => `- ${c.code}${c.title ? ` — ${cleanTitle(c.title)}` : ""}${c.inProgress ? " (in progress)" : ""}`),
     )
