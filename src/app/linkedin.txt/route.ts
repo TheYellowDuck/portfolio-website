@@ -6,6 +6,7 @@
 // Not linked from the UI and marked noindex: it's a personal utility, not content.
 import {
   mainHallExhibits,
+  skillsExhibits,
   experienceExhibits,
   officeExhibits,
   type ExhibitPopup,
@@ -119,18 +120,52 @@ export function GET(request: Request): Response {
     })
     .join(`\n\n${HR}\n\n`);
 
-  // ── Skills (curated for LinkedIn) ──
-  // The highest-signal skills under LinkedIn's exact (autocomplete-matching) names, in priority
-  // order — the first 3 become the pinned skills. A tight ~22 beats all 50; the long tail
-  // (Processing, SDL2, Make, R, …) is real but low-signal for recruiter search, so it's left off.
-  const skillList = [
+  // ── Skills (curated from the live synced skills — dynamic, not a frozen list) ──
+  // Rename to LinkedIn's exact (autocomplete-matching) names, order by recruiter value (first 3
+  // pin), drop low-signal build tooling, and cap the count. Anything new you pick up flows through
+  // (appended after the prioritized set), so this tracks the site's skills instead of being hardcoded.
+  const SKILL_RENAME: Record<string, string[]> = {
+    C: ["C (Programming Language)"],
+    React: ["React.js"],
+    Tailwind: ["Tailwind CSS"],
+    "OOP & Design Patterns": ["Object-Oriented Programming (OOP)"],
+    "Algorithms & DS": ["Data Structures", "Algorithms"],
+    "Mobile Development": ["Android Development"],
+    "Backend / APIs": ["REST APIs"],
+    "Web Development": ["Full-Stack Development"],
+  };
+  const SKILL_PRIORITY = [
     "Python", "Java", "C++", "Computer Vision", "Machine Learning",
     "Data Structures", "Algorithms", "TypeScript", "JavaScript", "React.js",
     "Next.js", "Android Development", "Kotlin", "Object-Oriented Programming (OOP)",
     "REST APIs", "Full-Stack Development", "Game Development", "NumPy", "PyTorch",
     "Tailwind CSS", "Git", "C (Programming Language)",
-  ]
-    .map((s, i) => `${String(i + 1).padStart(2, " ")}. ${s}`)
+  ];
+  const SKILL_DROP = new Set(["Processing", "Swing", "SDL2", "Make", "CMake", "pip", "ESLint", "Vitest", "Gradle", "Framer Motion", "R"]);
+  const SKILL_CAP = 26;
+
+  const skillSeen = new Set<string>();
+  const liveSkills: string[] = [];
+  for (const g of popups(skillsExhibits)) {
+    for (const raw of g.tech ?? []) {
+      for (const name of SKILL_RENAME[raw] ?? [raw]) {
+        const k = name.toLowerCase();
+        if (!skillSeen.has(k) && !SKILL_DROP.has(name)) {
+          skillSeen.add(k);
+          liveSkills.push(name);
+        }
+      }
+    }
+  }
+  const skillRank = (s: string) => {
+    const i = SKILL_PRIORITY.indexOf(s);
+    return i === -1 ? SKILL_PRIORITY.length : i;
+  };
+  const skillList = liveSkills
+    .map((s, i) => ({ s, i }))
+    .sort((a, b) => skillRank(a.s) - skillRank(b.s) || a.i - b.i) // priority first, else synced order
+    .slice(0, SKILL_CAP)
+    .map(({ s }, i) => `${String(i + 1).padStart(2, " ")}. ${s}`)
     .join("\n");
 
   // ── Education ──
