@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { readFileSync, readdirSync } from "fs";
 import path from "path";
-import { PDFParse } from "pdf-parse";
 import type { TranscriptData } from "@/types/transcript";
 import { parseTranscript } from "@/lib/transcript-parser";
 
@@ -36,8 +35,11 @@ async function fetchCourseDescriptions(subjects: string[]): Promise<Map<string, 
   return map;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Imported dynamically inside the try (see the resume route) so a serverless load failure of
+    // pdf-parse/pdfjs-dist is caught and surfaced as JSON instead of crashing the function.
+    const { PDFParse } = await import("pdf-parse");
     const dir      = path.join(process.cwd(), "public/assets/transcript");
     const fileName = readdirSync(dir).find((f) => f.toLowerCase().endsWith(".pdf"));
     if (!fileName) return NextResponse.json({ error: "No transcript PDF found" }, { status: 404 });
@@ -62,6 +64,10 @@ export async function GET() {
     } satisfies TranscriptData);
   } catch (err) {
     console.error("Transcript parse error:", err);
-    return NextResponse.json({ error: "Failed to parse transcript" }, { status: 500 });
+    const debug = new URL(request.url).searchParams.has("debug");
+    return NextResponse.json(
+      { error: "Failed to parse transcript", ...(debug ? { detail: err instanceof Error ? `${err.name}: ${err.message}` : String(err) } : {}) },
+      { status: 500 },
+    );
   }
 }
