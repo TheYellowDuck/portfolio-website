@@ -7,15 +7,16 @@
 //
 // ROOM ARRAYS  →  where they appear in the museum
 // ─────────────────────────────────────────────────────────
-//   lobbyExhibits       Lobby / entrance
-//   mainHallExhibits    Main hall — featured projects
-//   skillsExhibits      Skills & tech wing
-//   archiveExhibits     Archive — side / older projects
-//   experienceExhibits  Work experience wing
-//   officeExhibits      Office — about me
-//   giftShopExhibits    Gift shop — contact links
-//   easterEggExhibits   Hidden easter eggs
-//   resumeExhibit       Standalone resume pedestal
+//   experienceExhibits  Work experience wing       (hand-written)
+//   officeExhibits      Office — about me           (hand-written)
+//   giftShopExhibits    Gift shop — contact links   (hand-written)
+//   resumeExhibit       Standalone resume pedestal  (hand-written)
+//   easterEggExhibits   Hidden easter eggs          (hand-written)
+//   lobbyExhibits       Lobby / entrance            (hand-written)
+//
+//   mainHallExhibits    Main hall — featured projects   ┐ AUTO-GENERATED from GitHub
+//   archiveExhibits     Archive — side / older projects ├ by the daily sync. DON'T hand-edit
+//   skillsExhibits      Skills & tech wing              ┘ (use the sync config's `overrides`).
 //
 // ============================================================
 // EXHIBIT SHAPE
@@ -37,7 +38,8 @@
 //   embedUrl?:    string;          // renders an iframe in the popup
 //   width?:       string;          // e.g. "900px", "80vw"  (defaults provided)
 //   height?:      string;          // e.g. "600px", "70vh"
-//   type?:        "resume";        // special popup — shows the resume viewer
+//   videoUrl?:    string;          // autoplay-loop demo clip, e.g. "/videos/game.mp4"
+//   type?:        "resume" | "transcript";  // special popup — resume / transcript viewer
 // }
 
 // ============================================================
