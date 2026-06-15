@@ -1,8 +1,8 @@
 name: CI
 
-# Validates every PR (including Dependabot's) and pushes to the default branch with the same checks
-# you run locally — types, lint, tests. Vercel separately builds a preview, so this stays fast and
-# doesn't duplicate the full build. Merge a PR only when this is green.
+# Validates every PR (including Dependabot's) and pushes to the default branch — types, lint, tests,
+# and a full `next build`. The build makes this gate self-contained: a dependency that breaks the
+# build (not just types/lint/tests) is caught here, so auto-merge can't wave it through. Green = safe.
 on:
   pull_request:
   push:
@@ -27,3 +27,5 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Build
+        run: npm run build
