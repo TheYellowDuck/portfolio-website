@@ -119,13 +119,15 @@ export default function SiteShell() {
   }, [maybeStartBg]);
 
   // Begin entering the museum (the staged fade) — transition only, no history push.
-  const startEnter = useCallback(() => {
+  const startEnter = useCallback((instant = false) => {
     if (stage !== "site") return;
     scrollYRef.current = window.scrollY;
     gameReadyRef.current = false;
     fadeDoneRef.current = false;
     bgStartedRef.current = false;
-    if (reduceMotion) { setGameOn(true); setStage("game"); return; }
+    // `instant` (browser Back/Forward, incl. the mobile back-swipe) jumps straight to the game with
+    // no staged fade — the same path reduced-motion takes.
+    if (reduceMotion || instant) { setGameOn(true); setStage("game"); return; }
     setGameOn(false);   // fades to 1 on the next frame (in-fade effect)
     setStage("in-fade");
   }, [stage, reduceMotion]);
@@ -139,23 +141,32 @@ export default function SiteShell() {
     startEnter();
   }, [stage, startEnter]);
 
-  const exitGame = useCallback(() => {
+  const exitGame = useCallback((instant = false) => {
     if (stage === "site" || stage.startsWith("out")) return; // already on the site, or already leaving
-    if (reduceMotion) { setGameOn(false); setStage("site"); return; }
+    if (reduceMotion || instant) { setGameOn(false); setStage("site"); return; }
     setStage("out-hud");
   }, [stage, reduceMotion]);
 
   // The in-game Leave button goes through history.back() so it shares one path with the Back
   // button and the history stack stays consistent (and Forward can still re-enter afterwards).
-  const requestExitGame = useCallback(() => { window.history.back(); }, []);
+  // It flags the Back as button-initiated so the staged leave animation still plays for it, while a
+  // browser/device Back — including the mobile back-swipe — leaves instantly (no animation, and none
+  // of the staged-fade timers that a mid-swipe interruption could crash on).
+  const leaveAnimatedRef = useRef(false);
+  const requestExitGame = useCallback(() => { leaveAnimatedRef.current = true; window.history.back(); }, []);
 
   // Back/Forward across the museum entry → leave / re-enter the game. Direction comes from the
   // entry's own state: landing on the museum-marked entry enters, landing off it leaves. Each
   // call no-ops via its own stage guard when it doesn't apply (e.g. popup-hash navigation).
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {
-      if (e.state?.museum) startEnter();
-      else exitGame();
+      if (e.state?.museum) {
+        startEnter(true); // forward / re-enter via browser nav → instant
+      } else {
+        const animate = leaveAnimatedRef.current; // set only by our in-app Leave button
+        leaveAnimatedRef.current = false;
+        exitGame(!animate); // back-swipe / Back button → instant; Leave button → staged fade
+      }
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
