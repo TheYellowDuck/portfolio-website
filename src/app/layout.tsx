@@ -92,6 +92,11 @@ export default function RootLayout({
         <noscript>
           <style dangerouslySetInnerHTML={{ __html: ".reveal-anim{opacity:1!important;transform:none!important}.intro-curtain{display:none!important}" }} />
         </noscript>
+        {/* rel="me" — ties these profiles to this site so search/AI crawlers (and IndieWeb) treat
+            them as one identity; mirrors the JSON-LD sameAs below. */}
+        {PERSON.sameAs.map((u) => (
+          <link key={u} rel="me" href={u} />
+        ))}
       </head>
       <body className="min-h-full flex flex-col">
         <script

@@ -36,9 +36,13 @@ export const PERSON = {
   jobTitle: "Software Engineer · CS Student",
   alumniOf: "University of Waterloo",
   email: "gzhang06@outlook.com",
+  // Every profile that is "also me" — the strongest signal for search engines (and AI answer
+  // engines) to consolidate these into one entity. Surfaced as JSON-LD `sameAs` + <link rel="me">.
   sameAs: [
     "https://github.com/TheYellowDuck",
     "https://linkedin.com/in/iamgeorgezhang/",
+    "https://leetcode.com/u/georgezhang006/",
+    "https://dmoj.ca/user/georgezhang006",
   ],
 } as const;
 
