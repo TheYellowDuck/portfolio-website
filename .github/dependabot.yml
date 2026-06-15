@@ -1,38 +1,44 @@
 # Dependabot — automated dependency updates.
 #
-# Routine minor/patch bumps are batched into ONE weekly PR to keep noise low; major bumps arrive as
-# their own PRs so you can do them deliberately (read changelogs, test — never blanket-accept majors).
-# Your build / tsc / lint / tests validate each PR — merge the green ones.
+# Tuned for low noise: updates run MONTHLY and are batched into a few grouped PRs instead of one per
+# dependency. Routine minor/patch bumps land in one PR (safe to merge once CI is green); ALL major
+# bumps land together in a second PR so you can review the breaking ones deliberately — never blanket
+# -accept majors. GitHub Actions bumps are one PR too. Your build / tsc / lint / tests gate each PR.
 #
-# This file enables *version* updates. To also get advisory-driven *security* PRs (e.g. the current
-# Next.js App Router fix), turn on "Dependabot alerts" + "Dependabot security updates" once in
-# GitHub → repo Settings → Code security — those toggles can't be set from this file.
+# Security PRs are separate and advisory-driven — enable "Dependabot alerts" + "Dependabot security
+# updates" in GitHub → repo Settings → Code security (can't be set here). Those arrive as advisories
+# are disclosed, regardless of the monthly schedule below, so the cadence never delays a real fix.
 version: 2
 updates:
   # App dependencies (npm). Repo root is the Next.js app, so directory is "/".
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:00"
       timezone: America/Toronto
-    open-pull-requests-limit: 8
+    open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
     groups:
-      # One batched PR for all safe (non-major) updates; majors stay separate and deliberate.
       npm-minor-patch:
         applies-to: version-updates
         update-types:
           - minor
           - patch
+      npm-major:
+        applies-to: version-updates
+        update-types:
+          - major
 
-  # Keep the GitHub Actions used by the sync workflow current too (checkout, setup-node, …).
+  # Keep the GitHub Actions used by the sync/CI workflows current too (checkout, setup-node, …).
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     commit-message:
       prefix: "chore(actions)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
