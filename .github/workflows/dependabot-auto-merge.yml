@@ -1,0 +1,37 @@
+name: Dependabot auto-merge
+
+# Hands-off the *safe* Dependabot PRs. Once CI is green, auto-merge non-major updates (npm minor/patch
+# + GitHub Actions); MAJOR bumps are never auto-merged — you review those deliberately.
+#
+# The point: a PR that FAILS CI (e.g. ESLint 10 breaking `npm run lint`) never actually merges —
+# auto-merge waits for the required checks, so a broken update just sits there open + red for you to
+# look at, while the safe stuff merges itself. You only spend attention on the problems.
+#
+# Requires two one-time repo settings (see README / Settings):
+#   1. Settings → General → Pull Requests → "Allow auto-merge"  (ON)
+#   2. A branch-protection / ruleset on the default branch that REQUIRES the "check" CI job — without
+#      a required check, auto-merge has nothing to wait for and would merge immediately.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Non-major only. Majors (semver-major) fall through → left open for a human.
+      - name: Enable auto-merge for non-major updates
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
