@@ -20,6 +20,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
+    # ESLint 10 isn't supported by eslint-config-next yet — its bundled eslint-plugin-react still
+    # calls context.getFilename(), which ESLint 10 removed, so `npm run lint` crashes. Hold the major
+    # until the Next preset ships an ESLint-10-compatible release; minor/patch keep flowing.
+    ignore:
+      - dependency-name: "eslint"
+        update-types:
+          - "version-update:semver-major"
     groups:
       npm-minor-patch:
         applies-to: version-updates
