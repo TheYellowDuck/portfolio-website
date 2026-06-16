@@ -1,16 +1,15 @@
 name: Dependabot auto-merge
 
-# Hands-off the *safe* Dependabot PRs. Once CI is green, auto-merge non-major updates (npm minor/patch
-# + GitHub Actions); MAJOR bumps are never auto-merged — you review those deliberately.
+# Fully hands-off. Enable auto-merge on EVERY Dependabot PR — minor, patch, and major. GitHub then
+# merges each one the instant CI (the required `check` job) goes green. An update that FAILS CI (e.g.
+# ESLint 10, which crashes lint until eslint-config-next supports v10) simply stays open + red and
+# auto-merges itself the moment it turns green. So a branch only ever lingers while an update isn't
+# OK yet — exactly "update when it's good, otherwise wait."
 #
-# The point: a PR that FAILS CI (e.g. ESLint 10 breaking `npm run lint`) never actually merges —
-# auto-merge waits for the required checks, so a broken update just sits there open + red for you to
-# look at, while the safe stuff merges itself. You only spend attention on the problems.
-#
-# Requires two one-time repo settings (see README / Settings):
+# Requires two one-time repo settings, or nothing auto-merges:
 #   1. Settings → General → Pull Requests → "Allow auto-merge"  (ON)
-#   2. A branch-protection / ruleset on the default branch that REQUIRES the "check" CI job — without
-#      a required check, auto-merge has nothing to wait for and would merge immediately.
+#   2. A ruleset on the default branch that REQUIRES the "check" CI job (otherwise auto-merge has no
+#      check to wait for and would merge immediately).
 on: pull_request
 
 permissions:
@@ -22,15 +21,7 @@ jobs:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Dependabot metadata
-        id: meta
-        uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Non-major only. Majors (semver-major) fall through → left open for a human.
-      - name: Enable auto-merge for non-major updates
-        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+      - name: Enable auto-merge (GitHub merges it once CI is green)
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}

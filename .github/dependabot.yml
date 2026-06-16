@@ -1,9 +1,12 @@
 # Dependabot — automated dependency updates.
 #
-# Tuned for low noise: updates run MONTHLY and are batched into a few grouped PRs instead of one per
-# dependency. Routine minor/patch bumps land in one PR (safe to merge once CI is green); ALL major
-# bumps land together in a second PR so you can review the breaking ones deliberately — never blanket
-# -accept majors. GitHub Actions bumps are one PR too. Your build / tsc / lint / tests gate each PR.
+# Low-touch: updates run MONTHLY. Minor/patch batch into one PR and GitHub Actions into another, but
+# each MAJOR gets its own PR — so one broken major (e.g. ESLint 10) can't block the others. Everything
+# auto-merges the instant CI (build/tsc/lint/tests) is green — see dependabot-auto-merge.yml — so you
+# never merge by hand. The only branches that linger are updates that FAIL CI: they sit red until they
+# pass, then auto-merge themselves. (ESLint 10 is the current one — it crashes lint because
+# eslint-config-next's plugins call context.getFilename(), removed in v10; it'll go green and merge
+# once the Next preset supports v10. Leave it red; that red is the signal, not a bug.)
 #
 # Security PRs are separate and advisory-driven — enable "Dependabot alerts" + "Dependabot security
 # updates" in GitHub → repo Settings → Code security (can't be set here). Those arrive as advisories
@@ -17,23 +20,17 @@ updates:
       interval: monthly
       time: "06:00"
       timezone: America/Toronto
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "chore(deps)"
-    # The ESLint major is deliberately NOT ignored: Dependabot keeps an ESLint 10 PR open as a canary.
-    # It stays red — lint crashes because eslint-config-next's bundled plugins call context.getFilename(),
-    # removed in ESLint 10 — until the Next preset supports v10, then it flips green for you to merge.
-    # Leave it red; that red is the signal, not a bug to fix.
     groups:
+      # Only minor/patch are grouped (reliably green → auto-merge as one batch). Majors are left
+      # ungrouped on purpose so a red one never holds back a green one.
       npm-minor-patch:
         applies-to: version-updates
         update-types:
           - minor
           - patch
-      npm-major:
-        applies-to: version-updates
-        update-types:
-          - major
 
   # Keep the GitHub Actions used by the sync/CI workflows current too (checkout, setup-node, …).
   - package-ecosystem: github-actions
