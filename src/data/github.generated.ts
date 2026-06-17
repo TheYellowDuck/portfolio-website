@@ -788,10 +788,7 @@ export const generatedMainHall: Exhibit[] = [
       ],
       "embedUrl": "https://www.youtube.com/embed/wKVpjcZxiz4"
     }
-  }
-];
-
-export const generatedArchive: Exhibit[] = [
+  },
   {
     "popup": {
       "title": "Web Agent",
@@ -932,7 +929,10 @@ export const generatedArchive: Exhibit[] = [
         }
       ]
     }
-  },
+  }
+];
+
+export const generatedArchive: Exhibit[] = [
   {
     "popup": {
       "title": "PONG",
@@ -1885,5 +1885,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-17T23:31:29.376Z"
+  "syncedAt": "2026-06-17T23:40:24.361Z"
 };
