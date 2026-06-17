@@ -6,6 +6,7 @@ import { TILE_SIZE } from "@/game/tilemap";
 import { interactables } from "@/game/interactables";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { slugForPopup } from "@/lib/exhibit-slugs";
+import { PERSON, LINKS } from "@/lib/site";
 import { loadDiscovered, saveDiscovered, loadAudioPrefs, saveAudioPrefs } from "@/lib/museum-prefs";
 import { Howl, Howler } from "howler";
 import BottomHint from "./BottomHint";
@@ -44,11 +45,12 @@ const CURATOR_REWARD: ExhibitPopup = {
   description:
     "Most visitors wander a room or two — you walked the whole museum. Thank you for taking the time. " +
     "I built this place because a page of bullet points never felt like enough; I wanted somewhere you " +
-    "could actually step into the work. If any of it stuck with you, I'd genuinely love to hear from you. — George",
+    "could actually step into the work. If any of it stuck with you, I'd genuinely love to hear from you. — " +
+    PERSON.name.split(" ")[0],
   links: [
-    { label: "Email", url: "mailto:gzhang06@outlook.com" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/iamgeorgezhang/" },
-    { label: "GitHub", url: "https://github.com/TheYellowDuck" },
+    { label: "Email", url: LINKS.email },
+    { label: "LinkedIn", url: LINKS.linkedin },
+    { label: "GitHub", url: LINKS.github },
   ],
 };
 

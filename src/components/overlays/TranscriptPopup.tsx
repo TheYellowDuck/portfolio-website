@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { TranscriptData, SubjectGroup, CourseEntry } from "@/types/transcript";
 import { experienceExhibits } from "@/data/projects";
+import { PERSON } from "@/lib/site";
 
 let transcriptCache: TranscriptData | null = null;
 
@@ -186,7 +187,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
               {/* Left: institution */}
               <div className="flex-1 px-4 py-3 flex flex-col justify-center">
                 <p className="m-0 font-mono text-[18px] text-pine font-bold">
-                  University of Waterloo
+                  {PERSON.alumniOf}
                 </p>
                 {data?.program && (
                   <p className="m-0 mt-1 font-mono text-[12px] text-walnut opacity-55">

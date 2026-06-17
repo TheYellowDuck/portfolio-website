@@ -1,5 +1,7 @@
 "use client";
 
+import { PERSON } from "@/lib/site";
+
 interface LoadingScreenProps {
   visible: boolean;
   loaded: number;
@@ -17,7 +19,7 @@ export default function LoadingScreen({ visible, loaded, total }: LoadingScreenP
     >
       <div className="flex flex-col items-center gap-5">
         <h1 className="font-sans text-3xl tracking-[0.25em] text-ink-1 uppercase">
-          George Zhang
+          {PERSON.name}
         </h1>
         <p className="font-mono text-xs tracking-[0.35em] text-ink-3 uppercase">
           Personal Portfolio

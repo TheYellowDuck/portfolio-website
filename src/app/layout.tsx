@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
 import "./globals.css";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, PERSON } from "@/lib/site";
+import { currentRole } from "@/data/projects";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,6 +78,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Current employer for `worksFor` — derived from the experience data, never a hardcoded literal.
+  const employer = currentRole()?.title;
   return (
     <html
       lang="en"
@@ -116,7 +119,7 @@ export default function RootLayout({
                   description: PERSON.bio,
                   email: `mailto:${PERSON.email}`,
                   alumniOf: { "@type": "CollegeOrUniversity", name: PERSON.alumniOf },
-                  worksFor: { "@type": "Organization", name: PERSON.worksFor },
+                  ...(employer ? { worksFor: { "@type": "Organization", name: employer } } : {}),
                   knowsAbout: PERSON.knowsAbout,
                   address: {
                     "@type": "PostalAddress",

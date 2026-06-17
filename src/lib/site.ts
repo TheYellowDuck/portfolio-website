@@ -37,9 +37,6 @@ export const PERSON = {
   // One-line bio → the Person `description` in structured data; helps search + AI engines summarize
   // who you are. Mirrors the hero.
   bio: "CS student at the University of Waterloo building thoughtful software — from Android Automotive at Ford to computer-vision rehab tools and competitive programming.",
-  // Current role (per the hero). Update or clear this when the role changes — it's asserted as
-  // `worksFor` in structured data, so stale data here is a stale claim.
-  worksFor: "Ford Motor Company",
   alumniOf: "University of Waterloo",
   email: "gzhang06@outlook.com",
   location: { city: "Waterloo", region: "Ontario", country: "Canada" },
@@ -63,6 +60,16 @@ export const PERSON = {
   ],
 } as const;
 
-export const SITE_TITLE = "George Zhang — Portfolio";
+// Named profile/contact URLs derived from PERSON (single source) — so the hero, the in-game card,
+// and the gift shop never re-hardcode them.
+export const LINKS = {
+  github: PERSON.sameAs.find((u) => u.includes("github.com"))!,
+  linkedin: PERSON.sameAs.find((u) => u.includes("linkedin.com"))!,
+  leetcode: PERSON.sameAs.find((u) => u.includes("leetcode.com"))!,
+  dmoj: PERSON.sameAs.find((u) => u.includes("dmoj.ca"))!,
+  email: `mailto:${PERSON.email}`,
+} as const;
+
+export const SITE_TITLE = `${PERSON.name} — Portfolio`;
 export const SITE_DESCRIPTION =
   "CS student at the University of Waterloo — projects, experience, and an explorable pixel-art museum.";

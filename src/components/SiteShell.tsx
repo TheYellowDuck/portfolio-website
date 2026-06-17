@@ -35,7 +35,7 @@ function usePrefersReducedMotion() {
   );
 }
 
-export default function SiteShell() {
+export default function SiteShell({ currentStatus }: { currentStatus?: string }) {
   const [stage, setStage] = useState<Stage>("site");
   const [activePopup, setActivePopup] = useState<ExhibitPopup | null>(null);
   // Game-layer opacity flag (mounts at 0, fades to 1) so the site visibly
@@ -279,6 +279,7 @@ export default function SiteShell() {
           onResume={() => openPopup({ type: "resume" })}
           onTranscript={() => openPopup({ type: "transcript" })}
           onOpenProject={openPopup}
+          currentStatus={currentStatus}
         />
       </div>
 

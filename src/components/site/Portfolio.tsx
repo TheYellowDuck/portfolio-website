@@ -12,6 +12,7 @@ import {
   type ExhibitPopup,
 } from "@/data/projects";
 import Hero from "./Hero";
+import { PERSON } from "@/lib/site";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
@@ -25,6 +26,8 @@ interface PortfolioProps {
   onResume: () => void;
   onTranscript: () => void;
   onOpenProject: (popup: ExhibitPopup) => void;
+  /** Hero's "Currently:" line — server-derived (role or academic term); see app/page.tsx. */
+  currentStatus?: string;
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -45,7 +48,7 @@ function Section({ id, eyebrow, title, intro, children }: {
   );
 }
 
-export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject }: PortfolioProps) {
+export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject, currentStatus }: PortfolioProps) {
   const isMac = useIsMac();
   const featured = withPopup(mainHallExhibits);
   const archive = withPopup(archiveExhibits);
@@ -71,7 +74,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       {/* Slim sticky nav */}
       <nav className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-4">
-          <a href="#top" className="font-display text-[17px] font-semibold tracking-tight text-walnut">George Zhang</a>
+          <a href="#top" className="font-display text-[17px] font-semibold tracking-tight text-walnut">{PERSON.name}</a>
           <div className="hidden items-center gap-6 font-mono text-[13px] text-walnut/65 sm:flex">
             <a href="#work" className="transition-colors hover:text-pine">Work</a>
             <a href="#experience" className="transition-colors hover:text-pine">Experience</a>
@@ -99,7 +102,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       <main id="main-content" tabIndex={-1} className="outline-none">
         <div id="top" />
-        <Hero onEnter={onEnter} onResume={onResume} />
+        <Hero onEnter={onEnter} onResume={onResume} currentStatus={currentStatus} />
 
       {/* ── Work ── */}
       <Section id="work" eyebrow="The Collection" title="Selected Work"
@@ -225,7 +228,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
         <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
-          <span>© {new Date().getFullYear()} George Zhang · built with Next.js</span>
+          <span>© {new Date().getFullYear()} {PERSON.name} · built with Next.js</span>
           <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
             Prefer to wander? Step inside the museum →
           </button>

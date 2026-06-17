@@ -1,4 +1,5 @@
 import { TILES } from "@/game/tile-ids";
+import { LINKS } from "@/lib/site";
 // Projects + skills are auto-generated from GitHub — see scripts/sync-github.mjs.
 import { generatedMainHall, generatedArchive, generatedSkills } from "./github.generated";
 
@@ -119,6 +120,15 @@ export const experienceExhibits: Exhibit[] = [
   },
 ];
 
+/** The current role — the experience entry whose date reads "Present"/"current", or undefined.
+ *  Single source for "where George works now": the hero's status line and the Person `worksFor`
+ *  structured data both derive from this, so the current employer is never hardcoded twice. */
+export function currentRole(): ExhibitPopup | undefined {
+  return experienceExhibits
+    .map((e) => e.popup)
+    .find((p): p is ExhibitPopup => !!p && /present|current/i.test(p.date ?? ""));
+}
+
 // Tile 19 — RESUME (standalone hallway pedestal)
 export const resumeExhibit: Exhibit[] = [
   {
@@ -171,28 +181,28 @@ export const giftShopExhibits: Exhibit[] = [
     popup: {
       title: "GitHub",
       description: "Check out my code.",
-      links: [{ label: "Open GitHub", url: "https://github.com/TheYellowDuck" }],
+      links: [{ label: "Open GitHub", url: LINKS.github }],
     },
   },
   {
     popup: {
       title: "LinkedIn",
       description: "Let's connect!",
-      links: [{ label: "Open LinkedIn", url: "https://linkedin.com/in/iamgeorgezhang/" }],
+      links: [{ label: "Open LinkedIn", url: LINKS.linkedin }],
     },
   },
   {
     popup: {
       title: "Email",
       description: "Reach out anytime.",
-      links: [{ label: "Send Email", url: "mailto:gzhang06@outlook.com" }],
+      links: [{ label: "Send Email", url: LINKS.email }],
     },
   },
   {
     popup: {
       title: "This Portfolio's Source",
       description: "See how this museum was built.",
-      links: [{ label: "View Source", url: "https://github.com/TheYellowDuck/portfolio-website" }],
+      links: [{ label: "View Source", url: `${LINKS.github}/portfolio-website` }],
     },
   },
 ];

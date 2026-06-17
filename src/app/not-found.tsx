@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { PERSON } from "@/lib/site";
 
-export const metadata = { title: "Not found — George Zhang" };
+export const metadata = { title: `Not found — ${PERSON.name}` };
 
 // Museum-themed 404 so a bad link lands somewhere intentional rather than the
 // default Next.js page. Server component; inherits the theme from the layout.

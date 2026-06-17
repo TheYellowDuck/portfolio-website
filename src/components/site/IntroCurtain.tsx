@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PERSON } from "@/lib/site";
 
 // The intro curtain covers the first paint and lifts only once the page is actually ready — web
 // fonts loaded (the display face is what flickers) — rather than after a fixed timer, so it never
@@ -43,7 +44,7 @@ export default function IntroCurtain() {
           Portfolio · est. golden hour
         </p>
         <h1 className="intro-name font-display text-[clamp(28px,6vw,46px)] font-semibold tracking-tight text-walnut">
-          George Zhang
+          {PERSON.name}
         </h1>
         <span className="intro-line" />
       </div>

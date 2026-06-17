@@ -2,20 +2,23 @@
 
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
+import { PERSON, LINKS } from "@/lib/site";
 
 interface HeroProps {
   /** rect = the doorway panel's screen box, so the portal can zoom from it. */
   onEnter: (rect?: DOMRect) => void;
   onResume: () => void;
+  /** "Currently:" line — server-derived role or academic term (see app/page.tsx). */
+  currentStatus?: string;
 }
 
 const QUICK_LINKS = [
-  { label: "GitHub", url: "https://github.com/TheYellowDuck" },
-  { label: "LinkedIn", url: "https://linkedin.com/in/iamgeorgezhang/" },
-  { label: "Email", url: "mailto:gzhang06@outlook.com" },
+  { label: "GitHub", url: LINKS.github },
+  { label: "LinkedIn", url: LINKS.linkedin },
+  { label: "Email", url: LINKS.email },
 ];
 
-export default function Hero({ onEnter, onResume }: HeroProps) {
+export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   const doorRef = useRef<HTMLDivElement>(null);
   return (
     <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
@@ -25,16 +28,18 @@ export default function Hero({ onEnter, onResume }: HeroProps) {
           Portfolio · est. golden hour
         </p>
         <h1 className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
-          George Zhang
+          {PERSON.name}
         </h1>
         <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
           CS at the University of Waterloo, building thoughtful software — from
           Android Automotive at Ford to computer-vision rehab tools and a few too
           many games.
         </p>
-        <p className="mt-2 font-mono text-[13px] text-walnut/55">
-          Currently: SWE Intern @ Ford · Android Automotive OS
-        </p>
+        {currentStatus && (
+          <p className="mt-2 font-mono text-[13px] text-walnut/55">
+            Currently: {currentStatus}
+          </p>
+        )}
 
         <nav className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[13px]">
           <button
