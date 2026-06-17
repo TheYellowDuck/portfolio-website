@@ -15,6 +15,10 @@ const DMOJ_USER = config.dmoj;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, "..", "src", "data", "cp-stats.generated.json");
 
+// A real browser User-Agent. LeetCode and DMOJ both sit behind Cloudflare, which 403s requests with a
+// bot-looking UA (Node's default) — especially from datacenter IPs like the GitHub Action runner.
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+
 async function leetcode() {
   const query = `query($u:String!){
     matchedUser(username:$u){ profile{ ranking } submitStatsGlobal{ acSubmissionNum{ difficulty count } } }
@@ -25,7 +29,7 @@ async function leetcode() {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+      "user-agent": UA,
       referer: `https://leetcode.com/u/${LC_USER}/`,
       origin: "https://leetcode.com",
     },
@@ -47,7 +51,9 @@ async function leetcode() {
 }
 
 async function dmoj() {
-  const res = await fetch(`https://dmoj.ca/api/v2/user/${DMOJ_USER}`);
+  const res = await fetch(`https://dmoj.ca/api/v2/user/${DMOJ_USER}`, {
+    headers: { "user-agent": UA, accept: "application/json" },
+  });
   if (!res.ok) throw new Error(`DMOJ HTTP ${res.status}`);
   const o = (await res.json())?.data?.object;
   if (!o) throw new Error("DMOJ: user not found");
