@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
 import { PERSON, LINKS } from "@/lib/site";
+import { content } from "@/content";
 
 interface HeroProps {
   /** rect = the doorway panel's screen box, so the portal can zoom from it. */
@@ -13,9 +14,9 @@ interface HeroProps {
 }
 
 const QUICK_LINKS = [
-  { label: "GitHub", url: LINKS.github },
-  { label: "LinkedIn", url: LINKS.linkedin },
-  { label: "Email", url: LINKS.email },
+  { label: content.hero.links.github, url: LINKS.github },
+  { label: content.hero.links.linkedin, url: LINKS.linkedin },
+  { label: content.hero.links.email, url: LINKS.email },
 ];
 
 export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
@@ -25,19 +26,17 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
       {/* Left: identity */}
       <div className="flex-1">
         <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
-          Portfolio · est. golden hour
+          {content.hero.eyebrow}
         </p>
         <h1 className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
           {PERSON.name}
         </h1>
         <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
-          CS at the University of Waterloo, building thoughtful software — from
-          Android Automotive at Ford to computer-vision rehab tools and a few too
-          many games.
+          {content.hero.tagline}
         </p>
         {currentStatus && (
           <p className="mt-2 font-mono text-[13px] text-walnut/55">
-            Currently: {currentStatus}
+            {content.hero.currentlyLabel} {currentStatus}
           </p>
         )}
 
@@ -46,7 +45,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             onClick={onResume}
             className="text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
           >
-            Resume
+            {content.hero.resume}
           </button>
           {QUICK_LINKS.map((l) => (
             <a
@@ -87,16 +86,16 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             {/* Invitation */}
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[rgba(240,228,196,0.6)]">
-                The museum
+                {content.hero.doorway.label}
               </span>
               <span className="font-mono text-[15px] text-[rgba(240,228,196,0.95)] transition-colors group-hover:text-[#f0ce78]">
-                Step inside →
+                {content.hero.doorway.cta}
               </span>
             </div>
           </div>
         </button>
         <p className="mt-3 w-full max-w-[360px] text-center font-mono text-[12px] text-walnut/70 md:text-right">
-          an explorable, pixel-art version
+          {content.hero.doorway.caption}
         </p>
       </div>
     </header>

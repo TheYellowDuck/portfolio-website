@@ -13,6 +13,7 @@ import {
 } from "@/data/projects";
 import Hero from "./Hero";
 import { PERSON } from "@/lib/site";
+import { content } from "@/content";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
@@ -76,16 +77,16 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-4">
           <a href="#top" className="font-display text-[17px] font-semibold tracking-tight text-walnut">{PERSON.name}</a>
           <div className="hidden items-center gap-6 font-mono text-[13px] text-walnut/65 sm:flex">
-            <a href="#work" className="transition-colors hover:text-pine">Work</a>
-            <a href="#experience" className="transition-colors hover:text-pine">Experience</a>
-            <a href="#skills" className="transition-colors hover:text-pine">Skills</a>
-            <a href="#contact" className="transition-colors hover:text-pine">Contact</a>
+            <a href="#work" className="transition-colors hover:text-pine">{content.nav.links.work}</a>
+            <a href="#experience" className="transition-colors hover:text-pine">{content.nav.links.experience}</a>
+            <a href="#skills" className="transition-colors hover:text-pine">{content.nav.links.skills}</a>
+            <a href="#contact" className="transition-colors hover:text-pine">{content.nav.links.contact}</a>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
               onClick={() => window.dispatchEvent(new Event("command-palette:open"))}
-              aria-label="Open command palette"
+              aria-label={content.nav.paletteAria}
               className="hidden items-center rounded-md border border-[rgb(var(--c-line-rgb)_/_0.15)] px-2 py-1 font-mono text-[11px] text-walnut/55 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 sm:flex"
             >
               {isMac ? "⌘K" : "Ctrl K"}
@@ -94,7 +95,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
               onClick={() => onEnter()}
               className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
             >
-              Step inside →
+              {content.nav.enter}
             </button>
           </div>
         </div>
@@ -105,8 +106,8 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         <Hero onEnter={onEnter} onResume={onResume} currentStatus={currentStatus} />
 
       {/* ── Work ── */}
-      <Section id="work" eyebrow="The Collection" title="Selected Work"
-        intro="A few things I've built — games, tools, and research apps. Step inside the museum to see them on pedestals.">
+      <Section id="work" eyebrow={content.sections.work.eyebrow} title={content.sections.work.title}
+        intro={content.sections.work.intro}>
         <Masonry sm={2} lg={2} weights={featured.map((e) => cardWeight(e.popup as ExhibitPopup))} items={featured.map((e, i) => (
           <Reveal key={i} delay={(i % 2) * 70}>
             <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
@@ -118,7 +119,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             {/* In-section divider. Sub-division gap = mt-24 (96px) = half the section-to-section
                 gap (sections are py-24, so 96+96=192px between them). Visibly tighter than a full
                 section break, but one consistent value to reuse for any in-section division. */}
-            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">Archive</h3>
+            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.archive}</h3>
             <div className="mt-6">
               <Masonry sm={2} lg={3} weights={archive.map((e) => cardWeight(e.popup as ExhibitPopup))} items={archive.map((e, i) => (
                 <Reveal key={i} delay={(i % 3) * 60}>
@@ -131,7 +132,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       </Section>
 
       {/* ── Experience ── */}
-      <Section id="experience" eyebrow="Curriculum Vitae" title="Experience">
+      <Section id="experience" eyebrow={content.sections.experience.eyebrow} title={content.sections.experience.title}>
         <div className="relative ml-1 space-y-12 border-l border-[rgba(122,158,126,0.4)] pl-6 sm:pl-8">
           {experienceExhibits.map((e, i) =>
             e.popup ? <ExperienceItem key={i} popup={e.popup} /> : null
@@ -140,7 +141,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       </Section>
 
       {/* ── Skills ── */}
-      <Section id="skills" eyebrow="The Toolkit" title="Skills">
+      <Section id="skills" eyebrow={content.sections.skills.eyebrow} title={content.sections.skills.title}>
         <Masonry sm={2} lg={3} weights={skillsExhibits.filter((e) => e.popup).map((e) => skillWeight(e.popup as ExhibitPopup))} items={skillsExhibits.flatMap((e, i) => {
             if (!e.popup) return [];
             const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
@@ -165,24 +166,24 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       </Section>
 
       {/* ── About ── */}
-      <Section id="about" eyebrow="The Curator" title="About">
+      <Section id="about" eyebrow={content.sections.about.eyebrow} title={content.sections.about.title}>
         <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
           <Reveal>
             <div className="space-y-4 text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85">
               {aboutText && <p>{aboutText}</p>}
               {interests && (
-                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-pine">Off the clock — </span>{interests}</p>
+                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-pine">{content.sections.about.offClock}</span>{interests}</p>
               )}
             </div>
           </Reveal>
           <Reveal delay={80}>
             <div className="flex flex-col gap-3">
               <button onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
-                Read résumé →
+                {content.sections.about.resume}
               </button>
               {hasTranscript && (
                 <button onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
-                  Education & transcript →
+                  {content.sections.about.transcript}
                 </button>
               )}
             </div>
@@ -191,13 +192,13 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       </Section>
 
       {/* ── Competitive Programming — live stats from LeetCode + DMOJ ── */}
-      <Section id="competitive" eyebrow="The Grind" title="Competitive Programming"
-        intro="Problem-solving, pulled live from LeetCode and DMOJ.">
+      <Section id="competitive" eyebrow={content.sections.competitive.eyebrow} title={content.sections.competitive.title}
+        intro={content.sections.competitive.intro}>
         <Reveal><CpStats /></Reveal>
       </Section>
 
       {/* ── Contact ── */}
-      <Section id="contact" eyebrow="Stay in touch" title="Let's talk">
+      <Section id="contact" eyebrow={content.sections.contact.eyebrow} title={content.sections.contact.title}>
         <div className="flex flex-wrap items-center gap-3">
           {giftShopExhibits.map((e, i) => {
             const link = e.popup?.links?.[0];
@@ -228,14 +229,13 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
         <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
-          <span>© {new Date().getFullYear()} {PERSON.name} · built with Next.js</span>
+          <span>© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
           <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
-            Prefer to wander? Step inside the museum →
+            {content.footer.wander}
           </button>
         </div>
         <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/70">
-          Inside the museum, your anonymous movement is briefly recorded so future visitors can watch it
-          drift by as a glowing wisp. No accounts, no personal data — just footsteps.
+          {content.footer.privacy}
         </p>
       </footer>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { content } from "@/content";
 
 export interface Command {
   id: string;
@@ -67,7 +68,7 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
       className="fixed inset-0 z-70 flex items-start justify-center px-4 pt-[12vh]"
       role="dialog"
       aria-modal="true"
-      aria-label="Command palette"
+      aria-label={content.palette.aria}
     >
       <div className="fixed inset-0 bg-[rgba(28,21,8,0.45)] backdrop-blur-sm" onClick={doClose} />
       <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[rgb(var(--c-line-rgb)_/_0.18)] bg-parchment shadow-[0_16px_60px_rgba(28,21,8,0.4)]">
@@ -81,12 +82,12 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
             else if (e.key === "Enter") { e.preventDefault(); run(results[selClamped]); }
             else if (e.key === "Escape") { e.preventDefault(); doClose(); }
           }}
-          placeholder="Jump to a project, section, résumé…"
+          placeholder={content.palette.placeholder}
           className="w-full border-b border-[rgb(var(--c-line-rgb)_/_0.12)] bg-transparent px-5 py-4 font-sans text-[15px] text-walnut placeholder:text-walnut/40 focus:outline-none"
         />
         <div ref={listRef} className="max-h-[52vh] overflow-y-auto py-2 [scrollbar-width:thin]">
           {results.length === 0 && (
-            <p className="px-5 py-6 text-center font-mono text-[13px] text-walnut/45">No matches</p>
+            <p className="px-5 py-6 text-center font-mono text-[13px] text-walnut/45">{content.palette.noMatches}</p>
           )}
           {results.map((c, i) => {
             const showHeader = c.group && c.group !== results[i - 1]?.group;
@@ -113,7 +114,7 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
           })}
         </div>
         <div className="flex items-center gap-4 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] px-5 py-2 font-mono text-[11px] text-walnut/40">
-          <span>↑↓ navigate</span><span>↵ open</span><span>esc close</span>
+          <span>{content.palette.navigate}</span><span>{content.palette.open}</span><span>{content.palette.close}</span>
         </div>
       </div>
     </div>

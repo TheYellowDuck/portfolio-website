@@ -1,6 +1,7 @@
 "use client";
 
 import { PERSON } from "@/lib/site";
+import { content } from "@/content";
 
 interface LoadingScreenProps {
   visible: boolean;
@@ -22,7 +23,7 @@ export default function LoadingScreen({ visible, loaded, total }: LoadingScreenP
           {PERSON.name}
         </h1>
         <p className="font-mono text-xs tracking-[0.35em] text-ink-3 uppercase">
-          Personal Portfolio
+          {content.loading.subtitle}
         </p>
         <div className="mt-3 flex gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-sage animate-bounce [animation-delay:0ms]" />
@@ -30,7 +31,7 @@ export default function LoadingScreen({ visible, loaded, total }: LoadingScreenP
           <span className="h-1.5 w-1.5 rounded-full bg-sage animate-bounce [animation-delay:300ms]" />
         </div>
         <p className="font-mono text-[11px] tracking-[0.2em] text-ink-3 uppercase">
-          {total > 0 ? `${pct}%` : "loading…"}
+          {total > 0 ? `${pct}%` : content.loading.loading}
         </p>
       </div>
     </div>
