@@ -28,8 +28,10 @@ export const config = {
   ],
   // Auto-feature any repo whose significance score is at or above this threshold (not a
   // fixed count — the number featured floats with how many clear the bar). Run the sync and
-  // read the printed ranking to pick a value. Higher = more selective.
-  featuredThreshold: 45,
+  // read the printed ranking to pick a value. Higher = more selective. Set in the natural gap
+  // between the strong tier (≈44+) and the simpler/game tier (≈35), so "featured" reads as
+  // genuinely impressive work by difficulty/scope.
+  featuredThreshold: 40,
 
   // Soft skills can't be read from code (they're not in the repo), so list the ones
   // you want shown here. They appear as their own "Soft Skills" group, always.
