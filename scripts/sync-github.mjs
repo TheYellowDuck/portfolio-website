@@ -534,15 +534,12 @@ function significance(repo, scan, domains, popup) {
   // Reception — diminishing returns (log), so a couple of stars no longer single-handedly defines
   // "featured" and a strong-but-starless repo isn't buried (personal repos rarely have many stars).
   const social = Math.log2((repo.stargazers_count || 0) + 1) * 5 + Math.log2((repo.forks_count || 0) + 1) * 3;
-  // Recency — recent/active work is what recruiters (and GitHub) weight; without it a brand-new strong
-  // project gets nothing for being current. ~6 if pushed today, decaying to 0 over ~12 months.
-  const recency = Math.max(0, 6 - (Date.now() - new Date(repo.pushed_at).getTime()) / 86400000 / 60);
   const collab = scan.multiContributor ? 4 : 0;
   // Polish — small: README length is gameable and a demo is near-universal.
   const polish = Math.min((scan.readme || "").length / 900, 4) + ((popup.videoUrl || popup.embedUrl) ? 2 : 0);
   const coll = COLLECTION_RE.test(repo.name);
-  const sub = difficulty + scope + breadth + deployed + social + recency + collab + polish;
-  return { total: coll ? sub * 0.5 : sub, parts: { difficulty, scope, breadth, deployed, social, recency, collab, polish, coll } };
+  const sub = difficulty + scope + breadth + deployed + social + collab + polish;
+  return { total: coll ? sub * 0.5 : sub, parts: { difficulty, scope, breadth, deployed, social, collab, polish, coll } };
 }
 
 function groupSkills(allSkills, allLanguages, soft) {
@@ -658,14 +655,14 @@ async function main() {
 
   // Show the ranking + score breakdown so it's clear why each repo landed where.
   console.log(`\n  Significance ranking (score ≥ ${threshold} → Projects, else Archive):`);
-  console.log(`  ${"".padEnd(24)} score │ diffic scope brdth deploy social recent collab polish`);
+  console.log(`  ${"".padEnd(24)} score │ diffic scope brdth deploy social collab polish`);
   for (const e of byScore) {
     const p = e._sig || {};
     const tag = isFeatured(e) ? "★" : " ";
     console.log(
       `  ${tag} ${e._name.slice(0, 22).padEnd(22)} ${e._score.toFixed(1).padStart(5)} │ ` +
       `${p.difficulty.toFixed(1).padStart(6)} ${p.scope.toFixed(1).padStart(5)} ${p.breadth.toFixed(1).padStart(5)} ` +
-      `${String(p.deployed).padStart(6)} ${p.social.toFixed(1).padStart(6)} ${p.recency.toFixed(1).padStart(6)} ${String(p.collab).padStart(6)} ${p.polish.toFixed(1).padStart(6)}` +
+      `${String(p.deployed).padStart(6)} ${p.social.toFixed(1).padStart(6)} ${String(p.collab).padStart(6)} ${p.polish.toFixed(1).padStart(6)}` +
       `${p.coll ? "  ½ collection" : ""}`,
     );
   }

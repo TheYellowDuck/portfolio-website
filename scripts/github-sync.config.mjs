@@ -150,7 +150,9 @@ export const TOOL_SIGNS = [
 export const DOMAIN_RULES = [
   { skill: "Computer Vision", any: ["opencv", "mediapipe", "yolo", "image processing", "object detection", "face detection"] },
   { skill: "Machine Learning", any: ["tensorflow", "pytorch", "scikit-learn", "sklearn", "keras", "neural network", "machine learning", "deep learning"] },
-  { skill: "Generative AI / LLMs", any: ["llm", "large language model", "openai", "anthropic", "claude", "gemini", "langchain", "litellm", "llamaindex", "rag", "retrieval-augmented", "prompt engineering", "agentic", "ai agent", "embeddings", "vector database", "vector store", "fine-tuning", "hugging face", "generative ai"] },
+  // NOTE: keep keywords specific — these are substring-matched against repo text, so short tokens
+  // like "rag" would hit "fragment"/"storage"/"drag" (use "retrieval-augmented" instead).
+  { skill: "Generative AI / LLMs", any: ["large language model", " llm", "llm ", "openai", "anthropic", "claude", "gemini", "langchain", "litellm", "llamaindex", "retrieval-augmented", "prompt engineering", "agentic", "ai agent", "embeddings", "vector database", "vector store", "fine-tuning", "hugging face", "generative ai"] },
   { skill: "Data Analysis", any: ["numpy", "pandas", "matplotlib", "scipy", "jupyter", "data analysis", "dataset", "visualization"] },
   { skill: "Web Development", any: ["react", "vue", "next.js", "svelte", "angular", "tailwind", "html", "css", "express", "django", "flask", "fastapi"] },
   { skill: "Backend / APIs", any: ["express", "fastapi", "flask", "django", "spring", "rest api", "graphql", "endpoint", "backend"] },
