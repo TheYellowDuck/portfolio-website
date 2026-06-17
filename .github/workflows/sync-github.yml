@@ -2,8 +2,9 @@ name: Sync data (GitHub projects + CP stats)
 
 # Re-scans your repos → src/data/github.generated.ts, and fetches LeetCode + DMOJ →
 # src/data/cp-stats.generated.json (from GitHub's IPs, which Cloudflare doesn't block
-# the way it can Vercel's). Runs daily and on-demand. Uses the built-in GITHUB_TOKEN
-# (public-repo read) for the repo scan — no secret to set up; the CP-stats fetch needs none.
+# the way it can Vercel's). Runs daily and on-demand. The repo scan uses the built-in GITHUB_TOKEN,
+# but the commit is PUSHED with SYNC_PAT (a repo-admin PAT) so it clears the "Require CI on main"
+# ruleset, which blocks github-actions[bot]'s direct pushes. Without that secret the data never lands.
 on:
   schedule:
     - cron: "0 6 * * *" # daily at 06:00 UTC
@@ -17,9 +18,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Push the daily data commit with a PAT (the repo admin) so it bypasses the "Require CI on
+          # main" ruleset — admins are exempt, github-actions[bot] is not. Until SYNC_PAT is set this
+          # falls back to GITHUB_TOKEN (whose push the ruleset still blocks), so adding that one secret
+          # is all that's needed to switch this on.
+          token: ${{ secrets.SYNC_PAT || github.token }}
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+
+      # The sync downscales demo videos and renders poster frames — both need ffmpeg, which the
+      # GitHub-hosted runner doesn't include by default.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Sync from GitHub
         env:
