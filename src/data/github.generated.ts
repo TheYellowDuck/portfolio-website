@@ -787,6 +787,135 @@ export const generatedMainHall: Exhibit[] = [
 export const generatedArchive: Exhibit[] = [
   {
     "popup": {
+      "title": "Web Agent",
+      "description": "An autonomous LLM web agent built from scratch — a ReAct + reflection loop that drives a real headless browser (Playwright) over an accessibility-tree observation layer — paired with an honest evaluation harness over WebArena and Online-Mind2Web. The LLM layer is provider-agnostic (native Anthropic Claude / OpenAI / Gemini adapters plus a LiteLLM universal adapter for any other model), and the harness reports Wilson confidence intervals, pass@k, a failure taxonomy, and LLM-as-judge scoring. The scaffold is table stakes; the signal is the measurement — quantifying how much of any headline web-agent number comes from scoring methodology and task curation rather than capability. Claude Sonnet 4.6 driving the agent on a live Wikipedia task — search → navigate → extract → answer. (Frames from a real captured run.) action space, memory, and a ReAct loop; no agent-framework wrapper. ON vs OFF on identical tasks (the headline engineering contribution). LiteLLM universal adapter for any other model; swapping models is a config change. text, and pagination detection, with an optional Set-of-Marks screenshot modality. Online-Mind2Web LLM-as-judge, with 3-valued logic that never silently passes the unverifiable. taxonomy, and Matplotlib/pandas charts, all from reproducible JSONL trajectories. scoring, a verify-before-done gate, and site confinement. prompt caching. shopping subset the agent scores ~0.43 exact-match; a fair full-suite number would be mid-teens–30% (vs production ~60%, SOTA 71.6%, human ~78%). A solid from-scratch scaffold, not a production agent — and the writeup says exactly that. measurement/mechanism, not raw capability: +14pt from implementing WebArena's own fuzzymatch LLM scoring (I'd been under-counting \"N/A\" answers), +4pt from the one research-identified lever (an AgentOccam-style note scratchpad that cracked a 14-item extraction task). scoring (strict exact-match vs lenient LLM judge), not venue — the same agent reads ~0.6 or ~1.0 depending on how you score it. but a cheaper budget/commit fix captured most of it; on saturated slices ON ≈ OFF. lowest cost; Opus matches at ~2×; Haiku is a false economy (worse and pricier). Bigger ≠ better. reported negative result); a real sandbox found three agent bugs the synthetic tests missed (all fixed). Full blow-by-blow numbers, CIs, and every caveat are in Measured results below. Every component is small and explainable: browser control, an accessibility-tree observation layer, a typed action space, a model-agnostic LLM client, and a ReAct + reflection loop. agent/ never imports eval/ — the agent doesn't know it's being benchmarked, which is what keeps the measurement honest and the agent reusable. testable module rather than a black-box framework call. it can be ablated ON vs OFF on the same tasks. adapters; any other model works through the LiteLLM universal adapter (Mistral, Llama via Ollama, Bedrock, Groq, …) via the adapter + factory pattern. text agent/ browser.py Playwright session: goto / snapshot / act / screenshot / close (+ popup/new-tab following, networkidle settle) observation.py a11y-tree refs (@e1, @e2 …) + static-text + pagination detection actions.py typed action space + validation + JSON schema for the LLM llm.py model-agnostic client (Claude/OpenAI/Gemini/LiteLLM) + cost tracking (+ Anthropic prompt caching, offline 'echo' model) memory.py compact running state (recent steps verbatim, older summarized) prompts.py planner + reflection prompts (frozen system prompt) loop.py ReAct + reflection loop, vision fallback, guardrails, screenshot capture, observation persistence on failure types.py Task / Action / Step / Trajectory dataclasses eval/ harness.py runner: task -> trajectory -> score; CLI; JSONL;",
+      "tech": [
+        "Python",
+        "Playwright",
+        "Pandas",
+        "Matplotlib",
+        "React",
+        "SciPy",
+        "Pillow",
+        "Docker",
+        "Testing",
+        "JavaScript",
+        "HTML",
+        "ReAct agent loop",
+        "Reflection / self-correction",
+        "LLM-as-judge evaluation",
+        "Accessibility-tree observation",
+        "Set-of-Marks visual grounding",
+        "Provider-agnostic LLM abstraction",
+        "Factory pattern",
+        "Structured outputs",
+        "Prompt caching",
+        "Typed action space with validation",
+        "Browser automation",
+        "Deterministic benchmark scoring",
+        "Statistical rigor",
+        "Significance testing",
+        "Failure taxonomy",
+        "Parallel evaluation",
+        "Data visualization",
+        "Reproducible experiment logging",
+        "Rate-limit resilience",
+        "Docker sandbox integration",
+        "Anti-hallucination engineering",
+        "Cost/token accounting",
+        "Test engineering"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "React"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "Pandas",
+            "Matplotlib",
+            "SciPy"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "Playwright",
+            "Docker"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Parallel evaluation"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Provider-agnostic LLM abstraction",
+            "Factory pattern",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Significance testing",
+            "Test engineering",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Pillow",
+            "JavaScript",
+            "HTML",
+            "ReAct agent loop",
+            "Reflection / self-correction",
+            "LLM-as-judge evaluation",
+            "Accessibility-tree observation",
+            "Set-of-Marks visual grounding",
+            "Structured outputs",
+            "Prompt caching",
+            "Typed action space with validation",
+            "Browser automation",
+            "Deterministic benchmark scoring",
+            "Statistical rigor",
+            "Failure taxonomy",
+            "Data visualization",
+            "Reproducible experiment logging",
+            "Rate-limit resilience",
+            "Docker sandbox integration",
+            "Anti-hallucination engineering",
+            "Cost/token accounting",
+            "Data Analysis",
+            "Web Development",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/web-agent"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "PONG",
       "description": "A fully playable Pong game built in Java with Swing, featuring local two-player multiplayer and a single-player mode against a predictive AI that simulates the ball's full trajectory — including wall bounces — to anticipate where it will land. https://github.com/user-attachments/assets/54ef0b10-a559-49a8-9805-efe1b83df394 Single-player mode — AI that simulates the ball's full trajectory (including wall bounces) to predict its landing position, with a speed cap and randomised error margin so it's challenging but beatable; Two-player local multiplayer — both players share the keyboard; Physics-based ball mechanics — bounce angle depends on where the ball strikes the paddle; ball speed increases 5% per volley up to a maximum, rewarding longer rallies; Clean menu UI with keyboard navigation The game runs on a javax.swing.Timer firing at 60 FPS on the Event Dispatch Thread, so updates and repaints stay smooth without ever blocking the EDT with Thread.sleep. Ball physics are vector-based: each return angle is computed from the hit position relative to the paddle centre (rel × 60°), so edge hits produce steep angles and centre hits produce flat returns, with the velocity decomposed via cos/sin. Speed builds 5% per volley up to a hard cap (MAXSPEED), making long rallies progressively harder to control. The AI opponent projects where the ball will land by running a frame-by-frame physics simulation (predictBallY) that mirrors the wall-bounce logic. To stay beatable, it recomputes its target only every ~15 frames, applies a ±25px position error, moves slightly slower than the player, and drifts back to centre when the ball is travelling away — so it can be consistently beaten by pushing the ball into the corners at high speed. Object-oriented design — game state, rendering, and input separated across classes; Event-driven programming — Java Swing event dispatch and key handling; Game loop architecture — javax.swing.Timer at 60 FPS, no blocking on the EDT; Game physics — vector velocity, trigonometric bounce angles, per-volley speed ramping; Collision detection — ball-versus-paddle and ball-versus-wall response; Game AI — predictive opponent via frame-by-frame trajectory simulation; Vector math & trigonometry — cos/sin angle decomposition from paddle hit position; 2D rendering — custom Graphics drawing of paddles, ball, scores, and menu; Input handling — multi-key state tracking and keyboard menu navigation; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, JFrame, Graphics, javax.swing.Timer); Java Platform Module System (module-info.java, requires java.desktop); Packaged as a runnable modular JAR (PONG.jar)",
       "tech": [
@@ -1674,8 +1803,11 @@ export const generatedSkills: Exhibit[] = [
       "title": "ML / Data",
       "tech": [
         "NumPy",
+        "Pandas",
         "scikit-learn",
-        "PyTorch"
+        "PyTorch",
+        "Matplotlib",
+        "SciPy"
       ]
     }
   },
@@ -1683,11 +1815,13 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
+        "Docker",
         "GitHub Actions",
         "Make",
         "CMake",
         "Tailwind",
         "Vitest",
+        "Playwright",
         "ESLint",
         "TypeScript",
         "Gradle",
@@ -1715,6 +1849,7 @@ export const generatedSkills: Exhibit[] = [
         "GraphQL",
         "REST",
         "Pillow",
+        "HTML",
         "Requests",
         "OpenGL",
         "Go"
@@ -1725,6 +1860,6 @@ export const generatedSkills: Exhibit[] = [
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
-  "repoCount": 17,
-  "syncedAt": "2026-06-15T11:42:46.376Z"
+  "repoCount": 18,
+  "syncedAt": "2026-06-17T22:50:25.053Z"
 };
