@@ -391,7 +391,7 @@ function extractMedia(md) {
 // Order matters — first match wins, so the genuinely-hard buckets come before the lighter
 // ones (e.g. "minimax" → Algorithms before "Game AI"; "3D"/OpenGL → 3D Graphics before 2D).
 const CONCEPT_BUCKETS = [
-  { name: "AI & ML",                  re: /machine learning|deep learning|neural network|computer vision|\bcnn\b|\bnlp\b|reinforcement learning|model (?:training|inference)|\binference\b|object detection|image (?:processing|classification|recognition)|classifier|pose estimation|gesture recognition|transformer/i },
+  { name: "AI & ML",                  re: /machine learning|deep learning|neural network|computer vision|\bcnn\b|\bnlp\b|reinforcement learning|model (?:training|inference)|\binference\b|object detection|image (?:processing|classification|recognition)|classifier|pose estimation|gesture recognition|transformer|\bllms?\b|large language model|generative ai|\bgpt\b|openai|anthropic|\bclaude\b|gemini|langchain|llama|\brag\b|retrieval.?augmented|prompt engineering|embeddings?|vector (?:db|database|store|search)|chroma|faiss|pinecone|weaviate|hugging.?face|fine.?tun|agentic|\bai agent/i },
   { name: "Algorithms & DS",          re: /algorithm|data structure|\bgraph\b|breadth-first|depth-first|\bsearch\b|recursion|combinator|state.?space|traversal|dynamic programming|minimax|alpha-?beta|pathfind|\ba\*|complexity|\boptimization|\bsolver\b/i },
   { name: "Concurrency & Networking", re: /thread|concurren|asynchron|parallel|producer.?consumer|mutex|synchroniz|background process|real-?time|network|socket|client.?server|multiplayer|\btcp\b|\budp\b|websocket|distributed/i },
   { name: "3D Graphics",              re: /\b3d\b|opengl|webgl|vulkan|\bshader|raycast|ray-cast|rendering pipeline|physics engine|\bglsl\b/i },
@@ -531,13 +531,18 @@ function significance(repo, scan, domains, popup) {
   const links = popup.links || [];
   const deployed = links.some((l) => /google play|app store|live|chrome web|marketplace|devpost/i.test(l.label)) ? 14
     : links.some((l) => /\bnpm\b|pypi/i.test(l.label)) ? 7 : 0;
-  const social = (repo.stargazers_count || 0) * 6 + (repo.forks_count || 0) * 3;
+  // Reception — diminishing returns (log), so a couple of stars no longer single-handedly defines
+  // "featured" and a strong-but-starless repo isn't buried (personal repos rarely have many stars).
+  const social = Math.log2((repo.stargazers_count || 0) + 1) * 5 + Math.log2((repo.forks_count || 0) + 1) * 3;
+  // Recency — recent/active work is what recruiters (and GitHub) weight; without it a brand-new strong
+  // project gets nothing for being current. ~6 if pushed today, decaying to 0 over ~12 months.
+  const recency = Math.max(0, 6 - (Date.now() - new Date(repo.pushed_at).getTime()) / 86400000 / 60);
   const collab = scan.multiContributor ? 4 : 0;
   // Polish — small: README length is gameable and a demo is near-universal.
   const polish = Math.min((scan.readme || "").length / 900, 4) + ((popup.videoUrl || popup.embedUrl) ? 2 : 0);
   const coll = COLLECTION_RE.test(repo.name);
-  const sub = difficulty + scope + breadth + deployed + social + collab + polish;
-  return { total: coll ? sub * 0.5 : sub, parts: { difficulty, scope, breadth, deployed, social, collab, polish, coll } };
+  const sub = difficulty + scope + breadth + deployed + social + recency + collab + polish;
+  return { total: coll ? sub * 0.5 : sub, parts: { difficulty, scope, breadth, deployed, social, recency, collab, polish, coll } };
 }
 
 function groupSkills(allSkills, allLanguages, soft) {
@@ -653,14 +658,14 @@ async function main() {
 
   // Show the ranking + score breakdown so it's clear why each repo landed where.
   console.log(`\n  Significance ranking (score ≥ ${threshold} → Projects, else Archive):`);
-  console.log(`  ${"".padEnd(24)} score │ diffic scope brdth deploy social collab polish`);
+  console.log(`  ${"".padEnd(24)} score │ diffic scope brdth deploy social recent collab polish`);
   for (const e of byScore) {
     const p = e._sig || {};
     const tag = isFeatured(e) ? "★" : " ";
     console.log(
       `  ${tag} ${e._name.slice(0, 22).padEnd(22)} ${e._score.toFixed(1).padStart(5)} │ ` +
-      `${p.difficulty.toFixed(1).padStart(6)} ${p.scope.toFixed(1).padStart(5)} ${String(p.breadth).padStart(5)} ` +
-      `${String(p.deployed).padStart(6)} ${String(p.social).padStart(6)} ${String(p.collab).padStart(6)} ${p.polish.toFixed(1).padStart(6)}` +
+      `${p.difficulty.toFixed(1).padStart(6)} ${p.scope.toFixed(1).padStart(5)} ${p.breadth.toFixed(1).padStart(5)} ` +
+      `${String(p.deployed).padStart(6)} ${p.social.toFixed(1).padStart(6)} ${p.recency.toFixed(1).padStart(6)} ${String(p.collab).padStart(6)} ${p.polish.toFixed(1).padStart(6)}` +
       `${p.coll ? "  ½ collection" : ""}`,
     );
   }
