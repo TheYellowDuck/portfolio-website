@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
+import { PERSON, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
-export const alt = "George Zhang — interactive museum portfolio";
+export const alt = `${PERSON.name} — interactive museum portfolio`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,11 +35,11 @@ export default function OpengraphImage() {
             Interactive Museum Portfolio
           </div>
           <div style={{ fontSize: 92, fontWeight: 700, color: "#3a2e1e", marginTop: 18, lineHeight: 1.02 }}>
-            George Zhang
+            {PERSON.name}
           </div>
           <div style={{ width: 96, height: 5, background: "#7a9e7e", borderRadius: 3, marginTop: 28 }} />
           <div style={{ fontSize: 32, color: "#3a2e1e", opacity: 0.78, marginTop: 28, maxWidth: 560 }}>
-            CS @ Waterloo — building thoughtful software, from Android Automotive to a few too many games.
+            {SITE_DESCRIPTION}
           </div>
           <div
             style={{
@@ -49,7 +50,7 @@ export default function OpengraphImage() {
               fontFamily: "ui-monospace, monospace",
             }}
           >
-            georgezhang.ca
+            {SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "")}
           </div>
         </div>
 
