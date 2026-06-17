@@ -34,8 +34,25 @@ export function requestOrigin(request: Request): string {
 export const PERSON = {
   name: "George Zhang",
   jobTitle: "Software Engineer · CS Student",
+  // One-line bio → the Person `description` in structured data; helps search + AI engines summarize
+  // who you are. Mirrors the hero.
+  bio: "CS student at the University of Waterloo building thoughtful software — from Android Automotive at Ford to computer-vision rehab tools and competitive programming.",
+  // Current role (per the hero). Update or clear this when the role changes — it's asserted as
+  // `worksFor` in structured data, so stale data here is a stale claim.
+  worksFor: "Ford Motor Company",
   alumniOf: "University of Waterloo",
   email: "gzhang06@outlook.com",
+  location: { city: "Waterloo", region: "Ontario", country: "Canada" },
+  // Topics you're known for — a direct topical-relevance signal for search + AI answer engines
+  // (surfaced as JSON-LD `knowsAbout`). Keep these honest and grounded in the site's content.
+  knowsAbout: [
+    "Software Engineering",
+    "Competitive Programming",
+    "Algorithms and Data Structures",
+    "Android Development",
+    "Computer Vision",
+    "Full-Stack Web Development",
+  ],
   // Every profile that is "also me" — the strongest signal for search engines (and AI answer
   // engines) to consolidate these into one entity. Surfaced as JSON-LD `sameAs` + <link rel="me">.
   sameAs: [

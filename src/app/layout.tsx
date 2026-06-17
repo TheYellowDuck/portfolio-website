@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
+  authors: [{ name: PERSON.name, url: SITE_URL }],
+  creator: PERSON.name,
   alternates: { canonical: "/" },
   openGraph: {
     title: SITE_TITLE,
@@ -104,13 +106,45 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Person",
-              name: PERSON.name,
-              url: SITE_URL,
-              jobTitle: PERSON.jobTitle,
-              email: `mailto:${PERSON.email}`,
-              alumniOf: { "@type": "CollegeOrUniversity", name: PERSON.alumniOf },
-              sameAs: PERSON.sameAs,
+              "@graph": [
+                {
+                  "@type": "Person",
+                  "@id": `${SITE_URL}/#person`,
+                  name: PERSON.name,
+                  url: SITE_URL,
+                  jobTitle: PERSON.jobTitle,
+                  description: PERSON.bio,
+                  email: `mailto:${PERSON.email}`,
+                  alumniOf: { "@type": "CollegeOrUniversity", name: PERSON.alumniOf },
+                  worksFor: { "@type": "Organization", name: PERSON.worksFor },
+                  knowsAbout: PERSON.knowsAbout,
+                  address: {
+                    "@type": "PostalAddress",
+                    addressLocality: PERSON.location.city,
+                    addressRegion: PERSON.location.region,
+                    addressCountry: PERSON.location.country,
+                  },
+                  sameAs: PERSON.sameAs,
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}/#website`,
+                  url: SITE_URL,
+                  name: SITE_TITLE,
+                  description: SITE_DESCRIPTION,
+                  inLanguage: "en",
+                  publisher: { "@id": `${SITE_URL}/#person` },
+                },
+                {
+                  "@type": "ProfilePage",
+                  "@id": `${SITE_URL}/#profilepage`,
+                  url: SITE_URL,
+                  name: SITE_TITLE,
+                  isPartOf: { "@id": `${SITE_URL}/#website` },
+                  about: { "@id": `${SITE_URL}/#person` },
+                  mainEntity: { "@id": `${SITE_URL}/#person` },
+                },
+              ],
             }),
           }}
         />
