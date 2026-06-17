@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Portfolio from "./site/Portfolio";
+import { content } from "@/content";
 import IntroCurtain from "./site/IntroCurtain";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
@@ -201,23 +202,27 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     const email =
       giftShopExhibits.flatMap((e) => e.popup?.links ?? []).find((l) => l.url.startsWith("mailto:"))?.url.replace("mailto:", "") ??
       PERSON.email;
+    const goTo = content.palette.groups.goTo;
+    // "Go to" labels reuse the section titles (content.sections.*.title) so they can't drift.
     const sections: Command[] = [
-      { id: "s-top", label: "Home", group: "Go to", keywords: "top hero intro start", run: scrollTo("top") },
-      { id: "s-work", label: "Selected Work", group: "Go to", keywords: "projects portfolio", run: scrollTo("work") },
-      { id: "s-exp", label: "Experience", group: "Go to", keywords: "work jobs", run: scrollTo("experience") },
-      { id: "s-skills", label: "Skills", group: "Go to", keywords: "tech stack", run: scrollTo("skills") },
-      { id: "s-about", label: "About", group: "Go to", keywords: "bio me", run: scrollTo("about") },
-      { id: "s-cp", label: "Competitive Programming", group: "Go to", keywords: "leetcode dmoj problems grind", run: scrollTo("competitive") },
-      { id: "s-contact", label: "Contact", group: "Go to", keywords: "email reach", run: scrollTo("contact") },
+      { id: "s-top", label: content.palette.commands.home, group: goTo, keywords: "top hero intro start", run: scrollTo("top") },
+      { id: "s-work", label: content.sections.work.title, group: goTo, keywords: "projects portfolio", run: scrollTo("work") },
+      { id: "s-exp", label: content.sections.experience.title, group: goTo, keywords: "work jobs", run: scrollTo("experience") },
+      { id: "s-skills", label: content.sections.skills.title, group: goTo, keywords: "tech stack", run: scrollTo("skills") },
+      { id: "s-about", label: content.sections.about.title, group: goTo, keywords: "bio me", run: scrollTo("about") },
+      { id: "s-cp", label: content.sections.competitive.title, group: goTo, keywords: "leetcode dmoj problems grind", run: scrollTo("competitive") },
+      { id: "s-contact", label: content.sections.contact.title, group: goTo, keywords: "email reach", run: scrollTo("contact") },
     ];
     const projects: Command[] = [...mainHallExhibits, ...archiveExhibits]
       .filter((e) => e.popup?.title)
-      .map((e) => ({ id: "p-" + (slugForPopup(e.popup!) ?? e.popup!.title!), label: e.popup!.title!, group: "Projects", run: () => openPopup(e.popup!) }));
+      .map((e) => ({ id: "p-" + (slugForPopup(e.popup!) ?? e.popup!.title!), label: e.popup!.title!, group: content.palette.groups.projects, run: () => openPopup(e.popup!) }));
+    const { actions: actionsGroup } = content.palette.groups;
+    const { hints, commands } = content.palette;
     const actions: Command[] = [
-      { id: "enter", label: "Step inside the museum", group: "Actions", hint: "Game", keywords: "play explore pixel", run: () => enterGame() },
-      { id: "resume", label: "Open résumé", group: "Actions", hint: "Doc", keywords: "cv", run: () => openPopup({ type: "resume" }) },
-      { id: "transcript", label: "Education & transcript", group: "Actions", hint: "Doc", keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
-      { id: "email", label: "Copy email address", group: "Actions", hint: "Contact", keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
+      { id: "enter", label: commands.enter, group: actionsGroup, hint: hints.game, keywords: "play explore pixel", run: () => enterGame() },
+      { id: "resume", label: commands.resume, group: actionsGroup, hint: hints.doc, keywords: "cv", run: () => openPopup({ type: "resume" }) },
+      { id: "transcript", label: commands.transcript, group: actionsGroup, hint: hints.doc, keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
+      { id: "email", label: commands.copyEmail, group: actionsGroup, hint: hints.contact, keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
     ];
     return [...sections, ...projects, ...actions];
   }, [enterGame, openPopup]);

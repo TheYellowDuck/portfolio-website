@@ -8,9 +8,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { config } from "./github-sync.config.mjs";
 
-const LC_USER = "georgezhang006";
-const DMOJ_USER = "georgezhang006";
+const LC_USER = config.leetcode;
+const DMOJ_USER = config.dmoj;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, "..", "src", "data", "cp-stats.generated.json");
 

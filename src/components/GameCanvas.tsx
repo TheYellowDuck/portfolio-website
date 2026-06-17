@@ -7,6 +7,7 @@ import { interactables } from "@/game/interactables";
 import { Exhibit, ExhibitPopup } from "@/data/projects";
 import { slugForPopup } from "@/lib/exhibit-slugs";
 import { PERSON, LINKS } from "@/lib/site";
+import { content } from "@/content";
 import { loadDiscovered, saveDiscovered, loadAudioPrefs, saveAudioPrefs } from "@/lib/museum-prefs";
 import { Howl, Howler } from "howler";
 import BottomHint from "./BottomHint";
@@ -417,7 +418,7 @@ export default function GameCanvas({
 
     engine.onEvent = (event: GameEvent) => {
       switch (event.type) {
-        case "nearby":  setPrompt((event.content.dialog || event.content.jokes) ? "Press E to talk" : "Press E to inspect"); break;
+        case "nearby":  setPrompt((event.content.dialog || event.content.jokes) ? content.game.promptTalk : content.game.promptInspect); break;
         case "leave":   setPrompt(null); break;
         case "idle":    setShowControls(true); break;
         case "active":  setShowControls(false); break;
@@ -609,7 +610,7 @@ export default function GameCanvas({
           }
           message={
             showControls && !isLoading && !activePopup
-              ? (isTouch ? "Drag to move · push to run · tap E to inspect" : "WASD to move · Shift to sprint")
+              ? (isTouch ? content.game.controlsTouch : content.game.controlsKeyboard)
               : (prompt ?? "")
           }
           isTouch={isTouch}

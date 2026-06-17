@@ -5,6 +5,11 @@
 export const config = {
   username: "TheYellowDuck",
 
+  // Competitive-programming handles (read by sync-cp-stats.mjs) — kept here so every profile handle
+  // the build-time sync scripts need lives in one place.
+  leetcode: "georgezhang006",
+  dmoj: "georgezhang006",
+
   // Repos to skip entirely. Exact names or simple globs ("test-*", "*-fork").
   ignore: [
     "ML-For-Beginners", // Microsoft course fork

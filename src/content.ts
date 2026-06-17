@@ -17,11 +17,12 @@
  *   content.hero.*        → components/site/Hero.tsx
  *   content.hero.eyebrow  → ALSO components/site/IntroCurtain.tsx   (one key, two readers)
  *   content.nav.*         → components/site/Portfolio.tsx (sticky nav)
- *   content.sections.*    → components/site/Portfolio.tsx
+ *   content.sections.*    → components/site/Portfolio.tsx  (titles also reused by the palette below)
  *   content.footer.*      → components/site/Portfolio.tsx
  *   content.loading.*     → components/LoadingScreen.tsx
  *   content.notFound.*    → app/not-found.tsx
- *   content.palette.*     → components/site/CommandPalette.tsx
+ *   content.palette.*     → components/site/CommandPalette.tsx (chrome) + SiteShell.tsx (command list)
+ *   content.game.*        → components/GameCanvas.tsx  (in-game HUD; message passed to BottomHint)
  *
  * ── NOT here, and where it lives instead (this file's copy coexists with these sources) ──────
  *   • Exhibit copy (project titles/descriptions/tech/links, the About story, skills) → data/projects.ts
@@ -30,9 +31,6 @@
  *   • SEO page title + description → lib/site.ts  [SITE_TITLE, SITE_DESCRIPTION]
  *   • The hero "Currently:" VALUE (role or academic term) → computed in app/page.tsx
  *       from projects.ts currentRole() + the parsed transcript.
- *   • Command-palette COMMAND labels (Home, section jumps, actions) → components/SiteShell.tsx
- *       They're bound to navigation handlers/ids, not standalone copy.
- *   • In-game HUD hint text (BottomHint `message`) → supplied by the game (GameCanvas/engine).
  *   • classNames, event names ("command-palette:open"), storage keys ("museum:theme") → left inline;
  *       they're code contracts/styling, not content.
  */
@@ -96,6 +94,27 @@ const en = {
     navigate: "↑↓ navigate",
     open: "↵ open",
     close: "esc close",
+    // Command entries (built in SiteShell). NOTE: the "Go to" section jumps reuse sections.*.title
+    // above — one source — so they can't drift from the section headers. Only the non-section
+    // commands need their own labels here.
+    groups: { goTo: "Go to", projects: "Projects", actions: "Actions" },
+    hints: { game: "Game", doc: "Doc", contact: "Contact" },
+    commands: {
+      home: "Home",
+      enter: "Step inside the museum",
+      resume: "Open résumé",
+      transcript: "Education & transcript",
+      copyEmail: "Copy email address",
+    },
+  },
+  // In-game HUD copy (the canvas museum) — a distinct voice from the site chrome, but kept in the same
+  // dictionary so one translation covers the whole product. GameCanvas reads these and passes the
+  // active one to BottomHint as its `message`.
+  game: {
+    promptTalk: "Press E to talk",
+    promptInspect: "Press E to inspect",
+    controlsTouch: "Drag to move · push to run · tap E to inspect",
+    controlsKeyboard: "WASD to move · Shift to sprint",
   },
 } as const;
 
