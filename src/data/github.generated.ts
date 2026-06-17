@@ -139,101 +139,6 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
-      "title": "Robotics",
-      "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
-      "tech": [
-        "Python",
-        "Computer Vision",
-        "Testing",
-        "Robotics & Embedded",
-        "Processing",
-        "Autonomous navigation",
-        "Robotics & embedded programming",
-        "Computer vision",
-        "Image processing",
-        "Sensor integration & fusion",
-        "Motor control",
-        "Maze mapping",
-        "Algorithmic navigation",
-        "Bitmasking & state encoding",
-        "Serial communication",
-        "Real-time control loop",
-        "Iterative engineering",
-        "Hardware calibration"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "Computer Vision",
-            "Computer vision",
-            "Image processing"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Algorithmic navigation",
-            "Algorithms & DS"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Real-time control loop"
-          ]
-        },
-        {
-          "category": "Systems & Embedded",
-          "items": [
-            "Robotics & Embedded",
-            "Robotics & embedded programming"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Autonomous navigation"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Processing",
-            "Sensor integration & fusion",
-            "Motor control",
-            "Maze mapping",
-            "Bitmasking & state encoding",
-            "Serial communication",
-            "Iterative engineering",
-            "Hardware calibration",
-            "Game Development",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/Robotics"
-        }
-      ]
-    }
-  },
-  {
-    "popup": {
       "title": "My Fridge",
       "description": "A clean, modern Android app for tracking what's in your fridge, getting notified before things expire, and keeping your shopping organised — all in one place. Built with Kotlin and Jetpack Compose on an MVVM architecture, and published on the Google Play Store. Fridge tracker — add items with an expiry countdown; items sort automatically by urgency (expiring first); Expiry labels — colour-coded: grey for future, orange for today, red for expired; Smart notifications — a background worker runs daily at your chosen time and alerts you when something is about to expire; configure how many days in advance you want the warning; Shopping list — keep a running list with per-item quantities; swipe to remove, or tap Move all to My Fridge after a shop; Saved items — store your regular items as templates and add them to the fridge or shopping list in one tap; Search — instant filter on every list screen; Undo delete — swipe to dismiss or tap the delete icon; a brief snackbar lets you undo before it's gone; Expiry badge — the My Fridge tab shows a live count of items needing attention; Dark mode — full Material You colour scheme, works in light and dark system themes; Settings — choose your daily notification time (clock picker) and expiry warning window (0–30 days) The app follows an MVVM architecture. A MainViewModel holds the UI state and business logic and exposes it as StateFlow, which Jetpack Compose observes to recompose screens automatically. Data is persisted locally with a Room database (entity, DAO, and an ItemRepository interface backed by an OfflineItemRepository), using KSP for annotation processing. Screens are wired together with Navigation Compose, and user settings persist via Jetpack DataStore / SharedPreferences. Expiry reminders are powered by WorkManager: a daily CoroutineWorker recalculates each item's days-until-expiry and fires a local notification at the user's chosen time, with a configurable lead window — scheduled so it survives app restarts and device reboots. Shared UI is factored into reusable composables (ItemCard, EditCard, TopBar), and the whole interface is themed with Material 3. MVVM architecture — ViewModel + repository + Room, with UI state exposed as StateFlow; Declarative UI — Jetpack Compose with Material 3 (Material You) theming; Reactive state management — Compose state and StateFlow driving automatic recomposition; Asynchronous concurrency — Kotlin coroutines and Flow for non-blocking data access; Local persistence — Room database (entity, DAO, repository) with KSP annotation processing; Repository design pattern — ItemRepository interface with an offline implementation; Background processing — WorkManager CoroutineWorker for a daily expiry check; Local notifications — scheduled alerts with a user-configurable lead time; Navigation — multi-screen routing with Navigation Compose; Preferences storage — Jetpack DataStore / SharedPreferences for settings; Component reuse — shared composables (ItemCard, EditCard, TopBar); Material Design 3 — light/dark theming, colour scheme, and typography; UX engineering — swipe-to-delete with undo snackbar, instant search, urgency sorting, live badges; Lifecycle awareness — boot receiver and lifecycle-aware scheduling; Gradle build system — Android Gradle Plugin, Compose BOM, and KSP; Shipping to production — published on the Google Play Store Get it on Google Play: play.google.com/store/apps/details?id=com.iamtherealgeorge.myfridge",
       "tech": [
@@ -278,6 +183,12 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "Gradle",
             "JUnit"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Generative AI / LLMs"
           ]
         },
         {
@@ -386,6 +297,12 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "AI & ML",
+          "items": [
+            "Generative AI / LLMs"
+          ]
+        },
+        {
           "category": "Algorithms & DS",
           "items": [
             "Algorithm design",
@@ -459,6 +376,101 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Robotics",
+      "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
+      "tech": [
+        "Python",
+        "Computer Vision",
+        "Testing",
+        "Robotics & Embedded",
+        "Processing",
+        "Autonomous navigation",
+        "Robotics & embedded programming",
+        "Computer vision",
+        "Image processing",
+        "Sensor integration & fusion",
+        "Motor control",
+        "Maze mapping",
+        "Algorithmic navigation",
+        "Bitmasking & state encoding",
+        "Serial communication",
+        "Real-time control loop",
+        "Iterative engineering",
+        "Hardware calibration"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Computer Vision",
+            "Computer vision",
+            "Image processing"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Algorithmic navigation",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Real-time control loop"
+          ]
+        },
+        {
+          "category": "Systems & Embedded",
+          "items": [
+            "Robotics & Embedded",
+            "Robotics & embedded programming"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Autonomous navigation"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Processing",
+            "Sensor integration & fusion",
+            "Motor control",
+            "Maze mapping",
+            "Bitmasking & state encoding",
+            "Serial communication",
+            "Iterative engineering",
+            "Hardware calibration",
+            "Game Development",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/Robotics"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Box Head 2 Play",
       "description": "A top-down endless survival shooter built in Java with the Processing framework, inspired by the classic Flash game BoxHead 2 Play and modernised with Survivor.io-style mechanics. It features a procedurally generated infinite map, BFS flow-field pathfinding, seven enemy types, six weapons, and a 30+ card upgrade system — all built on a shared object-oriented entity model. Procedural infinite map — value-noise terrain generates a unique layout every run; enclosed floor pockets are detected and broken open at runtime via BFS connectivity analysis; BFS flow-field pathfinding — dual fields (standard + clearance-inflated for large enemies) rebuild on player tile change; enemies navigate through complex corridors without getting stuck; 7 enemy types with wave-scaled stats — Zombie, Skeleton, Shooter, Gunner, Brute, Marksman, and Devil (boss), each with distinct AI behaviour; 6 weapons — Pistol, Shotgun, SMG, Minigun, Sniper Rifle, Rocket Launcher; all acquired through procedural crate drops and upgradeable via level-up cards; Comprehensive upgrade system — 30+ upgrades across weapons, bullet modifiers, and defensive items; each upgrade is one-per-run and applied globally across all owned guns; Bullet modifier stack — Ricochet (up to 3 bounces), Chain Strike (arcs to 4 enemies), Frag Rounds (AoE splash per hit), Cryo (slow), Incendiary (burn DoT); all modifiers propagate to drones and turrets in real time; Defensive items — Force Field (contact-absorbing shield), Combat Drones (orbiting auto-turrets that mirror the player's active weapon), Blade Spin (rotating melee), Damage Aura, Shockwave pulse, Pickup Magnet; Kill-streak XP multiplier, floating damage numbers, elite enemy variants, wave events (Boss Rush, Supply Drop, Enemy Horde), and danger zones Shared entity model — a common Entity base handles physics, status effects (slow, burn), hit-flash, and HP bars; weapon logic lives in a unified Gun class used by the player, enemies, drones, and turrets alike, with concrete enemy and weapon subclasses extending the shared behaviour.; BFS flow-field pathfinding — two distance fields (a standard field and a clearance-inflated one for large enemies) are rebuilt from the player whenever the player crosses a tile boundary, so every enemy can follow the gradient to the player through complex corridors.; Reactive map repair — WorldMap.wouldIsolate uses a local 9×9 BFS to prevent small enclosed pockets at generation time; the Pathfinder.fixEnclosures pass catches larger rings after each flow-field rebuild and permanently opens wall tiles via WorldMap.openWall.; Shield absorption model — the shield intercepts the total HP delta from entity-contact damage before committing the kill flag; bullet damage intentionally bypasses the shield for difficulty.; Upgrades propagate to allies — syncAlliedGuns runs every frame, copying the full bullet style (pellet count, spread, speed, AoE radius, penetration, and all modifiers) from the player's active gun to every drone and turret. Object-oriented design — 30+ classes for entities, weapons, enemies, and items; Inheritance & polymorphism — enemy and weapon hierarchies over a shared Entity / Gun base; Entity–component modelling — physics, status effects, hit-flash, and HP bars on a common base; Game AI — seven enemy types with distinct behaviours, wave-scaled stats, and elite variants; BFS flow-field pathfinding — dual distance fields rebuilt on player movement; Graph connectivity analysis — BFS enclosure detection (wouldIsolate, fixEnclosures) and runtime wall opening; Procedural generation — value-noise infinite terrain with runtime connectivity repair; Collision detection & physics — entity contact, bullet hits, knockback, status effects; Spatial partitioning — tile grid for navigation and world representation; Game systems design — 30+ upgrades, a bullet-modifier stack, defensive items, and wave events; Real-time state propagation — per-frame weapon-style sync from player to drones and turrets;",
       "tech": [
@@ -485,6 +497,12 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Languages",
           "items": [
             "Java"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Generative AI / LLMs"
           ]
         },
         {
@@ -564,7 +582,10 @@ export const generatedMainHall: Exhibit[] = [
         "scikit-learn",
         "PyTorch",
         "Pillow",
+        "OpenAI API",
+        "Anthropic API",
         "Requests",
+        "Transformers",
         "Computer Vision",
         "Concurrency",
         "Testing",
@@ -617,9 +638,15 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "AI & ML",
           "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "Transformers",
             "Computer Vision",
+            "LLM application development",
             "Computer vision / multimodal AI",
-            "Machine Learning"
+            "Semantic embeddings",
+            "Machine Learning",
+            "Generative AI / LLMs"
           ]
         },
         {
@@ -653,10 +680,8 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "Pillow",
             "Requests",
-            "LLM application development",
             "Prompt caching",
             "Structured outputs",
-            "Semantic embeddings",
             "Hierarchical classification",
             "Rate-limit handling",
             "Fault tolerance",
@@ -721,7 +746,8 @@ export const generatedMainHall: Exhibit[] = [
           "category": "AI & ML",
           "items": [
             "Image processing",
-            "Computer Vision"
+            "Computer Vision",
+            "Generative AI / LLMs"
           ]
         },
         {
@@ -781,10 +807,7 @@ export const generatedMainHall: Exhibit[] = [
       ],
       "embedUrl": "https://www.youtube.com/embed/wKVpjcZxiz4"
     }
-  }
-];
-
-export const generatedArchive: Exhibit[] = [
+  },
   {
     "popup": {
       "title": "Web Agent",
@@ -794,6 +817,9 @@ export const generatedArchive: Exhibit[] = [
         "Playwright",
         "Pandas",
         "Matplotlib",
+        "OpenAI API",
+        "Anthropic API",
+        "LiteLLM",
         "React",
         "SciPy",
         "Pillow",
@@ -854,6 +880,16 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "AI & ML",
+          "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "LLM-as-judge evaluation",
+            "Provider-agnostic LLM abstraction",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
           "category": "Concurrency & Networking",
           "items": [
             "Parallel evaluation"
@@ -862,7 +898,6 @@ export const generatedArchive: Exhibit[] = [
         {
           "category": "Architecture & Design",
           "items": [
-            "Provider-agnostic LLM abstraction",
             "Factory pattern",
             "OOP & Design Patterns"
           ]
@@ -879,12 +914,12 @@ export const generatedArchive: Exhibit[] = [
         {
           "category": "Concepts & Practices",
           "items": [
+            "LiteLLM",
             "Pillow",
             "JavaScript",
             "HTML",
             "ReAct agent loop",
             "Reflection / self-correction",
-            "LLM-as-judge evaluation",
             "Accessibility-tree observation",
             "Set-of-Marks visual grounding",
             "Structured outputs",
@@ -914,6 +949,112 @@ export const generatedArchive: Exhibit[] = [
       ]
     }
   },
+  {
+    "popup": {
+      "title": "Cockroach",
+      "description": "A real-time 2D Java desktop game where cockroaches swarm in from the edges of the screen. Squash them before they eat your crumbs. The cockroaches run a lightweight greedy-steering AI to seek food and flee from fast cursor movement, all rendered with procedural Graphics2D animation. https://github.com/user-attachments/assets/1be13148-a2f2-4951-9818-146e4dd8ade0 Cockroaches spawn continuously from all four edges and wander across the screen. Drop bread crumbs to lure them — cockroaches use greedy steering to seek the nearest crumb and will eat it down to nothing. Move your cursor too quickly near a cockroach and it will scatter. Left-click to squash; a splat mark fades on the floor where it died. Swing game loop — javax.swing.Timer drives all updates on the EDT, giving thread-safe state mutation without locks while keeping repaint latency low.; Greedy steering AI — cockroaches find the nearest crumb and pick the 8-directional heading with the highest dot product against the target bearing, replacing an earlier pixel-level BFS that allocated a fresh 600 × 600 visited array per entity per tick.; Flee behaviour — peak cursor speed is sampled between direction-update cycles; any cockroach within 100 px when the speed threshold is exceeded steers directly away for ~0.8 s.; Custom 2D renderer — entities are drawn with Graphics2D transforms (translate → rotate → scale): body oval, head, eyes, antennae, and three leg pairs, all rotated to face the direction of travel. Death plays a squish-and-fade animation by scaling the transform over 100 frames.; Persistent splat marks — squash events stamp a dark oval into a separate list that fades over ~5 seconds independently of the entity lifecycle.; Crumb consumption — each crumb has 10 health points; stopped cockroaches bite stochastically (~3 % chance per frame), and the crumb shrinks visually in proportion to remaining health. Object-oriented design — Cockroach, Entity, Mouse, and Layout classes; Event-driven programming — Java Swing mouse handling and timer-driven updates; Game loop architecture — javax.swing.Timer on the EDT for lock-free, thread-safe state; Game AI & steering behaviours — greedy seek toward nearest crumb, flee on fast cursor; Vector math — 8-directional heading chosen by maximum dot product against the target bearing; Performance optimisation — replaced a per-tick 600×600 BFS scan with O(1) greedy steering; Collision & hit detection — click-to-squash hit testing and crumb proximity; Custom 2D rendering — Graphics2D affine transforms (translate/rotate/scale), procedural sprites; Animation — squish-and-fade death and time-decaying splat marks; Object lifecycle management — independent entity, crumb, and splat lists; Stochastic behaviour — probabilistic crumb biting and randomised spawning; Input handling — left-click squash, drag-and-throw, right-click crumb placement; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, Graphics2D, javax.swing.Timer, MouseListener); Java Platform Module System (module-info.java); Packaged as a runnable JAR (cockroach.jar); Eclipse IDE",
+      "tech": [
+        "Java",
+        "Game AI",
+        "Testing",
+        "Swing",
+        "Object-oriented design",
+        "Event-driven programming",
+        "Game loop architecture",
+        "Game AI & steering behaviours",
+        "Vector math",
+        "Performance optimisation",
+        "Collision & hit detection",
+        "Custom 2D rendering",
+        "Animation",
+        "Object lifecycle management",
+        "Stochastic behaviour",
+        "Input handling",
+        "Java Platform Module System",
+        "JAR packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Java"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "Swing"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency"
+          ]
+        },
+        {
+          "category": "Game AI",
+          "items": [
+            "Game AI",
+            "Game AI & steering behaviours"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "Custom 2D rendering",
+            "Animation"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Game loop architecture",
+            "Object lifecycle management",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "JAR packaging"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Event-driven programming",
+            "Vector math",
+            "Performance optimisation",
+            "Collision & hit detection",
+            "Stochastic behaviour",
+            "Input handling",
+            "Java Platform Module System",
+            "Game Development",
+            "Game Physics"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/cockroach"
+        }
+      ],
+      "videoUrl": "/videos/cockroach.mp4"
+    }
+  }
+];
+
+export const generatedArchive: Exhibit[] = [
   {
     "popup": {
       "title": "PONG",
@@ -1001,103 +1142,6 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "videoUrl": "/videos/PONG.mp4"
-    }
-  },
-  {
-    "popup": {
-      "title": "Cockroach",
-      "description": "A real-time 2D Java desktop game where cockroaches swarm in from the edges of the screen. Squash them before they eat your crumbs. The cockroaches run a lightweight greedy-steering AI to seek food and flee from fast cursor movement, all rendered with procedural Graphics2D animation. https://github.com/user-attachments/assets/1be13148-a2f2-4951-9818-146e4dd8ade0 Cockroaches spawn continuously from all four edges and wander across the screen. Drop bread crumbs to lure them — cockroaches use greedy steering to seek the nearest crumb and will eat it down to nothing. Move your cursor too quickly near a cockroach and it will scatter. Left-click to squash; a splat mark fades on the floor where it died. Swing game loop — javax.swing.Timer drives all updates on the EDT, giving thread-safe state mutation without locks while keeping repaint latency low.; Greedy steering AI — cockroaches find the nearest crumb and pick the 8-directional heading with the highest dot product against the target bearing, replacing an earlier pixel-level BFS that allocated a fresh 600 × 600 visited array per entity per tick.; Flee behaviour — peak cursor speed is sampled between direction-update cycles; any cockroach within 100 px when the speed threshold is exceeded steers directly away for ~0.8 s.; Custom 2D renderer — entities are drawn with Graphics2D transforms (translate → rotate → scale): body oval, head, eyes, antennae, and three leg pairs, all rotated to face the direction of travel. Death plays a squish-and-fade animation by scaling the transform over 100 frames.; Persistent splat marks — squash events stamp a dark oval into a separate list that fades over ~5 seconds independently of the entity lifecycle.; Crumb consumption — each crumb has 10 health points; stopped cockroaches bite stochastically (~3 % chance per frame), and the crumb shrinks visually in proportion to remaining health. Object-oriented design — Cockroach, Entity, Mouse, and Layout classes; Event-driven programming — Java Swing mouse handling and timer-driven updates; Game loop architecture — javax.swing.Timer on the EDT for lock-free, thread-safe state; Game AI & steering behaviours — greedy seek toward nearest crumb, flee on fast cursor; Vector math — 8-directional heading chosen by maximum dot product against the target bearing; Performance optimisation — replaced a per-tick 600×600 BFS scan with O(1) greedy steering; Collision & hit detection — click-to-squash hit testing and crumb proximity; Custom 2D rendering — Graphics2D affine transforms (translate/rotate/scale), procedural sprites; Animation — squish-and-fade death and time-decaying splat marks; Object lifecycle management — independent entity, crumb, and splat lists; Stochastic behaviour — probabilistic crumb biting and randomised spawning; Input handling — left-click squash, drag-and-throw, right-click crumb placement; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, Graphics2D, javax.swing.Timer, MouseListener); Java Platform Module System (module-info.java); Packaged as a runnable JAR (cockroach.jar); Eclipse IDE",
-      "tech": [
-        "Java",
-        "Game AI",
-        "Testing",
-        "Swing",
-        "Object-oriented design",
-        "Event-driven programming",
-        "Game loop architecture",
-        "Game AI & steering behaviours",
-        "Vector math",
-        "Performance optimisation",
-        "Collision & hit detection",
-        "Custom 2D rendering",
-        "Animation",
-        "Object lifecycle management",
-        "Stochastic behaviour",
-        "Input handling",
-        "Java Platform Module System",
-        "JAR packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Java"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "Swing"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency"
-          ]
-        },
-        {
-          "category": "Game AI",
-          "items": [
-            "Game AI",
-            "Game AI & steering behaviours"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "Custom 2D rendering",
-            "Animation"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Game loop architecture",
-            "Object lifecycle management",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing",
-            "JAR packaging"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Event-driven programming",
-            "Vector math",
-            "Performance optimisation",
-            "Collision & hit detection",
-            "Stochastic behaviour",
-            "Input handling",
-            "Java Platform Module System",
-            "Game Development",
-            "Game Physics"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/cockroach"
-        }
-      ],
-      "videoUrl": "/videos/cockroach.mp4"
     }
   },
   {
@@ -1447,6 +1491,88 @@ export const generatedArchive: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Snake",
+      "description": "A fully playable, built-from-scratch Snake game written in Java Swing — my first independent software project. It implements a complete fixed-timestep game loop, custom 2D rendering, collision detection, and persistent high-score storage using only the Java standard library, with no game engine or third-party dependencies. https://github.com/user-attachments/assets/86964c33-f588-46e8-9a75-cb2526216e93 Grid-based snake movement on a 60×30 board with wrap-around borders; Apple spawning that never lands on the snake's current body; Real-time score plus a persistent high score saved across sessions; Start and game-over overlays, with instant restart (R) without relaunching; WASD and arrow-key controls, with 180° reversal protection; Custom-drawn HUD, snake, food, and translucent message overlays The game is driven by an event-driven loop built on a javax.swing.Timer that fires about 12 times per second (FPS = 12). On each tick the game applies buffered input, advances the snake one cell, runs collision checks, and triggers a repaint. Input is deliberately decoupled from movement: a keypress only sets a pending direction (nextXv / nextYv), which is committed at the start of the next tick. A guard rejects any direct 180° reversal — this eliminates the classic bug where two quick keypresses between frames fold the snake back onto itself. The playfield wraps at every edge, so leaving one side re-enters from the opposite one. The snake's body is stored as a trail of grid coordinates; each tick appends the new head and trims the tail to the current length. Self-collision is detected by scanning the trail for the head's position, and food is re-rolled until it lands on an empty cell. The high score is persisted to a dotfile (~/.snakehighscore) in the user's home directory — loaded on startup, written on every new record, and flushed again on exit (window close or Esc). All visuals are produced in a single custom paintComponent override using AWT Graphics primitives. This was my first programming project, written to learn the fundamentals of Java, event-driven GUI design, and game-loop architecture from the ground up. It has since been refactored to fix several original bugs — timer misuse on the event dispatch thread, game logic embedded in the paint method, and incorrect high-score tracking — while preserving its original structure and scope. Object-oriented design — game model, rendering, and input separated across classes; Event-driven programming — built on Java Swing's event dispatch model; Game loop architecture — fixed-timestep loop via javax.swing.Timer (~12 FPS); 2D rendering — custom paintComponent / Graphics drawing of every element; Collision detection — self-collision and boundary wrap-around; Input handling — buffered direction changes with 180° reversal prevention; Separation of concerns — KeyListener decoupled from game and render logic; File I/O — persistent high-score storage across sessions; Application lifecycle handling — save-on-exit via a WindowListener; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 11+; Java Swing (JPanel, JFrame, javax.swing.Timer); AWT (Graphics, Color, Font, FontMetrics, KeyListener / KeyEvent); Java Platform Module System (module-info.java); java.io file I/O; Packaged as a runnable modular JAR (Snake.jar)",
+      "tech": [
+        "Java",
+        "Swing",
+        "Object-oriented design",
+        "Event-driven programming",
+        "Game loop architecture",
+        "2D rendering",
+        "Collision detection",
+        "Input handling",
+        "Separation of concerns",
+        "File I/O",
+        "Application lifecycle handling",
+        "Java Platform Module System",
+        "JAR packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Java"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "Swing"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "2D rendering"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Game loop architecture",
+            "Application lifecycle handling",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "JAR packaging"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Event-driven programming",
+            "Collision detection",
+            "Input handling",
+            "Separation of concerns",
+            "File I/O",
+            "Java Platform Module System",
+            "Game Development",
+            "Game Physics"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/Snake"
+        }
+      ],
+      "videoUrl": "/videos/Snake.mp4"
+    }
+  },
+  {
+    "popup": {
       "title": "Go Board Game",
       "description": "A fully playable 19×19 Go board game built in Java using the Processing library. It enforces the Chinese ruleset, handles all the tricky game logic (ko, suicide, group capture via BFS liberty checking), and renders smooth 3D-style stones with real-time hover feedback. https://github.com/user-attachments/assets/b50b9cbb-6e3c-4c03-96b8-1c9e5ed455c8 This project implements the ancient strategy game of Go as a standalone desktop application. It enforces Chinese ruleset scoring, handles all edge-case game logic (ko, suicide, group capture), and renders smooth 3D-style stones with real-time hover feedback — built on top of Processing's Java2D rendering pipeline. Chinese rules — area scoring (stones + territory) with 7.5 komi for White; Capture detection — BFS flood-fill liberty checking for individual stones and connected groups; Ko rule — rejects moves that recreate the previous board position; Suicide prevention — illegal self-capture moves are blocked before placement; Pass & Reset — pass your turn or restart the game at any time; Game end — two consecutive passes trigger automatic scoring and declare a winner; Territory visualisation — empty intersections are marked at game end to show each player's scored regions; 3D stone rendering — each stone is drawn with shadow, radial gradient, and specular highlight layers; Hover preview — semi-transparent ghost stone follows the cursor for precise placement; App icon — custom logo displayed on the window, taskbar, and macOS Dock The board state and rules live in a Go logic class, kept separate from the Sketch class that handles all Processing rendering and input. Captures are resolved with a BFS flood-fill: when a stone is placed, each adjacent enemy group is flooded to count its liberties, and any group with zero liberties is removed. The same liberty check, applied to the just-placed stone, enforces suicide prevention. The ko rule is implemented by snapshotting the previous board position and rejecting any move that would recreate it. At game end (two consecutive passes), the engine performs Chinese area scoring — counting each player's stones plus the empty territory they fully enclose, adding a 7.5 komi for White, and declaring the winner. Stones are rendered as layered 2D primitives (drop shadow, radial gradient body, specular highlight) for a 3D look, and a translucent ghost stone tracks the cursor for precise placement. Object-oriented design — game logic (Go) separated from rendering/input (Sketch); Game-rule engine — complete Go ruleset with Chinese area scoring and komi; BFS flood-fill — stone and connected-group liberty/capture detection; Graph connectivity — flooding adjacent groups to evaluate captures; Ko-rule detection — rejects moves that repeat the previous board position; Suicide-move prevention — illegal self-capture blocked before placement; Territory scoring — enclosed-region detection for end-game area scoring; Custom 2D rendering — layered 3D-style stones (shadow, radial gradient, specular highlight); Interactive UI — real-time hover ghost-stone preview; Game state management — turn order, pass, reset, and automatic end detection; Processing framework — PApplet with the Java2D renderer; Application packaging — window/taskbar/Dock icon and a runnable JAR Java 17; Processing (PApplet, Java2D renderer; core.jar); JOGL / GlueGen (bundled native libraries shipped with Processing for cross-platform support); Packaged as a runnable JAR (Go.jar)",
       "tech": [
@@ -1521,82 +1647,6 @@ export const generatedArchive: Exhibit[] = [
           "url": "https://github.com/TheYellowDuck/go-board-game"
         }
       ]
-    }
-  },
-  {
-    "popup": {
-      "title": "Snake",
-      "description": "A fully playable, built-from-scratch Snake game written in Java Swing — my first independent software project. It implements a complete fixed-timestep game loop, custom 2D rendering, collision detection, and persistent high-score storage using only the Java standard library, with no game engine or third-party dependencies. https://github.com/user-attachments/assets/86964c33-f588-46e8-9a75-cb2526216e93 Grid-based snake movement on a 60×30 board with wrap-around borders; Apple spawning that never lands on the snake's current body; Real-time score plus a persistent high score saved across sessions; Start and game-over overlays, with instant restart (R) without relaunching; WASD and arrow-key controls, with 180° reversal protection; Custom-drawn HUD, snake, food, and translucent message overlays The game is driven by an event-driven loop built on a javax.swing.Timer that fires about 12 times per second (FPS = 12). On each tick the game applies buffered input, advances the snake one cell, runs collision checks, and triggers a repaint. Input is deliberately decoupled from movement: a keypress only sets a pending direction (nextXv / nextYv), which is committed at the start of the next tick. A guard rejects any direct 180° reversal — this eliminates the classic bug where two quick keypresses between frames fold the snake back onto itself. The playfield wraps at every edge, so leaving one side re-enters from the opposite one. The snake's body is stored as a trail of grid coordinates; each tick appends the new head and trims the tail to the current length. Self-collision is detected by scanning the trail for the head's position, and food is re-rolled until it lands on an empty cell. The high score is persisted to a dotfile (~/.snakehighscore) in the user's home directory — loaded on startup, written on every new record, and flushed again on exit (window close or Esc). All visuals are produced in a single custom paintComponent override using AWT Graphics primitives. This was my first programming project, written to learn the fundamentals of Java, event-driven GUI design, and game-loop architecture from the ground up. It has since been refactored to fix several original bugs — timer misuse on the event dispatch thread, game logic embedded in the paint method, and incorrect high-score tracking — while preserving its original structure and scope. Object-oriented design — game model, rendering, and input separated across classes; Event-driven programming — built on Java Swing's event dispatch model; Game loop architecture — fixed-timestep loop via javax.swing.Timer (~12 FPS); 2D rendering — custom paintComponent / Graphics drawing of every element; Collision detection — self-collision and boundary wrap-around; Input handling — buffered direction changes with 180° reversal prevention; Separation of concerns — KeyListener decoupled from game and render logic; File I/O — persistent high-score storage across sessions; Application lifecycle handling — save-on-exit via a WindowListener; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 11+; Java Swing (JPanel, JFrame, javax.swing.Timer); AWT (Graphics, Color, Font, FontMetrics, KeyListener / KeyEvent); Java Platform Module System (module-info.java); java.io file I/O; Packaged as a runnable modular JAR (Snake.jar)",
-      "tech": [
-        "Java",
-        "Swing",
-        "Object-oriented design",
-        "Event-driven programming",
-        "Game loop architecture",
-        "2D rendering",
-        "Collision detection",
-        "Input handling",
-        "Separation of concerns",
-        "File I/O",
-        "Application lifecycle handling",
-        "Java Platform Module System",
-        "JAR packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Java"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "Swing"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "2D rendering"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Game loop architecture",
-            "Application lifecycle handling",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "JAR packaging"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Event-driven programming",
-            "Collision detection",
-            "Input handling",
-            "Separation of concerns",
-            "File I/O",
-            "Java Platform Module System",
-            "Game Development",
-            "Game Physics"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/Snake"
-        }
-      ],
-      "videoUrl": "/videos/Snake.mp4"
     }
   },
   {
@@ -1749,9 +1799,9 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
         "TypeScript",
         "JavaScript",
-        "Python",
         "Java",
         "CSS",
         "C++",
@@ -1844,13 +1894,18 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
+        "OpenAI API",
+        "Anthropic API",
+        "LiteLLM",
+        "Pillow",
+        "HTML",
+        "Generative AI / LLMs",
         "Framer Motion",
         "R",
         "GraphQL",
         "REST",
-        "Pillow",
-        "HTML",
         "Requests",
+        "Transformers",
         "OpenGL",
         "Go"
       ]
@@ -1861,5 +1916,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-17T22:50:25.053Z"
+  "syncedAt": "2026-06-17T23:21:47.332Z"
 };
