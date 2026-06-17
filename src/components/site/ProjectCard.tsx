@@ -1,7 +1,43 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
+
+/**
+ * A muted autoplay preview that only fetches its source once it's near the viewport — so a page of
+ * cards doesn't download and decode every clip up front (the heaviest cost on mobile). The poster
+ * shows immediately; the real video swaps in within `rootMargin` of being scrolled into view.
+ */
+function LazyVideo({ src, poster, className }: { src: string; poster?: string; className?: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [load, setLoad] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || load) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setLoad(true); io.disconnect(); }
+      },
+      { rootMargin: "300px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [load]);
+  return (
+    <video
+      ref={ref}
+      src={load ? src : undefined}
+      poster={poster}
+      className={className}
+      muted
+      loop
+      autoPlay
+      playsInline
+      preload={load ? "auto" : "none"}
+    />
+  );
+}
 
 interface ProjectCardProps {
   index: string;   // e.g. "01"
@@ -27,7 +63,7 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
       {hasMedia && (
         <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
           {popup.videoUrl ? (
-            <video src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata" />
+            <LazyVideo src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" />
           ) : (
             <>
               <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(https://img.youtube.com/vi/${ytId}/hqdefault.jpg)` }} />

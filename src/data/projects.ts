@@ -64,30 +64,6 @@ export interface Exhibit {
 // ROOM EXHIBITS — just add to the array, drop the tile on the map
 // ============================================================
 
-// Tile 10 — LOBBY / ENTRANCE
-export const lobbyExhibits: Exhibit[] = [
-  {
-    popup: {
-      title: "Welcome to My Museum!",
-      description: "Thanks for visiting. Walk around and explore each wing to learn about my projects, skills, and experience. Use arrow keys or WASD to move, press E to interact.",
-    },
-  },
-  {
-    popup: {
-      type: "resume",
-    },
-  },
-  {
-    popup: {
-      title: "Guest Book",
-      description: "Leave a message!",
-      links: [
-        { label: "Sign the Guest Book", url: "https://forms.google.com/your-form" },
-      ],
-    },
-  },
-];
-
 // Tile 11 — MAIN HALL / FEATURED PROJECTS
 export const mainHallExhibits: Exhibit[] = generatedMainHall;
 

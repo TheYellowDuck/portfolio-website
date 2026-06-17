@@ -34,11 +34,8 @@ const SELF_HOST_MAX = (config.selfHostVideoMaxMB ?? 5) * 1024 * 1024;
 // Download a repo's demo video into /public so the site serves it as real video/mp4
 // (GitHub raw serves octet-stream, which <video> rejects; the public CDNs are flaky).
 async function downloadVideo(url, dest) {
-  // Trust an existing real download; clear a tiny stub (stale LFS pointer / error page) and retry.
-  if (fs.existsSync(dest)) {
-    if (fs.statSync(dest).size > 1024) return true;
-    fs.rmSync(dest);
-  }
+  // Always re-fetch from source (never trust an existing file): an updated demo refreshes, and every
+  // clip lands at full quality so transcodeVideos() can downscale it deterministically afterward.
   // One controller covers BOTH the headers and the (heavily throttled) body read — a
   // generous 7-minute cap fits multi-MB demos at raw GitHub's ~24 KB/s while still
   // killing a truly dead connection instead of hanging the whole sync.
@@ -85,7 +82,37 @@ async function downloadVideos(queue) {
     done++; render();
   }));
   process.stdout.write(`\n  ${ok}/${total} videos ready${ok < total ? ` — ${total - ok} failed, re-run to retry` : ""}.\n`);
+  transcodeVideos();
   generatePosters();
+}
+
+// Downscale every self-hosted clip to fit a 1280px box (H.264, audio stripped — they autoplay muted)
+// so a 3K screen-recording isn't shipped and decoded into a small card. Runs on the freshly
+// downloaded original each sync, so it's a clean re-derive, not a re-compress of a compress.
+// ffmpeg-gated like posters: if it's missing the step is skipped and the full-size video still works.
+function transcodeVideos() {
+  if (!fs.existsSync(VIDEO_DIR)) return;
+  const vids = fs.readdirSync(VIDEO_DIR).filter((f) => /\.(mp4|webm|mov)$/i.test(f));
+  let done = 0;
+  for (const v of vids) {
+    const src = path.join(VIDEO_DIR, v);
+    const tmp = path.join(VIDEO_DIR, `.transcode-${v}`);
+    try {
+      execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", src,
+        "-vf", "scale='min(1280,iw)':'min(1280,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2",
+        "-c:v", "libx264", "-crf", "30", "-preset", "slow", "-an",
+        "-pix_fmt", "yuv420p", "-movflags", "+faststart", tmp], { stdio: "ignore" });
+      // Only adopt the transcode if it actually saved bytes — a mildly-oversized, already-efficient
+      // clip can re-encode larger; in that case keep the original rather than ship a bigger file.
+      if (fs.statSync(tmp).size < fs.statSync(src).size) { fs.renameSync(tmp, src); done++; }
+      else fs.rmSync(tmp);
+    } catch {
+      if (fs.existsSync(tmp)) fs.rmSync(tmp);
+      console.warn("  transcode: ffmpeg unavailable or failed — skipping (videos keep working at full size).");
+      break;
+    }
+  }
+  if (done) console.log(`  transcode: downscaled ${done} clip(s) to ≤1280px.`);
 }
 
 // A poster (first frame ~1s in) for each self-hosted video → public/videos/posters/<name>.jpg, used
