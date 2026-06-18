@@ -652,7 +652,11 @@ async function main() {
     // get queued and the downloader confirms/skips them against the real size.
     let videoFile = null;
     let gifUrl = null;
-    if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
+    if (config.overrides[repo.name]?.videoUrl) {
+      // Pinned to a pre-committed file (config.overrides[name].videoUrl) — toExhibit adopts it
+      // directly; skip the fetch queue so the parallel pass can't drop it. Used for demos CI can't
+      // fetch on its own (e.g. a GitHub user-attachments GIF, which needs a broad user token).
+    } else if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
       videoFile = `${repo.name}.${scan.videoExt}`;
       scan.videoUrl = `/videos/${videoFile}`; // optimistic; the parallel pass below confirms it
     } else if ((gifUrl = extractMedia(scan.readme).gifUrl)) {
