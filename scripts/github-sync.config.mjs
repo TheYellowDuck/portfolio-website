@@ -75,7 +75,8 @@ export const config = {
     // `bias: ±N` — a manual score nudge for what the auto-scorer genuinely can't read: code
     // quality, a competition result, architecture elegance. It shows next to the repo in the
     // ranking printout, so it's never a hidden thumb on the scale.
-    Robotics: { bias: -5 }, // strong on paper (CV + LiDAR + Worlds) but messy code, didn't place
+    Robotics: { bias: -5 },    // strong on paper (CV + LiDAR + Worlds) but messy code, didn't place
+    biquadris: { bias: 12.5 }, // elegant C++ OOP (Strategy/MVC/RAII) the scorer can't read as a "hard" domain
     // "biquadris": {
     //   title: "Biquadris",
     //   description: "A two-player Tetris variant — full OOP design in C++.",
