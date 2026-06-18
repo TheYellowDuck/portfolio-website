@@ -281,7 +281,8 @@ export const generatedMainHall: Exhibit[] = [
           "label": "GitHub",
           "url": "https://github.com/TheYellowDuck/web-agent"
         }
-      ]
+      ],
+      "videoUrl": "/videos/web-agent.mp4"
     }
   },
   {
@@ -1886,5 +1887,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-18T01:40:45.296Z"
+  "syncedAt": "2026-06-18T01:50:00.145Z"
 };
