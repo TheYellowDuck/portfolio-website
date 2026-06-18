@@ -139,6 +139,268 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Web Agent",
+      "description": "An autonomous LLM web agent built from scratch — a ReAct + reflection loop that drives a real headless browser (Playwright) over an accessibility-tree observation layer — paired with an honest evaluation harness over WebArena and Online-Mind2Web. The LLM layer is provider-agnostic (native Anthropic Claude / OpenAI / Gemini adapters plus a LiteLLM universal adapter for any other model), and the harness reports Wilson confidence intervals, pass@k, a failure taxonomy, and LLM-as-judge scoring. The scaffold is table stakes; the signal is the measurement — quantifying how much of any headline web-agent number comes from scoring methodology and task curation rather than capability. Claude Sonnet 4.6 driving the agent on a live Wikipedia task — search → navigate → extract → answer. (Frames from a real captured run.) action space, memory, and a ReAct loop; no agent-framework wrapper. ON vs OFF on identical tasks (the headline engineering contribution). LiteLLM universal adapter for any other model; swapping models is a config change. text, and pagination detection, with an optional Set-of-Marks screenshot modality. Online-Mind2Web LLM-as-judge, with 3-valued logic that never silently passes the unverifiable. taxonomy, and Matplotlib/pandas charts, all from reproducible JSONL trajectories. scoring, a verify-before-done gate, and site confinement. prompt caching. shopping subset the agent scores ~0.43 exact-match; a fair full-suite number would be mid-teens–30% (vs production ~60%, SOTA 71.6%, human ~78%). A solid from-scratch scaffold, not a production agent — and the writeup says exactly that. measurement/mechanism, not raw capability: +14pt from implementing WebArena's own fuzzymatch LLM scoring (I'd been under-counting \"N/A\" answers), +4pt from the one research-identified lever (an AgentOccam-style note scratchpad that cracked a 14-item extraction task). scoring (strict exact-match vs lenient LLM judge), not venue — the same agent reads ~0.6 or ~1.0 depending on how you score it. but a cheaper budget/commit fix captured most of it; on saturated slices ON ≈ OFF. lowest cost; Opus matches at ~2×; Haiku is a false economy (worse and pricier). Bigger ≠ better. reported negative result); a real sandbox found three agent bugs the synthetic tests missed (all fixed). Full blow-by-blow numbers, CIs, and every caveat are in Measured results below. Every component is small and explainable: browser control, an accessibility-tree observation layer, a typed action space, a model-agnostic LLM client, and a ReAct + reflection loop. agent/ never imports eval/ — the agent doesn't know it's being benchmarked, which is what keeps the measurement honest and the agent reusable. testable module rather than a black-box framework call. it can be ablated ON vs OFF on the same tasks. adapters; any other model works through the LiteLLM universal adapter (Mistral, Llama via Ollama, Bedrock, Groq, …) via the adapter + factory pattern. text agent/ browser.py Playwright session: goto / snapshot / act / screenshot / close (+ popup/new-tab following, networkidle settle) observation.py a11y-tree refs (@e1, @e2 …) + static-text + pagination detection actions.py typed action space + validation + JSON schema for the LLM llm.py model-agnostic client (Claude/OpenAI/Gemini/LiteLLM) + cost tracking (+ Anthropic prompt caching, offline 'echo' model) memory.py compact running state (recent steps verbatim, older summarized) prompts.py planner + reflection prompts (frozen system prompt) loop.py ReAct + reflection loop, vision fallback, guardrails, screenshot capture, observation persistence on failure types.py Task / Action / Step / Trajectory dataclasses eval/ harness.py runner: task -> trajectory -> score; CLI; JSONL;",
+      "tech": [
+        "Python",
+        "Playwright",
+        "Pandas",
+        "Matplotlib",
+        "OpenAI API",
+        "Anthropic API",
+        "LiteLLM",
+        "React",
+        "SciPy",
+        "Pillow",
+        "Docker",
+        "Testing",
+        "JavaScript",
+        "HTML",
+        "ReAct agent loop",
+        "Reflection / self-correction",
+        "LLM-as-judge evaluation",
+        "Accessibility-tree observation",
+        "Set-of-Marks visual grounding",
+        "Provider-agnostic LLM abstraction",
+        "Factory pattern",
+        "Structured outputs",
+        "Prompt caching",
+        "Typed action space with validation",
+        "Browser automation",
+        "Deterministic benchmark scoring",
+        "Statistical rigor",
+        "Significance testing",
+        "Failure taxonomy",
+        "Parallel evaluation",
+        "Data visualization",
+        "Reproducible experiment logging",
+        "Rate-limit resilience",
+        "Docker sandbox integration",
+        "Anti-hallucination engineering",
+        "Cost/token accounting",
+        "Test engineering"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "React"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "Pandas",
+            "Matplotlib",
+            "SciPy"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "Playwright",
+            "Docker"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "LLM-as-judge evaluation",
+            "Provider-agnostic LLM abstraction",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Statistics & Evaluation",
+          "items": [
+            "Statistical rigor",
+            "Significance testing",
+            "Reproducible experiment logging",
+            "Statistics & Evaluation"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Parallel evaluation"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Factory pattern",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Test engineering",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "LiteLLM",
+            "Pillow",
+            "JavaScript",
+            "HTML",
+            "ReAct agent loop",
+            "Reflection / self-correction",
+            "Accessibility-tree observation",
+            "Set-of-Marks visual grounding",
+            "Structured outputs",
+            "Prompt caching",
+            "Typed action space with validation",
+            "Browser automation",
+            "Deterministic benchmark scoring",
+            "Failure taxonomy",
+            "Data visualization",
+            "Rate-limit resilience",
+            "Docker sandbox integration",
+            "Anti-hallucination engineering",
+            "Cost/token accounting",
+            "Data Analysis",
+            "Web Development",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/web-agent"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Rubiks Cube",
+      "description": "An interactive 3D Rubik's Cube built from scratch in Processing 4 (Java / P3D OpenGL), with a from-scratch CFOP solver that solves any scramble and animates the solution move-by-move. The solver runs on a background thread, was property-tested against thousands of random scrambles, and uses no external cube or solving libraries. ▶ Watch the demo on YouTube Real-time 3D cube — 27 chamfered cubies with per-face lighting, beveled edges, and z-fight-free stickers, rendered in P3D (OpenGL).; Natural controls — grab any face and drag to turn it (ray-cast picking + axis-locked slice dragging), spin the whole cube to look around, or drive it from the keyboard.; From-scratch CFOP auto-solver — Cross → F2L → OLL → PLL, no external libraries. Solve the whole thing automatically, or step through it one move at a time.; Runs off the UI thread — the solver computes on a background worker so the interface never freezes; the solution is streamed into the animation queue when ready.; Polished UX — scramble, timer with persisted best time, move counter, undo (animated, reaches back through scrambles and solves), light/dark themes that follow the OS, and cross-platform fonts/labels (macOS · Windows · Linux). A complete CFOP (\"Fridrich method\") pipeline implemented over the cube's sticker model: The whole pipeline was validated against thousands of random scrambles (a standalone Java port of the cube + solver) before shipping — 0 failures over 1500 scrambles. A hidden t key re-runs that self-check live from the console. While building the solver I discovered the cube model itself was subtly wrong: it passed casual play but failed the classic identity (R U R' U')⁶ = solved. Property-style testing (checking cubie groupings across thousands of scrambles, then move-order identities) isolated a corner-cycling bug that was invisible to edges and centers — a reversed strip in two of the turn functions. Fixing it made the model a mathematically valid cube and the solver correct. The sketch is split into focused tabs: 3D graphics programming — real-time P3D / OpenGL rendering of 27 chamfered cubies with lighting and bevels; Ray-cast picking — face selection via ray–geometry intersection; Interaction design — axis-locked slice dragging for natural click-and-drag face turns; Algorithm design — a from-scratch CFOP (Cross → F2L → OLL → PLL) solver with no libraries; Breadth-first search — optimal cross over a reduced ~190k state space; State-space reduction — cross-preserving F2L search and bounded last-layer coset searches; Multithreading & concurrency — solver runs on a background worker; the UI thread never blocks; Producer–consumer queue — one animation queue fed by scramble, solve, step, and undo; Property-based testing — validated over 1500+ random scrambles with a standalone Java port (0 failures); Debugging with invariants — isolated a corner-cycling bug via move-order identities ((R U R' U')⁶); Object-oriented design — focused modules for cube, solver, renderer, input, and raycasting; Data modelling — six char[3][3] faces and the 18 canonical face turns; Persistence — best time and theme saved as JSON in the home directory; Cross-platform packaging — jpackage produces self-contained apps for macOS, Windows, and Linux; CI/CD automation — GitHub Actions builds and attaches all three OS apps on v tags; UX engineering — animated undo through scrambles/solves, OS-following dark mode, live timer Java; Processing 4 (PApplet, P3D renderer); OpenGL via JOGL / GlueGen (the P3D backend); Python (a small build-time sketch preprocessor); jpackage (self-contained native app bundles); GitHub Actions (multi-OS release CI); JSON persistence (~/.rubikscubeprefs.json) 📺 Watch the demo on YouTube; ⬇️ Download the latest release",
+      "tech": [
+        "Processing",
+        "GitHub Actions",
+        "Concurrency",
+        "Testing",
+        "3D Graphics",
+        "Java",
+        "R",
+        "OpenGL",
+        "3D graphics programming",
+        "Ray-cast picking",
+        "Interaction design",
+        "Algorithm design",
+        "Breadth-first search",
+        "State-space reduction",
+        "Multithreading & concurrency",
+        "Producer–consumer queue",
+        "Property-based testing",
+        "Debugging with invariants",
+        "Object-oriented design",
+        "Data modelling",
+        "Persistence",
+        "Cross-platform packaging",
+        "CI/CD automation",
+        "UX engineering"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Processing"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Algorithm design",
+            "Breadth-first search",
+            "State-space reduction",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Multithreading & concurrency",
+            "Producer–consumer queue"
+          ]
+        },
+        {
+          "category": "3D Graphics",
+          "items": [
+            "3D Graphics",
+            "OpenGL",
+            "3D graphics programming",
+            "Ray-cast picking"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "Interaction design",
+            "UX engineering"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Data modelling",
+            "Persistence",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Property-based testing",
+            "Debugging with invariants",
+            "Cross-platform packaging",
+            "CI/CD automation",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Java",
+            "R",
+            "Game Development",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/rubiks-cube"
+        }
+      ],
+      "embedUrl": "https://www.youtube.com/embed/p14M3V3xtMY"
+    }
+  },
+  {
+    "popup": {
       "title": "Robotics",
       "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
       "tech": [
@@ -172,8 +434,7 @@ export const generatedMainHall: Exhibit[] = [
           "category": "AI & ML",
           "items": [
             "Computer Vision",
-            "Computer vision",
-            "Image processing"
+            "Computer vision"
           ]
         },
         {
@@ -212,6 +473,7 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Concepts & Practices",
           "items": [
             "Processing",
+            "Image processing",
             "Sensor integration & fusion",
             "Motor control",
             "Maze mapping",
@@ -340,121 +602,6 @@ export const generatedMainHall: Exhibit[] = [
         }
       ],
       "videoUrl": "/videos/MyFridge.mp4"
-    }
-  },
-  {
-    "popup": {
-      "title": "Rubiks Cube",
-      "description": "An interactive 3D Rubik's Cube built from scratch in Processing 4 (Java / P3D OpenGL), with a from-scratch CFOP solver that solves any scramble and animates the solution move-by-move. The solver runs on a background thread, was property-tested against thousands of random scrambles, and uses no external cube or solving libraries. ▶ Watch the demo on YouTube Real-time 3D cube — 27 chamfered cubies with per-face lighting, beveled edges, and z-fight-free stickers, rendered in P3D (OpenGL).; Natural controls — grab any face and drag to turn it (ray-cast picking + axis-locked slice dragging), spin the whole cube to look around, or drive it from the keyboard.; From-scratch CFOP auto-solver — Cross → F2L → OLL → PLL, no external libraries. Solve the whole thing automatically, or step through it one move at a time.; Runs off the UI thread — the solver computes on a background worker so the interface never freezes; the solution is streamed into the animation queue when ready.; Polished UX — scramble, timer with persisted best time, move counter, undo (animated, reaches back through scrambles and solves), light/dark themes that follow the OS, and cross-platform fonts/labels (macOS · Windows · Linux). A complete CFOP (\"Fridrich method\") pipeline implemented over the cube's sticker model: The whole pipeline was validated against thousands of random scrambles (a standalone Java port of the cube + solver) before shipping — 0 failures over 1500 scrambles. A hidden t key re-runs that self-check live from the console. While building the solver I discovered the cube model itself was subtly wrong: it passed casual play but failed the classic identity (R U R' U')⁶ = solved. Property-style testing (checking cubie groupings across thousands of scrambles, then move-order identities) isolated a corner-cycling bug that was invisible to edges and centers — a reversed strip in two of the turn functions. Fixing it made the model a mathematically valid cube and the solver correct. The sketch is split into focused tabs: 3D graphics programming — real-time P3D / OpenGL rendering of 27 chamfered cubies with lighting and bevels; Ray-cast picking — face selection via ray–geometry intersection; Interaction design — axis-locked slice dragging for natural click-and-drag face turns; Algorithm design — a from-scratch CFOP (Cross → F2L → OLL → PLL) solver with no libraries; Breadth-first search — optimal cross over a reduced ~190k state space; State-space reduction — cross-preserving F2L search and bounded last-layer coset searches; Multithreading & concurrency — solver runs on a background worker; the UI thread never blocks; Producer–consumer queue — one animation queue fed by scramble, solve, step, and undo; Property-based testing — validated over 1500+ random scrambles with a standalone Java port (0 failures); Debugging with invariants — isolated a corner-cycling bug via move-order identities ((R U R' U')⁶); Object-oriented design — focused modules for cube, solver, renderer, input, and raycasting; Data modelling — six char[3][3] faces and the 18 canonical face turns; Persistence — best time and theme saved as JSON in the home directory; Cross-platform packaging — jpackage produces self-contained apps for macOS, Windows, and Linux; CI/CD automation — GitHub Actions builds and attaches all three OS apps on v tags; UX engineering — animated undo through scrambles/solves, OS-following dark mode, live timer Java; Processing 4 (PApplet, P3D renderer); OpenGL via JOGL / GlueGen (the P3D backend); Python (a small build-time sketch preprocessor); jpackage (self-contained native app bundles); GitHub Actions (multi-OS release CI); JSON persistence (~/.rubikscubeprefs.json) 📺 Watch the demo on YouTube; ⬇️ Download the latest release",
-      "tech": [
-        "Processing",
-        "GitHub Actions",
-        "Concurrency",
-        "Testing",
-        "3D Graphics",
-        "Java",
-        "R",
-        "OpenGL",
-        "3D graphics programming",
-        "Ray-cast picking",
-        "Interaction design",
-        "Algorithm design",
-        "Breadth-first search",
-        "State-space reduction",
-        "Multithreading & concurrency",
-        "Producer–consumer queue",
-        "Property-based testing",
-        "Debugging with invariants",
-        "Object-oriented design",
-        "Data modelling",
-        "Persistence",
-        "Cross-platform packaging",
-        "CI/CD automation",
-        "UX engineering"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Processing"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "GitHub Actions"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Algorithm design",
-            "Breadth-first search",
-            "State-space reduction",
-            "Algorithms & DS"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency",
-            "Multithreading & concurrency",
-            "Producer–consumer queue"
-          ]
-        },
-        {
-          "category": "3D Graphics",
-          "items": [
-            "3D Graphics",
-            "OpenGL",
-            "3D graphics programming",
-            "Ray-cast picking"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "Interaction design",
-            "UX engineering"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Data modelling",
-            "Persistence",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing",
-            "Property-based testing",
-            "Debugging with invariants",
-            "Cross-platform packaging",
-            "CI/CD automation",
-            "DevOps"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Java",
-            "R",
-            "Game Development",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/rubiks-cube"
-        }
-      ],
-      "embedUrl": "https://www.youtube.com/embed/p14M3V3xtMY"
     }
   },
   {
@@ -686,7 +833,10 @@ export const generatedMainHall: Exhibit[] = [
         }
       ]
     }
-  },
+  }
+];
+
+export const generatedArchive: Exhibit[] = [
   {
     "popup": {
       "title": "Image To Text",
@@ -722,13 +872,6 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Frameworks",
           "items": [
             "Swing"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "Image processing",
-            "Computer Vision"
           ]
         },
         {
@@ -771,6 +914,7 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Concepts & Practices",
           "items": [
             "Processing",
+            "Image processing",
             "Grayscale conversion",
             "Image scaling",
             "Keyboard shortcut system",
@@ -789,150 +933,6 @@ export const generatedMainHall: Exhibit[] = [
       "embedUrl": "https://www.youtube.com/embed/wKVpjcZxiz4"
     }
   },
-  {
-    "popup": {
-      "title": "Web Agent",
-      "description": "An autonomous LLM web agent built from scratch — a ReAct + reflection loop that drives a real headless browser (Playwright) over an accessibility-tree observation layer — paired with an honest evaluation harness over WebArena and Online-Mind2Web. The LLM layer is provider-agnostic (native Anthropic Claude / OpenAI / Gemini adapters plus a LiteLLM universal adapter for any other model), and the harness reports Wilson confidence intervals, pass@k, a failure taxonomy, and LLM-as-judge scoring. The scaffold is table stakes; the signal is the measurement — quantifying how much of any headline web-agent number comes from scoring methodology and task curation rather than capability. Claude Sonnet 4.6 driving the agent on a live Wikipedia task — search → navigate → extract → answer. (Frames from a real captured run.) action space, memory, and a ReAct loop; no agent-framework wrapper. ON vs OFF on identical tasks (the headline engineering contribution). LiteLLM universal adapter for any other model; swapping models is a config change. text, and pagination detection, with an optional Set-of-Marks screenshot modality. Online-Mind2Web LLM-as-judge, with 3-valued logic that never silently passes the unverifiable. taxonomy, and Matplotlib/pandas charts, all from reproducible JSONL trajectories. scoring, a verify-before-done gate, and site confinement. prompt caching. shopping subset the agent scores ~0.43 exact-match; a fair full-suite number would be mid-teens–30% (vs production ~60%, SOTA 71.6%, human ~78%). A solid from-scratch scaffold, not a production agent — and the writeup says exactly that. measurement/mechanism, not raw capability: +14pt from implementing WebArena's own fuzzymatch LLM scoring (I'd been under-counting \"N/A\" answers), +4pt from the one research-identified lever (an AgentOccam-style note scratchpad that cracked a 14-item extraction task). scoring (strict exact-match vs lenient LLM judge), not venue — the same agent reads ~0.6 or ~1.0 depending on how you score it. but a cheaper budget/commit fix captured most of it; on saturated slices ON ≈ OFF. lowest cost; Opus matches at ~2×; Haiku is a false economy (worse and pricier). Bigger ≠ better. reported negative result); a real sandbox found three agent bugs the synthetic tests missed (all fixed). Full blow-by-blow numbers, CIs, and every caveat are in Measured results below. Every component is small and explainable: browser control, an accessibility-tree observation layer, a typed action space, a model-agnostic LLM client, and a ReAct + reflection loop. agent/ never imports eval/ — the agent doesn't know it's being benchmarked, which is what keeps the measurement honest and the agent reusable. testable module rather than a black-box framework call. it can be ablated ON vs OFF on the same tasks. adapters; any other model works through the LiteLLM universal adapter (Mistral, Llama via Ollama, Bedrock, Groq, …) via the adapter + factory pattern. text agent/ browser.py Playwright session: goto / snapshot / act / screenshot / close (+ popup/new-tab following, networkidle settle) observation.py a11y-tree refs (@e1, @e2 …) + static-text + pagination detection actions.py typed action space + validation + JSON schema for the LLM llm.py model-agnostic client (Claude/OpenAI/Gemini/LiteLLM) + cost tracking (+ Anthropic prompt caching, offline 'echo' model) memory.py compact running state (recent steps verbatim, older summarized) prompts.py planner + reflection prompts (frozen system prompt) loop.py ReAct + reflection loop, vision fallback, guardrails, screenshot capture, observation persistence on failure types.py Task / Action / Step / Trajectory dataclasses eval/ harness.py runner: task -> trajectory -> score; CLI; JSONL;",
-      "tech": [
-        "Python",
-        "Playwright",
-        "Pandas",
-        "Matplotlib",
-        "OpenAI API",
-        "Anthropic API",
-        "LiteLLM",
-        "React",
-        "SciPy",
-        "Pillow",
-        "Docker",
-        "Testing",
-        "JavaScript",
-        "HTML",
-        "ReAct agent loop",
-        "Reflection / self-correction",
-        "LLM-as-judge evaluation",
-        "Accessibility-tree observation",
-        "Set-of-Marks visual grounding",
-        "Provider-agnostic LLM abstraction",
-        "Factory pattern",
-        "Structured outputs",
-        "Prompt caching",
-        "Typed action space with validation",
-        "Browser automation",
-        "Deterministic benchmark scoring",
-        "Statistical rigor",
-        "Significance testing",
-        "Failure taxonomy",
-        "Parallel evaluation",
-        "Data visualization",
-        "Reproducible experiment logging",
-        "Rate-limit resilience",
-        "Docker sandbox integration",
-        "Anti-hallucination engineering",
-        "Cost/token accounting",
-        "Test engineering"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "React"
-          ]
-        },
-        {
-          "category": "ML / Data",
-          "items": [
-            "Pandas",
-            "Matplotlib",
-            "SciPy"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "Playwright",
-            "Docker"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "OpenAI API",
-            "Anthropic API",
-            "LLM-as-judge evaluation",
-            "Provider-agnostic LLM abstraction",
-            "Generative AI / LLMs"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Parallel evaluation"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Factory pattern",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing",
-            "Significance testing",
-            "Test engineering",
-            "DevOps"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "LiteLLM",
-            "Pillow",
-            "JavaScript",
-            "HTML",
-            "ReAct agent loop",
-            "Reflection / self-correction",
-            "Accessibility-tree observation",
-            "Set-of-Marks visual grounding",
-            "Structured outputs",
-            "Prompt caching",
-            "Typed action space with validation",
-            "Browser automation",
-            "Deterministic benchmark scoring",
-            "Statistical rigor",
-            "Failure taxonomy",
-            "Data visualization",
-            "Reproducible experiment logging",
-            "Rate-limit resilience",
-            "Docker sandbox integration",
-            "Anti-hallucination engineering",
-            "Cost/token accounting",
-            "Data Analysis",
-            "Web Development",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/web-agent"
-        }
-      ]
-    }
-  }
-];
-
-export const generatedArchive: Exhibit[] = [
   {
     "popup": {
       "title": "PONG",
@@ -1295,89 +1295,6 @@ export const generatedArchive: Exhibit[] = [
   },
   {
     "popup": {
-      "title": "Instagram Non Follower Finder",
-      "description": "A desktop app that automates finding Instagram accounts you follow that don't follow you back. Built with Python, Selenium WebDriver, and CustomTkinter — it drives a real browser to scroll and extract your follower/following lists, applies hand-rolled anti-bot stealth, and presents the diff in a clean dark-mode GUI with cross-browser support. Cross-browser — Chrome, Firefox, Edge, Safari; Stealth mode — patches automation fingerprints to reduce bot detection across browsers; Manual login flow with full 2FA and captcha support; Auto-downloads browser drivers (no PATH setup required); Accumulates users across virtual-scroll batches so no one is missed; Results copyable to clipboard The app launches a real browser through Selenium WebDriver and lets you log in manually (so 2FA and captchas just work). To reduce automation detection, it injects a small stealth script that redefines navigator.webdriver — via the Chrome DevTools Protocol (Page.addScriptToEvaluateOnNewDocument) on Chromium browsers and executescript on Firefox — alongside flags like --disable-blink-features=AutomationControlled and Firefox's dom.webdriver.enabled = false. It then opens your followers and following dialogs and uses ActionChains with ScrollOrigin to scroll the virtual-scrolling lists, accumulating usernames across batches until the full list is captured. A set difference between following and followers yields the accounts that don't follow you back. All of this runs on a background threading worker so the CustomTkinter UI stays responsive, with per-browser error dialogs when a driver fails to start. Browser automation — Selenium WebDriver driving Chrome, Firefox, Edge, and Safari; Cross-browser abstraction — per-browser options and driver setup behind one flow (match/case); Anti-bot stealth — CDP navigator.webdriver patching and disabling automation fingerprints; Dynamic web scraping — ActionChains + ScrollOrigin to drive virtual-scroll list extraction; Set operations — diff of following vs. followers to surface non-followers; Multithreading & concurrency — background threading worker keeps the GUI responsive; GUI development — CustomTkinter dark-mode desktop interface; Robust error handling — per-browser driver-failure dialogs and captcha/2FA-friendly login; Automatic driver management — webdriver-manager for Firefox/Edge; Chrome 115+ self-manages; Clipboard integration — one-click copy of results; Application packaging — PyInstaller native build via build.py Python 3.10+ (match/case); Selenium WebDriver (Chrome, Firefox, Edge, Safari); CustomTkinter (dark-mode GUI); webdriver-manager (Firefox / Edge driver management); Chrome DevTools Protocol (stealth script injection); threading (responsive UI); PyInstaller (native app packaging)",
-      "tech": [
-        "Python",
-        "pip",
-        "Selenium",
-        "Concurrency",
-        "Browser automation",
-        "Cross-browser abstraction",
-        "Anti-bot stealth",
-        "Dynamic web scraping",
-        "Set operations",
-        "Multithreading & concurrency",
-        "GUI development",
-        "Robust error handling",
-        "Automatic driver management",
-        "Clipboard integration",
-        "Application packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "pip",
-            "Selenium"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency",
-            "Multithreading & concurrency"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "GUI development"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Cross-browser abstraction"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Application packaging"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Browser automation",
-            "Anti-bot stealth",
-            "Dynamic web scraping",
-            "Set operations",
-            "Robust error handling",
-            "Automatic driver management",
-            "Clipboard integration",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/instagram-non-follower-finder"
-        }
-      ],
-      "embedUrl": "https://www.youtube.com/embed/CibVM3FueDY"
-    }
-  },
-  {
-    "popup": {
       "title": "Biquadris",
       "description": "A two-player competitive Tetris variant built in C++ with an object-oriented design. Originally developed as a final project for CS 246: Object-Oriented Software Development at the University of Waterloo (Fall 2025) by a team of three students, then refactored and extended into a cross-platform, SDL2-rendered game. The game has since been refactored and extended beyond the original submission: bugs fixed, the X11 graphics layer replaced with SDL2 for cross-platform support, and the build system migrated to CMake for easy packaging. Biquadris is a turn-based, two-player spin on Tetris. Both players share one screen — each managing their own 11×18 board. Players alternate turns: you make one move, then your opponent does. Clear two or more lines in a single drop and you earn a special action to punish your opponent. The game ends when a player can no longer place a new block. The codebase is organized around a small set of well-encapsulated classes. Game owns the two Board models and drives the turn loop; each Board tracks its grid, score, level, and active effects; Block encodes the seven tetromino shapes and their rotations; Level generates the next block according to the current difficulty; and the rendering is handled by interchangeable views — a TextDisplay for the terminal and an SDL2 Xwindow for graphics. Two design ideas carry most of the weight. Special actions are a polymorphic effect system (Strategy-style): an abstract Effect base class declares apply, onDrop, isExpired, and getName, and concrete BlindEffect, HeavyEffect, and ForceEffect subclasses implement each behaviour. An EffectManager holds the active effects per board, applies them on activation, ticks them after every drop, and retires them when they expire — so new actions can be added without touching the board logic. The model is fully decoupled from the views: the boards know nothing about how they're drawn, so the same game state renders identically to the terminal or to SDL2. Memory is managed entirely through std::uniqueptr (RAII — no manual new/delete), collision detection validates every move and rotation against the walls and settled cells before committing it, and a single codebase compiles either text-only or with graphics via conditional compilation (ifdef BIQUADRISGRAPHICS). Commands are parsed with unique-prefix matching and numeric multipliers, the high score persists between sessions, and a ghost-block preview shows where the current piece will land. Clearing 2 or more lines in a single drop earns a special action against your opponent: Line clear: (currentlevel + linescleared)² points; A block that scores zero lines resets the combo; clearing any lines resets the no-clear counter (relevant for Level 4 penalty blocks); High score is saved across sessions in .biquadrishighscore Object-oriented design — encapsulated Game, Board, Block, Level, and Effect classes; Polymorphism & abstract base classes — Effect interface with Blind / Heavy / Force subclasses; Inheritance — virtual methods and virtual destructors across the effect hierarchy; Strategy-style effect system — runtime special actions managed by an EffectManager; Model–view separation (MVC) — board state decoupled from the text and SDL2 renderers; RAII & smart pointers — std::uniqueptr ownership throughout, no manual memory management; Modern C++20 — const-correctness, standard containers, move semantics; Collision detection — move and rotation validation against walls and settled cells; Conditional compilation — one codebase builds text-only or with SDL2 graphics; Command parsing — unique-prefix matching with numeric multipliers; File I/O — high-score persistence and script-driven block sequences; Cross-platform build system — CMake with Homebrew SDL2 discovery on macOS; CI/CD release automation — GitHub Actions builds and bundles a distributable macOS app; Game logic — line clearing, level progression, ghost-block preview, and squared scoring C++20;",
       "tech": [
@@ -1462,6 +1379,89 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
+    }
+  },
+  {
+    "popup": {
+      "title": "Instagram Non Follower Finder",
+      "description": "A desktop app that automates finding Instagram accounts you follow that don't follow you back. Built with Python, Selenium WebDriver, and CustomTkinter — it drives a real browser to scroll and extract your follower/following lists, applies hand-rolled anti-bot stealth, and presents the diff in a clean dark-mode GUI with cross-browser support. Cross-browser — Chrome, Firefox, Edge, Safari; Stealth mode — patches automation fingerprints to reduce bot detection across browsers; Manual login flow with full 2FA and captcha support; Auto-downloads browser drivers (no PATH setup required); Accumulates users across virtual-scroll batches so no one is missed; Results copyable to clipboard The app launches a real browser through Selenium WebDriver and lets you log in manually (so 2FA and captchas just work). To reduce automation detection, it injects a small stealth script that redefines navigator.webdriver — via the Chrome DevTools Protocol (Page.addScriptToEvaluateOnNewDocument) on Chromium browsers and executescript on Firefox — alongside flags like --disable-blink-features=AutomationControlled and Firefox's dom.webdriver.enabled = false. It then opens your followers and following dialogs and uses ActionChains with ScrollOrigin to scroll the virtual-scrolling lists, accumulating usernames across batches until the full list is captured. A set difference between following and followers yields the accounts that don't follow you back. All of this runs on a background threading worker so the CustomTkinter UI stays responsive, with per-browser error dialogs when a driver fails to start. Browser automation — Selenium WebDriver driving Chrome, Firefox, Edge, and Safari; Cross-browser abstraction — per-browser options and driver setup behind one flow (match/case); Anti-bot stealth — CDP navigator.webdriver patching and disabling automation fingerprints; Dynamic web scraping — ActionChains + ScrollOrigin to drive virtual-scroll list extraction; Set operations — diff of following vs. followers to surface non-followers; Multithreading & concurrency — background threading worker keeps the GUI responsive; GUI development — CustomTkinter dark-mode desktop interface; Robust error handling — per-browser driver-failure dialogs and captcha/2FA-friendly login; Automatic driver management — webdriver-manager for Firefox/Edge; Chrome 115+ self-manages; Clipboard integration — one-click copy of results; Application packaging — PyInstaller native build via build.py Python 3.10+ (match/case); Selenium WebDriver (Chrome, Firefox, Edge, Safari); CustomTkinter (dark-mode GUI); webdriver-manager (Firefox / Edge driver management); Chrome DevTools Protocol (stealth script injection); threading (responsive UI); PyInstaller (native app packaging)",
+      "tech": [
+        "Python",
+        "pip",
+        "Selenium",
+        "Concurrency",
+        "Browser automation",
+        "Cross-browser abstraction",
+        "Anti-bot stealth",
+        "Dynamic web scraping",
+        "Set operations",
+        "Multithreading & concurrency",
+        "GUI development",
+        "Robust error handling",
+        "Automatic driver management",
+        "Clipboard integration",
+        "Application packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "pip",
+            "Selenium"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Multithreading & concurrency"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "GUI development"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Cross-browser abstraction"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Application packaging"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Browser automation",
+            "Anti-bot stealth",
+            "Dynamic web scraping",
+            "Set operations",
+            "Robust error handling",
+            "Automatic driver management",
+            "Clipboard integration",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/instagram-non-follower-finder"
+        }
+      ],
+      "embedUrl": "https://www.youtube.com/embed/CibVM3FueDY"
     }
   },
   {
@@ -1620,6 +1620,69 @@ export const generatedArchive: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Competitive Programming",
+      "description": "Solutions to competitive programming problems from the Canadian Computing Competition (CCC) and DMOJ, written in C, C++, and Java. The collection spans 150+ solved problems across algorithms, data structures, dynamic programming, graph theory, string processing, and computational geometry. The CCC is Canada's premier annual high school programming competition, organized by the University of Waterloo. This repository contains Senior division solutions spanning 15 years (2000–2014), as well as class materials and practice problems from two competition seasons (2022–2024). Sorting & Searching — binary search, merge sort, quicksort, dual-pivot quicksort, BST; Graph Algorithms — BFS, DFS, shortest path, cycle detection, Eulerian paths; Dynamic Programming — coin change, knapsack, frog DP, sequence DP; Data Structures — binary search trees, hash tables, disjoint sets, segment trees; String Processing — pattern matching, compression, encoding (Huffman, Morse, CRC); Math & Combinatorics — modular inverse, fast exponentiation, RSA numbers, Fibonacci; Geometry — Voronoi diagrams, triangle problems, spiral patterns Solutions to problems from DMOJ: Modern Online Judge, an online judge for Canadian high school competitive programming. Competitive programming — CCC and DMOJ contest problem solving; Algorithms & data structures — broad coverage across 150+ solved problems; Graph algorithms — BFS, DFS, shortest path, cycle detection, Eulerian paths, max flow; Dynamic programming — coin change, knapsack, and sequence DP formulations; Sorting & searching — binary search and merge / quick / dual-pivot quicksort; Tree & set structures — binary search trees, disjoint sets, segment trees, hash tables; String processing — pattern matching, compression, and Huffman / Morse / CRC encoding; Math & combinatorics — modular inverse, fast exponentiation, RSA, Fibonacci; Computational geometry — Voronoi diagrams, triangle and spiral problems; Multi-language fluency — solving the same class of problems in C, C++, and Java; Complexity & optimization — meeting contest time and memory limits C; C++; Java; Eclipse IDE (CCC / DMOJ workspaces)",
+      "tech": [
+        "Java",
+        "C++",
+        "C",
+        "Processing",
+        "Competitive programming",
+        "Algorithms & data structures",
+        "Graph algorithms",
+        "Dynamic programming",
+        "Sorting & searching",
+        "Tree & set structures",
+        "String processing",
+        "Math & combinatorics",
+        "Computational geometry",
+        "Multi-language fluency",
+        "Complexity & optimization"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Java",
+            "C++",
+            "C"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Algorithms & data structures",
+            "Graph algorithms",
+            "Dynamic programming",
+            "Math & combinatorics",
+            "Complexity & optimization",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Processing",
+            "Competitive programming",
+            "Sorting & searching",
+            "Tree & set structures",
+            "String processing",
+            "Computational geometry",
+            "Multi-language fluency",
+            "Game Development"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/Competitive-Programming"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Learning",
       "description": "A collection of programming projects spanning my learning journey — from writing my first lines of Java and C++ through implementing classic graph algorithms and teaching others. It ranges across language fundamentals, data-structure and graph-algorithm implementations, small utilities, and material I prepared as a high-school programming instructor. Foundational Java projects built through a structured course, including GUI programs, sound playback, and user input handling. Entry point into object-oriented programming. Java practice workspace from 2022, used for experimenting with new concepts alongside formal coursework. Selected projects from a guided Java curriculum — includes a Length Converter, Word Counter, and an image display program. Focused on practical application of core Java APIs. Implementations of classic graph and tree algorithms in Java: Material prepared and taught as an instructor in a high school programming club. Includes introductory exercises and guided problems written to help beginners get started with Java. Small utilities written for personal use — prime number tools and helper scripts for everyday tasks. Stars and Bars — combinatorics calculator; Galois 2022 4 — solution to a Galois Contest problem; Change Finder — coin change problem variant 26 single-topic programs covering the full introductory C++ curriculum: Variables · Data Types · Numbers · Strings · Arrays · 2D Arrays · User Input · If Statements · Switch Statements · For Loops · While Loops · Functions · Return Values · Pointers · Classes & Objects · Constructor Functions · Getters & Setters · Object Functions · Inheritance · Calculator · Guessing Game · MadLibs · Exponent Function · Comments · HelloWorld Each program isolates one concept, making this a clean reference for C++ fundamentals. Object-oriented programming — Java and C++ fundamentals through to small projects; Data structures — binary search trees and disjoint-set union; Graph algorithms — Dijkstra's shortest path, Prim's & Kruskal's MST, Tarjan's & Kosaraju's SCC; Graph traversal & validation — Eulerian paths and directed/undirected cycle detection; Algorithm implementation — classic graph and tree algorithms written from scratch; Combinatorics & math — stars and bars, coin change, and contest math problems; GUI programming — Java Swing projects with sound playback and user input; C++ fundamentals — 26 single-topic programs (pointers, classes, inheritance, and more); Practical utilities — converters, a word counter, image display, and prime-number tools; Teaching & mentoring — prepared and taught high-school programming-club material; Self-directed learning — a multi-year progression across two languages Java; C++; Java Swing (GUI projects); Eclipse IDE",
       "tech": [
@@ -1693,69 +1756,6 @@ export const generatedArchive: Exhibit[] = [
         {
           "label": "GitHub",
           "url": "https://github.com/TheYellowDuck/Learning"
-        }
-      ]
-    }
-  },
-  {
-    "popup": {
-      "title": "Competitive Programming",
-      "description": "Solutions to competitive programming problems from the Canadian Computing Competition (CCC) and DMOJ, written in C, C++, and Java. The collection spans 150+ solved problems across algorithms, data structures, dynamic programming, graph theory, string processing, and computational geometry. The CCC is Canada's premier annual high school programming competition, organized by the University of Waterloo. This repository contains Senior division solutions spanning 15 years (2000–2014), as well as class materials and practice problems from two competition seasons (2022–2024). Sorting & Searching — binary search, merge sort, quicksort, dual-pivot quicksort, BST; Graph Algorithms — BFS, DFS, shortest path, cycle detection, Eulerian paths; Dynamic Programming — coin change, knapsack, frog DP, sequence DP; Data Structures — binary search trees, hash tables, disjoint sets, segment trees; String Processing — pattern matching, compression, encoding (Huffman, Morse, CRC); Math & Combinatorics — modular inverse, fast exponentiation, RSA numbers, Fibonacci; Geometry — Voronoi diagrams, triangle problems, spiral patterns Solutions to problems from DMOJ: Modern Online Judge, an online judge for Canadian high school competitive programming. Competitive programming — CCC and DMOJ contest problem solving; Algorithms & data structures — broad coverage across 150+ solved problems; Graph algorithms — BFS, DFS, shortest path, cycle detection, Eulerian paths, max flow; Dynamic programming — coin change, knapsack, and sequence DP formulations; Sorting & searching — binary search and merge / quick / dual-pivot quicksort; Tree & set structures — binary search trees, disjoint sets, segment trees, hash tables; String processing — pattern matching, compression, and Huffman / Morse / CRC encoding; Math & combinatorics — modular inverse, fast exponentiation, RSA, Fibonacci; Computational geometry — Voronoi diagrams, triangle and spiral problems; Multi-language fluency — solving the same class of problems in C, C++, and Java; Complexity & optimization — meeting contest time and memory limits C; C++; Java; Eclipse IDE (CCC / DMOJ workspaces)",
-      "tech": [
-        "Java",
-        "C++",
-        "C",
-        "Processing",
-        "Competitive programming",
-        "Algorithms & data structures",
-        "Graph algorithms",
-        "Dynamic programming",
-        "Sorting & searching",
-        "Tree & set structures",
-        "String processing",
-        "Math & combinatorics",
-        "Computational geometry",
-        "Multi-language fluency",
-        "Complexity & optimization"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Java",
-            "C++",
-            "C"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Algorithms & data structures",
-            "Graph algorithms",
-            "Dynamic programming",
-            "Math & combinatorics",
-            "Complexity & optimization",
-            "Algorithms & DS"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Processing",
-            "Competitive programming",
-            "Sorting & searching",
-            "Tree & set structures",
-            "String processing",
-            "Computational geometry",
-            "Multi-language fluency",
-            "Game Development"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/Competitive-Programming"
         }
       ]
     }
@@ -1873,6 +1873,7 @@ export const generatedSkills: Exhibit[] = [
         "Pillow",
         "HTML",
         "Generative AI / LLMs",
+        "Statistics & Evaluation",
         "Requests",
         "Transformers",
         "OpenGL",
@@ -1885,5 +1886,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-17T23:40:24.361Z"
+  "syncedAt": "2026-06-18T00:55:12.155Z"
 };
