@@ -64,6 +64,34 @@ async function downloadVideo(url, dest) {
   finally { clearTimeout(timer); }
 }
 
+// A README GIF (or a GitHub user-attachments image asset) → a looping mp4 at `dest`. user-attachments
+// URLs 302-redirect to a short-lived signed S3 URL only when authenticated, so resolve the redirect
+// with the token, then fetch the asset WITHOUT it (S3 rejects the forwarded auth header). Returns
+// false — the repo simply shows no demo — if it isn't actually a GIF (e.g. a static screenshot),
+// ffmpeg is missing, or anything else fails.
+async function downloadGif(url, dest) {
+  try {
+    let assetUrl = url;
+    if (/github\.com\/user-attachments\/assets\//i.test(url)) {
+      const res = await fetchTimeout(url, { headers: HEADERS, redirect: "manual" });
+      assetUrl = res.headers.get("location");
+      if (!assetUrl) return false;
+    }
+    const r = await fetchTimeout(assetUrl, { headers: { "User-Agent": "museum-portfolio-sync" } });
+    if (!r.ok) return false;
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (buf.length > SELF_HOST_MAX * 3 || buf.toString("latin1", 0, 3) !== "GIF") return false; // too big, or not a GIF
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    const tmp = `${dest}.src.gif`;
+    fs.writeFileSync(tmp, buf);
+    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", tmp,
+      "-vf", "scale='min(1280,iw)':-2:flags=lanczos", "-c:v", "libx264", "-crf", "30",
+      "-an", "-pix_fmt", "yuv420p", "-movflags", "+faststart", dest], { stdio: "ignore" });
+    fs.rmSync(tmp);
+    return true;
+  } catch { return false; }
+}
+
 // Download all queued demo videos at once — raw GitHub throttles each connection hard,
 // so serial would crawl; in parallel the total ≈ the single slowest file. Live progress
 // bar; on a failed download we drop that popup's videoUrl and fall back to its YouTube embed
@@ -77,7 +105,7 @@ async function downloadVideos(queue) {
   };
   render();
   await Promise.all(queue.map(async (t) => {
-    if (await downloadVideo(t.url, t.dest)) ok++;
+    if (await (t.gif ? downloadGif(t.url, t.dest) : downloadVideo(t.url, t.dest))) ok++;
     else { delete t.popup.videoUrl; if (t.embedFallback) t.popup.embedUrl = t.embedFallback; }
     done++; render();
   }));
@@ -374,7 +402,13 @@ function extractMedia(md) {
     const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{6,})/);
     if (yt) { if (!out.embedUrl) out.embedUrl = `https://www.youtube.com/embed/${yt[1]}`; continue; }
     if (/\.(mp4|webm)(\?|$)/i.test(url)) { if (!out.videoUrl) out.videoUrl = url; continue; }
-    if (/\.(png|jpe?g|svg|gif|webp)(\?|$)/i.test(url)) continue;     // images / badges
+    // A README GIF (or a GitHub user-attachments asset, which carries no extension) — kept as a demo
+    // candidate; the downloader confirms it's really a GIF and transcodes it to a looping mp4.
+    if (/\.gif(\?|$)/i.test(url) || /github\.com\/user-attachments\/assets\//i.test(url)) {
+      if (!out.gifUrl) out.gifUrl = url;
+      continue;
+    }
+    if (/\.(png|jpe?g|svg|webp)(\?|$)/i.test(url)) continue;     // static images / badges
     if (/shields\.io|badgen|forthebadge|img\.shields/i.test(url)) continue;
     for (const r of config.linkRules) {
       if (url.toLowerCase().includes(r.match.toLowerCase())) {
@@ -614,9 +648,15 @@ async function main() {
     // because we never set scan.videoUrl for them). LFS pointers report tiny here, so they
     // get queued and the downloader confirms/skips them against the real size.
     let videoFile = null;
+    let gifUrl = null;
     if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
       videoFile = `${repo.name}.${scan.videoExt}`;
       scan.videoUrl = `/videos/${videoFile}`; // optimistic; the parallel pass below confirms it
+    } else if ((gifUrl = extractMedia(scan.readme).gifUrl)) {
+      // No committed video, but the README has a GIF (incl. a GitHub user-attachments asset) — adopt
+      // it as the demo; the downloader transcodes it to a looping mp4.
+      videoFile = `${repo.name}.mp4`;
+      scan.videoUrl = `/videos/${videoFile}`;
     }
     const exhibit = toExhibit(repo, scan, domains);
     const sig = significance(repo, scan, domains, exhibit.popup);
@@ -627,7 +667,7 @@ async function main() {
     exhibits.push(exhibit);
     if (videoFile) {
       const embedFallback = config.overrides[repo.name]?.embedUrl || extractMedia(scan.readme).embedUrl;
-      videoQueue.push({ url: scan.videoRawUrl, dest: path.join(VIDEO_DIR, videoFile), popup: exhibit.popup, embedFallback });
+      videoQueue.push({ url: gifUrl || scan.videoRawUrl, gif: !!gifUrl, dest: path.join(VIDEO_DIR, videoFile), popup: exhibit.popup, embedFallback });
     }
     const usesEmbed = !videoFile && (config.overrides[repo.name]?.embedUrl || extractMedia(scan.readme).embedUrl);
     console.log(`  · ${repo.name}: ${scan.languages[0] || "?"}${scan.skills.length ? " + " + scan.skills.length + " skills" : ""}${domains.length ? " · " + domains.join(", ") : ""}${videoFile ? " · video" : usesEmbed ? " · youtube" : ""}`);
