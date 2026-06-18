@@ -77,7 +77,6 @@ export const config = {
     // ranking printout, so it's never a hidden thumb on the scale.
     Robotics: { bias: -5 },    // strong on paper (CV + LiDAR + Worlds) but messy code, didn't place
     biquadris: { bias: 12.5 }, // elegant C++ OOP (Strategy/MVC/RAII) the scorer can't read as a "hard" domain
-    "web-agent": { videoUrl: "/videos/web-agent.mp4" }, // demo is a user-attachments GIF CI can't fetch — pinned (pre-converted)
     // "biquadris": {
     //   title: "Biquadris",
     //   description: "A two-player Tetris variant — full OOP design in C++.",

@@ -64,23 +64,13 @@ async function downloadVideo(url, dest) {
   finally { clearTimeout(timer); }
 }
 
-// A README GIF (or a GitHub user-attachments image asset) → a looping mp4 at `dest`. user-attachments
-// URLs 302-redirect to a short-lived signed S3 URL only when authenticated, so resolve the redirect
-// with the token, then fetch the asset WITHOUT it (S3 rejects the forwarded auth header). Returns
-// false — the repo simply shows no demo — if it isn't actually a GIF (e.g. a static screenshot),
-// ffmpeg is missing, or anything else fails.
+// A directly-fetchable demo GIF URL → a looping mp4 at `dest`. (resolveGifUrl below has already turned
+// any GitHub user-attachments asset into its rendered JWT-signed URL, which GETs with no special auth.)
+// Returns false — the repo simply shows no demo — if it isn't actually a GIF (e.g. a static
+// screenshot), ffmpeg is missing, or anything else fails.
 async function downloadGif(url, dest) {
   try {
-    let assetUrl = url;
-    if (/github\.com\/user-attachments\/assets\//i.test(url)) {
-      // user-attachments assets need a USER token to issue the signed-S3 redirect — the repo-scoped
-      // CI GITHUB_TOKEN gets a 404. Use GIF_TOKEN (a user PAT) when provided, else fall back.
-      const gtok = process.env.GIF_TOKEN || TOKEN;
-      const res = await fetchTimeout(url, { headers: { ...(gtok ? { Authorization: `Bearer ${gtok}` } : {}), "User-Agent": "museum-portfolio-sync" }, redirect: "manual" });
-      assetUrl = res.headers.get("location");
-      if (!assetUrl) return false;
-    }
-    const r = await fetchTimeout(assetUrl, { headers: { "User-Agent": "museum-portfolio-sync" } });
+    const r = await fetchTimeout(url, { headers: { "User-Agent": "museum-portfolio-sync" } });
     if (!r.ok) return false;
     const buf = Buffer.from(await r.arrayBuffer());
     if (buf.length > SELF_HOST_MAX * 3 || buf.toString("latin1", 0, 3) !== "GIF") return false; // too big, or not a GIF
@@ -201,6 +191,23 @@ async function gh(pathOrUrl) {
   if (res.status === 403 && remaining === 0) throw new Error("RATE_LIMIT");
   if (!res.ok) throw new Error(`GitHub ${res.status} for ${url}`);
   return res.json();
+}
+
+// Resolve a README GIF to a directly-fetchable URL. The modern drag-and-drop README GIF is a GitHub
+// user-attachments asset whose raw github.com/user-attachments URL is auth-walled — our CI token 404s
+// it. But the *rendered* README rewrites that asset to a short-lived JWT-signed private-user-images URL
+// that anyone can GET, so we fetch the HTML render (which the standard token CAN read) and lift the
+// first .gif <img> src out of it. Returns "" when there's no GIF or the render fails — the repo just
+// shows no demo. (Used by the deep scan; main()'s video retrieval then downloads it like any demo.)
+async function resolveGifUrl(owner, name) {
+  try {
+    const res = await fetchTimeout(`${API}/repos/${owner}/${name}/readme`, {
+      headers: { ...HEADERS, Accept: "application/vnd.github.html" },
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    return (html.match(/<img[^>]+src="(https:\/\/[^"]+\.gif[^"]*)"/i) || [])[1] || "";
+  } catch { return ""; }
 }
 
 const MANIFESTS = ["package.json", "requirements.txt", "pyproject.toml", "Pipfile", "Cargo.toml", "go.mod", "Gemfile", "pom.xml", "build.gradle"];
@@ -337,6 +344,7 @@ async function scanRepo(repo) {
   languages.forEach((l) => skills.add(l));
 
   let readme = "";
+  let gifUrl = "";
   let videoRawUrl = "";
   let videoExt = "mp4";
   let videoSize = 0;
@@ -376,6 +384,12 @@ async function scanRepo(repo) {
         if (r?.content) readme = Buffer.from(r.content, "base64").toString("utf8");
       } catch (e) { if (e.message === "RATE_LIMIT") throw e; }
     }
+    // If the README embeds a user-attachments GIF demo, resolve it to a fetchable URL now, while we
+    // still hold this repo's context (see resolveGifUrl). Only that auth-walled form needs resolving —
+    // a plain .gif URL is already hotlinkable, so extractMedia handles it downstream.
+    if (remaining > 8 && /user-attachments\/assets\//i.test(readme)) {
+      gifUrl = await resolveGifUrl(owner, name);
+    }
   }
   techFromReadme(readme).forEach((s) => skills.add(s));
 
@@ -387,7 +401,7 @@ async function scanRepo(repo) {
       multiContributor = Array.isArray(c) && c.length > 1;
     } catch (e) { if (e.message === "RATE_LIMIT") throw e; }
   }
-  return { languages, codeBytes, skills: [...skills], readme, videoRawUrl, videoExt, videoSize, multiContributor };
+  return { languages, codeBytes, skills: [...skills], readme, gifUrl, videoRawUrl, videoExt, videoSize, multiContributor };
 }
 
 // Pull a demo video and/or labeled links out of a README. Works off every URL in
@@ -652,16 +666,13 @@ async function main() {
     // get queued and the downloader confirms/skips them against the real size.
     let videoFile = null;
     let gifUrl = null;
-    if (config.overrides[repo.name]?.videoUrl) {
-      // Pinned to a pre-committed file (config.overrides[name].videoUrl) — toExhibit adopts it
-      // directly; skip the fetch queue so the parallel pass can't drop it. Used for demos CI can't
-      // fetch on its own (e.g. a GitHub user-attachments GIF, which needs a broad user token).
-    } else if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
+    if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
       videoFile = `${repo.name}.${scan.videoExt}`;
       scan.videoUrl = `/videos/${videoFile}`; // optimistic; the parallel pass below confirms it
-    } else if ((gifUrl = extractMedia(scan.readme).gifUrl)) {
-      // No committed video, but the README has a GIF (incl. a GitHub user-attachments asset) — adopt
-      // it as the demo; the downloader transcodes it to a looping mp4.
+    } else if ((gifUrl = scan.gifUrl || extractMedia(scan.readme).gifUrl)) {
+      // No committed video, but the README has a GIF — adopt it as the demo; the downloader transcodes
+      // it to a looping mp4. The scan already resolved auth-walled user-attachments GIFs to a fetchable
+      // URL (scan.gifUrl); a plain .gif URL falls through to extractMedia.
       videoFile = `${repo.name}.mp4`;
       scan.videoUrl = `/videos/${videoFile}`;
     }
