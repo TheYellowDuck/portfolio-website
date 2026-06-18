@@ -833,6 +833,94 @@ export const generatedMainHall: Exhibit[] = [
         }
       ]
     }
+  },
+  {
+    "popup": {
+      "title": "Biquadris",
+      "description": "A two-player competitive Tetris variant built in C++ with an object-oriented design. Originally developed as a final project for CS 246: Object-Oriented Software Development at the University of Waterloo (Fall 2025) by a team of three students, then refactored and extended into a cross-platform, SDL2-rendered game. The game has since been refactored and extended beyond the original submission: bugs fixed, the X11 graphics layer replaced with SDL2 for cross-platform support, and the build system migrated to CMake for easy packaging. Biquadris is a turn-based, two-player spin on Tetris. Both players share one screen — each managing their own 11×18 board. Players alternate turns: you make one move, then your opponent does. Clear two or more lines in a single drop and you earn a special action to punish your opponent. The game ends when a player can no longer place a new block. The codebase is organized around a small set of well-encapsulated classes. Game owns the two Board models and drives the turn loop; each Board tracks its grid, score, level, and active effects; Block encodes the seven tetromino shapes and their rotations; Level generates the next block according to the current difficulty; and the rendering is handled by interchangeable views — a TextDisplay for the terminal and an SDL2 Xwindow for graphics. Two design ideas carry most of the weight. Special actions are a polymorphic effect system (Strategy-style): an abstract Effect base class declares apply, onDrop, isExpired, and getName, and concrete BlindEffect, HeavyEffect, and ForceEffect subclasses implement each behaviour. An EffectManager holds the active effects per board, applies them on activation, ticks them after every drop, and retires them when they expire — so new actions can be added without touching the board logic. The model is fully decoupled from the views: the boards know nothing about how they're drawn, so the same game state renders identically to the terminal or to SDL2. Memory is managed entirely through std::uniqueptr (RAII — no manual new/delete), collision detection validates every move and rotation against the walls and settled cells before committing it, and a single codebase compiles either text-only or with graphics via conditional compilation (ifdef BIQUADRISGRAPHICS). Commands are parsed with unique-prefix matching and numeric multipliers, the high score persists between sessions, and a ghost-block preview shows where the current piece will land. Clearing 2 or more lines in a single drop earns a special action against your opponent: Line clear: (currentlevel + linescleared)² points; A block that scores zero lines resets the combo; clearing any lines resets the no-clear counter (relevant for Level 4 penalty blocks); High score is saved across sessions in .biquadrishighscore Object-oriented design — encapsulated Game, Board, Block, Level, and Effect classes; Polymorphism & abstract base classes — Effect interface with Blind / Heavy / Force subclasses; Inheritance — virtual methods and virtual destructors across the effect hierarchy; Strategy-style effect system — runtime special actions managed by an EffectManager; Model–view separation (MVC) — board state decoupled from the text and SDL2 renderers; RAII & smart pointers — std::uniqueptr ownership throughout, no manual memory management; Modern C++20 — const-correctness, standard containers, move semantics; Collision detection — move and rotation validation against walls and settled cells; Conditional compilation — one codebase builds text-only or with SDL2 graphics; Command parsing — unique-prefix matching with numeric multipliers; File I/O — high-score persistence and script-driven block sequences; Cross-platform build system — CMake with Homebrew SDL2 discovery on macOS; CI/CD release automation — GitHub Actions builds and bundles a distributable macOS app; Game logic — line clearing, level progression, ghost-block preview, and squared scoring C++20;",
+      "tech": [
+        "C++",
+        "GitHub Actions",
+        "CMake",
+        "SDL2",
+        "Object-oriented design",
+        "Polymorphism & abstract base classes",
+        "Inheritance",
+        "Strategy-style effect system",
+        "Model–view separation (MVC)",
+        "RAII & smart pointers",
+        "Modern C++20",
+        "Collision detection",
+        "Conditional compilation",
+        "Command parsing",
+        "File I/O",
+        "Cross-platform build system",
+        "CI/CD release automation",
+        "Game logic"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "C++"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "SDL2"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "CMake"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Polymorphism & abstract base classes",
+            "Inheritance",
+            "Model–view separation (MVC)",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Cross-platform build system",
+            "CI/CD release automation",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Strategy-style effect system",
+            "RAII & smart pointers",
+            "Modern C++20",
+            "Collision detection",
+            "Conditional compilation",
+            "Command parsing",
+            "File I/O",
+            "Game logic",
+            "Game Development",
+            "Automation / Scraping",
+            "Game Physics"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/biquadris"
+        }
+      ],
+      "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
+    }
   }
 ];
 
@@ -1291,94 +1379,6 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "videoUrl": "/videos/minesweeper.mp4"
-    }
-  },
-  {
-    "popup": {
-      "title": "Biquadris",
-      "description": "A two-player competitive Tetris variant built in C++ with an object-oriented design. Originally developed as a final project for CS 246: Object-Oriented Software Development at the University of Waterloo (Fall 2025) by a team of three students, then refactored and extended into a cross-platform, SDL2-rendered game. The game has since been refactored and extended beyond the original submission: bugs fixed, the X11 graphics layer replaced with SDL2 for cross-platform support, and the build system migrated to CMake for easy packaging. Biquadris is a turn-based, two-player spin on Tetris. Both players share one screen — each managing their own 11×18 board. Players alternate turns: you make one move, then your opponent does. Clear two or more lines in a single drop and you earn a special action to punish your opponent. The game ends when a player can no longer place a new block. The codebase is organized around a small set of well-encapsulated classes. Game owns the two Board models and drives the turn loop; each Board tracks its grid, score, level, and active effects; Block encodes the seven tetromino shapes and their rotations; Level generates the next block according to the current difficulty; and the rendering is handled by interchangeable views — a TextDisplay for the terminal and an SDL2 Xwindow for graphics. Two design ideas carry most of the weight. Special actions are a polymorphic effect system (Strategy-style): an abstract Effect base class declares apply, onDrop, isExpired, and getName, and concrete BlindEffect, HeavyEffect, and ForceEffect subclasses implement each behaviour. An EffectManager holds the active effects per board, applies them on activation, ticks them after every drop, and retires them when they expire — so new actions can be added without touching the board logic. The model is fully decoupled from the views: the boards know nothing about how they're drawn, so the same game state renders identically to the terminal or to SDL2. Memory is managed entirely through std::uniqueptr (RAII — no manual new/delete), collision detection validates every move and rotation against the walls and settled cells before committing it, and a single codebase compiles either text-only or with graphics via conditional compilation (ifdef BIQUADRISGRAPHICS). Commands are parsed with unique-prefix matching and numeric multipliers, the high score persists between sessions, and a ghost-block preview shows where the current piece will land. Clearing 2 or more lines in a single drop earns a special action against your opponent: Line clear: (currentlevel + linescleared)² points; A block that scores zero lines resets the combo; clearing any lines resets the no-clear counter (relevant for Level 4 penalty blocks); High score is saved across sessions in .biquadrishighscore Object-oriented design — encapsulated Game, Board, Block, Level, and Effect classes; Polymorphism & abstract base classes — Effect interface with Blind / Heavy / Force subclasses; Inheritance — virtual methods and virtual destructors across the effect hierarchy; Strategy-style effect system — runtime special actions managed by an EffectManager; Model–view separation (MVC) — board state decoupled from the text and SDL2 renderers; RAII & smart pointers — std::uniqueptr ownership throughout, no manual memory management; Modern C++20 — const-correctness, standard containers, move semantics; Collision detection — move and rotation validation against walls and settled cells; Conditional compilation — one codebase builds text-only or with SDL2 graphics; Command parsing — unique-prefix matching with numeric multipliers; File I/O — high-score persistence and script-driven block sequences; Cross-platform build system — CMake with Homebrew SDL2 discovery on macOS; CI/CD release automation — GitHub Actions builds and bundles a distributable macOS app; Game logic — line clearing, level progression, ghost-block preview, and squared scoring C++20;",
-      "tech": [
-        "C++",
-        "GitHub Actions",
-        "CMake",
-        "SDL2",
-        "Object-oriented design",
-        "Polymorphism & abstract base classes",
-        "Inheritance",
-        "Strategy-style effect system",
-        "Model–view separation (MVC)",
-        "RAII & smart pointers",
-        "Modern C++20",
-        "Collision detection",
-        "Conditional compilation",
-        "Command parsing",
-        "File I/O",
-        "Cross-platform build system",
-        "CI/CD release automation",
-        "Game logic"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "C++"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "SDL2"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "GitHub Actions",
-            "CMake"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Polymorphism & abstract base classes",
-            "Inheritance",
-            "Model–view separation (MVC)",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Cross-platform build system",
-            "CI/CD release automation",
-            "DevOps"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Strategy-style effect system",
-            "RAII & smart pointers",
-            "Modern C++20",
-            "Collision detection",
-            "Conditional compilation",
-            "Command parsing",
-            "File I/O",
-            "Game logic",
-            "Game Development",
-            "Automation / Scraping",
-            "Game Physics"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/biquadris"
-        }
-      ],
-      "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
     }
   },
   {
@@ -1886,5 +1886,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-18T00:55:12.155Z"
+  "syncedAt": "2026-06-18T01:00:30.930Z"
 };
