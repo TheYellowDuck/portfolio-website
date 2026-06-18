@@ -391,8 +391,9 @@ function extractMedia(md) {
 // Order matters — first match wins, so the genuinely-hard buckets come before the lighter
 // ones (e.g. "minimax" → Algorithms before "Game AI"; "3D"/OpenGL → 3D Graphics before 2D).
 const CONCEPT_BUCKETS = [
-  { name: "AI & ML",                  re: /machine learning|deep learning|neural network|computer vision|\bcnn\b|\bnlp\b|reinforcement learning|model (?:training|inference)|\binference\b|object detection|image (?:processing|classification|recognition)|classifier|pose estimation|gesture recognition|transformer|\bllms?\b|large language model|generative ai|\bgpt\b|openai|anthropic|\bclaude\b|gemini|langchain|llama|\brag\b|retrieval.?augmented|prompt engineering|embeddings?|vector (?:db|database|store|search)|chroma|faiss|pinecone|weaviate|hugging.?face|fine.?tun|agentic|\bai agent/i },
+  { name: "AI & ML",                  re: /machine learning|deep learning|neural network|computer vision|\bcnn\b|\bnlp\b|reinforcement learning|model (?:training|inference)|\binference\b|object detection|image (?:classification|recognition|segmentation)|classifier|pose estimation|gesture recognition|transformer|\bllms?\b|large language model|generative ai|\bgpt\b|openai|anthropic|\bclaude\b|gemini|langchain|llama|\brag\b|retrieval.?augmented|prompt engineering|embeddings?|vector (?:db|database|store|search)|chroma|faiss|pinecone|weaviate|hugging.?face|fine.?tun|agentic|\bai agent/i },
   { name: "Algorithms & DS",          re: /algorithm|data structure|\bgraph\b|breadth-first|depth-first|\bsearch\b|recursion|combinator|state.?space|traversal|dynamic programming|minimax|alpha-?beta|pathfind|\ba\*|complexity|\boptimization|\bsolver\b/i },
+  { name: "Statistics & Evaluation",  re: /statistic|significance test|hypothesis test|confidence interval|\bwilson\b|\bp-value\b|\bablation\b|evaluation (?:harness|methodolog)|benchmark harness|\bpass@k\b|reproducib|\ba\/b test/i },
   { name: "Concurrency & Networking", re: /thread|concurren|asynchron|parallel|producer.?consumer|mutex|synchroniz|background process|real-?time|network|socket|client.?server|multiplayer|\btcp\b|\budp\b|websocket|distributed/i },
   { name: "3D Graphics",              re: /\b3d\b|opengl|webgl|vulkan|\bshader|raycast|ray-cast|rendering pipeline|physics engine|\bglsl\b/i },
   { name: "Systems & Embedded",       re: /robotics|embedded|firmware|microcontroller|arduino|raspberry pi|\brtos\b|\bros\b|sensor fusion|actuator|bare-metal|control system|device driver|\bkernel\b|\bsimd\b/i },
@@ -476,7 +477,7 @@ function toExhibit(repo, scan, domains = []) {
 //   HARD   — real ML/CV, non-trivial algorithms, concurrency/networking, 3D graphics.
 //   MEDIUM — Game AI (state machines / steering — NOT real ML) and UI / 2D rendering.
 //   BASIC  — table-stakes engineering present in almost every project (OOP, tests/packaging).
-const HARD_AREAS = ["AI & ML", "Algorithms & DS", "Concurrency & Networking", "3D Graphics", "Systems & Embedded", "Security & Crypto", "Compilers & Languages", "Distributed & Data"];
+const HARD_AREAS = ["AI & ML", "Algorithms & DS", "Statistics & Evaluation", "Concurrency & Networking", "3D Graphics", "Systems & Embedded", "Security & Crypto", "Compilers & Languages", "Distributed & Data"];
 const MEDIUM_AREAS = ["Game AI", "UI & 2D"];
 const BASIC_AREAS = ["Architecture & Design", "Testing & Delivery"];
 const SYSTEMS_LANGS = new Set(["C", "C++", "Rust", "Assembly"]); // low-level langs signal harder engineering
@@ -523,14 +524,15 @@ function significance(repo, scan, domains, popup) {
     MEDIUM_AREAS.filter((c) => itemsIn(c) > 0).length * 3 +
     BASIC_AREAS.filter((c) => itemsIn(c) > 0).length * 1.5 +
     Math.min(concepts, 18) * 0.3 +
+    (scan.languages.slice(0, 2).some((l) => SYSTEMS_LANGS.has(l)) ? 3 : 0) +  // C/C++/Rust as a primary lang = lower-level, harder
     (domains || []).reduce((s, d) => s + (DOMAIN_DIFFICULTY[d] || 0), 0);  // backend/data/mobile/scraping
   // Scope — code actually written (language bytes, NOT repo.size which is inflated by videos).
   const scope = Math.log2((scan.codeBytes || 0) / 1024 + 1) * 1.8;
   const breadth = scan.languages.length * 1.5 + scan.languages.filter((l) => SYSTEMS_LANGS.has(l)).length * 2; // polyglot + low-level bonus
   // Shipped — a published app / live site is the strongest recruiter signal; a package, less so.
   const links = popup.links || [];
-  const deployed = links.some((l) => /google play|app store|live|chrome web|marketplace|devpost/i.test(l.label)) ? 14
-    : links.some((l) => /\bnpm\b|pypi/i.test(l.label)) ? 7 : 0;
+  const deployed = links.some((l) => /google play|app store|live|chrome web|marketplace|devpost/i.test(l.label)) ? 10
+    : links.some((l) => /\bnpm\b|pypi/i.test(l.label)) ? 5 : 0;
   // Reception — diminishing returns (log), so a couple of stars no longer single-handedly defines
   // "featured" and a strong-but-starless repo isn't buried (personal repos rarely have many stars).
   const social = Math.log2((repo.stargazers_count || 0) + 1) * 5 + Math.log2((repo.forks_count || 0) + 1) * 3;
@@ -618,8 +620,10 @@ async function main() {
     }
     const exhibit = toExhibit(repo, scan, domains);
     const sig = significance(repo, scan, domains, exhibit.popup);
-    exhibit._score = sig.total;
+    const bias = config.overrides[repo.name]?.bias || 0; // manual nudge for what the scorer can't read
+    exhibit._score = sig.total + bias;
     exhibit._sig = sig.parts;
+    exhibit._bias = bias;
     exhibits.push(exhibit);
     if (videoFile) {
       const embedFallback = config.overrides[repo.name]?.embedUrl || extractMedia(scan.readme).embedUrl;
@@ -663,7 +667,7 @@ async function main() {
       `  ${tag} ${e._name.slice(0, 22).padEnd(22)} ${e._score.toFixed(1).padStart(5)} │ ` +
       `${p.difficulty.toFixed(1).padStart(6)} ${p.scope.toFixed(1).padStart(5)} ${p.breadth.toFixed(1).padStart(5)} ` +
       `${String(p.deployed).padStart(6)} ${p.social.toFixed(1).padStart(6)} ${String(p.collab).padStart(6)} ${p.polish.toFixed(1).padStart(6)}` +
-      `${p.coll ? "  ½ collection" : ""}`,
+      `${p.coll ? "  ½ collection" : ""}${e._bias ? "  (" + (e._bias > 0 ? "+" : "") + e._bias + " bias)" : ""}`,
     );
   }
   console.log("");

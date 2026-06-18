@@ -31,7 +31,7 @@ export const config = {
   // read the printed ranking to pick a value. Higher = more selective. Set in the natural gap
   // between the strong tier (≈44+) and the simpler/game tier (≈35), so "featured" reads as
   // genuinely impressive work by difficulty/scope.
-  featuredThreshold: 40,
+  featuredThreshold: 45,
 
   // Soft skills can't be read from code (they're not in the repo), so list the ones
   // you want shown here. They appear as their own "Soft Skills" group, always.
@@ -72,6 +72,10 @@ export const config = {
   // Per-repo overrides — re-curate anything the auto data gets wrong. Any field
   // here wins over the GitHub-derived value. Keys are repo names (case-sensitive).
   overrides: {
+    // `bias: ±N` — a manual score nudge for what the auto-scorer genuinely can't read: code
+    // quality, a competition result, architecture elegance. It shows next to the repo in the
+    // ranking printout, so it's never a hidden thumb on the scale.
+    Robotics: { bias: -5 }, // strong on paper (CV + LiDAR + Worlds) but messy code, didn't place
     // "biquadris": {
     //   title: "Biquadris",
     //   description: "A two-player Tetris variant — full OOP design in C++.",
@@ -150,11 +154,12 @@ export const TOOL_SIGNS = [
 // skills, languages, topics, name, or description. (Lets pure-Java game repos still
 // read as "Game Development," etc.)  Add your own.
 export const DOMAIN_RULES = [
-  { skill: "Computer Vision", any: ["opencv", "mediapipe", "yolo", "image processing", "object detection", "face detection"] },
+  { skill: "Computer Vision", any: ["opencv", "mediapipe", "yolo", "object detection", "face detection", "image segmentation", "image classification", "pose estimation"] },
   { skill: "Machine Learning", any: ["tensorflow", "pytorch", "scikit-learn", "sklearn", "keras", "neural network", "machine learning", "deep learning"] },
   // NOTE: keep keywords specific — these are substring-matched against repo text, so short tokens
   // like "rag" would hit "fragment"/"storage"/"drag" (use "retrieval-augmented" instead).
   { skill: "Generative AI / LLMs", any: ["large language model", " llm", "llm ", "openai", "anthropic", "claude", "gemini", "langchain", "litellm", "llamaindex", "retrieval-augmented", "prompt engineering", "agentic", "ai agent", "embeddings", "vector database", "vector store", "fine-tuning", "hugging face", "generative ai"] },
+  { skill: "Statistics & Evaluation", any: ["significance test", "confidence interval", "wilson", "p-value", "hypothesis test", "statistical significance", "ablation", "evaluation harness", "benchmark harness", "pass@k", "reproducib", "a/b test"] },
   { skill: "Data Analysis", any: ["numpy", "pandas", "matplotlib", "scipy", "jupyter", "data analysis", "dataset", "visualization"] },
   { skill: "Web Development", any: ["react", "vue", "next.js", "svelte", "angular", "tailwind", "html", "css", "express", "django", "flask", "fastapi"] },
   { skill: "Backend / APIs", any: ["express", "fastapi", "flask", "django", "spring", "rest api", "graphql", "endpoint", "backend"] },
