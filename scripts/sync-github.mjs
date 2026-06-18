@@ -73,7 +73,10 @@ async function downloadGif(url, dest) {
   try {
     let assetUrl = url;
     if (/github\.com\/user-attachments\/assets\//i.test(url)) {
-      const res = await fetchTimeout(url, { headers: HEADERS, redirect: "manual" });
+      // user-attachments assets need a USER token to issue the signed-S3 redirect — the repo-scoped
+      // CI GITHUB_TOKEN gets a 404. Use GIF_TOKEN (a user PAT) when provided, else fall back.
+      const gtok = process.env.GIF_TOKEN || TOKEN;
+      const res = await fetchTimeout(url, { headers: { ...(gtok ? { Authorization: `Bearer ${gtok}` } : {}), "User-Agent": "museum-portfolio-sync" }, redirect: "manual" });
       assetUrl = res.headers.get("location");
       if (!assetUrl) return false;
     }

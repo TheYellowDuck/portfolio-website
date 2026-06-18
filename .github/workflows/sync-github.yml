@@ -35,7 +35,8 @@ jobs:
 
       - name: Sync from GitHub
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}            # repo scan (public read, high rate limit)
+          GIF_TOKEN: ${{ secrets.SYNC_PAT }}               # user token — fetch README GIFs from GitHub user-attachments
         run: node scripts/sync-github.mjs
 
       - name: Sync CP stats (LeetCode + DMOJ)
