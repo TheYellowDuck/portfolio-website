@@ -21,6 +21,12 @@ export const config = {
   skipArchived: false,    // hide archived repos
   skipNoDescriptionAndNoStars: false, // hide bare repos (no description AND 0 stars)
 
+  // A repo carrying ANY of these GitHub topics is treated as still-being-built: it's shown in a
+  // separate "In progress" group (site + museum) and pulled OUT of the scored ranking — an unfinished
+  // project scores low only because it's incomplete, so ranking it would misrepresent it. Set the
+  // topic on the repo while you build; remove it when it ships. Matched case-insensitively.
+  inProgressTopics: ["in-progress", "wip", "work-in-progress"],
+
   // Which repos land in the Main Hall ("featured"); the rest go to the Archive.
   // List names to force-feature them regardless of score:
   featured: [

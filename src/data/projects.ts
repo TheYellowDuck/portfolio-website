@@ -1,7 +1,7 @@
 import { TILES } from "@/game/tile-ids";
 import { LINKS } from "@/lib/site";
 // Projects + skills are auto-generated from GitHub — see scripts/sync-github.mjs.
-import { generatedMainHall, generatedArchive, generatedSkills } from "./github.generated";
+import { generatedMainHall, generatedInProgress, generatedArchive, generatedSkills } from "./github.generated";
 
 // ============================================================
 // EXHIBIT — One simple type for everything
@@ -67,6 +67,10 @@ export interface Exhibit {
 
 // Tile 11 — MAIN HALL / FEATURED PROJECTS
 export const mainHallExhibits: Exhibit[] = generatedMainHall;
+
+// Actively-built projects (GitHub topic `in-progress` etc.) — shown in their own group on the site,
+// deliberately kept OUT of the scored ranking so an unfinished repo isn't judged as minor work.
+export const inProgressExhibits: Exhibit[] = generatedInProgress;
 
 // Tile 12 — SKILLS & TECH WING
 export const skillsExhibits: Exhibit[] = generatedSkills;
@@ -252,7 +256,9 @@ export const easterEggExhibits: Exhibit[] = [
 
 export const roomRegistry: Record<number, Exhibit[]> = {
   [TILES.EXPERIENCE]: experienceExhibits,
-  [TILES.MAIN_HALL]:  mainHallExhibits,
+  // The game has no separate "in progress" room, so current work shares the Main Hall (it's still
+  // shown, just not split out the way the web view separates it from the ranked featured projects).
+  [TILES.MAIN_HALL]:  [...mainHallExhibits, ...inProgressExhibits],
   [TILES.ARCHIVE]:    archiveExhibits,
   [TILES.OFFICE]:     officeExhibits,
   [TILES.GIFT_SHOP]:  giftShopExhibits,

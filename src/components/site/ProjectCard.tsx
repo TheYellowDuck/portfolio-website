@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
+import { content } from "@/content";
 
 /**
  * A muted autoplay preview that only fetches its source once it's near the viewport — so a page of
@@ -40,14 +41,16 @@ function LazyVideo({ src, poster, className }: { src: string; poster?: string; c
 }
 
 interface ProjectCardProps {
-  index: string;   // e.g. "01"
+  index?: string;   // e.g. "01" — omitted for in-progress cards, which show a status pill instead
   popup: ExhibitPopup;
   compact?: boolean;
+  /** Actively-built project: show an "In progress" pill in place of the No. NN ranking index. */
+  inProgress?: boolean;
   /** Open the full exhibit (grouped skills, demo, etc.). The whole card triggers this. */
   onOpen?: () => void;
 }
 
-export default function ProjectCard({ index, popup, compact = false, onOpen }: ProjectCardProps) {
+export default function ProjectCard({ index, popup, compact = false, inProgress = false, onOpen }: ProjectCardProps) {
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
@@ -80,7 +83,14 @@ export default function ProjectCard({ index, popup, compact = false, onOpen }: P
         </div>
       )}
 
-      <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+      {inProgress ? (
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
+          <span className="h-1.5 w-1.5 rounded-full bg-sage" aria-hidden="true" />
+          {content.sections.work.inProgressTag}
+        </span>
+      ) : (
+        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+      )}
 
       <h3 className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
         {popup.title}

@@ -56,6 +56,8 @@ const en = {
       title: "Selected Work",
       intro:
         "A few things I've built — games, tools, and research apps. Step inside the museum to see them on pedestals.",
+      inProgress: "In progress",   // subsection heading for actively-built projects (pulled out of the ranking)
+      inProgressTag: "In progress", // the pill shown on those cards in place of a No. NN index
       archive: "Archive",
     },
     experience: { eyebrow: "Curriculum Vitae", title: "Experience" },

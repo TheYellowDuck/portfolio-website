@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   mainHallExhibits,
+  inProgressExhibits,
   archiveExhibits,
   experienceExhibits,
   skillsExhibits,
@@ -52,6 +53,7 @@ function Section({ id, eyebrow, title, intro, children }: {
 export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject, currentStatus }: PortfolioProps) {
   const isMac = useIsMac();
   const featured = withPopup(mainHallExhibits);
+  const inProgress = withPopup(inProgressExhibits);
   const archive = withPopup(archiveExhibits);
   // Height estimates for masonry balancing, so columns pack evenly (no exposed seam).
   // A project card with a demo/thumbnail (aspect-video) is ~twice the height of one without.
@@ -113,6 +115,20 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
           </Reveal>
         ))} />
+
+        {inProgress.length > 0 && (
+          <>
+            {/* Current work — deliberately not ranked (no No. NN); see scripts/sync-github.mjs. */}
+            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.inProgress}</h3>
+            <div className="mt-6">
+              <Masonry sm={2} lg={2} weights={inProgress.map((e) => cardWeight(e.popup as ExhibitPopup))} items={inProgress.map((e, i) => (
+                <Reveal key={i} delay={(i % 2) * 70}>
+                  <ProjectCard popup={e.popup as ExhibitPopup} inProgress onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
+                </Reveal>
+              ))} />
+            </div>
+          </>
+        )}
 
         {archive.length > 0 && (
           <>

@@ -925,6 +925,8 @@ export const generatedMainHall: Exhibit[] = [
   }
 ];
 
+export const generatedInProgress: Exhibit[] = [];
+
 export const generatedArchive: Exhibit[] = [
   {
     "popup": {
