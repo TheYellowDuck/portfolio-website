@@ -1024,6 +1024,89 @@ export const generatedArchive: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Instagram Non Follower Finder",
+      "description": "A desktop app that automates finding Instagram accounts you follow that don't follow you back. Built with Python, Selenium WebDriver, and CustomTkinter — it drives a real browser to scroll and extract your follower/following lists, applies hand-rolled anti-bot stealth, and presents the diff in a clean dark-mode GUI with cross-browser support. Cross-browser — Chrome, Firefox, Edge, Safari; Stealth mode — patches automation fingerprints to reduce bot detection across browsers; Manual login flow with full 2FA and captcha support; Auto-downloads browser drivers (no PATH setup required); Accumulates users across virtual-scroll batches so no one is missed; Results copyable to clipboard The app launches a real browser through Selenium WebDriver and lets you log in manually (so 2FA and captchas just work). To reduce automation detection, it injects a small stealth script that redefines navigator.webdriver — via the Chrome DevTools Protocol (Page.addScriptToEvaluateOnNewDocument) on Chromium browsers and executescript on Firefox — alongside flags like --disable-blink-features=AutomationControlled and Firefox's dom.webdriver.enabled = false. It then opens your followers and following dialogs and uses ActionChains with ScrollOrigin to scroll the virtual-scrolling lists, accumulating usernames across batches until the full list is captured. A set difference between following and followers yields the accounts that don't follow you back. All of this runs on a background threading worker so the CustomTkinter UI stays responsive, with per-browser error dialogs when a driver fails to start. Browser automation — Selenium WebDriver driving Chrome, Firefox, Edge, and Safari; Cross-browser abstraction — per-browser options and driver setup behind one flow (match/case); Anti-bot stealth — CDP navigator.webdriver patching and disabling automation fingerprints; Dynamic web scraping — ActionChains + ScrollOrigin to drive virtual-scroll list extraction; Set operations — diff of following vs. followers to surface non-followers; Multithreading & concurrency — background threading worker keeps the GUI responsive; GUI development — CustomTkinter dark-mode desktop interface; Robust error handling — per-browser driver-failure dialogs and captcha/2FA-friendly login; Automatic driver management — webdriver-manager for Firefox/Edge; Chrome 115+ self-manages; Clipboard integration — one-click copy of results; Application packaging — PyInstaller native build via build.py Python 3.10+ (match/case); Selenium WebDriver (Chrome, Firefox, Edge, Safari); CustomTkinter (dark-mode GUI); webdriver-manager (Firefox / Edge driver management); Chrome DevTools Protocol (stealth script injection); threading (responsive UI); PyInstaller (native app packaging)",
+      "tech": [
+        "Python",
+        "pip",
+        "Selenium",
+        "Concurrency",
+        "Browser automation",
+        "Cross-browser abstraction",
+        "Anti-bot stealth",
+        "Dynamic web scraping",
+        "Set operations",
+        "Multithreading & concurrency",
+        "GUI development",
+        "Robust error handling",
+        "Automatic driver management",
+        "Clipboard integration",
+        "Application packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "pip",
+            "Selenium"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Multithreading & concurrency"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "GUI development"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Cross-browser abstraction"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Application packaging"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Browser automation",
+            "Anti-bot stealth",
+            "Dynamic web scraping",
+            "Set operations",
+            "Robust error handling",
+            "Automatic driver management",
+            "Clipboard integration",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/instagram-non-follower-finder"
+        }
+      ],
+      "embedUrl": "https://www.youtube.com/embed/CibVM3FueDY"
+    }
+  },
+  {
+    "popup": {
       "title": "PONG",
       "description": "A fully playable Pong game built in Java with Swing, featuring local two-player multiplayer and a single-player mode against a predictive AI that simulates the ball's full trajectory — including wall bounces — to anticipate where it will land. https://github.com/user-attachments/assets/54ef0b10-a559-49a8-9805-efe1b83df394 Single-player mode — AI that simulates the ball's full trajectory (including wall bounces) to predict its landing position, with a speed cap and randomised error margin so it's challenging but beatable; Two-player local multiplayer — both players share the keyboard; Physics-based ball mechanics — bounce angle depends on where the ball strikes the paddle; ball speed increases 5% per volley up to a maximum, rewarding longer rallies; Clean menu UI with keyboard navigation The game runs on a javax.swing.Timer firing at 60 FPS on the Event Dispatch Thread, so updates and repaints stay smooth without ever blocking the EDT with Thread.sleep. Ball physics are vector-based: each return angle is computed from the hit position relative to the paddle centre (rel × 60°), so edge hits produce steep angles and centre hits produce flat returns, with the velocity decomposed via cos/sin. Speed builds 5% per volley up to a hard cap (MAXSPEED), making long rallies progressively harder to control. The AI opponent projects where the ball will land by running a frame-by-frame physics simulation (predictBallY) that mirrors the wall-bounce logic. To stay beatable, it recomputes its target only every ~15 frames, applies a ±25px position error, moves slightly slower than the player, and drifts back to centre when the ball is travelling away — so it can be consistently beaten by pushing the ball into the corners at high speed. Object-oriented design — game state, rendering, and input separated across classes; Event-driven programming — Java Swing event dispatch and key handling; Game loop architecture — javax.swing.Timer at 60 FPS, no blocking on the EDT; Game physics — vector velocity, trigonometric bounce angles, per-volley speed ramping; Collision detection — ball-versus-paddle and ball-versus-wall response; Game AI — predictive opponent via frame-by-frame trajectory simulation; Vector math & trigonometry — cos/sin angle decomposition from paddle hit position; 2D rendering — custom Graphics drawing of paddles, ball, scores, and menu; Input handling — multi-key state tracking and keyboard menu navigation; Java Platform Module System — modular build with module-info.java; JAR packaging — runnable modular Java application Java 17+; Java Swing / AWT (JPanel, JFrame, Graphics, javax.swing.Timer); Java Platform Module System (module-info.java, requires java.desktop); Packaged as a runnable modular JAR (PONG.jar)",
       "tech": [
@@ -1384,89 +1467,6 @@ export const generatedArchive: Exhibit[] = [
   },
   {
     "popup": {
-      "title": "Instagram Non Follower Finder",
-      "description": "A desktop app that automates finding Instagram accounts you follow that don't follow you back. Built with Python, Selenium WebDriver, and CustomTkinter — it drives a real browser to scroll and extract your follower/following lists, applies hand-rolled anti-bot stealth, and presents the diff in a clean dark-mode GUI with cross-browser support. Cross-browser — Chrome, Firefox, Edge, Safari; Stealth mode — patches automation fingerprints to reduce bot detection across browsers; Manual login flow with full 2FA and captcha support; Auto-downloads browser drivers (no PATH setup required); Accumulates users across virtual-scroll batches so no one is missed; Results copyable to clipboard The app launches a real browser through Selenium WebDriver and lets you log in manually (so 2FA and captchas just work). To reduce automation detection, it injects a small stealth script that redefines navigator.webdriver — via the Chrome DevTools Protocol (Page.addScriptToEvaluateOnNewDocument) on Chromium browsers and executescript on Firefox — alongside flags like --disable-blink-features=AutomationControlled and Firefox's dom.webdriver.enabled = false. It then opens your followers and following dialogs and uses ActionChains with ScrollOrigin to scroll the virtual-scrolling lists, accumulating usernames across batches until the full list is captured. A set difference between following and followers yields the accounts that don't follow you back. All of this runs on a background threading worker so the CustomTkinter UI stays responsive, with per-browser error dialogs when a driver fails to start. Browser automation — Selenium WebDriver driving Chrome, Firefox, Edge, and Safari; Cross-browser abstraction — per-browser options and driver setup behind one flow (match/case); Anti-bot stealth — CDP navigator.webdriver patching and disabling automation fingerprints; Dynamic web scraping — ActionChains + ScrollOrigin to drive virtual-scroll list extraction; Set operations — diff of following vs. followers to surface non-followers; Multithreading & concurrency — background threading worker keeps the GUI responsive; GUI development — CustomTkinter dark-mode desktop interface; Robust error handling — per-browser driver-failure dialogs and captcha/2FA-friendly login; Automatic driver management — webdriver-manager for Firefox/Edge; Chrome 115+ self-manages; Clipboard integration — one-click copy of results; Application packaging — PyInstaller native build via build.py Python 3.10+ (match/case); Selenium WebDriver (Chrome, Firefox, Edge, Safari); CustomTkinter (dark-mode GUI); webdriver-manager (Firefox / Edge driver management); Chrome DevTools Protocol (stealth script injection); threading (responsive UI); PyInstaller (native app packaging)",
-      "tech": [
-        "Python",
-        "pip",
-        "Selenium",
-        "Concurrency",
-        "Browser automation",
-        "Cross-browser abstraction",
-        "Anti-bot stealth",
-        "Dynamic web scraping",
-        "Set operations",
-        "Multithreading & concurrency",
-        "GUI development",
-        "Robust error handling",
-        "Automatic driver management",
-        "Clipboard integration",
-        "Application packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "pip",
-            "Selenium"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency",
-            "Multithreading & concurrency"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "GUI development"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Cross-browser abstraction"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Application packaging"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Browser automation",
-            "Anti-bot stealth",
-            "Dynamic web scraping",
-            "Set operations",
-            "Robust error handling",
-            "Automatic driver management",
-            "Clipboard integration",
-            "Automation / Scraping"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/instagram-non-follower-finder"
-        }
-      ],
-      "embedUrl": "https://www.youtube.com/embed/CibVM3FueDY"
-    }
-  },
-  {
-    "popup": {
       "title": "Go Board Game",
       "description": "A fully playable 19×19 Go board game built in Java using the Processing library. It enforces the Chinese ruleset, handles all the tricky game logic (ko, suicide, group capture via BFS liberty checking), and renders smooth 3D-style stones with real-time hover feedback. https://github.com/user-attachments/assets/b50b9cbb-6e3c-4c03-96b8-1c9e5ed455c8 This project implements the ancient strategy game of Go as a standalone desktop application. It enforces Chinese ruleset scoring, handles all edge-case game logic (ko, suicide, group capture), and renders smooth 3D-style stones with real-time hover feedback — built on top of Processing's Java2D rendering pipeline. Chinese rules — area scoring (stones + territory) with 7.5 komi for White; Capture detection — BFS flood-fill liberty checking for individual stones and connected groups; Ko rule — rejects moves that recreate the previous board position; Suicide prevention — illegal self-capture moves are blocked before placement; Pass & Reset — pass your turn or restart the game at any time; Game end — two consecutive passes trigger automatic scoring and declare a winner; Territory visualisation — empty intersections are marked at game end to show each player's scored regions; 3D stone rendering — each stone is drawn with shadow, radial gradient, and specular highlight layers; Hover preview — semi-transparent ghost stone follows the cursor for precise placement; App icon — custom logo displayed on the window, taskbar, and macOS Dock The board state and rules live in a Go logic class, kept separate from the Sketch class that handles all Processing rendering and input. Captures are resolved with a BFS flood-fill: when a stone is placed, each adjacent enemy group is flooded to count its liberties, and any group with zero liberties is removed. The same liberty check, applied to the just-placed stone, enforces suicide prevention. The ko rule is implemented by snapshotting the previous board position and rejecting any move that would recreate it. At game end (two consecutive passes), the engine performs Chinese area scoring — counting each player's stones plus the empty territory they fully enclose, adding a 7.5 komi for White, and declaring the winner. Stones are rendered as layered 2D primitives (drop shadow, radial gradient body, specular highlight) for a 3D look, and a translucent ghost stone tracks the cursor for precise placement. Object-oriented design — game logic (Go) separated from rendering/input (Sketch); Game-rule engine — complete Go ruleset with Chinese area scoring and komi; BFS flood-fill — stone and connected-group liberty/capture detection; Graph connectivity — flooding adjacent groups to evaluate captures; Ko-rule detection — rejects moves that repeat the previous board position; Suicide-move prevention — illegal self-capture blocked before placement; Territory scoring — enclosed-region detection for end-game area scoring; Custom 2D rendering — layered 3D-style stones (shadow, radial gradient, specular highlight); Interactive UI — real-time hover ghost-stone preview; Game state management — turn order, pass, reset, and automatic end detection; Processing framework — PApplet with the Java2D renderer; Application packaging — window/taskbar/Dock icon and a runnable JAR Java 17; Processing (PApplet, Java2D renderer; core.jar); JOGL / GlueGen (bundled native libraries shipped with Processing for cross-platform support); Packaged as a runnable JAR (Go.jar)",
       "tech": [
@@ -1769,15 +1769,15 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "TypeScript",
-        "JavaScript",
         "Python",
         "Java",
         "CSS",
         "C++",
         "C",
         "Kotlin",
-        "Processing"
+        "Processing",
+        "TypeScript",
+        "JavaScript"
       ]
     }
   },
@@ -1864,10 +1864,6 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
-        "Framer Motion",
-        "R",
-        "GraphQL",
-        "REST",
         "OpenAI API",
         "Anthropic API",
         "LiteLLM",
@@ -1877,8 +1873,12 @@ export const generatedSkills: Exhibit[] = [
         "Statistics & Evaluation",
         "Requests",
         "Transformers",
+        "R",
         "OpenGL",
-        "Go"
+        "Go",
+        "Framer Motion",
+        "GraphQL",
+        "REST"
       ]
     }
   }
@@ -1887,5 +1887,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 18,
-  "syncedAt": "2026-06-18T10:07:50.887Z"
+  "syncedAt": "2026-06-19T10:14:29.629Z"
 };
