@@ -139,6 +139,152 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "RAG Codebase",
+      "description": "A code-aware retrieval-augmented generation (RAG) system for asking natural-language questions about a codebase and getting grounded, citation-backed answers. It chunks source on AST boundaries with tree-sitter (not character windows), retrieves with hybrid dense + BM25 search fused by Reciprocal Rank Fusion and cross-encoder reranking, builds a code graph (imports / calls / containment) with personalized PageRank for connected context, answers with Claude using [n] citations plus an LLM-as-judge faithfulness check, and — the centerpiece — ships a rigorous evaluation harness (recall@k / MRR / NDCG, bootstrap confidence intervals, paired significance tests). Provider-agnostic (Anthropic or any OpenAI-compatible endpoint, incl. local Ollama); semantic search via sentence-transformers embeddings with an optional HNSW (approximate nearest neighbor) backend for scale. New to RAG / embeddings / the eval methodology? Start with docs/LEARN.md, a from-scratch walkthrough. Design rationale lives in outline.md; the full measured write-up is RESULTS.md. language specs (Python, JS, TS, Go, Rust, Ruby, Java, C/C++, C, PHP, Kotlin, Scala, Swift, Lua, Bash, Perl, Objective-C) + a generic pattern classifier, with line-window fallback. by Reciprocal Rank Fusion, reranked by a cross-encoder. resolution; personalized-PageRank traversal for connected, token-cheap context. don't cover this\"), and a RAGAS-style faithfulness check that verifies each claim against its cited source. endpoint (OpenRouter, Together, Groq, Azure, local Ollama / LM Studio / vLLM). confidence intervals, paired-bootstrap significance, a holdout split, and ablations. (full retriever), so quality is validated off the self-made golden set. significant recall gain (+0.086, p<0.001) that also lifts answer-correctness. brute-force matmul is the default. hierarchical layouts) plus a live localhost server with persistent edits + reset. Cursor, Claude Desktop). (retry/backoff + timeouts), and secret hygiene (gitignored dotenv + secret scanner, CI). The pipeline is digest once, probe per query. At index time: discover files → AST-chunk → embed (header + code) into a vector store → tokenize into a BM25 index → build the code graph → persist. At query time: embed the question → dense + BM25 search → RRF fuse → (rerank) → grounded answer with citations → faithfulness verification. Design decisions, each empirically motivated: retrieves as noise. Chunks land on definition boundaries: methods are their own chunks, classes get a summary chunk, oversized functions are windowed carrying their signature, and a module chunk captures imports + top-level code. A chunk's id is its file:line location, so the retrieved unit is already its own citation. / docstring — the embedding then carries location and signature, exactly what code queries key off. (The header is embedded, not displayed.) embeddings smear together; BM25 nails them, aided by a code-aware tokenizer that splits getcurrentuser / getCurrentUser. Dense and lexical lists are fused by Reciprocal Rank Fusion (rank-based, so no score calibration) and reranked by a cross-encoder. connected chunks (callees, callers, imports, enclosing class) via a dictionary lookup, so the model gets a few precise neighbors plus a compact structural map instead of whole files. into atomic claims and checks each against its cited source (faithfulness = supported / total), backed by a free structural check that every [n] resolves to a real source. contribution, reported with confidence intervals and paired significance rather than vibes. A real CodeIndex subgraph this repo emits (graph-export --symbol CodeIndex --format mermaid): mermaid graph LR CodeIndex[\"CodeIndex\"] build[\"build\"]; reg[\"registerparse\"]; emb[\"embedandindex\"]; stats[\"stats\"] rebuild[\"rebuildgraph\"]; allp[\"allparses\"]; add[\"addfiles\"] cli[\"cli.py\"]; inc[\"incremental.py\"];",
+      "tech": [
+        "Python",
+        "GitHub Actions",
+        "pip",
+        "NumPy",
+        "OpenAI API",
+        "Anthropic API",
+        "PyTorch",
+        "Transformers",
+        "DevOps",
+        "Testing",
+        "Assembly",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic search & embeddings",
+        "Hybrid search",
+        "Cross-encoder reranking",
+        "Listwise LLM reranking",
+        "AST parsing",
+        "Code graph construction",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "LLM-as-judge & faithfulness (RAGAS-style)",
+        "Grounded generation",
+        "Prompt engineering",
+        "Provider-agnostic API design",
+        "Evaluation methodology",
+        "Statistical rigor",
+        "Benchmarking",
+        "Tokenization",
+        "Incremental computation",
+        "Performance optimization",
+        "Resilience engineering",
+        "Interactive data visualization",
+        "HTTP server",
+        "CLI design",
+        "MCP (Model Context Protocol) server",
+        "CI / DevOps",
+        "Security & secret hygiene"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "Transformers",
+            "Retrieval-Augmented Generation (RAG)",
+            "Semantic search & embeddings",
+            "Listwise LLM reranking",
+            "LLM-as-judge & faithfulness (RAGAS-style)",
+            "Prompt engineering",
+            "Machine Learning",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Hybrid search",
+            "Code graph construction",
+            "Performance optimization"
+          ]
+        },
+        {
+          "category": "Statistics & Evaluation",
+          "items": [
+            "Evaluation methodology",
+            "Statistical rigor",
+            "Statistics & Evaluation"
+          ]
+        },
+        {
+          "category": "Security & Crypto",
+          "items": [
+            "Security & secret hygiene"
+          ]
+        },
+        {
+          "category": "Compilers & Languages",
+          "items": [
+            "AST parsing",
+            "Tokenization",
+            "Compilers & Languages"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "DevOps",
+            "Testing",
+            "CI / DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Assembly",
+            "Cross-encoder reranking",
+            "Personalized PageRank",
+            "Approximate nearest neighbor (ANN)",
+            "Grounded generation",
+            "Provider-agnostic API design",
+            "Benchmarking",
+            "Incremental computation",
+            "Resilience engineering",
+            "Interactive data visualization",
+            "HTTP server",
+            "CLI design",
+            "MCP (Model Context Protocol) server",
+            "Data Analysis",
+            "Backend / APIs"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/RAG-codebase"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Web Agent",
       "description": "An autonomous LLM web agent built from scratch — a ReAct + reflection loop that drives a real headless browser (Playwright) over an accessibility-tree observation layer — paired with an honest evaluation harness over WebArena and Online-Mind2Web. The LLM layer is provider-agnostic (native Anthropic Claude / OpenAI / Gemini adapters plus a LiteLLM universal adapter for any other model), and the harness reports Wilson confidence intervals, pass@k, a failure taxonomy, and LLM-as-judge scoring. The scaffold is table stakes; the signal is the measurement — quantifying how much of any headline web-agent number comes from scoring methodology and task curation rather than capability. Claude Sonnet 4.6 driving the agent on a live Wikipedia task — search → navigate → extract → answer. (Frames from a real captured run.) action space, memory, and a ReAct loop; no agent-framework wrapper. ON vs OFF on identical tasks (the headline engineering contribution). LiteLLM universal adapter for any other model; swapping models is a config change. text, and pagination detection, with an optional Set-of-Marks screenshot modality. Online-Mind2Web LLM-as-judge, with 3-valued logic that never silently passes the unverifiable. taxonomy, and Matplotlib/pandas charts, all from reproducible JSONL trajectories. scoring, a verify-before-done gate, and site confinement. prompt caching. shopping subset the agent scores ~0.43 exact-match; a fair full-suite number would be mid-teens–30% (vs production ~60%, SOTA 71.6%, human ~78%). A solid from-scratch scaffold, not a production agent — and the writeup says exactly that. measurement/mechanism, not raw capability: +14pt from implementing WebArena's own fuzzymatch LLM scoring (I'd been under-counting \"N/A\" answers), +4pt from the one research-identified lever (an AgentOccam-style note scratchpad that cracked a 14-item extraction task). scoring (strict exact-match vs lenient LLM judge), not venue — the same agent reads ~0.6 or ~1.0 depending on how you score it. but a cheaper budget/commit fix captured most of it; on saturated slices ON ≈ OFF. lowest cost; Opus matches at ~2×; Haiku is a false economy (worse and pricier). Bigger ≠ better. reported negative result); a real sandbox found three agent bugs the synthetic tests missed (all fixed). Full blow-by-blow numbers, CIs, and every caveat are in Measured results below. Every component is small and explainable: browser control, an accessibility-tree observation layer, a typed action space, a model-agnostic LLM client, and a ReAct + reflection loop. agent/ never imports eval/ — the agent doesn't know it's being benchmarked, which is what keeps the measurement honest and the agent reusable. testable module rather than a black-box framework call. it can be ablated ON vs OFF on the same tasks. adapters; any other model works through the LiteLLM universal adapter (Mistral, Llama via Ollama, Bedrock, Groq, …) via the adapter + factory pattern. text agent/ browser.py Playwright session: goto / snapshot / act / screenshot / close (+ popup/new-tab following, networkidle settle) observation.py a11y-tree refs (@e1, @e2 …) + static-text + pagination detection actions.py typed action space + validation + JSON schema for the LLM llm.py model-agnostic client (Claude/OpenAI/Gemini/LiteLLM) + cost tracking (+ Anthropic prompt caching, offline 'echo' model) memory.py compact running state (recent steps verbatim, older summarized) prompts.py planner + reflection prompts (frozen system prompt) loop.py ReAct + reflection loop, vision fallback, guardrails, screenshot capture, observation persistence on failure types.py Task / Action / Step / Trajectory dataclasses eval/ harness.py runner: task -> trajectory -> score; CLI; JSONL;",
       "tech": [
@@ -925,7 +1071,133 @@ export const generatedMainHall: Exhibit[] = [
   }
 ];
 
-export const generatedInProgress: Exhibit[] = [];
+export const generatedInProgress: Exhibit[] = [
+  {
+    "popup": {
+      "title": "RLHF Pipeline",
+      "description": "An end-to-end Reinforcement Learning from Human Feedback (RLHF) pipeline that reproduces the post-training recipe behind aligned large language models — supervised fine-tuning → reward modeling → PPO — with the reinforcement-learning core written from scratch in PyTorch: generalized advantage estimation (GAE), the clipped policy-gradient surrogate, a per-token KL-to-reference penalty, and an adaptive KL controller. It also implements DPO and GRPO as modern alternatives, plus LoRA parameter-efficient fine-tuning, multi-GPU training, and an independent LLM-as-judge evaluation. Built on HuggingFace Transformers for the backbone models and tokenizers; every reward-modeling and RL component is hand-implemented, not wrapped from a higher-level library. text pretrained LM │ ▼ ┌──────────────────────┐ demonstrations │ 1. SFT │ ◄────────────────── (chosen transcripts) └──────────┬───────────┘ │ policy πsft (also the reference πref) ▼ ┌──────────────────────┐ preference pairs (chosen ≻ rejected) │ 2. Reward Model │ ◄────────────────── Bradley-Terry loss └──────────┬───────────┘ │ reward rφ(x, y) ▼ ┌──────────────────────┐ on-policy rollouts, scored by rφ │ 3a. PPO (RL) │ advantage = GAE, KL(π‖πref) penalty │ 3b. GRPO (RL) │ group-relative advantage, critic-free └──────────────────────┘ ▲ │ …or skip the RM+RL entirely with ┌──────────────────────┐ │ DPO │ implicit reward, preference pairs only └──────────────────────┘ Three alignment methods, one codebase — PPO (reward-model-based RL), DPO (reward-model-free), and GRPO (critic-free, DeepSeek-style).; PPO written from scratch — on-policy rollouts, GAE, the clipped surrogate objective, clipped value loss, entropy bonus, per-token KL-to-reference reward shaping, and an adaptive KL controller.; Reward model — a scalar reward head on a pretrained trunk, trained with the Bradley-Terry pairwise preference loss, scored at the last real token (robust to left/right padding).; Supervised fine-tuning — teacher forcing with prompt-masked labels as the policy initializer and PPO reference.; Parameter-efficient fine-tuning — LoRA adapters everywhere via PEFT; the frozen RL reference is recovered by disabling the adapter (no second copy of weights).; Scales out — multi-GPU data parallelism via HuggingFace Accelerate (DDP-ready) and gradient checkpointing for the supervised trainers.; RL stability knobs — running reward normalization, length and missing-EOS penalties to curb reward hacking, and KL-vs-reward logging.; Checkpoint resume — optimizer, global step, and KL-controller state save and restore for long runs.; Independent evaluation — an LLM-as-judge win-rate computed via the Anthropic Claude API with position-bias control, alongside reward-model accuracy.; Optional fast rollouts — a flag-gated vLLM generation backend that auto-falls back to HuggingFace generation if unavailable.; Validated to actually optimize — unit tests for the RL/RM math plus an end-to-end harness that proves the reward model learns a separable signal and a PPO step increases the log-prob of positive-advantage tokens.; Laptop-to-GPU — runs a tiny end-to-end smoke test on a CPU in seconds; trains real models on a free Kaggle GPU. The repository mirrors the standard post-training stack. The RL and reward-modeling logic (GAE, the PPO surrogate, KL shaping, the Bradley-Terry / DPO / GRPO objectives) is implemented by hand; HuggingFace Transformers supplies only the pretrained backbones and tokenizers, and PEFT supplies optional LoRA. Reward model. A scalar head reads the trunk's last non-pad hidden state and is trained with −log σ(rchosen − rrejected), the maximum-likelihood objective of the Bradley-Terry preference model.; PPO reward shaping. Each response token's reward is a KL-to-reference penalty −β·(log π − log πref); the scalar reward-model score is added at the final token. β is adapted toward a target KL, which keeps the policy from drifting off-distribution while chasing reward (reward hacking).; Advantages.",
+      "tech": [
+        "Python",
+        "pip",
+        "NumPy",
+        "PyTorch",
+        "Anthropic API",
+        "Transformers",
+        "Testing",
+        "Reinforcement Learning from Human Feedback (RLHF)",
+        "Proximal Policy Optimization (PPO)",
+        "Policy-gradient methods",
+        "Reward modeling",
+        "Generalized Advantage Estimation (GAE)",
+        "Adaptive KL control",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
+        "Supervised fine-tuning (SFT)",
+        "Deep learning with PyTorch",
+        "HuggingFace Transformers",
+        "Parameter-efficient fine-tuning",
+        "Distributed / multi-GPU training",
+        "Numerical stability",
+        "LLM-as-judge evaluation",
+        "Reward-hacking mitigation",
+        "Checkpointing and resumability",
+        "Unit testing and validation harnesses",
+        "Software design",
+        "Reproducibility and static analysis"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Anthropic API",
+            "Transformers",
+            "Reinforcement Learning from Human Feedback (RLHF)",
+            "Supervised fine-tuning (SFT)",
+            "Deep learning with PyTorch",
+            "HuggingFace Transformers",
+            "Parameter-efficient fine-tuning",
+            "LLM-as-judge evaluation",
+            "Machine Learning",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Proximal Policy Optimization (PPO)",
+            "Direct Preference Optimization (DPO)",
+            "Group Relative Policy Optimization (GRPO)"
+          ]
+        },
+        {
+          "category": "Statistics & Evaluation",
+          "items": [
+            "Reproducibility and static analysis",
+            "Statistics & Evaluation"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Distributed / multi-GPU training"
+          ]
+        },
+        {
+          "category": "Compilers & Languages",
+          "items": [
+            "Compilers & Languages"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Unit testing and validation harnesses"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Policy-gradient methods",
+            "Reward modeling",
+            "Generalized Advantage Estimation (GAE)",
+            "Adaptive KL control",
+            "Numerical stability",
+            "Reward-hacking mitigation",
+            "Checkpointing and resumability",
+            "Software design",
+            "Data Analysis"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/RLHF-pipeline"
+        }
+      ]
+    }
+  }
+];
 
 export const generatedArchive: Exhibit[] = [
   {
@@ -1771,9 +2043,9 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
         "TypeScript",
         "JavaScript",
-        "Python",
         "Java",
         "CSS",
         "C++",
@@ -1804,7 +2076,8 @@ export const generatedSkills: Exhibit[] = [
         "Game AI",
         "Testing",
         "3D Graphics",
-        "Robotics & Embedded"
+        "Robotics & Embedded",
+        "Compilers & Languages"
       ]
     }
   },
@@ -1866,19 +2139,20 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
+        "Anthropic API",
+        "Transformers",
+        "Generative AI / LLMs",
+        "Statistics & Evaluation",
+        "OpenAI API",
+        "Assembly",
         "Framer Motion",
         "R",
         "GraphQL",
         "REST",
-        "OpenAI API",
-        "Anthropic API",
         "LiteLLM",
         "Pillow",
         "HTML",
-        "Generative AI / LLMs",
-        "Statistics & Evaluation",
         "Requests",
-        "Transformers",
         "OpenGL",
         "Go"
       ]
@@ -1888,6 +2162,6 @@ export const generatedSkills: Exhibit[] = [
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
-  "repoCount": 18,
-  "syncedAt": "2026-06-21T09:37:49.437Z"
+  "repoCount": 20,
+  "syncedAt": "2026-06-21T22:52:32.458Z"
 };
