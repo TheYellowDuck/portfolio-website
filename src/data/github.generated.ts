@@ -2043,9 +2043,9 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
         "TypeScript",
         "JavaScript",
-        "Python",
         "Java",
         "CSS",
         "C++",
@@ -2139,14 +2139,14 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
-        "Framer Motion",
-        "R",
-        "GraphQL",
-        "REST",
         "Anthropic API",
         "Transformers",
         "Generative AI / LLMs",
         "Statistics & Evaluation",
+        "Framer Motion",
+        "R",
+        "GraphQL",
+        "REST",
         "OpenAI API",
         "Assembly",
         "LiteLLM",
@@ -2163,5 +2163,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 20,
-  "syncedAt": "2026-06-22T01:56:14.484Z"
+  "syncedAt": "2026-06-22T11:35:49.675Z"
 };
