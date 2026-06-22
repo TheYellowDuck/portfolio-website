@@ -241,7 +241,14 @@ const STOP_HEADING = /\b(install|setup|getting[ -]?started|usage|how to|build|co
 // popup shows it all — so we pull generously.
 function readmeDescription(md) {
   if (!md) return "";
-  const blocks = md.replace(/\r/g, "").split(/\n\s*\n/);
+  // Drop fenced code blocks up front: code samples, CLI snippets, and ASCII/box-drawing diagrams
+  // aren't prose, and collapsing them into a one-line <p> (whitespace flattened) produces garbled
+  // text. extractMedia strips the same way. Handles both ``` and ~~~ fences.
+  const blocks = md
+    .replace(/\r/g, "")
+    .replace(/```[\s\S]*?```/g, "\n\n")
+    .replace(/~~~[\s\S]*?~~~/g, "\n\n")
+    .split(/\n\s*\n/);
   const parts = [];
   let started = false;
   for (const block of blocks) {
