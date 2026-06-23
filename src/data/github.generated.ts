@@ -1078,6 +1078,7 @@ export const generatedInProgress: Exhibit[] = [
       "description": "An end-to-end Reinforcement Learning from Human Feedback (RLHF) pipeline that reproduces the post-training recipe behind aligned large language models — supervised fine-tuning → reward modeling → PPO — with the reinforcement-learning core written from scratch in PyTorch: generalized advantage estimation (GAE), the clipped policy-gradient surrogate, a per-token KL-to-reference penalty, and an adaptive KL controller. It also implements DPO and GRPO as modern alternatives, plus LoRA parameter-efficient fine-tuning, multi-GPU training, and an independent LLM-as-judge evaluation. Built on HuggingFace Transformers for the backbone models and tokenizers; every reward-modeling and RL component is hand-implemented, not wrapped from a higher-level library. Three alignment methods, one codebase — PPO (reward-model-based RL), DPO (reward-model-free), and GRPO (critic-free, DeepSeek-style).; PPO written from scratch — on-policy rollouts, GAE, the clipped surrogate objective, clipped value loss, entropy bonus, per-token KL-to-reference reward shaping, and an adaptive KL controller.; Reward model — a scalar reward head on a pretrained trunk, trained with the Bradley-Terry pairwise preference loss, scored at the last real token (robust to left/right padding).; Supervised fine-tuning — teacher forcing with prompt-masked labels as the policy initializer and PPO reference.; Parameter-efficient fine-tuning — LoRA adapters everywhere via PEFT; the frozen RL reference is recovered by disabling the adapter (no second copy of weights).; Scales out — multi-GPU data parallelism via HuggingFace Accelerate (DDP-ready) and gradient checkpointing for the supervised trainers.; RL stability knobs — running reward normalization, length and missing-EOS penalties to curb reward hacking, and KL-vs-reward logging.; Checkpoint resume — optimizer, global step, and KL-controller state save and restore for long runs.; Independent evaluation — an LLM-as-judge win-rate computed via the Anthropic Claude API with position-bias control, alongside reward-model accuracy.; Optional fast rollouts — a flag-gated vLLM generation backend that auto-falls back to HuggingFace generation if unavailable.; Validated to actually optimize — unit tests for the RL/RM math plus an end-to-end harness that proves the reward model learns a separable signal and a PPO step increases the log-prob of positive-advantage tokens.; Laptop-to-GPU — runs a tiny end-to-end smoke test on a CPU in seconds; trains real models on a free Kaggle GPU. The repository mirrors the standard post-training stack. The RL and reward-modeling logic (GAE, the PPO surrogate, KL shaping, the Bradley-Terry / DPO / GRPO objectives) is implemented by hand; HuggingFace Transformers supplies only the pretrained backbones and tokenizers, and PEFT supplies optional LoRA. Reward model. A scalar head reads the trunk's last non-pad hidden state and is trained with −log σ(rchosen − rrejected), the maximum-likelihood objective of the Bradley-Terry preference model.; PPO reward shaping. Each response token's reward is a KL-to-reference penalty −β·(log π − log πref); the scalar reward-model score is added at the final token. β is adapted toward a target KL, which keeps the policy from drifting off-distribution while chasing reward (reward hacking).; Advantages. GAE(γ, λ) over the value head's per-token estimates, then whitened. Token/value alignment is handled explicitly: the log-prob and value of response token j come from the model output at position j−1.; DPO. Optimizes the same Bradley-Terry preference likelihood but with the implicit reward β·log(π/πref), removing the separate reward model and RL loop. Supports sigmoid / IPO / hinge losses and optional length normalization.; GRPO. Replaces the value critic with a group baseline — sample G responses per prompt, advantage = (reward − group mean) / group std — with an unbiased k3 KL penalty. Cheaper and stable; the DeepSeek-R1 recipe. Engineering notes.",
       "tech": [
         "Python",
+        "Jupyter Notebook",
         "pip",
         "NumPy",
         "PyTorch",
@@ -1109,7 +1110,8 @@ export const generatedInProgress: Exhibit[] = [
         {
           "category": "Languages",
           "items": [
-            "Python"
+            "Python",
+            "Jupyter Notebook"
           ]
         },
         {
@@ -2044,6 +2046,7 @@ export const generatedSkills: Exhibit[] = [
       "description": "Languages across my repositories, by usage.",
       "tech": [
         "Python",
+        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
         "Java",
@@ -2163,5 +2166,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 20,
-  "syncedAt": "2026-06-22T11:35:49.675Z"
+  "syncedAt": "2026-06-23T09:00:05.325Z"
 };
