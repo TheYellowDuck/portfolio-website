@@ -188,6 +188,14 @@ html.dark {
 }
 @media (prefers-reduced-motion: reduce) { .curator-glow { display: none; } }
 
+/* ── Archive horizontal scroller ─────────────────────────────────────────────
+   A compact, sideways-scrolling rail of horizontal cards (the archive is the
+   least-prominent work, so it gets a tighter footprint than the masonry above).
+   The rail's left/right edges disintegrate cards into a scatter of their own
+   pixels via a CSS mask; the scrollbar is hidden (see ArchiveScroller.tsx). */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-bricolage);

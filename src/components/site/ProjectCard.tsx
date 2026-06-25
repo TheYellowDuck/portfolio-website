@@ -10,7 +10,7 @@ import { content } from "@/content";
  * cards doesn't download and decode every clip up front (the heaviest cost on mobile). The poster
  * shows immediately; the real video swaps in within `rootMargin` of being scrolled into view.
  */
-function LazyVideo({ src, poster, className }: { src: string; poster?: string; className?: string }) {
+export function LazyVideo({ src, poster, className }: { src: string; poster?: string; className?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [load, setLoad] = useState(false);
   useEffect(() => {

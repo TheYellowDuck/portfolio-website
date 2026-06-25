@@ -20,6 +20,7 @@ import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
 import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
 import Masonry from "./Masonry";
+import ArchiveScroller from "./ArchiveScroller";
 import CpStats from "@/components/CpStats";
 import { useIsMac } from "@/lib/use-is-mac";
 
@@ -136,13 +137,17 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
                 gap (sections are py-24, so 96+96=192px between them). Visibly tighter than a full
                 section break, but one consistent value to reuse for any in-section division. */}
             <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.archive}</h3>
-            <div className="mt-6">
-              <Masonry sm={2} lg={3} weights={archive.map((e) => cardWeight(e.popup as ExhibitPopup))} items={archive.map((e, i) => (
-                <Reveal key={i} delay={(i % 3) * 60}>
-                  <ProjectCard index={pad(featured.length + i + 1)} popup={e.popup as ExhibitPopup} compact onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
-                </Reveal>
-              ))} />
-            </div>
+            <Reveal>
+              <div className="mt-6">
+                <ArchiveScroller
+                  onOpen={onOpenProject}
+                  items={archive.map((e, i) => ({
+                    popup: e.popup as ExhibitPopup,
+                    index: pad(featured.length + i + 1),
+                  }))}
+                />
+              </div>
+            </Reveal>
           </>
         )}
       </Section>
