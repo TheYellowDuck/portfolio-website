@@ -1204,6 +1204,114 @@ export const generatedInProgress: Exhibit[] = [
 export const generatedArchive: Exhibit[] = [
   {
     "popup": {
+      "title": "Limit Order Book",
+      "description": "A low-latency, lock-free limit order book and matching engine in modern C++20 — the core data structure and algorithm behind every electronic exchange. It implements strict price-time priority matching across a full set of order types, on top of custom, cache-optimized data structures built from first principles: a hierarchical-bitmap price ladder, an intrusive-linked-list order pool, and an open-addressing hash index. Around the matcher sits a wait-free concurrent runtime — a lock-free SPSC ring buffer for ingress, a single-writer matcher thread, and a seqlock for wait-free market-data publishing — plus multi-core sharding, deterministic journaling and replay, a pre-trade risk layer, and a binary wire protocol. Header-only core, zero third-party runtime dependencies, and backed by differential, property-based, and fuzz testing under sanitizers. Full order-type set — Limit, Market, IOC (immediate-or-cancel), FOK (fill-or-kill), PostOnly, Stop, Stop-Limit, Iceberg (reserve), and Pegged (peg-to-bid/ask/mid) orders.; Two matching policies — classic price-time (FIFO) priority, or pro-rata size-proportional allocation (as used in many futures/rates markets), selectable per book.; Self-trade prevention — four STP modes (cancel-maker / cancel-taker / cancel-both / none).; Opening/closing auctions — uncross a crossed book at the single uniform price that maximizes executed volume.; Lock-free runtime — wait-free single-producer/single-consumer ring for order ingress, one matcher thread per book, and a seqlock publishing top-of-book to wait-free market-data readers.; Multi-core sharding — symbols partitioned across a fixed pool of shared-nothing threads for horizontal scale.; Deterministic persistence — append-only command journal; replay reconstructs an identical book and trade tape (crash recovery, hot standby, reproducible debugging).; Pre-trade risk gate — per-account size caps, price collars, position and open-order limits, with live position keeping from both sides of every fill.; Binary wire protocol — versioned, little-endian, length-prefixed codec that decodes an untrusted byte stream into engine commands and back.; Two interchangeable backends — a flat array + bitmap ladder (O(1), for liquid/banded prices) and a std::map ladder (unbounded/sparse), so the central data-structure tradeoff is measured, not asserted.; L2 market-data snapshots, running statistics, and a full structural self-audit. Each layer is independently usable: a single OrderBook, a RiskEngine wrapping one, a threaded matcher for the lock-free pipeline, or a sharded engine spanning cores — and any of them can be journaled. Everything is an integer. Prices are signed 64-bit ticks, never floating point — money is discrete and float rounding would corrupt exact matching. This makes matching exact and deterministic. Price-time priority falls out of the structures. Price priority is which level an order lands in; time priority is an intrusive FIFO queue within each level — new orders append at the tail, the matcher consumes from the head. Orders are intrusive doubly-linked-list nodes, so a cancel is O(1) (an unlink with no search) — essential, since cancels dominate real order flow. Each Order is packed into a single 64-byte cache line. The price ladder (the performance core). For a liquid instrument, prices cluster in a narrow band, so the fast backend stores a whole side of the book as a flat array indexed directly by price − base — O(1) level access with no tree walk. The hard part — \"what's the best price, and the next best after this level empties?\" — is solved with a two-level hierarchical bitmap (a bit per level, plus a summary bit per 64 levels) and the hardware bit-scan instructions (ctz/clz): finding the next occupied level becomes a couple of masked word reads, effectively O(1). The tradeoff is O(band) memory; the std::map backend handles unbounded/sparse prices when that doesn't fit. No allocation on the hot path.",
+      "tech": [
+        "C++",
+        "GitHub Actions",
+        "CMake",
+        "Concurrency",
+        "Testing",
+        "R",
+        "Low-latency systems programming",
+        "Custom data structure design",
+        "Bit manipulation",
+        "Intrusive data structures",
+        "Custom memory allocation",
+        "Open-addressing hash map",
+        "Cache optimization",
+        "Lock-free programming",
+        "C++ memory model",
+        "Wait-free synchronization",
+        "Multithreading and concurrency",
+        "Template metaprogramming",
+        "Algorithm design",
+        "Matching-engine domain",
+        "Financial-exchange order types",
+        "Event sourcing and deterministic replay",
+        "Pre-trade risk management",
+        "Binary protocol design",
+        "Differential and property-based testing",
+        "Fuzzing",
+        "Sanitizers",
+        "Benchmarking methodology",
+        "Build and CI engineering"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "C++"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "CMake"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Custom data structure design",
+            "Intrusive data structures",
+            "Cache optimization",
+            "Algorithm design",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Wait-free synchronization",
+            "Multithreading and concurrency",
+            "Distributed Systems"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Differential and property-based testing",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "R",
+            "Low-latency systems programming",
+            "Bit manipulation",
+            "Custom memory allocation",
+            "Open-addressing hash map",
+            "Lock-free programming",
+            "C++ memory model",
+            "Template metaprogramming",
+            "Matching-engine domain",
+            "Financial-exchange order types",
+            "Event sourcing and deterministic replay",
+            "Pre-trade risk management",
+            "Binary protocol design",
+            "Fuzzing",
+            "Sanitizers",
+            "Benchmarking methodology",
+            "Build and CI engineering",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/limit-order-book"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Image To Text",
       "description": "A desktop Java application that converts raster images into ASCII art in real time. Built from scratch with a fully custom Swing GUI, an off-screen rendering pipeline for O(1) scroll/zoom, background processing via SwingWorker, and smooth zoom/pan interaction. The app takes any JPG, PNG, or GIF image, converts each pixel to a grayscale luminance value using the Rec. 601 standard, and maps it to one of 70 ASCII characters ordered by visual density (Paul Bourke gradient). The result is rendered into a scrollable, zoomable panel and the intermediate grayscale image is saved to disk automatically. Conversion reads pixels directly from a BufferedImage (getRGB), computes per-pixel luminance with the Rec. 601 luma coefficients (0.299R + 0.587G + 0.114B), and maps each value through a static lookup table to one of 70 density-ordered ASCII characters. The hot pixel loop uses a StringBuilder for O(n) assembly, and the whole conversion runs on a SwingWorker so the UI never blocks. The rendered ASCII is drawn once into an off-screen buffer, so scrolling and zooming stay O(1) regardless of image size — nearest-neighbor interpolation keeps it crisp when zoomed in, bilinear keeps it smooth when zoomed out. Interaction is handled with a MouseAdapter for drag-to-pan (using screen coordinates for stable deltas) and getPreciseWheelRotation for smooth Ctrl+scroll zoom, with an InputMap/ActionMap shortcut system scoped to the focused window. Swing GUI from scratch — custom layouts, components, and event handling; Multithreading & concurrency — SwingWorker keeps the UI responsive during conversion; Off-screen rendering — pre-rendered BufferedImage makes scroll and zoom O(1) at any image size; Image processing — pixel-level RGB manipulation via getRGB / setRGB; Grayscale conversion — Rec. 601 luma coefficients (0.299R + 0.587G + 0.114B); Algorithm/data-structure use — static lookup table for the brightness → character mapping; Image scaling — SCALESMOOTH downscaling with zoom-aware nearest-neighbor / bilinear interpolation; Keyboard shortcut system — InputMap / ActionMap with WHENINFOCUSEDWINDOW scope; Performance optimization — StringBuilder over concatenation in hot pixel loops for O(n); Pan & zoom UX — drag-to-pan, precise Ctrl+scroll zoom, and fit-to-window on every transform; Layout management — responsive nested BorderLayout so zoom controls stay visible at any width; Error handling — IOException propagation with user-facing dialogs, no silent failures; Object-oriented design — separate converter, text panel, and prompt components; JAR packaging — distributed as a standalone runnable JAR Java 17+; Java Swing / AWT (BufferedImage, Graphics2D, SwingWorker, InputMap / ActionMap, MouseAdapter); Packaged as a standalone runnable JAR (ImageToText.jar)",
       "tech": [
@@ -2046,13 +2154,13 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "C++",
         "TypeScript",
         "JavaScript",
         "Python",
         "Jupyter Notebook",
         "Java",
         "CSS",
-        "C++",
         "C",
         "Kotlin",
         "Processing"
@@ -2081,7 +2189,8 @@ export const generatedSkills: Exhibit[] = [
         "Testing",
         "3D Graphics",
         "Robotics & Embedded",
-        "Compilers & Languages"
+        "Compilers & Languages",
+        "Distributed Systems"
       ]
     }
   },
@@ -2143,8 +2252,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "More",
       "tech": [
-        "Framer Motion",
         "R",
+        "Framer Motion",
         "GraphQL",
         "REST",
         "Anthropic API",
@@ -2166,6 +2275,6 @@ export const generatedSkills: Exhibit[] = [
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
-  "repoCount": 20,
-  "syncedAt": "2026-06-26T08:53:25.727Z"
+  "repoCount": 21,
+  "syncedAt": "2026-06-26T15:29:49.586Z"
 };
