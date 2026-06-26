@@ -412,10 +412,17 @@ async function scanRepo(repo) {
   let multiContributor = false;
   if (config.inferSoftSkills && remaining > 8) {
     try {
-      const c = await gh(`/repos/${owner}/${name}/contributors?per_page=2`);
-      multiContributor = Array.isArray(c) && c.length > 1;
+      const c = await gh(`/repos/${owner}/${name}/contributors?per_page=10`);
+      // Exclude bot accounts (github-actions[bot], dependabot[bot], …) — automation, not collaborators.
+      const humans = Array.isArray(c) ? c.filter((u) => u.type !== "Bot" && !/\[bot\]$/i.test(u.login || "")) : [];
+      multiContributor = humans.length > 1;
     } catch (e) { if (e.message === "RATE_LIMIT") throw e; }
   }
+  // Manual override (config.overrides[name].collab): a genuine team project can read as solo on
+  // GitHub when the team's work was re-committed under one account; this credits it explicitly
+  // (or revokes a false positive). `true`/`false` wins over the auto-detected value.
+  const collabOverride = config.overrides[name]?.collab;
+  if (collabOverride !== undefined) multiContributor = collabOverride;
   return { languages, codeBytes, skills: [...skills], readme, attach, videoRawUrl, videoExt, videoSize, multiContributor };
 }
 

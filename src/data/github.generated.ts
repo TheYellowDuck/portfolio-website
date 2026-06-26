@@ -548,6 +548,114 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Limit Order Book",
+      "description": "A low-latency, lock-free limit order book and matching engine in modern C++20 — the core data structure and algorithm behind every electronic exchange. It implements strict price-time priority matching across a full set of order types, on top of custom, cache-optimized data structures built from first principles: a hierarchical-bitmap price ladder, an intrusive-linked-list order pool, and an open-addressing hash index. Around the matcher sits a wait-free concurrent runtime — a lock-free SPSC ring buffer for ingress, a single-writer matcher thread, and a seqlock for wait-free market-data publishing — plus multi-core sharding, deterministic journaling and replay, a pre-trade risk layer, and a binary wire protocol. Header-only core, zero third-party runtime dependencies, and backed by differential, property-based, and fuzz testing under sanitizers. Full order-type set — Limit, Market, IOC (immediate-or-cancel), FOK (fill-or-kill), PostOnly, Stop, Stop-Limit, Iceberg (reserve), and Pegged (peg-to-bid/ask/mid) orders.; Two matching policies — classic price-time (FIFO) priority, or pro-rata size-proportional allocation (as used in many futures/rates markets), selectable per book.; Self-trade prevention — four STP modes (cancel-maker / cancel-taker / cancel-both / none).; Opening/closing auctions — uncross a crossed book at the single uniform price that maximizes executed volume.; Lock-free runtime — wait-free single-producer/single-consumer ring for order ingress, one matcher thread per book, and a seqlock publishing top-of-book to wait-free market-data readers.; Multi-core sharding — symbols partitioned across a fixed pool of shared-nothing threads for horizontal scale.; Deterministic persistence — append-only command journal; replay reconstructs an identical book and trade tape (crash recovery, hot standby, reproducible debugging).; Pre-trade risk gate — per-account size caps, price collars, position and open-order limits, with live position keeping from both sides of every fill.; Binary wire protocol — versioned, little-endian, length-prefixed codec that decodes an untrusted byte stream into engine commands and back.; Two interchangeable backends — a flat array + bitmap ladder (O(1), for liquid/banded prices) and a std::map ladder (unbounded/sparse), so the central data-structure tradeoff is measured, not asserted.; L2 market-data snapshots, running statistics, and a full structural self-audit. Each layer is independently usable: a single OrderBook, a RiskEngine wrapping one, a threaded matcher for the lock-free pipeline, or a sharded engine spanning cores — and any of them can be journaled. Everything is an integer. Prices are signed 64-bit ticks, never floating point — money is discrete and float rounding would corrupt exact matching. This makes matching exact and deterministic. Price-time priority falls out of the structures. Price priority is which level an order lands in; time priority is an intrusive FIFO queue within each level — new orders append at the tail, the matcher consumes from the head. Orders are intrusive doubly-linked-list nodes, so a cancel is O(1) (an unlink with no search) — essential, since cancels dominate real order flow. Each Order is packed into a single 64-byte cache line. The price ladder (the performance core). For a liquid instrument, prices cluster in a narrow band, so the fast backend stores a whole side of the book as a flat array indexed directly by price − base — O(1) level access with no tree walk. The hard part — \"what's the best price, and the next best after this level empties?\" — is solved with a two-level hierarchical bitmap (a bit per level, plus a summary bit per 64 levels) and the hardware bit-scan instructions (ctz/clz): finding the next occupied level becomes a couple of masked word reads, effectively O(1). The tradeoff is O(band) memory; the std::map backend handles unbounded/sparse prices when that doesn't fit. No allocation on the hot path.",
+      "tech": [
+        "C++",
+        "GitHub Actions",
+        "CMake",
+        "Concurrency",
+        "Testing",
+        "R",
+        "Low-latency systems programming",
+        "Custom data structure design",
+        "Bit manipulation",
+        "Intrusive data structures",
+        "Custom memory allocation",
+        "Open-addressing hash map",
+        "Cache optimization",
+        "Lock-free programming",
+        "C++ memory model",
+        "Wait-free synchronization",
+        "Multithreading and concurrency",
+        "Template metaprogramming",
+        "Algorithm design",
+        "Matching-engine domain",
+        "Financial-exchange order types",
+        "Event sourcing and deterministic replay",
+        "Pre-trade risk management",
+        "Binary protocol design",
+        "Differential and property-based testing",
+        "Fuzzing",
+        "Sanitizers",
+        "Benchmarking methodology",
+        "Build and CI engineering"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "C++"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "CMake"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Custom data structure design",
+            "Intrusive data structures",
+            "Cache optimization",
+            "Algorithm design",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Wait-free synchronization",
+            "Multithreading and concurrency",
+            "Distributed Systems"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Differential and property-based testing",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "R",
+            "Low-latency systems programming",
+            "Bit manipulation",
+            "Custom memory allocation",
+            "Open-addressing hash map",
+            "Lock-free programming",
+            "C++ memory model",
+            "Template metaprogramming",
+            "Matching-engine domain",
+            "Financial-exchange order types",
+            "Event sourcing and deterministic replay",
+            "Pre-trade risk management",
+            "Binary protocol design",
+            "Fuzzing",
+            "Sanitizers",
+            "Benchmarking methodology",
+            "Build and CI engineering",
+            "Automation / Scraping"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/limit-order-book"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Robotics",
       "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
       "tech": [
@@ -980,94 +1088,6 @@ export const generatedMainHall: Exhibit[] = [
         }
       ]
     }
-  },
-  {
-    "popup": {
-      "title": "Biquadris",
-      "description": "A two-player competitive Tetris variant built in C++ with an object-oriented design. Originally developed as a final project for CS 246: Object-Oriented Software Development at the University of Waterloo (Fall 2025) by a team of three students, then refactored and extended into a cross-platform, SDL2-rendered game. The game has since been refactored and extended beyond the original submission: bugs fixed, the X11 graphics layer replaced with SDL2 for cross-platform support, and the build system migrated to CMake for easy packaging. Biquadris is a turn-based, two-player spin on Tetris. Both players share one screen — each managing their own 11×18 board. Players alternate turns: you make one move, then your opponent does. Clear two or more lines in a single drop and you earn a special action to punish your opponent. The game ends when a player can no longer place a new block. The codebase is organized around a small set of well-encapsulated classes. Game owns the two Board models and drives the turn loop; each Board tracks its grid, score, level, and active effects; Block encodes the seven tetromino shapes and their rotations; Level generates the next block according to the current difficulty; and the rendering is handled by interchangeable views — a TextDisplay for the terminal and an SDL2 Xwindow for graphics. Two design ideas carry most of the weight. Special actions are a polymorphic effect system (Strategy-style): an abstract Effect base class declares apply, onDrop, isExpired, and getName, and concrete BlindEffect, HeavyEffect, and ForceEffect subclasses implement each behaviour. An EffectManager holds the active effects per board, applies them on activation, ticks them after every drop, and retires them when they expire — so new actions can be added without touching the board logic. The model is fully decoupled from the views: the boards know nothing about how they're drawn, so the same game state renders identically to the terminal or to SDL2. Memory is managed entirely through std::uniqueptr (RAII — no manual new/delete), collision detection validates every move and rotation against the walls and settled cells before committing it, and a single codebase compiles either text-only or with graphics via conditional compilation (ifdef BIQUADRISGRAPHICS). Commands are parsed with unique-prefix matching and numeric multipliers, the high score persists between sessions, and a ghost-block preview shows where the current piece will land. Clearing 2 or more lines in a single drop earns a special action against your opponent: Line clear: (currentlevel + linescleared)² points; A block that scores zero lines resets the combo; clearing any lines resets the no-clear counter (relevant for Level 4 penalty blocks); High score is saved across sessions in .biquadrishighscore Object-oriented design — encapsulated Game, Board, Block, Level, and Effect classes; Polymorphism & abstract base classes — Effect interface with Blind / Heavy / Force subclasses; Inheritance — virtual methods and virtual destructors across the effect hierarchy; Strategy-style effect system — runtime special actions managed by an EffectManager; Model–view separation (MVC) — board state decoupled from the text and SDL2 renderers; RAII & smart pointers — std::uniqueptr ownership throughout, no manual memory management; Modern C++20 — const-correctness, standard containers, move semantics; Collision detection — move and rotation validation against walls and settled cells; Conditional compilation — one codebase builds text-only or with SDL2 graphics; Command parsing — unique-prefix matching with numeric multipliers; File I/O — high-score persistence and script-driven block sequences; Cross-platform build system — CMake with Homebrew SDL2 discovery on macOS; CI/CD release automation — GitHub Actions builds and bundles a distributable macOS app; Game logic — line clearing, level progression, ghost-block preview, and squared scoring C++20;",
-      "tech": [
-        "C++",
-        "GitHub Actions",
-        "CMake",
-        "SDL2",
-        "Object-oriented design",
-        "Polymorphism & abstract base classes",
-        "Inheritance",
-        "Strategy-style effect system",
-        "Model–view separation (MVC)",
-        "RAII & smart pointers",
-        "Modern C++20",
-        "Collision detection",
-        "Conditional compilation",
-        "Command parsing",
-        "File I/O",
-        "Cross-platform build system",
-        "CI/CD release automation",
-        "Game logic"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "C++"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "SDL2"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "GitHub Actions",
-            "CMake"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "Polymorphism & abstract base classes",
-            "Inheritance",
-            "Model–view separation (MVC)",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Cross-platform build system",
-            "CI/CD release automation",
-            "DevOps"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Strategy-style effect system",
-            "RAII & smart pointers",
-            "Modern C++20",
-            "Collision detection",
-            "Conditional compilation",
-            "Command parsing",
-            "File I/O",
-            "Game logic",
-            "Game Development",
-            "Automation / Scraping",
-            "Game Physics"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/biquadris"
-        }
-      ],
-      "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
-    }
   }
 ];
 
@@ -1204,44 +1224,39 @@ export const generatedInProgress: Exhibit[] = [
 export const generatedArchive: Exhibit[] = [
   {
     "popup": {
-      "title": "Limit Order Book",
-      "description": "A low-latency, lock-free limit order book and matching engine in modern C++20 — the core data structure and algorithm behind every electronic exchange. It implements strict price-time priority matching across a full set of order types, on top of custom, cache-optimized data structures built from first principles: a hierarchical-bitmap price ladder, an intrusive-linked-list order pool, and an open-addressing hash index. Around the matcher sits a wait-free concurrent runtime — a lock-free SPSC ring buffer for ingress, a single-writer matcher thread, and a seqlock for wait-free market-data publishing — plus multi-core sharding, deterministic journaling and replay, a pre-trade risk layer, and a binary wire protocol. Header-only core, zero third-party runtime dependencies, and backed by differential, property-based, and fuzz testing under sanitizers. Full order-type set — Limit, Market, IOC (immediate-or-cancel), FOK (fill-or-kill), PostOnly, Stop, Stop-Limit, Iceberg (reserve), and Pegged (peg-to-bid/ask/mid) orders.; Two matching policies — classic price-time (FIFO) priority, or pro-rata size-proportional allocation (as used in many futures/rates markets), selectable per book.; Self-trade prevention — four STP modes (cancel-maker / cancel-taker / cancel-both / none).; Opening/closing auctions — uncross a crossed book at the single uniform price that maximizes executed volume.; Lock-free runtime — wait-free single-producer/single-consumer ring for order ingress, one matcher thread per book, and a seqlock publishing top-of-book to wait-free market-data readers.; Multi-core sharding — symbols partitioned across a fixed pool of shared-nothing threads for horizontal scale.; Deterministic persistence — append-only command journal; replay reconstructs an identical book and trade tape (crash recovery, hot standby, reproducible debugging).; Pre-trade risk gate — per-account size caps, price collars, position and open-order limits, with live position keeping from both sides of every fill.; Binary wire protocol — versioned, little-endian, length-prefixed codec that decodes an untrusted byte stream into engine commands and back.; Two interchangeable backends — a flat array + bitmap ladder (O(1), for liquid/banded prices) and a std::map ladder (unbounded/sparse), so the central data-structure tradeoff is measured, not asserted.; L2 market-data snapshots, running statistics, and a full structural self-audit. Each layer is independently usable: a single OrderBook, a RiskEngine wrapping one, a threaded matcher for the lock-free pipeline, or a sharded engine spanning cores — and any of them can be journaled. Everything is an integer. Prices are signed 64-bit ticks, never floating point — money is discrete and float rounding would corrupt exact matching. This makes matching exact and deterministic. Price-time priority falls out of the structures. Price priority is which level an order lands in; time priority is an intrusive FIFO queue within each level — new orders append at the tail, the matcher consumes from the head. Orders are intrusive doubly-linked-list nodes, so a cancel is O(1) (an unlink with no search) — essential, since cancels dominate real order flow. Each Order is packed into a single 64-byte cache line. The price ladder (the performance core). For a liquid instrument, prices cluster in a narrow band, so the fast backend stores a whole side of the book as a flat array indexed directly by price − base — O(1) level access with no tree walk. The hard part — \"what's the best price, and the next best after this level empties?\" — is solved with a two-level hierarchical bitmap (a bit per level, plus a summary bit per 64 levels) and the hardware bit-scan instructions (ctz/clz): finding the next occupied level becomes a couple of masked word reads, effectively O(1). The tradeoff is O(band) memory; the std::map backend handles unbounded/sparse prices when that doesn't fit. No allocation on the hot path.",
+      "title": "Biquadris",
+      "description": "A two-player competitive Tetris variant built in C++ with an object-oriented design. Originally developed as a final project for CS 246: Object-Oriented Software Development at the University of Waterloo (Fall 2025) by a team of three students, then refactored and extended into a cross-platform, SDL2-rendered game. The game has since been refactored and extended beyond the original submission: bugs fixed, the X11 graphics layer replaced with SDL2 for cross-platform support, and the build system migrated to CMake for easy packaging. Biquadris is a turn-based, two-player spin on Tetris. Both players share one screen — each managing their own 11×18 board. Players alternate turns: you make one move, then your opponent does. Clear two or more lines in a single drop and you earn a special action to punish your opponent. The game ends when a player can no longer place a new block. The codebase is organized around a small set of well-encapsulated classes. Game owns the two Board models and drives the turn loop; each Board tracks its grid, score, level, and active effects; Block encodes the seven tetromino shapes and their rotations; Level generates the next block according to the current difficulty; and the rendering is handled by interchangeable views — a TextDisplay for the terminal and an SDL2 Xwindow for graphics. Two design ideas carry most of the weight. Special actions are a polymorphic effect system (Strategy-style): an abstract Effect base class declares apply, onDrop, isExpired, and getName, and concrete BlindEffect, HeavyEffect, and ForceEffect subclasses implement each behaviour. An EffectManager holds the active effects per board, applies them on activation, ticks them after every drop, and retires them when they expire — so new actions can be added without touching the board logic. The model is fully decoupled from the views: the boards know nothing about how they're drawn, so the same game state renders identically to the terminal or to SDL2. Memory is managed entirely through std::uniqueptr (RAII — no manual new/delete), collision detection validates every move and rotation against the walls and settled cells before committing it, and a single codebase compiles either text-only or with graphics via conditional compilation (ifdef BIQUADRISGRAPHICS). Commands are parsed with unique-prefix matching and numeric multipliers, the high score persists between sessions, and a ghost-block preview shows where the current piece will land. Clearing 2 or more lines in a single drop earns a special action against your opponent: Line clear: (currentlevel + linescleared)² points; A block that scores zero lines resets the combo; clearing any lines resets the no-clear counter (relevant for Level 4 penalty blocks); High score is saved across sessions in .biquadrishighscore Object-oriented design — encapsulated Game, Board, Block, Level, and Effect classes; Polymorphism & abstract base classes — Effect interface with Blind / Heavy / Force subclasses; Inheritance — virtual methods and virtual destructors across the effect hierarchy; Strategy-style effect system — runtime special actions managed by an EffectManager; Model–view separation (MVC) — board state decoupled from the text and SDL2 renderers; RAII & smart pointers — std::uniqueptr ownership throughout, no manual memory management; Modern C++20 — const-correctness, standard containers, move semantics; Collision detection — move and rotation validation against walls and settled cells; Conditional compilation — one codebase builds text-only or with SDL2 graphics; Command parsing — unique-prefix matching with numeric multipliers; File I/O — high-score persistence and script-driven block sequences; Cross-platform build system — CMake with Homebrew SDL2 discovery on macOS; CI/CD release automation — GitHub Actions builds and bundles a distributable macOS app; Game logic — line clearing, level progression, ghost-block preview, and squared scoring C++20;",
       "tech": [
         "C++",
         "GitHub Actions",
         "CMake",
-        "Concurrency",
-        "Testing",
-        "R",
-        "Low-latency systems programming",
-        "Custom data structure design",
-        "Bit manipulation",
-        "Intrusive data structures",
-        "Custom memory allocation",
-        "Open-addressing hash map",
-        "Cache optimization",
-        "Lock-free programming",
-        "C++ memory model",
-        "Wait-free synchronization",
-        "Multithreading and concurrency",
-        "Template metaprogramming",
-        "Algorithm design",
-        "Matching-engine domain",
-        "Financial-exchange order types",
-        "Event sourcing and deterministic replay",
-        "Pre-trade risk management",
-        "Binary protocol design",
-        "Differential and property-based testing",
-        "Fuzzing",
-        "Sanitizers",
-        "Benchmarking methodology",
-        "Build and CI engineering"
+        "SDL2",
+        "Object-oriented design",
+        "Polymorphism & abstract base classes",
+        "Inheritance",
+        "Strategy-style effect system",
+        "Model–view separation (MVC)",
+        "RAII & smart pointers",
+        "Modern C++20",
+        "Collision detection",
+        "Conditional compilation",
+        "Command parsing",
+        "File I/O",
+        "Cross-platform build system",
+        "CI/CD release automation",
+        "Game logic"
       ],
       "skills": [
         {
           "category": "Languages",
           "items": [
             "C++"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "SDL2"
           ]
         },
         {
@@ -1252,62 +1267,47 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Algorithms & DS",
+          "category": "Architecture & Design",
           "items": [
-            "Custom data structure design",
-            "Intrusive data structures",
-            "Cache optimization",
-            "Algorithm design",
-            "Algorithms & DS"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency",
-            "Wait-free synchronization",
-            "Multithreading and concurrency",
-            "Distributed Systems"
+            "Object-oriented design",
+            "Polymorphism & abstract base classes",
+            "Inheritance",
+            "Model–view separation (MVC)",
+            "OOP & Design Patterns"
           ]
         },
         {
           "category": "Testing & Delivery",
           "items": [
-            "Testing",
-            "Differential and property-based testing",
+            "Cross-platform build system",
+            "CI/CD release automation",
             "DevOps"
           ]
         },
         {
           "category": "Concepts & Practices",
           "items": [
-            "R",
-            "Low-latency systems programming",
-            "Bit manipulation",
-            "Custom memory allocation",
-            "Open-addressing hash map",
-            "Lock-free programming",
-            "C++ memory model",
-            "Template metaprogramming",
-            "Matching-engine domain",
-            "Financial-exchange order types",
-            "Event sourcing and deterministic replay",
-            "Pre-trade risk management",
-            "Binary protocol design",
-            "Fuzzing",
-            "Sanitizers",
-            "Benchmarking methodology",
-            "Build and CI engineering",
-            "Automation / Scraping"
+            "Strategy-style effect system",
+            "RAII & smart pointers",
+            "Modern C++20",
+            "Collision detection",
+            "Conditional compilation",
+            "Command parsing",
+            "File I/O",
+            "Game logic",
+            "Game Development",
+            "Automation / Scraping",
+            "Game Physics"
           ]
         }
       ],
       "links": [
         {
           "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/limit-order-book"
+          "url": "https://github.com/TheYellowDuck/biquadris"
         }
-      ]
+      ],
+      "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
     }
   },
   {
@@ -2157,6 +2157,7 @@ export const generatedSkills: Exhibit[] = [
         "C++",
         "TypeScript",
         "JavaScript",
+        "C++",
         "Python",
         "Jupyter Notebook",
         "Java",
@@ -2276,5 +2277,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-26T15:29:49.586Z"
+  "syncedAt": "2026-06-26T15:44:47.645Z"
 };

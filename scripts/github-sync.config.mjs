@@ -82,7 +82,8 @@ export const config = {
     // quality, a competition result, architecture elegance. It shows next to the repo in the
     // ranking printout, so it's never a hidden thumb on the scale.
     Robotics: { bias: -5 },    // strong on paper (CV + LiDAR + Worlds) but messy code, didn't place
-    biquadris: { bias: 12.5 }, // elegant C++ OOP (Strategy/MVC/RAII) the scorer can't read as a "hard" domain
+    biquadris: { bias: 5, collab: true }, // 3-person CS 246 team project (reads as solo on GitHub — team's work re-committed under one account); elegant C++ OOP
+    "limit-order-book": { bias: 5 }, // sophisticated systems/finance project the scorer under-credits
     // "biquadris": {
     //   title: "Biquadris",
     //   description: "A two-player Tetris variant — full OOP design in C++.",
