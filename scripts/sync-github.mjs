@@ -64,8 +64,8 @@ async function downloadVideo(url, dest) {
   finally { clearTimeout(timer); }
 }
 
-// A directly-fetchable demo GIF URL → a looping mp4 at `dest`. (resolveGifUrl below has already turned
-// any GitHub user-attachments asset into its rendered JWT-signed URL, which GETs with no special auth.)
+// A directly-fetchable demo GIF URL → a looping mp4 at `dest`. (resolveAttachment below has already
+// turned any GitHub user-attachments asset into its rendered JWT-signed URL, which GETs with no auth.)
 // Returns false — the repo simply shows no demo — if it isn't actually a GIF (e.g. a static
 // screenshot), ffmpeg is missing, or anything else fails.
 async function downloadGif(url, dest) {
@@ -193,21 +193,25 @@ async function gh(pathOrUrl) {
   return res.json();
 }
 
-// Resolve a README GIF to a directly-fetchable URL. The modern drag-and-drop README GIF is a GitHub
-// user-attachments asset whose raw github.com/user-attachments URL is auth-walled — our CI token 404s
-// it. But the *rendered* README rewrites that asset to a short-lived JWT-signed private-user-images URL
-// that anyone can GET, so we fetch the HTML render (which the standard token CAN read) and lift the
-// first .gif <img> src out of it. Returns "" when there's no GIF or the render fails — the repo just
-// shows no demo. (Used by the deep scan; main()'s video retrieval then downloads it like any demo.)
-async function resolveGifUrl(owner, name) {
+// Resolve a drag-and-drop README attachment (video OR gif) to a directly-fetchable URL. The raw
+// github.com/user-attachments URL is auth-walled — our CI token 404s it — but the *rendered* README
+// rewrites it to a short-lived JWT-signed private-user-images URL anyone can GET. So we fetch the
+// HTML render (which the standard token CAN read) and lift the asset's src. An uploaded video renders
+// as <video src="…"> (or a <source>), a gif as <img src="…gif">. Returns { url, isVideo } or null —
+// videos are self-hosted directly; gifs are transcoded to a looping mp4 downstream.
+async function resolveAttachment(owner, name) {
   try {
     const res = await fetchTimeout(`${API}/repos/${owner}/${name}/readme`, {
       headers: { ...HEADERS, Accept: "application/vnd.github.html" },
     });
-    if (!res.ok) return "";
+    if (!res.ok) return null;
     const html = await res.text();
-    return (html.match(/<img[^>]+src="(https:\/\/[^"]+\.gif[^"]*)"/i) || [])[1] || "";
-  } catch { return ""; }
+    const video = html.match(/<(?:video|source)\b[^>]*?\ssrc="(https:\/\/[^"]+)"/i);
+    if (video) return { url: video[1], isVideo: true };
+    const gif = html.match(/<img[^>]+src="(https:\/\/[^"]+\.gif[^"]*)"/i);
+    if (gif) return { url: gif[1], isVideo: false };
+    return null;
+  } catch { return null; }
 }
 
 const MANIFESTS = ["package.json", "requirements.txt", "pyproject.toml", "Pipfile", "Cargo.toml", "go.mod", "Gemfile", "pom.xml", "build.gradle"];
@@ -265,7 +269,11 @@ function readmeDescription(md) {
     let chunk = (bullets.length >= 2 && bullets.length >= body.length - 1)
       ? bullets.map((l) => l.replace(/^[-*+]\s*/, "")).join("; ")
       : body.filter((l) => !/^[-*+]\s/.test(l)).join(" ");
-    chunk = chunk.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*_`#]/g, "").replace(/\s+/g, " ").trim();
+    chunk = chunk
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")   // markdown links → their text
+      .replace(/https?:\/\/\S+/g, "")             // bare URLs (e.g. GitHub user-attachments video embeds) aren't prose
+      .replace(/[*_`#]/g, "")
+      .replace(/\s+/g, " ").trim();
     if (chunk.length >= 12) parts.push(chunk);
     if (parts.join(" ").length > 4200) break; // safety ceiling only
   }
@@ -351,7 +359,7 @@ async function scanRepo(repo) {
   languages.forEach((l) => skills.add(l));
 
   let readme = "";
-  let gifUrl = "";
+  let attach = null;
   let videoRawUrl = "";
   let videoExt = "mp4";
   let videoSize = 0;
@@ -391,11 +399,11 @@ async function scanRepo(repo) {
         if (r?.content) readme = Buffer.from(r.content, "base64").toString("utf8");
       } catch (e) { if (e.message === "RATE_LIMIT") throw e; }
     }
-    // If the README embeds a user-attachments GIF demo, resolve it to a fetchable URL now, while we
-    // still hold this repo's context (see resolveGifUrl). Only that auth-walled form needs resolving —
-    // a plain .gif URL is already hotlinkable, so extractMedia handles it downstream.
+    // If the README embeds a user-attachments demo (video or gif), resolve it to a fetchable URL now,
+    // while we still hold this repo's context (see resolveAttachment). Only that auth-walled form needs
+    // resolving — a plain .gif/.mp4 URL is already hotlinkable, so extractMedia handles it downstream.
     if (remaining > 8 && /user-attachments\/assets\//i.test(readme)) {
-      gifUrl = await resolveGifUrl(owner, name);
+      attach = await resolveAttachment(owner, name);
     }
   }
   techFromReadme(readme).forEach((s) => skills.add(s));
@@ -408,7 +416,7 @@ async function scanRepo(repo) {
       multiContributor = Array.isArray(c) && c.length > 1;
     } catch (e) { if (e.message === "RATE_LIMIT") throw e; }
   }
-  return { languages, codeBytes, skills: [...skills], readme, gifUrl, videoRawUrl, videoExt, videoSize, multiContributor };
+  return { languages, codeBytes, skills: [...skills], readme, attach, videoRawUrl, videoExt, videoSize, multiContributor };
 }
 
 // Pull a demo video and/or labeled links out of a README. Works off every URL in
@@ -678,16 +686,24 @@ async function main() {
     // because we never set scan.videoUrl for them). LFS pointers report tiny here, so they
     // get queued and the downloader confirms/skips them against the real size.
     let videoFile = null;
-    let gifUrl = null;
+    let dlUrl = null;   // URL the downloader fetches
+    let dlIsGif = false; // gif → transcode to a looping mp4; video → self-host directly
     if (scan.videoRawUrl && scan.videoSize <= SELF_HOST_MAX) {
+      // A committed demo file in the repo tree.
       videoFile = `${repo.name}.${scan.videoExt}`;
       scan.videoUrl = `/videos/${videoFile}`; // optimistic; the parallel pass below confirms it
-    } else if ((gifUrl = scan.gifUrl || extractMedia(scan.readme).gifUrl)) {
-      // No committed video, but the README has a GIF — adopt it as the demo; the downloader transcodes
-      // it to a looping mp4. The scan already resolved auth-walled user-attachments GIFs to a fetchable
-      // URL (scan.gifUrl); a plain .gif URL falls through to extractMedia.
+      dlUrl = scan.videoRawUrl;
+    } else if (scan.attach?.isVideo) {
+      // README drag-and-drop VIDEO (user-attachments) — resolved to a signed URL; self-host it.
       videoFile = `${repo.name}.mp4`;
       scan.videoUrl = `/videos/${videoFile}`;
+      dlUrl = scan.attach.url;
+    } else if ((dlUrl = scan.attach?.url || extractMedia(scan.readme).gifUrl)) {
+      // README GIF — adopt it as the demo; the downloader transcodes it to a looping mp4. The scan
+      // resolved auth-walled user-attachments to a fetchable URL; a plain .gif URL falls through here.
+      videoFile = `${repo.name}.mp4`;
+      scan.videoUrl = `/videos/${videoFile}`;
+      dlIsGif = true;
     }
     const exhibit = toExhibit(repo, scan, domains);
     const sig = significance(repo, scan, domains, exhibit.popup);
@@ -699,7 +715,7 @@ async function main() {
     exhibits.push(exhibit);
     if (videoFile) {
       const embedFallback = config.overrides[repo.name]?.embedUrl || extractMedia(scan.readme).embedUrl;
-      videoQueue.push({ url: gifUrl || scan.videoRawUrl, gif: !!gifUrl, dest: path.join(VIDEO_DIR, videoFile), popup: exhibit.popup, embedFallback });
+      videoQueue.push({ url: dlUrl, gif: dlIsGif, dest: path.join(VIDEO_DIR, videoFile), popup: exhibit.popup, embedFallback });
     }
     const usesEmbed = !videoFile && (config.overrides[repo.name]?.embedUrl || extractMedia(scan.readme).embedUrl);
     console.log(`  · ${repo.name}: ${scan.languages[0] || "?"}${scan.skills.length ? " + " + scan.skills.length + " skills" : ""}${domains.length ? " · " + domains.join(", ") : ""}${videoFile ? " · video" : usesEmbed ? " · youtube" : ""}`);

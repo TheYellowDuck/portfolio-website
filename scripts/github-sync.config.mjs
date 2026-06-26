@@ -51,7 +51,7 @@ export const config = {
   // Demo videos: self-host a repo's committed demo file when it's at or under this size
   // (in MB). Anything bigger keeps its README YouTube embed instead — so the repo stays
   // small and the projects page stays light. (Oversized Git LFS videos are skipped too.)
-  selfHostVideoMaxMB: 5,
+  selfHostVideoMaxMB: 10,
 
   // Links found in a repo's README are surfaced as buttons, labeled by URL.
   // Add your own — first matching rule wins (substring, case-insensitive).
