@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   mainHallExhibits,
   inProgressExhibits,
@@ -36,6 +36,30 @@ interface PortfolioProps {
 const pad = (n: number) => String(n).padStart(2, "0");
 const withPopup = (xs: Exhibit[]) => xs.filter((e): e is Required<Pick<Exhibit, "popup">> & Exhibit => !!e.popup?.title);
 
+// How many cards a grid shows before the "Show all" fold — fewer on mobile (1-column, so tall).
+const MOBILE_Q = "(max-width: 639px)";
+function useIsMobile() {
+  return useSyncExternalStore(
+    (cb) => { const m = window.matchMedia(MOBILE_Q); m.addEventListener("change", cb); return () => m.removeEventListener("change", cb); },
+    () => window.matchMedia(MOBILE_Q).matches,
+    () => false,
+  );
+}
+
+// A quiet "Show all N →" / "Show less" toggle under a grid (N = the live total in that group).
+function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number; onClick: () => void }) {
+  return (
+    <div className="mt-8 flex justify-center">
+      <button
+        onClick={onClick}
+        className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+      >
+        {open ? "Show less" : `Show all ${total} →`}
+      </button>
+    </div>
+  );
+}
+
 function Section({ id, eyebrow, title, intro, children }: {
   id: string; eyebrow: string; title: string; intro?: string; children: React.ReactNode;
 }) {
@@ -56,6 +80,14 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   const featured = withPopup(mainHallExhibits);
   const inProgress = withPopup(inProgressExhibits);
   const archive = withPopup(archiveExhibits);
+  // Featured/in-progress show a clean top set, with the rest behind a "Show all" fold (nothing is
+  // demoted to the archive — it's purely how many render before the fold). Fewer on mobile.
+  const isMobile = useIsMobile();
+  const cap = isMobile ? 3 : 5;
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const [showAllProgress, setShowAllProgress] = useState(false);
+  const shownFeatured = showAllFeatured ? featured : featured.slice(0, cap);
+  const shownInProgress = showAllProgress ? inProgress : inProgress.slice(0, cap);
   // Height estimates for masonry balancing, so columns pack evenly (no exposed seam).
   // A project card with a demo/thumbnail (aspect-video) is ~twice the height of one without.
   const cardWeight = (popup: ExhibitPopup) => (popup.videoUrl || popup.embedUrl ? 2 : 1);
@@ -111,23 +143,29 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       {/* ── Work ── */}
       <Section id="work" eyebrow={content.sections.work.eyebrow} title={content.sections.work.title}
         intro={content.sections.work.intro}>
-        <Masonry sm={2} lg={2} weights={featured.map((e) => cardWeight(e.popup as ExhibitPopup))} items={featured.map((e, i) => (
+        <Masonry sm={2} lg={2} weights={shownFeatured.map((e) => cardWeight(e.popup as ExhibitPopup))} items={shownFeatured.map((e, i) => (
           <Reveal key={i} delay={(i % 2) * 70}>
             <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
           </Reveal>
         ))} />
+        {featured.length > cap && (
+          <ShowAllToggle open={showAllFeatured} total={featured.length} onClick={() => setShowAllFeatured((v) => !v)} />
+        )}
 
         {inProgress.length > 0 && (
           <>
             {/* Current work — deliberately not ranked (no No. NN); see scripts/sync-github.mjs. */}
             <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.inProgress}</h3>
             <div className="mt-6">
-              <Masonry sm={2} lg={2} weights={inProgress.map((e) => cardWeight(e.popup as ExhibitPopup))} items={inProgress.map((e, i) => (
+              <Masonry sm={2} lg={2} weights={shownInProgress.map((e) => cardWeight(e.popup as ExhibitPopup))} items={shownInProgress.map((e, i) => (
                 <Reveal key={i} delay={(i % 2) * 70}>
                   <ProjectCard popup={e.popup as ExhibitPopup} inProgress onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
                 </Reveal>
               ))} />
             </div>
+            {inProgress.length > cap && (
+              <ShowAllToggle open={showAllProgress} total={inProgress.length} onClick={() => setShowAllProgress((v) => !v)} />
+            )}
           </>
         )}
 
