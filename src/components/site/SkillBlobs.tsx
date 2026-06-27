@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { categoryColor } from "@/lib/skill-colors";
 
 export interface SkillBlobGroup {
   title: string;
@@ -10,28 +11,24 @@ export interface SkillBlobGroup {
   items: string[];
 }
 
-const PALETTE = ["#5a8260", "#5b7ba0", "#a96a36", "#8f7434", "#7d5f8a", "#4f857e", "#9e635a", "#7a7a34", "#646e84", "#8a5f74", "#6e8c5a", "#996f4a"];
-const rgba = (hex: string, a: number) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
-const shade = (hex: string, p: number) => { const n = parseInt(hex.slice(1), 16); const c = (v: number) => Math.max(0, Math.min(255, v + p)); return `rgb(${c((n >> 16) & 255)},${c((n >> 8) & 255)},${c(n & 255)})`; };
 const longestWord = (s: string) => Math.max(...s.split(/\s+/).map((w) => w.length));
 const CHIP_GAP = 6;          // px between chip rows (gap-1.5) — also the seam between the two copies
 const SCROLL_SPEED = 25;     // px/s cruising drift speed
 const SCROLL_DELAY = 600;    // ms of stillness after opening / after manual scroll before it drifts
 const SCROLL_RAMP = 1100;    // ms to ease the speed up on (re)start AND down to a stop on hover
 
-// The colour lives entirely in the LABEL TEXT — darkened for light paper, lightened for the dark
-// surface — so it reads clearly in both themes.
-const labelColor = (hex: string, dark: boolean) => shade(hex, dark ? 92 : -30);
+// Shared chip look — identical to the project cards, so a skill reads the same everywhere.
+const CHIP_CLASS = "rounded border px-2 py-0.5 font-mono text-[11px]";
 
-// Paper disc with a soft top sheen + deeper underside, plus the group's hue as a top-down wash on
-// the surface (re-added to compare against the neutral version). Dark needs a touch more wash to read.
-const discStyle = (hex: string, dark: boolean) =>
+// Paper disc with a soft top sheen + deeper underside, plus the group's hue (from skillColorFor) as a
+// top-down wash on the surface. Dark needs a touch more wash to read on the dark surface.
+const discStyle = (hue: number, dark: boolean) =>
   dark
     ? {
         background:
           `radial-gradient(circle at 50% 32%, rgba(255,255,255,0.06), rgba(255,255,255,0) 55%),` +
           `radial-gradient(circle at 50% 118%, rgba(0,0,0,0.34), rgba(0,0,0,0) 56%),` +
-          `radial-gradient(125% 92% at 50% 0%, ${rgba(hex, 0.2)}, rgba(0,0,0,0) 76%), var(--c-surface)`,
+          `radial-gradient(125% 92% at 50% 0%, hsla(${hue}, 55%, 55%, 0.22), rgba(0,0,0,0) 76%), var(--c-surface)`,
         boxShadow:
           `inset 0 1px 1px rgba(255,255,255,0.07), inset 0 -9px 18px rgba(0,0,0,0.34),` +
           `0 9px 22px -12px rgba(0,0,0,0.5), 0 30px 54px -42px rgba(0,0,0,0.45)`,
@@ -40,7 +37,7 @@ const discStyle = (hex: string, dark: boolean) =>
         background:
           `radial-gradient(circle at 50% 36%, rgba(255,255,255,0.5), rgba(255,255,255,0) 54%),` +
           `radial-gradient(circle at 50% 114%, rgba(58,46,30,0.06), rgba(58,46,30,0) 56%),` +
-          `radial-gradient(125% 90% at 50% 0%, ${rgba(hex, 0.14)}, rgba(255,255,255,0) 76%), var(--c-surface)`,
+          `radial-gradient(125% 90% at 50% 0%, hsla(${hue}, 50%, 45%, 0.16), rgba(255,255,255,0) 76%), var(--c-surface)`,
         boxShadow:
           `inset 0 1.5px 2px rgba(255,255,255,0.6), inset 0 -8px 16px rgba(58,46,30,0.05),` +
           `0 9px 20px -12px rgba(58,46,30,0.16), 0 28px 50px -42px rgba(58,46,30,0.13)`,
@@ -166,7 +163,6 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
   }, [active, loop, trackH]);
 
   const layout = useMemo(() => (width > 0 ? packField(groups, width, mobile) : null), [groups, width, mobile]);
-  const color = (i: number) => PALETTE[i % PALETTE.length];
   const containerH = !layout ? 360 : active !== null ? expandedR * 2 + (mobile ? 20 : 28) : layout.height;
 
   return (
@@ -180,6 +176,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
           {layout && groups.map((g, i) => {
             const nd = layout.nodes[i];
             if (!nd) return null;
+            const sc = categoryColor(g.title);
             // Label scales to the orb: fits its longest word, never larger than the orb can hold.
             const fs = Math.max(mobile ? 7.5 : 8.5, Math.min((nd.r * 2 * 0.8) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
             return (
@@ -198,7 +195,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                 className="absolute flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 style={{
                   left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
-                  ...discStyle(color(i), dark), color: labelColor(color(i), dark), fontSize: fs, lineHeight: 1.16, letterSpacing: "-0.005em",
+                  ...discStyle(sc.hue, dark), color: dark ? sc.solidDark : sc.solid, fontSize: fs, lineHeight: 1.16, letterSpacing: "-0.005em",
                   pointerEvents: active !== null ? "none" : "auto",
                 }}
                 aria-label={`${g.title}, ${g.items.length} skills`}
@@ -217,10 +214,12 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
           <AnimatePresence>
             {active !== null && groups[active] && (() => {
               const g = groups[active];
-              const tint = labelColor(color(active), dark);
+              const sc = categoryColor(g.title);
+              const tint = dark ? sc.solidDark : sc.solid;
               const titleFs = Math.max(14, Math.min(expandedR * 0.17, (expandedR * 2 * 0.62) / (longestWord(g.title) * 0.6), 26));
+              // All pills share the group's category colour, so the open orb reads as one coherent set.
               const chips = g.items.map((item) => (
-                <span key={item} className="rounded-full border border-walnut/10 bg-[rgb(var(--c-bg-rgb))] px-2.5 py-1 font-mono text-[11.5px] text-walnut">{item}</span>
+                <span key={item} className={CHIP_CLASS} style={{ borderColor: sc.border, background: sc.bg, color: dark ? sc.solidDark : sc.solid }}>{item}</span>
               ));
               const chipRow = "flex w-full flex-wrap content-start justify-center gap-1.5";
               return (
@@ -237,7 +236,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                       onClick={() => setActive(null)}
                       transition={{ layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
                       className="flex cursor-zoom-out flex-col items-center justify-center overflow-hidden rounded-full"
-                      style={{ width: expandedR * 2, height: expandedR * 2, ...discStyle(color(active), dark), pointerEvents: "auto" }}
+                      style={{ width: expandedR * 2, height: expandedR * 2, ...discStyle(sc.hue, dark), pointerEvents: "auto" }}
                     >
                       <motion.div
                         className="flex min-h-0 flex-col items-center justify-center"

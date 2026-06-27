@@ -61,7 +61,7 @@ const en = {
       archive: "Archive",
     },
     experience: { eyebrow: "Curriculum Vitae", title: "Experience" },
-    skills: { eyebrow: "The Toolkit", title: "Skills" },
+    skills: { eyebrow: "The Toolkit", title: "Skills", note: "Tap a circle to open it. A skill's colour is its category — skills in the same group share one colour, and each keeps that colour everywhere it appears (Work, Projects, Archive). Skills outside these groups show in grey." },
     about: {
       eyebrow: "The Curator",
       title: "About",

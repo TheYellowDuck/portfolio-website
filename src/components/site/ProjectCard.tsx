@@ -5,6 +5,7 @@ import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
 import { content } from "@/content";
 import { skillColorFor } from "@/lib/skill-colors";
+import { useDarkMode } from "@/lib/use-dark-mode";
 
 /**
  * A muted autoplay preview that only fetches its source once it's near the viewport — so a page of
@@ -52,6 +53,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ index, popup, compact = false, inProgress = false, onOpen }: ProjectCardProps) {
+  const dark = useDarkMode();
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
@@ -111,7 +113,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
               <span
                 key={t}
                 className="rounded border px-2 py-0.5 font-mono text-[11px]"
-                style={{ borderColor: c.border, background: c.bg, color: c.solid }}
+                style={{ borderColor: c.border, background: c.bg, color: dark ? c.solidDark : c.solid }}
               >
                 {t}
               </span>

@@ -86,6 +86,16 @@ export const skillsExhibits: Exhibit[] = [
     : []),
 ];
 
+// Maps a skill/tech name → the category (skill group) it belongs to, so bare chips on project,
+// experience, and archive cards can be coloured by their category — the same colour scheme as the
+// Skills wing. First group to claim a name wins. Names not in any group fall back to neutral.
+export const skillCategoryMap: Record<string, string> = {};
+for (const e of skillsExhibits) {
+  const category = e.popup?.title;
+  if (!category || !e.popup?.tech) continue;
+  for (const item of e.popup.tech) if (!(item in skillCategoryMap)) skillCategoryMap[item] = category;
+}
+
 // Tile 13 — ARCHIVE / OTHER PROJECTS
 export const archiveExhibits: Exhibit[] = generatedArchive;
 

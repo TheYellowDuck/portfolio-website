@@ -15,6 +15,8 @@ import {
 import Hero from "./Hero";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";
+import { skillColorFor } from "@/lib/skill-colors";
+import { useDarkMode } from "@/lib/use-dark-mode";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
@@ -203,6 +205,9 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             e.popup?.title ? [{ title: e.popup.title, description: e.popup.description, items: e.popup.tech ?? [] }] : [],
           )}
         />
+        <p className="mx-auto mt-7 max-w-[60ch] text-center font-mono text-[11px] leading-relaxed text-walnut/55">
+          {content.sections.skills.note}
+        </p>
       </Section>
 
       {/* ── About ── */}
@@ -284,6 +289,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
 function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
   const [open, setOpen] = useState(false);
+  const dark = useDarkMode();
   const long = (popup.description?.length ?? 0) > 280;
   return (
     <Reveal variant="left">
@@ -304,9 +310,12 @@ function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
         )}
         {popup.tech && popup.tech.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {popup.tech.slice(0, 10).map((t) => (
-              <span key={t} className="rounded border border-[rgba(122,158,126,0.4)] bg-[rgba(122,158,126,0.1)] px-2 py-0.5 font-mono text-[11px] text-pine">{t}</span>
-            ))}
+            {popup.tech.slice(0, 10).map((t) => {
+              const c = skillColorFor(t);
+              return (
+                <span key={t} className="rounded border px-2 py-0.5 font-mono text-[11px]" style={{ borderColor: c.border, background: c.bg, color: dark ? c.solidDark : c.solid }}>{t}</span>
+              );
+            })}
           </div>
         )}
         {popup.links && popup.links.length > 0 && (

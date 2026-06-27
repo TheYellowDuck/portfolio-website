@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
-import { skillGroupColor } from "@/lib/skill-colors";
+import { categoryColor } from "@/lib/skill-colors";
 import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
 
@@ -263,7 +263,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                             {/* Left tab rail — its OWN scroll, independent of the groups column. */}
                             <nav aria-label="Skill groups" className="shrink-0 w-28 sm:w-36 flex flex-col gap-0.5 roomy:overflow-y-auto roomy:min-h-0 overscroll-contain [scrollbar-width:none]">
                               {popup.skills.map((group, i) => {
-                                const c = skillGroupColor(i, popup.skills!.length);
+                                const c = categoryColor(group.category);
                                 return (
                                   <button
                                     key={group.category}
@@ -279,7 +279,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                             {/* Groups — separate independent scroll. */}
                             <div className="flex-1 min-w-0 flex flex-col gap-4 roomy:overflow-y-auto roomy:min-h-0 overscroll-contain pr-1 [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                               {popup.skills.map((group, i) => {
-                                const c = skillGroupColor(i, popup.skills!.length);
+                                const c = categoryColor(group.category);
                                 return (
                                   <div key={group.category} ref={(el) => { skillRefs.current[i] = el; }} style={{ scrollMarginTop: 8 }}>
                                     <h3 className="m-0 mb-2 font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: c.solid }}>
@@ -287,7 +287,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                                     </h3>
                                     <div className="flex flex-wrap gap-1.5">
                                       {group.items.map((item) => (
-                                        <span key={item} className="font-mono text-[11px] text-walnut/85 rounded border px-2 py-0.5" style={{ background: c.bg, borderColor: c.border }}>
+                                        <span key={item} className="font-mono text-[11px] rounded border px-2 py-0.5" style={{ background: c.bg, borderColor: c.border, color: c.solid }}>
                                           {item}
                                         </span>
                                       ))}
@@ -309,10 +309,10 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                               {t}
                             </span>
                           ))}
-                          {popup.skills?.flatMap((group, i) => {
-                            const color = skillGroupColor(i, popup.skills!.length);
+                          {popup.skills?.flatMap((group) => {
+                            const c = categoryColor(group.category);
                             return group.items.map((item) => (
-                              <span key={item} className="font-mono text-[11px] text-walnut rounded px-2 py-0.5 border" style={{ background: color.bg, borderColor: color.border }}>
+                              <span key={item} className="font-mono text-[11px] rounded px-2 py-0.5 border" style={{ background: c.bg, borderColor: c.border, color: c.solid }}>
                                 {item}
                               </span>
                             ));

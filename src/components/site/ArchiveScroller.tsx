@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { motion } from "framer-motion";
 import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
+import { skillColorFor } from "@/lib/skill-colors";
+import { useDarkMode } from "@/lib/use-dark-mode";
 import { LazyVideo } from "./ProjectCard";
 
 // Mobile (<640px) gets a swipeable card deck; wider screens get the auto-scrolling rail.
@@ -68,6 +70,7 @@ function CardMedia({ popup, aspect }: { popup: ExhibitPopup; aspect: number }) {
 
 function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: number; onOpen: () => void }) {
   const { popup, index } = item;
+  const dark = useDarkMode();
   const hasMedia = !!(popup.videoUrl || popup.embedUrl);
   return (
     <article
@@ -89,9 +92,12 @@ function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: numb
         )}
         {popup.tech && popup.tech.length > 0 && (
           <div className="mt-3 flex h-[22px] flex-wrap gap-1.5 overflow-hidden">
-            {popup.tech.slice(0, 3).map((t) => (
-              <span key={t} className="rounded border border-[rgba(122,158,126,0.45)] bg-[rgba(122,158,126,0.12)] px-2 py-0.5 font-mono text-[10px] text-pine">{t}</span>
-            ))}
+            {popup.tech.slice(0, 3).map((t) => {
+              const c = skillColorFor(t);
+              return (
+                <span key={t} className="rounded border px-2 py-0.5 font-mono text-[10px]" style={{ borderColor: c.border, background: c.bg, color: dark ? c.solidDark : c.solid }}>{t}</span>
+              );
+            })}
           </div>
         )}
       </div>
@@ -287,6 +293,7 @@ function deckTarget(o: number, seed: number) {
 
 function DeckCard({ item }: { item: ArchiveItem }) {
   const { popup, index } = item;
+  const dark = useDarkMode();
   const id = ytId(popup);
   const hasMedia = !!(popup.videoUrl || id);
   return (
@@ -315,9 +322,12 @@ function DeckCard({ item }: { item: ArchiveItem }) {
         )}
         {popup.tech && popup.tech.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {popup.tech.slice(0, 4).map((t) => (
-              <span key={t} className="rounded border border-[rgba(122,158,126,0.45)] bg-[rgba(122,158,126,0.12)] px-2 py-0.5 font-mono text-[10px] text-pine">{t}</span>
-            ))}
+            {popup.tech.slice(0, 4).map((t) => {
+              const c = skillColorFor(t);
+              return (
+                <span key={t} className="rounded border px-2 py-0.5 font-mono text-[10px]" style={{ borderColor: c.border, background: c.bg, color: dark ? c.solidDark : c.solid }}>{t}</span>
+              );
+            })}
           </div>
         )}
       </div>
