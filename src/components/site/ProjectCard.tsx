@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
 import { content } from "@/content";
+import { skillColorFor } from "@/lib/skill-colors";
 
 /**
  * A muted autoplay preview that only fetches its source once it's near the viewport — so a page of
@@ -104,14 +105,18 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
 
       {popup.tech && popup.tech.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {popup.tech.slice(0, compact ? 4 : 8).map((t) => (
-            <span
-              key={t}
-              className="rounded border border-[rgba(122,158,126,0.45)] bg-[rgba(122,158,126,0.12)] px-2 py-0.5 font-mono text-[11px] text-pine"
-            >
-              {t}
-            </span>
-          ))}
+          {popup.tech.slice(0, compact ? 4 : 8).map((t) => {
+            const c = skillColorFor(t);
+            return (
+              <span
+                key={t}
+                className="rounded border px-2 py-0.5 font-mono text-[11px]"
+                style={{ borderColor: c.border, background: c.bg, color: c.solid }}
+              >
+                {t}
+              </span>
+            );
+          })}
         </div>
       )}
 

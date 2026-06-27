@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
-import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
+import { skillGroupColor } from "@/lib/skill-colors";
 import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
 
@@ -110,6 +110,16 @@ interface ExhibitOverlayProps {
 
 export default function ExhibitOverlay({ popup, onClose, gentle = false }: ExhibitOverlayProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const skillRefs = useRef<(HTMLDivElement | null)[]>([]); // skill-group anchors for the left tab rail
+
+  // Lock background page scroll while a popup is open, so scrolling past the end of the
+  // popup doesn't chain into (and scroll) the page behind it.
+  useEffect(() => {
+    if (!popup) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [popup]);
 
   // While a popup is open: Esc closes it, focus moves into the dialog and is trapped
   // there (Tab wraps), and focus returns to the trigger on close.
@@ -229,7 +239,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                   {(popup.description || popup.tech?.length || popup.skills?.length || popup.videoUrl || popup.embedUrl) && (
                     <div className="flex flex-col roomy:flex-row roomy:flex-1 roomy:min-h-0 roomy:overflow-hidden">
                       {/* Left — video above description; scrolls on its own only when roomy */}
-                      <div className="flex-1 min-w-0 flex flex-col roomy:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                      <div className="flex-1 min-w-0 flex flex-col roomy:overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
                         {popup.videoUrl ? (
                           <video src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="shrink-0 w-full aspect-video bg-black" autoPlay loop muted playsInline controls />
                         ) : popup.embedUrl ? (
@@ -249,24 +259,43 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                         {/* The "Skills" exhibit shows its grouped skills as the main content
                             (full width, by category) rather than in the narrow side column. */}
                         {popup.title === "Skills" && popup.skills && (
-                          <div className="flex flex-col gap-4 px-5 pb-4">
-                            {popup.skills.map((group, i) => {
-                              const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
-                              return (
-                                <div key={group.category}>
-                                  <h3 className="m-0 mb-2 font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: c.solid }}>
+                          <div className="flex gap-3 px-5 pb-4 roomy:flex-1 roomy:min-h-0 roomy:overflow-hidden">
+                            {/* Left tab rail — its OWN scroll, independent of the groups column. */}
+                            <nav aria-label="Skill groups" className="shrink-0 w-28 sm:w-36 flex flex-col gap-0.5 roomy:overflow-y-auto roomy:min-h-0 overscroll-contain [scrollbar-width:none]">
+                              {popup.skills.map((group, i) => {
+                                const c = skillGroupColor(i, popup.skills!.length);
+                                return (
+                                  <button
+                                    key={group.category}
+                                    onClick={() => skillRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                                    className="text-left font-mono text-[11px] rounded px-2 py-1 hover:bg-[rgb(var(--c-line-rgb)_/_0.08)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                                    style={{ color: c.solid }}
+                                  >
                                     {group.category}
-                                  </h3>
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {group.items.map((item) => (
-                                      <span key={item} className="font-mono text-[11px] text-walnut/85 rounded border px-2 py-0.5" style={{ background: c.bg, borderColor: c.border }}>
-                                        {item}
-                                      </span>
-                                    ))}
+                                  </button>
+                                );
+                              })}
+                            </nav>
+                            {/* Groups — separate independent scroll. */}
+                            <div className="flex-1 min-w-0 flex flex-col gap-4 roomy:overflow-y-auto roomy:min-h-0 overscroll-contain pr-1 [scrollbar-width:thin] [scrollbar-color:#7a9e7e_transparent]">
+                              {popup.skills.map((group, i) => {
+                                const c = skillGroupColor(i, popup.skills!.length);
+                                return (
+                                  <div key={group.category} ref={(el) => { skillRefs.current[i] = el; }} style={{ scrollMarginTop: 8 }}>
+                                    <h3 className="m-0 mb-2 font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: c.solid }}>
+                                      {group.category}
+                                    </h3>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {group.items.map((item) => (
+                                        <span key={item} className="font-mono text-[11px] text-walnut/85 rounded border px-2 py-0.5" style={{ background: c.bg, borderColor: c.border }}>
+                                          {item}
+                                        </span>
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -281,7 +310,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                             </span>
                           ))}
                           {popup.skills?.flatMap((group, i) => {
-                            const color = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
+                            const color = skillGroupColor(i, popup.skills!.length);
                             return group.items.map((item) => (
                               <span key={item} className="font-mono text-[11px] text-walnut rounded px-2 py-0.5 border" style={{ background: color.bg, borderColor: color.border }}>
                                 {item}

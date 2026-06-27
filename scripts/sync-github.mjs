@@ -617,28 +617,75 @@ function significance(repo, scan, domains, popup) {
   return { total: coll ? sub * 0.5 : sub, parts: { difficulty, scope, breadth, deployed, social, collab, polish, coll } };
 }
 
-function groupSkills(allSkills, allLanguages, soft) {
-  const langs = [...new Set(allLanguages)].slice(0, 12);
-  // Aggregate view: keep only canonical *detected* skills. The per-repo README free-text
-  // phrasings are dropped here — across repos they duplicate the same skill reworded
-  // ("Object-oriented design" / "OOP" / "Object-oriented programming"). The detailed phrases
-  // still appear, grouped, inside each project's own popup.
-  const canon = new Set(KNOWN_SKILLS);
-  const have = new Set([...allSkills].filter((s) => canon.has(s)));
+// Synonym / acronym aliases so a concept named differently across repos collapses to ONE label
+// (keyed by the normalised form below). Keep conservative — only genuine duplicates.
+const SKILL_ALIASES = {
+  oop: "Object-Oriented Design", objectoriented: "Object-Oriented Design",
+  ds: "Data Structures", datastructure: "Data Structures", datastructures: "Data Structures",
+  ml: "Machine Learning", llm: "LLMs", llms: "LLMs",
+  largelanguagemodel: "LLMs", largelanguagemodels: "LLMs",
+  cicd: "CI/CD", tdd: "Test-Driven Development", testdriven: "Test-Driven Development",
+};
+// Generic filler dropped when building the dedup key, so "Object-oriented design",
+// "Object-oriented programming" and "OOP" all collapse to one entry.
+const SKILL_FILLER = new Set(["design", "programming", "development", "patterns", "pattern", "based", "the", "a", "an", "of", "for", "with", "using", "and", "to"]);
+const skillKey = (s) => s.toLowerCase().replace(/[^a-z0-9+]+/g, " ").trim().split(" ").filter((w) => w && !SKILL_FILLER.has(w)).join("");
+// Display order for the aggregate Skills section (hard/impressive areas first).
+const SKILL_GROUP_ORDER = ["AI & ML", "Algorithms & DS", "Statistics & Evaluation", "Concurrency & Networking", "3D Graphics", "Systems & Embedded", "Security & Crypto", "Compilers & Languages", "Distributed & Data", "Game AI", "UI & 2D", "Architecture & Design", "Testing & Delivery", "Frameworks", "ML / Data", "Databases", "Tools", "Concepts & Practices"];
+
+// Exact wording-variants of the SAME concept → one canonical label. Anchored (^…$) so only the
+// confirmed phrasings merge — distinct skills (e.g. "Differential testing", "PPO") are untouched.
+const SKILL_CANONICAL = [
+  [/^(concurrency|multi-?threading|asynchronous concurrency)(\s*(?:&|and|\/)\s*(?:concurrency|multi-?threading))?$/i, "Concurrency"],
+  [/^(algorithm design|algorithm implementation|algorithms? (?:&|and) data[- ]structures?|algorithm\/data-structure use)$/i, "Algorithms & Data Structures"],
+  [/^a\*? pathfinding$/i, "A* Pathfinding"],
+  [/^(combinatorics & math|math & combinatorics)$/i, "Combinatorics & Math"],
+  [/^(graph connectivity|graph connectivity analysis)$/i, "Graph Connectivity Analysis"],
+  [/^(devops|ci ?\/ ?devops|ci\/cd( and| release)? automation|ci\/cd)$/i, "CI/CD & DevOps"],
+  [/^(testing|test engineering|automated testing|unit testing and validation harnesses|unit testing)$/i, "Testing"],
+  [/^(property-based testing|differential and property-based testing)$/i, "Property-Based Testing"],
+  [/^(packaging|application packaging)$/i, "Packaging"],
+  [/^(jar packaging|fat-jar packaging)$/i, "JAR Packaging"],
+  [/^(cross-platform packaging|cross-platform build system)$/i, "Cross-Platform Builds"],
+  [/^(llm-as-judge evaluation|llm-as-judge & faithfulness \(ragas-style\))$/i, "LLM-as-Judge Evaluation"],
+  [/^(transformers|huggingface transformers)$/i, "Transformers"],
+  [/^(semantic embeddings|semantic search & embeddings)$/i, "Semantic Search & Embeddings"],
+  [/^(computer vision|computer vision \/ multimodal ai)$/i, "Computer Vision"],
+];
+
+// Aggregate the Skills section dynamically from every project's own categorised skills
+// (popup.skills) — no fixed allow-list, so niche real skills (fuzzing, lock-free, order-book,
+// RAG, …) surface — deduped across repos so each concept appears once, in its strongest category.
+function groupSkills(exhibits, allLanguages, soft) {
   const groups = [];
   const push = (title, items, description) => {
     const uniq = [...new Set(items)].filter(Boolean);
     if (uniq.length) groups.push({ popup: { title, ...(description ? { description } : {}), tech: uniq } });
   };
+  push("Languages", [...new Set(allLanguages)].slice(0, 12), "Languages across my repositories, by usage.");
 
-  push("Languages", langs, "Languages across my repositories, by usage.");
-  for (const [cat, members] of Object.entries(SKILL_CATEGORY)) {
-    push(cat, members.filter((m) => have.has(m)));
-  }
+  const seen = new Set();   // dedup key → one concept shown once
+  const byCat = new Map();  // category → [display labels]
+  const place = (cat, raw0) => {
+    if (!raw0) return;
+    const raw = raw0.replace(/\\/g, "").trim(); // drop stray markdown-escape backslashes (e.g. A\* )
+    if (!raw || raw.toLowerCase() === cat.toLowerCase()) return;
+    let display = SKILL_ALIASES[skillKey(raw)] || raw;
+    for (const [re, to] of SKILL_CANONICAL) if (re.test(raw)) { display = to; break; }
+    const key = skillKey(display);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    if (!byCat.has(cat)) byCat.set(cat, []);
+    byCat.get(cat).push(display);
+  };
+  // Outer loop by category order → a concept lands in its strongest category, not the catch-all.
+  for (const cat of SKILL_GROUP_ORDER)
+    for (const ex of exhibits)
+      for (const g of ex.popup?.skills || [])
+        if (g.category === cat) for (const it of g.items) place(cat, it);
+
+  for (const cat of SKILL_GROUP_ORDER) push(cat, byCat.get(cat) || []);
   if (soft?.length) push("Soft Skills", soft);
-  // Canonical but uncategorised (e.g. Tokio, Gson) — small.
-  const known = new Set([...langs, ...Object.values(SKILL_CATEGORY).flat()]);
-  push("More", [...have].filter((s) => !known.has(s)));
   return groups;
 }
 
@@ -779,7 +826,7 @@ async function main() {
   const mainHall = ranked.filter(isFeatured).sort(order).map(strip);
   const archive = ranked.filter((e) => !isFeatured(e)).sort(order).map(strip);
   const inProgress = exhibits.filter((e) => e._inProgress).sort(order).map(strip);
-  const skills = groupSkills(allSkills, allLanguages, soft);
+  const skills = groupSkills(exhibits, allLanguages, soft);
 
   const banner = `// ⚠ AUTO-GENERATED by scripts/sync-github.mjs — do not edit by hand.\n// Run \`npm run sync:github\` (or let the scheduled GitHub Action) to regenerate.\n`;
   const body =

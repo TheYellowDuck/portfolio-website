@@ -2,6 +2,10 @@ import { TILES } from "@/game/tile-ids";
 import { LINKS } from "@/lib/site";
 // Projects + skills are auto-generated from GitHub — see scripts/sync-github.mjs.
 import { generatedMainHall, generatedInProgress, generatedArchive, generatedSkills } from "./github.generated";
+// Coursework skills are derived dynamically from the parsed transcript (see lib/course-skills).
+import transcript from "@/data/transcript.generated.json";
+import { deriveCourseworkSkills } from "@/lib/course-skills";
+import type { TranscriptData } from "@/types/transcript";
 
 // ============================================================
 // EXHIBIT — One simple type for everything
@@ -73,7 +77,14 @@ export const mainHallExhibits: Exhibit[] = generatedMainHall;
 export const inProgressExhibits: Exhibit[] = generatedInProgress;
 
 // Tile 12 — SKILLS & TECH WING
-export const skillsExhibits: Exhibit[] = generatedSkills;
+// Auto-generated repo skills, plus a dynamic "Coursework" group derived from the transcript.
+const courseworkSkills = deriveCourseworkSkills(transcript as unknown as TranscriptData);
+export const skillsExhibits: Exhibit[] = [
+  ...generatedSkills,
+  ...(courseworkSkills.length
+    ? [{ popup: { title: "Coursework", description: "Skills from my University of Waterloo coursework.", tech: courseworkSkills } }]
+    : []),
+];
 
 // Tile 13 — ARCHIVE / OTHER PROJECTS
 export const archiveExhibits: Exhibit[] = generatedArchive;

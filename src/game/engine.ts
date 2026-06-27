@@ -105,6 +105,7 @@ export class GameEngine {
   private idleTimer = 0;
   private idleFired = false;
   private currentNearby: Interactable | null = null;
+  private lastNearby: Interactable | null = null; // retained so the floating label can fade OUT after you walk away
   private labelAlpha = 0; // fades the floating exhibit-name label in/out
   private labelFont = '500 16px ui-monospace, monospace'; // set from --font-pixel in the constructor
 
@@ -405,7 +406,8 @@ export class GameEngine {
 
     // The exhibit's name floats in above it while you're standing at it (not the secret duck).
     const labelOn = !!(this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && exhibitLabel(this.currentNearby.content.popup));
-    this.labelAlpha += ((labelOn ? 1 : 0) - this.labelAlpha) * Math.min(1, dt * 14);
+    if (labelOn) this.lastNearby = this.currentNearby; // keep it so the label can fade out after leaving
+    this.labelAlpha += ((labelOn ? 1 : 0) - this.labelAlpha) * Math.min(1, dt * 9);
 
     // Sparkles rise from the pedestal while the player lingers nearby (but not
     // from the easter-egg duck).
@@ -528,7 +530,7 @@ export class GameEngine {
   // Floating name above the exhibit you're standing at — just text (dark-outlined for
   // legibility over the floor), no plaque.
   private drawExhibitLabel() {
-    const near = this.currentNearby;
+    const near = this.lastNearby;
     if (this.labelAlpha < 0.02 || !near || near.tileType === TILES.EASTER_EGG) return;
     const title = exhibitLabel(near.content.popup);
     if (!title) return;

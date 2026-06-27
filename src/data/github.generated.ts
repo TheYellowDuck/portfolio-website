@@ -140,15 +140,15 @@ export const generatedMainHall: Exhibit[] = [
   {
     "popup": {
       "title": "RAG Codebase",
-      "description": "A code-aware retrieval-augmented generation (RAG) system for asking natural-language questions about a codebase and getting grounded, citation-backed answers. It chunks source on AST boundaries with tree-sitter (not character windows), retrieves with hybrid dense + BM25 search fused by Reciprocal Rank Fusion and cross-encoder reranking, builds a code graph (imports / calls / containment) with personalized PageRank for connected context, answers with Claude using [n] citations plus an LLM-as-judge faithfulness check, and — the centerpiece — ships a rigorous evaluation harness (recall@k / MRR / NDCG, bootstrap confidence intervals, paired significance tests). Provider-agnostic (Anthropic or any OpenAI-compatible endpoint, incl. local Ollama); semantic search via sentence-transformers embeddings with an optional HNSW (approximate nearest neighbor) backend for scale. New to RAG / embeddings / the eval methodology? Start with docs/LEARN.md, a from-scratch walkthrough. Design rationale lives in outline.md; the full measured write-up is RESULTS.md. language specs (Python, JS, TS, Go, Rust, Ruby, Java, C/C++, C, PHP, Kotlin, Scala, Swift, Lua, Bash, Perl, Objective-C) + a generic pattern classifier, with line-window fallback. by Reciprocal Rank Fusion, reranked by a cross-encoder. resolution; personalized-PageRank traversal for connected, token-cheap context. don't cover this\"), and a RAGAS-style faithfulness check that verifies each claim against its cited source. endpoint (OpenRouter, Together, Groq, Azure, local Ollama / LM Studio / vLLM). confidence intervals, paired-bootstrap significance, a holdout split, and ablations. (full retriever), so quality is validated off the self-made golden set. significant recall gain (+0.086, p<0.001) that also lifts answer-correctness. brute-force matmul is the default. hierarchical layouts) plus a live localhost server with persistent edits + reset. Cursor, Claude Desktop). (retry/backoff + timeouts), and secret hygiene (gitignored dotenv + secret scanner, CI). The pipeline is digest once, probe per query. At index time: discover files → AST-chunk → embed (header + code) into a vector store → tokenize into a BM25 index → build the code graph → persist. At query time: embed the question → dense + BM25 search → RRF fuse → (rerank) → grounded answer with citations → faithfulness verification. Design decisions, each empirically motivated: retrieves as noise. Chunks land on definition boundaries: methods are their own chunks, classes get a summary chunk, oversized functions are windowed carrying their signature, and a module chunk captures imports + top-level code. A chunk's id is its file:line location, so the retrieved unit is already its own citation. / docstring — the embedding then carries location and signature, exactly what code queries key off. (The header is embedded, not displayed.) embeddings smear together; BM25 nails them, aided by a code-aware tokenizer that splits getcurrentuser / getCurrentUser. Dense and lexical lists are fused by Reciprocal Rank Fusion (rank-based, so no score calibration) and reranked by a cross-encoder. connected chunks (callees, callers, imports, enclosing class) via a dictionary lookup, so the model gets a few precise neighbors plus a compact structural map instead of whole files. into atomic claims and checks each against its cited source (faithfulness = supported / total), backed by a free structural check that every [n] resolves to a real source. contribution, reported with confidence intervals and paired significance rather than vibes. A real CodeIndex subgraph this repo emits (graph-export --symbol CodeIndex --format mermaid): The value isn't \"it works\" — it's measuring what moves the needle and reporting the negatives: 1. The embedder is the dominant lever — a code-trained model lifted recall@5 0.83 → 0.97 (0.70 → 0.97 on direct lookups), confirmed externally on CodeSearchNet. 2. A hybrid \"win\" that was a confound — caught and killed.",
+      "description": "A code-aware retrieval-augmented generation (RAG) system for asking natural-language questions about a codebase and getting grounded, citation-backed answers. It chunks source on AST boundaries with tree-sitter (not character windows), retrieves with hybrid dense + BM25 search fused by Reciprocal Rank Fusion (with an optional cross-encoder and the measured-best listwise LLM reranker), builds a code graph (imports / calls / containment) with personalized PageRank for connected context, answers with Claude using [n] citations plus an LLM-as-judge faithfulness check, and — the centerpiece — ships a rigorous evaluation harness (recall@k / MRR / NDCG, bootstrap confidence intervals, paired significance tests). Provider-agnostic (Anthropic or any OpenAI-compatible endpoint, incl. local Ollama); semantic search via sentence-transformers embeddings with an optional HNSW (approximate nearest neighbor) backend for scale. New to RAG / embeddings / the eval methodology? Start with docs/LEARN.md, a from-scratch walkthrough. Design rationale lives in outline.md; the full measured write-up is RESULTS.md. language specs (Python, JS, TS, Go, Rust, Ruby, Java, C/C++, C, PHP, Kotlin, Scala, Swift, Lua, Bash, Perl, Objective-C) + a generic pattern classifier, with line-window fallback. by Reciprocal Rank Fusion; an optional cross-encoder and a validated listwise LLM reranker refine the pool (the cross-encoder is off by default — measured net-negative on code, §3d). resolution; personalized-PageRank traversal for connected, token-cheap context. don't cover this\"), and a RAGAS-style faithfulness check that verifies each claim against its cited source. endpoint (OpenRouter, Together, Groq, Azure, local Ollama / LM Studio / vLLM). confidence intervals, paired-bootstrap significance, a holdout split, and ablations. (full retriever), so quality is validated off the self-made golden set. significant recall gain (+0.086, p<0.001) that also lifts answer-correctness. brute-force matmul is the default. hierarchical layouts) plus a live localhost server with persistent edits + reset. Cursor, Claude Desktop). (retry/backoff + timeouts), and secret hygiene (gitignored dotenv + secret scanner, CI). The pipeline is digest once, probe per query. At index time: discover files → AST-chunk → embed (header + code) into a vector store → tokenize into a BM25 index → build the code graph → persist. At query time: embed the question → dense + BM25 search → RRF fuse → (rerank) → grounded answer with citations → faithfulness verification. Design decisions, each empirically motivated: retrieves as noise. Chunks land on definition boundaries: methods are their own chunks, classes get a summary chunk, oversized functions are windowed carrying their signature, and a module chunk captures imports + top-level code. A chunk's id is its file:line location, so the retrieved unit is already its own citation. / docstring — the embedding then carries location and signature, exactly what code queries key off. (The header is embedded, not displayed.) embeddings smear together; BM25 nails them, aided by a code-aware tokenizer that splits getcurrentuser / getCurrentUser. Dense and lexical lists are fused by Reciprocal Rank Fusion (rank-based, so no score calibration). A cross-encoder reranker is wired in but off by default (measured net-negative on code retrieval — §3d); the listwise LLM reranker (--accurate) is the validated accuracy lever. connected chunks (callees, callers, imports, enclosing class) via a dictionary lookup, so the model gets a few precise neighbors plus a compact structural map instead of whole files. into atomic claims and checks each against its cited source (faithfulness = supported / total), backed by a free structural check that every [n] resolves to a real source. contribution, reported with confidence intervals and paired significance rather than vibes.",
       "tech": [
         "Python",
         "GitHub Actions",
         "pip",
         "NumPy",
+        "PyTorch",
         "OpenAI API",
         "Anthropic API",
-        "PyTorch",
         "Transformers",
         "DevOps",
         "Testing",
@@ -2154,11 +2154,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "C++",
+        "Python",
         "TypeScript",
         "JavaScript",
         "C++",
-        "Python",
         "Jupyter Notebook",
         "Java",
         "CSS",
@@ -2170,28 +2169,199 @@ export const generatedSkills: Exhibit[] = [
   },
   {
     "popup": {
-      "title": "Concepts",
+      "title": "AI & ML",
       "tech": [
-        "Computer Vision",
+        "OpenAI API",
+        "Anthropic API",
+        "Transformers",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic Search & Embeddings",
+        "Listwise LLM reranking",
+        "LLM-as-Judge Evaluation",
+        "Prompt engineering",
         "Machine Learning",
-        "Data Analysis",
-        "Web Development",
-        "Backend / APIs",
-        "Game Development",
-        "Mobile Development",
-        "DevOps",
-        "Algorithms & DS",
-        "Automation / Scraping",
-        "OOP & Design Patterns",
-        "Concurrency",
+        "Generative AI / LLMs",
+        "Reinforcement Learning from Human Feedback (RLHF)",
+        "Supervised fine-tuning (SFT)",
+        "Deep learning with PyTorch",
+        "Parameter-efficient fine-tuning",
+        "Provider-agnostic LLM abstraction",
+        "Computer Vision",
+        "LLM application development"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Algorithms & DS",
+      "tech": [
+        "Hybrid search",
+        "Code graph construction",
+        "Performance optimization",
+        "A* Pathfinding",
+        "Custom data structure design",
+        "Intrusive data structures",
+        "Cache optimization",
+        "Algorithms & Data Structures",
+        "Proximal Policy Optimization (PPO)",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
+        "Data Structures",
+        "Graph algorithms",
+        "Graph traversal & validation",
+        "Combinatorics & Math",
+        "Dynamic programming",
+        "Complexity & optimization",
+        "Algorithmic navigation",
+        "Breadth-first search",
+        "State-space reduction",
+        "BFS flow-field pathfinding",
+        "Graph Connectivity Analysis",
+        "Constraint-propagation solver"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Statistics & Evaluation",
+      "tech": [
+        "Evaluation methodology",
+        "Statistical rigor",
+        "Reproducibility and static analysis",
+        "Significance testing",
+        "Reproducible experiment logging"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Concurrency & Networking",
+      "tech": [
+        "Multiplayer presence",
+        "Real-time animation",
         "Networking",
-        "Game Physics",
-        "Game AI",
+        "Concurrency",
+        "Wait-free synchronization",
+        "Distributed Systems",
+        "Distributed / multi-GPU training",
+        "Parallel evaluation",
+        "Thread-safe state",
+        "Real-time control loop",
+        "Background processing",
+        "Producer–consumer queue",
+        "Real-time state propagation"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "3D Graphics",
+      "tech": [
+        "OpenGL",
+        "3D graphics programming",
+        "Ray-cast picking"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Systems & Embedded",
+      "tech": [
+        "Robotics & Embedded"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Security & Crypto",
+      "tech": [
+        "Security & secret hygiene"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Compilers & Languages",
+      "tech": [
+        "AST parsing",
+        "Tokenization"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Game AI",
+      "tech": [
+        "Procedural generation",
+        "State-machine AI",
+        "Game AI & steering behaviours"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "UI & 2D",
+      "tech": [
+        "HTML5 Canvas rendering",
+        "GUI programming",
+        "Declarative UI",
+        "Reactive state management",
+        "Material Design 3",
+        "UX engineering",
+        "Swing GUI from scratch",
+        "Off-screen rendering",
+        "Pan & zoom UX",
+        "Interaction design",
+        "Sprite animation system",
+        "Custom 2D rendering",
+        "Interactive UI",
+        "Animation",
+        "2D rendering",
+        "Dynamic UI scaling"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Architecture & Design",
+      "tech": [
+        "Game engine architecture",
+        "Factory pattern",
+        "Object-Oriented Design",
+        "Provider abstraction (strategy pattern)",
+        "Autonomous navigation",
+        "MVVM architecture",
+        "Local persistence",
+        "Repository design pattern",
+        "Navigation",
+        "Lifecycle awareness",
+        "Cross-browser abstraction",
+        "Data modelling",
+        "Persistence",
+        "Inheritance & polymorphism",
+        "Game loop architecture",
+        "Game state management",
+        "Object lifecycle management",
+        "Polymorphism & abstract base classes",
+        "Inheritance",
+        "Model–view separation (MVC)",
+        "Application lifecycle handling"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Testing & Delivery",
+      "tech": [
+        "CI/CD & DevOps",
         "Testing",
-        "3D Graphics",
-        "Robotics & Embedded",
-        "Compilers & Languages",
-        "Distributed Systems"
+        "Property-Based Testing",
+        "Packaging",
+        "Gradle build system",
+        "Shipping to production",
+        "JAR Packaging",
+        "Debugging with invariants",
+        "Cross-Platform Builds"
       ]
     }
   },
@@ -2199,8 +2369,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
-        "React",
         "Next.js",
+        "React",
         "Swing",
         "Jetpack Compose",
         "SDL2"
@@ -2212,11 +2382,11 @@ export const generatedSkills: Exhibit[] = [
       "title": "ML / Data",
       "tech": [
         "NumPy",
-        "Pandas",
-        "scikit-learn",
         "PyTorch",
+        "Pandas",
         "Matplotlib",
-        "SciPy"
+        "SciPy",
+        "scikit-learn"
       ]
     }
   },
@@ -2224,19 +2394,178 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "Docker",
         "GitHub Actions",
-        "Make",
-        "CMake",
-        "Tailwind",
-        "Vitest",
-        "Playwright",
-        "ESLint",
-        "TypeScript",
-        "Gradle",
         "pip",
+        "TypeScript",
+        "Vitest",
+        "ESLint",
+        "Tailwind",
+        "CMake",
+        "Playwright",
+        "Docker",
+        "Make",
+        "Gradle",
         "JUnit",
         "Selenium"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Concepts & Practices",
+      "tech": [
+        "Assembly",
+        "Cross-encoder reranking",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "Grounded generation",
+        "Provider-agnostic API design",
+        "Benchmarking",
+        "Incremental computation",
+        "Resilience engineering",
+        "Interactive data visualization",
+        "HTTP server",
+        "CLI design",
+        "MCP (Model Context Protocol) server",
+        "Data Analysis",
+        "Backend / APIs",
+        "Framer Motion",
+        "R",
+        "GraphQL",
+        "REST",
+        "Collision detection & physics",
+        "Particle systems",
+        "React and Next.js (App Router)",
+        "REST API and route handlers",
+        "Redis with Upstash REST API",
+        "External API integration",
+        "PDF parsing",
+        "Accessibility and performance",
+        "Web Development",
+        "Game Development",
+        "Automation / Scraping",
+        "Game Physics",
+        "Low-latency systems programming",
+        "Bit manipulation",
+        "Custom memory allocation",
+        "Open-addressing hash map",
+        "Lock-free programming",
+        "C++ memory model",
+        "Template metaprogramming",
+        "Matching-engine domain",
+        "Financial-exchange order types",
+        "Event sourcing and deterministic replay",
+        "Pre-trade risk management",
+        "Binary protocol design",
+        "Fuzzing",
+        "Sanitizers",
+        "Benchmarking methodology",
+        "Build and CI engineering",
+        "Policy-gradient methods",
+        "Reward modeling",
+        "Generalized Advantage Estimation (GAE)",
+        "Adaptive KL control",
+        "Numerical stability",
+        "Reward-hacking mitigation",
+        "Checkpointing and resumability",
+        "Software design",
+        "LiteLLM",
+        "Pillow",
+        "JavaScript",
+        "HTML",
+        "ReAct agent loop",
+        "Reflection / self-correction",
+        "Accessibility-tree observation",
+        "Set-of-Marks visual grounding",
+        "Structured outputs",
+        "Prompt caching",
+        "Typed action space with validation",
+        "Browser automation",
+        "Deterministic benchmark scoring",
+        "Failure taxonomy",
+        "Data visualization",
+        "Rate-limit resilience",
+        "Docker sandbox integration",
+        "Anti-hallucination engineering",
+        "Cost/token accounting",
+        "Requests",
+        "Hierarchical classification",
+        "Rate-limit handling",
+        "Fault tolerance",
+        "Crash-safe file operations",
+        "Secrets management",
+        "Content extraction",
+        "Cost engineering",
+        "Privacy engineering",
+        "Automatic dependency management",
+        "C++",
+        "C++ fundamentals",
+        "Practical utilities",
+        "Teaching & mentoring",
+        "Self-directed learning",
+        "Processing",
+        "Competitive programming",
+        "Sorting & searching",
+        "Tree & set structures",
+        "String processing",
+        "Computational geometry",
+        "Multi-language fluency",
+        "Image processing",
+        "Sensor integration & fusion",
+        "Motor control",
+        "Maze mapping",
+        "Bitmasking & state encoding",
+        "Serial communication",
+        "Iterative engineering",
+        "Hardware calibration",
+        "Local notifications",
+        "Preferences storage",
+        "Component reuse",
+        "Mobile Development",
+        "Anti-bot stealth",
+        "Dynamic web scraping",
+        "Set operations",
+        "Robust error handling",
+        "Automatic driver management",
+        "Clipboard integration",
+        "Grayscale conversion",
+        "Image scaling",
+        "Keyboard shortcut system",
+        "Layout management",
+        "Error handling",
+        "Java",
+        "Input handling",
+        "Audio playback",
+        "Tile-map system",
+        "File I/O",
+        "Combat systems design",
+        "Java Platform Module System",
+        "Entity–component modelling",
+        "Spatial partitioning",
+        "Game systems design",
+        "Performance optimisation",
+        "Go",
+        "Game-rule engine",
+        "BFS flood-fill",
+        "Ko-rule detection",
+        "Suicide-move prevention",
+        "Territory scoring",
+        "Processing framework",
+        "Event-driven programming",
+        "Vector math",
+        "Collision & hit detection",
+        "Stochastic behaviour",
+        "Probabilistic reasoning",
+        "Procedural graphics",
+        "Strategy-style effect system",
+        "RAII & smart pointers",
+        "Modern C++20",
+        "Collision detection",
+        "Conditional compilation",
+        "Command parsing",
+        "Game logic",
+        "Vector math & trigonometry",
+        "Separation of concerns"
       ]
     }
   },
@@ -2248,34 +2577,11 @@ export const generatedSkills: Exhibit[] = [
         "Technical Writing"
       ]
     }
-  },
-  {
-    "popup": {
-      "title": "More",
-      "tech": [
-        "R",
-        "Framer Motion",
-        "GraphQL",
-        "REST",
-        "Anthropic API",
-        "Transformers",
-        "Generative AI / LLMs",
-        "Statistics & Evaluation",
-        "OpenAI API",
-        "Assembly",
-        "LiteLLM",
-        "Pillow",
-        "HTML",
-        "Requests",
-        "OpenGL",
-        "Go"
-      ]
-    }
   }
 ];
 
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-26T15:44:47.645Z"
+  "syncedAt": "2026-06-26T16:20:30.175Z"
 };

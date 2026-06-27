@@ -18,8 +18,8 @@ import { content } from "@/content";
 import Reveal from "./Reveal";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
-import { SKILL_GROUP_COLORS } from "@/lib/skill-colors";
 import Masonry from "./Masonry";
+import SkillBlobs from "./SkillBlobs";
 import ArchiveScroller from "./ArchiveScroller";
 import CpStats from "@/components/CpStats";
 import { useIsMac } from "@/lib/use-is-mac";
@@ -91,9 +91,6 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   // Height estimates for masonry balancing, so columns pack evenly (no exposed seam).
   // A project card with a demo/thumbnail (aspect-video) is ~twice the height of one without.
   const cardWeight = (popup: ExhibitPopup) => (popup.videoUrl || popup.embedUrl ? 2 : 1);
-  // A skill card's height is driven by its pill count (≈ rows) plus title/description.
-  const skillWeight = (popup: ExhibitPopup) =>
-    1 + (popup.description ? 1.4 : 0) + Math.ceil((popup.tech?.length ?? 0) / 3.5) * 0.8;
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
   const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
   const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
@@ -201,27 +198,11 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* ── Skills ── */}
       <Section id="skills" eyebrow={content.sections.skills.eyebrow} title={content.sections.skills.title}>
-        <Masonry sm={2} lg={3} weights={skillsExhibits.filter((e) => e.popup).map((e) => skillWeight(e.popup as ExhibitPopup))} items={skillsExhibits.flatMap((e, i) => {
-            if (!e.popup) return [];
-            const c = SKILL_GROUP_COLORS[i % SKILL_GROUP_COLORS.length];
-            return [(
-              <Reveal key={i} delay={(i % 3) * 60}>
-                <div className="rounded-xl border bg-surface p-5" style={{ borderColor: c.border }}>
-                  <h3 className="font-display text-[16px] font-semibold" style={{ color: c.solid }}>{e.popup.title}</h3>
-                  {e.popup.description && (
-                    <p className="mt-1.5 text-[13px] leading-relaxed dark:leading-[1.72] text-walnut/70">{e.popup.description}</p>
-                  )}
-                  {e.popup.tech && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {e.popup.tech.map((t) => (
-                        <span key={t} className="rounded border px-2 py-0.5 font-mono text-[11px] text-walnut/85" style={{ background: c.bg, borderColor: c.border }}>{t}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-            )];
-          })} />
+        <SkillBlobs
+          groups={skillsExhibits.flatMap((e) =>
+            e.popup?.title ? [{ title: e.popup.title, description: e.popup.description, items: e.popup.tech ?? [] }] : [],
+          )}
+        />
       </Section>
 
       {/* ── About ── */}
