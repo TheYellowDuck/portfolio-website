@@ -2,6 +2,7 @@ import { TILES } from "@/game/tile-ids";
 import { LINKS } from "@/lib/site";
 // Projects + skills are auto-generated from GitHub — see scripts/sync-github.mjs.
 import { generatedMainHall, generatedInProgress, generatedArchive, generatedSkills } from "./github.generated";
+import { generatedSkillCategories } from "./skill-categories.generated";
 // Coursework skills are derived dynamically from the parsed transcript (see lib/course-skills).
 import transcript from "@/data/transcript.generated.json";
 import { deriveCourseworkSkills } from "@/lib/course-skills";
@@ -86,15 +87,21 @@ export const skillsExhibits: Exhibit[] = [
     : []),
 ];
 
-// Maps a skill/tech name → the category (skill group) it belongs to, so bare chips on project,
-// experience, and archive cards can be coloured by their category — the same colour scheme as the
-// Skills wing. First group to claim a name wins. Names not in any group fall back to neutral.
+// Maps a skill/tech name → the category it belongs to, so bare chips on project, experience, and
+// archive cards can be coloured by their category — the same scheme as the Skills wing. The wing's
+// aggregated groups come FIRST (authoritative category for each canonical name), then each project's
+// own `popup.skills` groups (whose RAW strings match the card chips, so aliased concept phrases like
+// "Object-oriented design" still resolve). First claim wins. Names in no group fall back to neutral.
 export const skillCategoryMap: Record<string, string> = {};
-for (const e of skillsExhibits) {
-  const category = e.popup?.title;
-  if (!category || !e.popup?.tech) continue;
-  for (const item of e.popup.tech) if (!(item in skillCategoryMap)) skillCategoryMap[item] = category;
-}
+const claimSkill = (name: string, category: string) => {
+  if (name && category && !(name in skillCategoryMap)) skillCategoryMap[name] = category;
+};
+for (const e of skillsExhibits) for (const item of e.popup?.tech ?? []) claimSkill(item, e.popup?.title ?? "");
+for (const e of [...generatedMainHall, ...generatedInProgress, ...generatedArchive])
+  for (const g of e.popup?.skills ?? []) for (const item of g.items) claimSkill(item, g.category);
+// Static taxonomy fallback (from the config) — colours tech that never appears in a scanned repo,
+// e.g. Experience-only tools, so no chip is left uncategorised.
+for (const [name, category] of Object.entries(generatedSkillCategories)) claimSkill(name, category);
 
 // Tile 13 — ARCHIVE / OTHER PROJECTS
 export const archiveExhibits: Exhibit[] = generatedArchive;

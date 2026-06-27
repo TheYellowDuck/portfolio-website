@@ -201,3 +201,12 @@ export const SKILL_CATEGORY = {
   Databases: ["PostgreSQL", "MySQL", "MongoDB", "SQLAlchemy", "Prisma", "GORM"],
   Tools: ["Docker", "GitHub Actions", "Make", "CMake", "Vite", "Webpack", "Rollup", "Tailwind", "Jest", "Vitest", "Cypress", "Playwright", "ESLint", "Prettier", "Storybook", "TypeScript", "Git", "Gradle", "Maven", "pip", "JUnit", "Selenium", "Vercel", "Netlify", "Kubernetes", "Terraform"],
 };
+
+// Skill/tech names that should be COLOUR-categorised but aren't part of repo skill-detection — e.g.
+// tech that only appears in hand-written Experience entries. Read by scripts/gen-skill-categories.mjs
+// (NOT by the sync) to give every chip a category colour. Categories must match the ones the Skills
+// wing uses (Languages, Frameworks, ML / Data, Databases, Tools, or a concept name).
+export const EXTRA_SKILL_CATEGORIES = {
+  Languages: ["XML", "Groovy", "Bash/Shell"],
+  Frameworks: ["Android SDK", "Android Automotive OS"],
+};

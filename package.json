@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "sync:github": "node scripts/sync-github.mjs",
+    "sync:github": "node scripts/sync-github.mjs && node scripts/gen-skill-categories.mjs",
     "sync:cp-stats": "node scripts/sync-cp-stats.mjs",
     "sync:docs": "node --experimental-strip-types scripts/sync-docs.mts"
   },
