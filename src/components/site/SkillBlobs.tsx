@@ -19,6 +19,12 @@ const SCROLL_RAMP = 1100;    // ms to ease the speed up on (re)start AND down to
 
 // Shared chip look — identical to the project cards, so a skill reads the same everywhere.
 const CHIP_CLASS = "rounded border px-2 py-0.5 font-mono text-[11px]";
+// Soft top/bottom edge fade for the scrolling chip band, so chips dissolve in/out instead of clipping.
+// Percentage-based + multi-stop (eased) for a long, seamless dissolve that scales with the orb.
+const SCROLL_FADE =
+  "linear-gradient(to bottom," +
+  " transparent 0%, rgba(0,0,0,0.12) 2%, rgba(0,0,0,0.5) 5%, #000 9%," +
+  " #000 91%, rgba(0,0,0,0.5) 95%, rgba(0,0,0,0.12) 98%, transparent 100%)";
 
 // Paper disc with a soft top sheen + deeper underside, plus the group's hue (from skillColorFor) as a
 // top-down wash on the surface. Dark needs a touch more wash to read on the dark surface.
@@ -247,7 +253,11 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                         <div
                           ref={viewportRef}
                           className="mt-3 w-full overflow-hidden overscroll-contain"
-                          style={{ maxHeight: expandedR, touchAction: loop ? "none" : undefined }}
+                          style={{
+                            maxHeight: expandedR,
+                            touchAction: loop ? "none" : undefined,
+                            ...(loop ? { maskImage: SCROLL_FADE, WebkitMaskImage: SCROLL_FADE } : {}),
+                          }}
                         >
                           <div ref={trackRef} className="flex flex-col items-center gap-1.5" style={{ willChange: loop ? "transform" : undefined }}>
                             <div ref={copyRef} className={chipRow}>{chips}</div>
