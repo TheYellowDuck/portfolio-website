@@ -270,16 +270,21 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
    Swipe left/right switches the top card; it also auto-advances on a timer
    (paused while dragging, while a popup is open, off-screen, or reduced-motion). */
 const DECK_DWELL = 3500; // ms between auto-advances
-// The transform for a card at depth `o`: 0 = front, 1/2 = fanned behind, -1 = the visible card at
-// the BOTTOM of the pile, otherwise tucked fully behind (hidden, used for entering/leaving).
-// Advancing just changes each card's depth, so swiping forward sends the top card down to the
-// visible bottom, and swiping back lifts the bottom card up to the front.
+const DECK_MOVE = 0.95;  // s — glide duration for advancing a card (manual swipe AND auto), kept
+                         // deliberately slow so the stack motion reads clearly
+// The transform for a card at depth `o`: 0 = front. UPCOMING cards (o = 1/2) stack up-and-behind,
+// peeking above the front; the JUST-SEEN card (o = -1) slips down and out the bottom. Keeping those
+// two directions opposite is what makes the motion read: advancing forward sends the front card DOWN
+// and out while the next drops in from above, and swiping back is the exact mirror — the front
+// recedes UP into the stack while the previous card rises from the bottom to the front. Cards beyond
+// the fan are tucked fully out of view (used for entering/leaving) on the correct edge.
 function deckSlot(o: number) {
   if (o === 0) return { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 30 };
-  if (o === 1) return { x: -12, y: 8, rotate: -4, scale: 0.965, opacity: 1, zIndex: 20 };
-  if (o === 2) return { x: 13, y: 16, rotate: 5, scale: 0.93, opacity: 1, zIndex: 10 };
-  if (o === -1) return { x: 0, y: 24, rotate: -2, scale: 0.9, opacity: 1, zIndex: 6 }; // bottom of the pile
-  return { x: 0, y: 30, rotate: 0, scale: 0.82, opacity: 0, zIndex: 3 }; // hidden (entering / leaving)
+  if (o === 1) return { x: -16, y: -18, rotate: -5, scale: 0.95, opacity: 1, zIndex: 20 };
+  if (o === 2) return { x: 16, y: -34, rotate: 6, scale: 0.9, opacity: 1, zIndex: 10 };
+  if (o === -1) return { x: 0, y: 34, rotate: -2, scale: 0.9, opacity: 1, zIndex: 6 }; // slipping out the bottom
+  if (o > 0) return { x: 0, y: -52, rotate: 0, scale: 0.84, opacity: 0, zIndex: 3 };   // hidden above (upcoming)
+  return { x: 0, y: 60, rotate: 0, scale: 0.82, opacity: 0, zIndex: 3 };               // hidden below (just left)
 }
 
 const hash = (s: number) => { const v = Math.sin(s * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
@@ -339,14 +344,38 @@ function DeckCard({ item }: { item: ArchiveItem }) {
 // to the back can finish animating there before unmounting.
 const DECK_WINDOW = [-2, -1, 0, 1, 2];
 
+type Slot = { x: number; y: number; rotate: number; scale: number; opacity: number; zIndex: number };
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+// Blend two slots by t for the live drag. `onTop` forces the card you're pulling in (the one that
+// follows your finger) above the rest so it reads as the active card — z-index can't tween.
+function blendSlot(a: Slot, b: Slot, t: number, onTop: boolean): Slot {
+  return {
+    x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), rotate: lerp(a.rotate, b.rotate, t),
+    scale: lerp(a.scale, b.scale, t), opacity: lerp(a.opacity, b.opacity, t),
+    zIndex: onTop ? 40 : t < 0.5 ? a.zIndex : b.zIndex,
+  };
+}
+
+const SWIPE_FULL = 170;    // px of horizontal drag == a full advance to the next/previous card
+const SWIPE_COMMIT = 0.32; // release past this fraction commits the advance; below it snaps back
+
 function Deck({ items, onOpen }: ArchiveScrollerProps) {
   const n = items.length;
   const [index, setIndex] = useState(0);
+  // Live horizontal drag: dir (+1 = forward, -1 = back) and progress 0..1 toward committing. The ref
+  // mirrors it so the pointer-up handler reads the latest value synchronously. null = at rest.
+  const [drag, setDrag] = useState<{ dir: 1 | -1; p: number } | null>(null);
+  const dragRef = useRef(drag);
+  const setDragBoth = (v: { dir: 1 | -1; p: number } | null) => { dragRef.current = v; setDrag(v); };
   const interacting = useRef(false);
-  const dragged = useRef(false); // true through a drag, so a swipe doesn't fire onTap (open)
   const visibleRef = useRef(true);
+  // Per-advance glide duration (s). Normally the slow DECK_MOVE; the spin-to-stop entrance briefly
+  // overrides it for the fast riffle. A ref so changing it doesn't itself trigger a re-render.
+  const moveDur = useRef(DECK_MOVE);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  // Raw pointer-drag bookkeeping (in a ref so per-move updates don't each re-render until we setDrag).
+  const pointer = useRef<{ id: number; x0: number; y0: number; axis: "" | "x" | "y" } | null>(null);
   const at = (o: number) => items[(((index + o) % n) + n) % n];
 
   // Auto-advance — restarted on every advance, so a manual swipe resets the timer.
@@ -358,7 +387,7 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
       if (visibleRef.current && !modal && !interacting.current) setIndex((i) => i + 1);
     }, DECK_DWELL);
   }, []);
-  const advance = (d: number) => { setIndex((i) => i + d); restart(); };
+  const advance = useCallback((d: number) => { setIndex((i) => i + d); restart(); }, [restart]);
 
   useEffect(() => {
     if (n === 0) return;
@@ -368,33 +397,69 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
     return () => { if (timer.current) clearInterval(timer.current); io.disconnect(); };
   }, [n, restart]);
 
+  // Manual horizontal swipe. Drag LEFT (forward) pulls the FRONT card down and out while the next
+  // drops in from above; drag RIGHT (back) pulls the PREVIOUS card up from the bottom to the front —
+  // so the card that follows your finger is always the one you're bringing in, not whatever's on top.
+  // Vertical drags are handed back to the page (touch-action: pan-y) so it still scrolls.
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (pointer.current) return;
+    pointer.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, axis: "" };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const pt = pointer.current;
+    if (!pt || e.pointerId !== pt.id) return;
+    const dx = e.clientX - pt.x0, dy = e.clientY - pt.y0;
+    if (pt.axis === "") {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      pt.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (pt.axis === "x") { wrapRef.current?.setPointerCapture?.(pt.id); interacting.current = true; }
+    }
+    if (pt.axis !== "x") return;
+    setDragBoth({ dir: dx < 0 ? 1 : -1, p: Math.min(Math.abs(dx) / SWIPE_FULL, 1) });
+  };
+  const endPointer = (e: React.PointerEvent) => {
+    const pt = pointer.current;
+    if (!pt || e.pointerId !== pt.id) return;
+    pointer.current = null;
+    if (pt.axis === "x") {
+      interacting.current = false;
+      const cur = dragRef.current;
+      setDragBoth(null);
+      if (cur && cur.p >= SWIPE_COMMIT) advance(cur.dir);
+      else restart();
+    } else if (pt.axis === "") {
+      onOpen(at(0).popup); // a tap (no drag) opens the front card
+    }
+  };
+
   if (n === 0) return null;
 
   return (
-    <div ref={wrapRef} className="relative mx-auto h-[440px] w-full max-w-[330px] touch-pan-y select-none">
+    // `isolate` keeps the cards' z-indices (up to 40) in their own stacking context so they tuck
+    // UNDER the sticky nav (z-20) — once the parent Reveal's transform/opacity context clears, the
+    // cards would otherwise paint over the header.
+    <div
+      ref={wrapRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endPointer}
+      onPointerCancel={endPointer}
+      style={{ touchAction: "pan-y" }}
+      className="relative isolate mx-auto h-[440px] w-full max-w-[330px] cursor-grab select-none active:cursor-grabbing"
+    >
       {DECK_WINDOW.map((o) => {
-        const front = o === 0;
+        // While dragging, blend each card from its slot toward the slot one advance away (the active
+        // card — the one being pulled in — rides on top). At rest, settle into the lightly-messy fan.
+        const slot = drag
+          ? blendSlot(deckSlot(o), deckSlot(o - drag.dir), drag.p, o === (drag.dir === 1 ? 0 : -1))
+          : deckTarget(o, index + o);
         return (
           <motion.div
             key={(((index + o) % n) + n) % n} // keyed by item, so depth changes animate the same card
-            className={`absolute inset-0 ${front ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"}`}
+            className="pointer-events-none absolute inset-0"
             initial={deckSlot(o >= 0 ? o + 1 : o - 1)} // mount from the adjacent hidden slot
-            animate={deckTarget(o, index + o)}
-            transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-            {...(front
-              ? {
-                  drag: "x" as const,
-                  dragConstraints: { left: 0, right: 0 },
-                  dragElastic: 0.6,
-                  onDragStart: () => { interacting.current = true; dragged.current = true; },
-                  onDragEnd: (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-                    interacting.current = false;
-                    if (Math.abs(info.offset.x) > 90 || Math.abs(info.velocity.x) > 450) advance(info.offset.x < 0 ? 1 : -1);
-                    setTimeout(() => { dragged.current = false; }, 0);
-                  },
-                  onTap: () => { if (!dragged.current) onOpen(at(0).popup); },
-                }
-              : {})}
+            animate={slot}
+            transition={drag ? { duration: 0 } : { duration: moveDur.current, ease: [0.22, 1, 0.36, 1] }}
           >
             <DeckCard item={at(o)} />
           </motion.div>
