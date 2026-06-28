@@ -23,8 +23,10 @@ export default function HandwrittenNote({ text, className }: { text: string; cla
 
   useEffect(() => {
     if (count >= words.length) return;
-    const w = words[count] ?? "";
-    const delay = skipRef.current ? 0 : (PAUSE[w.slice(-1)] ?? BASE + w.length * PER_CHAR);
+    // Pause AFTER the word just inked if it ended in punctuation; otherwise a per-length beat.
+    const prev = words[count - 1] ?? "";
+    const next = words[count] ?? "";
+    const delay = skipRef.current ? 0 : (PAUSE[prev.slice(-1)] ?? BASE + next.length * PER_CHAR);
     const t = setTimeout(() => setCount((c) => c + 1), delay);
     return () => clearTimeout(t);
   }, [count, words]);
@@ -36,8 +38,9 @@ export default function HandwrittenNote({ text, className }: { text: string; cla
           <span
             style={{
               display: "inline-block",
-              // -25% top/bottom so tall ascenders / descenders are never clipped by the horizontal wipe.
-              clipPath: i < count ? "inset(-25% 0% -25% 0%)" : "inset(-25% 100% -25% 0%)",
+              // Negative insets on all sides so the wipe never clips a tall ascender/descender or the
+              // slanted tail of a cursive letter at the end of a word.
+              clipPath: i < count ? "inset(-30% -12% -30% -8%)" : "inset(-30% 100% -30% -8%)",
               transition: `clip-path ${WIPE_MS}ms linear`,
             }}
           >
