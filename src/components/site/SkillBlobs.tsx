@@ -100,6 +100,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
   const copyRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<number | null>(null);
+  const [inView, setInView] = useState(false);
   const [trackH, setTrackH] = useState(0);
   const dark = useDarkMode();
   const mobile = width > 0 && width < 640;
@@ -114,6 +115,14 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
     const el = ref.current; if (!el) return;
     const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width));
     ro.observe(el); return () => ro.disconnect();
+  }, []);
+  // Entry animation is driven by scroll-into-view and REPLAYS every time the field re-enters view, so
+  // the disks visibly rise up + populate each time. Reduced motion keeps them shown.
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setInView(true); return; }
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+    io.observe(el); return () => io.disconnect();
   }, []);
   useEffect(() => {
     if (active === null) return;
@@ -217,11 +226,17 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                 key={g.title}
                 layoutId={`blob-${i}`}
                 onClick={() => setActive(active === i ? null : i)}
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: active === null ? 1 : active === i ? 0 : 0.07, scale: 1 }}
+                initial={{ opacity: 0, y: 40, scale: 0.85 }}
+                animate={
+                  active !== null
+                    ? { opacity: active === i ? 0 : 0.07, y: 0, scale: 1 }
+                    : inView
+                      ? { opacity: 1, y: 0, scale: 1 }            // rise up into place
+                      : { opacity: 0, y: 40, scale: 0.85 }        // reset below view so it replays
+                }
                 transition={{
                   layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-                  default: { type: "spring", stiffness: 260, damping: 24, delay: active === null ? (reduceMotion ? 0 : entryDelays[i] ?? 0) : 0 },
+                  default: { type: "spring", stiffness: 220, damping: 22, delay: active === null && inView && !reduceMotion ? (entryDelays[i] ?? 0) : 0 },
                 }}
                 whileHover={active === null ? { y: -4, scale: 1.035 } : undefined}
                 whileTap={active === null ? { scale: 0.96 } : undefined}
