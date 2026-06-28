@@ -31,7 +31,7 @@ export default function NpcDialog({ line, speaker = "George", hasNext, onAdvance
           onClick={onAdvance}
           // Touch positioning (portrait: above the controls; landscape: in the low gap
           // between the joystick + interact button) lives in `.npc-dialog-touch`.
-          className={`fixed left-1/2 z-50 w-[min(560px,92vw)] -translate-x-1/2 cursor-pointer select-none rounded-2xl border-2 border-sage bg-parchment px-5 py-4 shadow-[0_8px_40px_rgba(28,21,8,0.35)] ${isTouch ? "npc-dialog-touch" : "bottom-10"}`}
+          className={`fixed left-1/2 z-50 -translate-x-1/2 cursor-pointer select-none rounded-2xl border-2 border-sage bg-parchment px-5 py-4 shadow-[0_8px_40px_rgba(28,21,8,0.35)] ${isTouch ? "npc-dialog-touch w-[min(560px,92vw)]" : "bottom-10 npc-dialog-desktop"}`}
         >
           <p className="font-mono text-[12px] uppercase tracking-[0.2em] text-pine">{speaker}</p>
           <p className="mt-1.5 font-sans text-[15px] leading-relaxed text-walnut">{line}</p>

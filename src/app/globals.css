@@ -160,6 +160,12 @@ html.dark {
   }
 }
 
+/* Desktop NPC dialog: keep it clear of the bottom-corner HUD (sound button bottom-left, minimap
+   bottom-right, each ~min(28vw,24vh) wide). Reserve that corner zone on both sides so the centred
+   dialog stays full width (560px) on wide screens and shrinks only enough to not overlap them when
+   the window is narrow. */
+.npc-dialog-desktop { width: min(560px, calc(100vw - 2 * (min(28vw, 24vh) + 1.5rem))); }
+
 /* NPC dialog on touch. Portrait: float above the bottom controls. Landscape: the
    viewport is short, so sit low and fill the gap between the joystick (left) and the
    interact button (right). (translate:none cancels the Tailwind x-centering; Framer
