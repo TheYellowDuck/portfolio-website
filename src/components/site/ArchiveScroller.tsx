@@ -343,13 +343,14 @@ const DECK_WINDOW = [-2, -1, 0, 1, 2];
 
 type Slot = { x: number; y: number; rotate: number; scale: number; opacity: number; zIndex: number };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-// Blend two slots by t for the live drag. `onTop` forces the card you're pulling in above the rest
-// (z-index can't tween) so it clearly reads as the active card.
-function blendSlot(a: Slot, b: Slot, t: number, onTop: boolean): Slot {
+// Blend two slots by t for the live drag. z-index follows the slot it's closest to (it can't tween),
+// so the dragged card naturally recedes BEHIND on a forward swipe and EMERGES from behind on a back
+// swipe — a true mirror, with the card visibly coming out of the back of the pile as you drag.
+function blendSlot(a: Slot, b: Slot, t: number): Slot {
   return {
     x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), rotate: lerp(a.rotate, b.rotate, t),
     scale: lerp(a.scale, b.scale, t), opacity: lerp(a.opacity, b.opacity, t),
-    zIndex: onTop ? 40 : t < 0.5 ? a.zIndex : b.zIndex,
+    zIndex: t < 0.5 ? a.zIndex : b.zIndex,
   };
 }
 
@@ -449,7 +450,7 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
         const seed = index + o;
         const isActive = !!drag && o === (drag.dir === 1 ? 0 : -1);
         const slot: Slot = drag
-          ? blendSlot(deckTarget(o, seed), deckTarget(o - drag.dir, seed), drag.p, isActive)
+          ? blendSlot(deckTarget(o, seed), deckTarget(o - drag.dir, seed), drag.p)
           : deckTarget(o, seed);
         if (drag && isActive) slot.x += drag.dx;
         return (
