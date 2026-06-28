@@ -18,6 +18,7 @@ import { content } from "@/content";
 import { skillColorFor } from "@/lib/skill-colors";
 import { useDarkMode } from "@/lib/use-dark-mode";
 import Reveal from "./Reveal";
+import Typewriter from "./Typewriter";
 import ProjectCard from "./ProjectCard";
 import ThemeToggle from "./ThemeToggle";
 import Masonry from "./Masonry";
@@ -214,12 +215,19 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       <Section id="about" eyebrow={content.sections.about.eyebrow} title={content.sections.about.title}>
         <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
           <Reveal>
-            <div className="space-y-4 text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85">
-              {aboutText && <p>{aboutText}</p>}
-              {interests && (
-                <p><span className="font-mono text-[12px] uppercase tracking-[0.2em] text-pine">{content.sections.about.offClock}</span>{interests}</p>
-              )}
-            </div>
+            <Typewriter
+              className="block whitespace-pre-wrap text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85"
+              segments={[
+                ...(aboutText ? [{ text: aboutText }] : []),
+                ...(aboutText && interests ? [{ text: "\n\n" }] : []),
+                ...(interests
+                  ? [
+                      { text: content.sections.about.offClock, className: "font-mono text-[12px] uppercase tracking-[0.2em] text-pine" },
+                      { text: interests },
+                    ]
+                  : []),
+              ]}
+            />
           </Reveal>
           <Reveal delay={80}>
             <div className="flex flex-col gap-3">

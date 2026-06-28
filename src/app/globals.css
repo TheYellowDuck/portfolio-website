@@ -194,6 +194,11 @@ html.dark {
 }
 @media (prefers-reduced-motion: reduce) { .curator-glow { display: none; } }
 
+/* Typewriter caret — a soft blink while text is being typed (About section). */
+.tw-caret { display: inline-block; margin-left: 1px; color: var(--c-accent); animation: tw-blink 1s steps(1) infinite; }
+@keyframes tw-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tw-caret { display: none; } }
+
 /* ── Archive horizontal scroller ─────────────────────────────────────────────
    A compact, sideways-scrolling rail of horizontal cards (the archive is the
    least-prominent work, so it gets a tighter footprint than the masonry above).
