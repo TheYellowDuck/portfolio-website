@@ -105,6 +105,10 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
   const mobile = width > 0 && width < 640;
   const expandedR = active !== null && groups[active] ? orbRadius(groups[active].items, mobile, width) : 0;
   const loop = active !== null && trackH > expandedR + 4;   // auto-scroll only when chips overflow
+  // The disks pop in in a RANDOM order (not left-to-right) so the field "populates" organically.
+  // Stable per mount; reduced motion drops the stagger to 0.
+  const entryDelays = useMemo(() => groups.map(() => Math.random() * 0.55), [groups.length]);
+  const reduceMotion = typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
     const el = ref.current; if (!el) return;
@@ -217,7 +221,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                 animate={{ opacity: active === null ? 1 : active === i ? 0 : 0.07, scale: 1 }}
                 transition={{
                   layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-                  default: { type: "spring", stiffness: 260, damping: 24, delay: active === null ? Math.min(i * 0.022, 0.3) : 0 },
+                  default: { type: "spring", stiffness: 260, damping: 24, delay: active === null ? (reduceMotion ? 0 : entryDelays[i] ?? 0) : 0 },
                 }}
                 whileHover={active === null ? { y: -4, scale: 1.035 } : undefined}
                 whileTap={active === null ? { scale: 0.96 } : undefined}
