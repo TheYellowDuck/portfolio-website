@@ -166,6 +166,9 @@ html.dark {
    just enough to leave daylight between it and the minimap when the window is narrow. (3rem = the
    minimap's ~1.5rem edge offset + a ~1.5rem gap.) */
 .npc-dialog-desktop { width: min(560px, calc(100vw - 2 * (min(28vw, 24vh) + 3rem))); }
+/* The bottom-centre controls hint / prompt ("WASD to move…") — cap its width the same way so a long
+   line wraps instead of sliding under the bottom-corner minimap on a narrow window. */
+.hud-hint-clear { max-width: min(90vw, calc(100vw - 2 * (min(28vw, 24vh) + 3rem))); }
 
 /* NPC dialog on touch. Portrait: float above the bottom controls. Landscape: the
    viewport is short, so sit low and fill the gap between the joystick (left) and the
