@@ -8,6 +8,7 @@ import TranscriptPopup from "./TranscriptPopup";
 import { categoryColor } from "@/lib/skill-colors";
 import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
+import HandwrittenNote from "@/components/site/HandwrittenNote";
 
 // YouTube embeds don't autoplay/loop without params — add them so the popup video
 // plays muted on a loop (like the card preview); viewers can unmute via the controls.
@@ -252,9 +253,13 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                           </div>
                         )}
                         {popup.description && (
-                          <p className="m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
-                            {popup.description}
-                          </p>
+                          popup.handwritten ? (
+                            <HandwrittenNote text={popup.description} className="cursor-default px-5 py-4 font-hand text-[25px] leading-[1.5] text-walnut" />
+                          ) : (
+                            <p className="m-0 font-mono text-[14px] text-walnut leading-[1.7] px-5 py-4">
+                              {popup.description}
+                            </p>
+                          )
                         )}
                         {/* The "Skills" exhibit shows its grouped skills as the main content
                             (full width, by category) rather than in the narrow side column. */}

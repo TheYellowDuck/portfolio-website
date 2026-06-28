@@ -49,6 +49,9 @@ export interface ExhibitPopup {
 
   // Special popup types
   type?: "resume" | "transcript";
+
+  // Render the description as a hand-traced handwritten note (used for the Curator's Note reward).
+  handwritten?: boolean;
 }
 
 export interface Exhibit {

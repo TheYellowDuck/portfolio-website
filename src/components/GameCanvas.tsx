@@ -43,6 +43,8 @@ const TOTAL_EXHIBITS = interactables.filter((i) => i.content.popup).length;
 const CURATOR_REWARD: ExhibitPopup = {
   title: "Curator's Note",
   subtitle: "You've seen every exhibit",
+  handwritten: true, // render the note as a hand-traced handwritten message
+
   description:
     "Most visitors wander a room or two — you walked the whole museum. Thank you for taking the time. " +
     "I built this place because a page of bullet points never felt like enough; I wanted somewhere you " +

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Bricolage_Grotesque, Pixelify_Sans } from "next/font/google";
+import { Geist, Geist_Mono, Bricolage_Grotesque, Pixelify_Sans, Caveat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
@@ -30,6 +30,13 @@ const bricolage = Bricolage_Grotesque({
 const pixel = Pixelify_Sans({
   variable: "--font-pixel",
   subsets: ["latin"],
+});
+
+// Handwriting face for the Curator's Note — legible and warm, not a heavy brush cursive.
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["400", "600"],
 });
 
 export const metadata: Metadata = {
@@ -83,7 +90,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} ${pixel.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} ${pixel.variable} ${caveat.variable} h-full antialiased`}
     >
       <head>
         {/* Apply the saved/system theme before paint to avoid a light flash. */}
