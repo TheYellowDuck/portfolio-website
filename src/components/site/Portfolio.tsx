@@ -62,12 +62,12 @@ function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number;
   );
 }
 
-function Section({ id, eyebrow, title, intro, children }: {
-  id: string; eyebrow: string; title: string; intro?: string; children: React.ReactNode;
+function Section({ id, eyebrow, title, intro, titleDuration, children }: {
+  id: string; eyebrow: string; title: string; intro?: string; titleDuration?: number; children: React.ReactNode;
 }) {
   return (
     <section id={id} className="mx-auto max-w-[1080px] scroll-mt-20 px-6 py-16 sm:py-24">
-      <Reveal variant="fade">
+      <Reveal variant="fade" duration={titleDuration}>
         <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-pine">{eyebrow}</p>
         <h2 className="mt-3 font-display text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
         {intro && <p className="mt-3 max-w-[60ch] text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/70">{intro}</p>}
@@ -141,9 +141,9 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* ── Work ── */}
       <Section id="work" eyebrow={content.sections.work.eyebrow} title={content.sections.work.title}
-        intro={content.sections.work.intro}>
+        intro={content.sections.work.intro} titleDuration={900}>
         <Masonry sm={2} lg={2} weights={shownFeatured.map((e) => cardWeight(e.popup as ExhibitPopup))} items={shownFeatured.map((e, i) => (
-          <Reveal key={i} delay={(i % 2) * 70}>
+          <Reveal key={i} delay={(i % 2) * 70} variant="up" distance={44} duration={760}>
             <ProjectCard index={pad(i + 1)} popup={e.popup as ExhibitPopup} onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
           </Reveal>
         ))} />
@@ -157,7 +157,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.inProgress}</h3>
             <div className="mt-6">
               <Masonry sm={2} lg={2} weights={shownInProgress.map((e) => cardWeight(e.popup as ExhibitPopup))} items={shownInProgress.map((e, i) => (
-                <Reveal key={i} delay={(i % 2) * 70}>
+                <Reveal key={i} delay={(i % 2) * 70} variant="up" distance={44} duration={760}>
                   <ProjectCard popup={e.popup as ExhibitPopup} inProgress onOpen={() => onOpenProject(e.popup as ExhibitPopup)} />
                 </Reveal>
               ))} />

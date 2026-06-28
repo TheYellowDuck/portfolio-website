@@ -8,6 +8,10 @@ interface RevealProps {
   delay?: number; // ms
   /** Entrance that fits what's revealed: lift (content), fade (headers), slide (timeline). */
   variant?: "up" | "fade" | "left";
+  /** Override the transition duration (ms). Defaults to 550. */
+  duration?: number;
+  /** Override the starting offset (px). For "up"/"fade" it starts below; for "left", to the left. */
+  distance?: number;
 }
 
 const FROM: Record<NonNullable<RevealProps["variant"]>, string> = {
@@ -21,8 +25,12 @@ const FROM: Record<NonNullable<RevealProps["variant"]>, string> = {
  * Reveals by mutating the element's style directly (the effect-updates-the-DOM
  * pattern — no React state), and reveals immediately under prefers-reduced-motion.
  */
-export default function Reveal({ children, className = "", delay = 0, variant = "up" }: RevealProps) {
+export default function Reveal({ children, className = "", delay = 0, variant = "up", duration = 550, distance }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const from =
+    distance != null
+      ? variant === "left" ? `translateX(-${distance}px)` : `translateY(${distance}px)`
+      : FROM[variant];
 
   useEffect(() => {
     const el = ref.current;
@@ -54,8 +62,8 @@ export default function Reveal({ children, className = "", delay = 0, variant = 
       className={`reveal-anim ${className}`}
       style={{
         opacity: 0,
-        transform: FROM[variant],
-        transition: `opacity 550ms ease-out ${delay}ms, transform 550ms ease-out ${delay}ms`,
+        transform: from,
+        transition: `opacity ${duration}ms ease-out ${delay}ms, transform ${duration}ms ease-out ${delay}ms`,
       }}
     >
       {children}
