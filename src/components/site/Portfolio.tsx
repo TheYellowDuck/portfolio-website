@@ -155,7 +155,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         {inProgress.length > 0 && (
           <>
             {/* Current work — deliberately not ranked (no No. NN); see scripts/sync-github.mjs. */}
-            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.inProgress}</h3>
+            <Reveal variant="fade"><h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.inProgress}</h3></Reveal>
             <div className="mt-6">
               <Masonry sm={2} lg={2} weights={shownInProgress.map((e) => cardWeight(e.popup as ExhibitPopup))} items={shownInProgress.map((e, i) => (
                 <Reveal key={i} delay={(i % 2) * 70} variant="up" distance={44} duration={760}>
@@ -174,7 +174,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             {/* In-section divider. Sub-division gap = mt-24 (96px) = half the section-to-section
                 gap (sections are py-24, so 96+96=192px between them). Visibly tighter than a full
                 section break, but one consistent value to reuse for any in-section division. */}
-            <h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.archive}</h3>
+            <Reveal variant="fade"><h3 className="mt-24 font-mono text-[12px] uppercase tracking-[0.28em] text-walnut/70">{content.sections.work.archive}</h3></Reveal>
             <Reveal>
               <div className="mt-6">
                 <ArchiveScroller
@@ -206,9 +206,11 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             e.popup?.title ? [{ title: e.popup.title, description: e.popup.description, items: e.popup.tech ?? [] }] : [],
           )}
         />
-        <p className="mx-auto mt-7 max-w-[60ch] text-center font-mono text-[11px] leading-relaxed text-walnut/55">
-          {content.sections.skills.note}
-        </p>
+        <Reveal variant="fade">
+          <p className="mx-auto mt-7 max-w-[60ch] text-center font-mono text-[11px] leading-relaxed text-walnut/55">
+            {content.sections.skills.note}
+          </p>
+        </Reveal>
       </Section>
 
       {/* ── About ── */}
@@ -281,15 +283,17 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
       {/* Footer */}
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
-        <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
-          <span>© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
-          <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
-            {content.footer.wander}
-          </button>
-        </div>
-        <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/70">
-          {content.footer.privacy}
-        </p>
+        <Reveal variant="fade">
+          <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
+            <span>© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
+            <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
+              {content.footer.wander}
+            </button>
+          </div>
+          <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/70">
+            {content.footer.privacy}
+          </p>
+        </Reveal>
       </footer>
     </div>
   );
@@ -300,7 +304,7 @@ function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
   const dark = useDarkMode();
   const long = (popup.description?.length ?? 0) > 280;
   return (
-    <Reveal variant="left">
+    <Reveal variant="left" duration={850} distance={30}>
       <div className="relative">
         <span className="absolute -left-[24.5px] top-1.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-sage bg-parchment sm:-left-[32.5px]" />
         {popup.date && <p className="font-mono text-[12px] tracking-wide text-sage">{popup.date}</p>}

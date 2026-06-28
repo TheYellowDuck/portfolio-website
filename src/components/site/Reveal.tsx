@@ -8,7 +8,7 @@ interface RevealProps {
   delay?: number; // ms
   /** Entrance that fits what's revealed: lift (content), fade (headers), slide (timeline). */
   variant?: "up" | "fade" | "left";
-  /** Override the transition duration (ms). Defaults to 550. */
+  /** Override the transition duration (ms). Defaults to 750 for a gentle, gradual fade. */
   duration?: number;
   /** Override the starting offset (px). For "up"/"fade" it starts below; for "left", to the left. */
   distance?: number;
@@ -25,7 +25,7 @@ const FROM: Record<NonNullable<RevealProps["variant"]>, string> = {
  * Reveals by mutating the element's style directly (the effect-updates-the-DOM
  * pattern — no React state), and reveals immediately under prefers-reduced-motion.
  */
-export default function Reveal({ children, className = "", delay = 0, variant = "up", duration = 550, distance }: RevealProps) {
+export default function Reveal({ children, className = "", delay = 0, variant = "up", duration = 750, distance }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const from =
     distance != null
