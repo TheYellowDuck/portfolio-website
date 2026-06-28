@@ -46,14 +46,19 @@ export default function ScrambleText({ text, className, delay = 0 }: ScrambleTex
         if (text[i] === " " || text[i] === "\n") continue;
         range.setStart(node, i);
         range.setEnd(node, i + 1);
-        const r = range.getBoundingClientRect();
+        // For the first character of a soft-wrapped line, getBoundingClientRect unions a phantom
+        // zero-width rect at the previous line's end with the real glyph rect — putting the overlay a
+        // line too high. Take the real (non-zero-width) glyph rect instead.
+        const rects = Array.from(range.getClientRects()).filter((rr) => rr.width > 0);
+        const r = rects[rects.length - 1] ?? range.getBoundingClientRect();
         const el = document.createElement("span");
         el.setAttribute("aria-hidden", "true");
-        // overflow:hidden is safe here (these are absolutely-positioned, not in the line flow) and
-        // clips a wide random glyph to its slot so the scramble never overlaps its neighbours.
+        // Anchor each glyph CENTERED on its character's centre at natural width — so it lands exactly
+        // where the real letter is (matching its baseline via line-height) without clipping narrow
+        // letters to slivers or letting wide ones shove their neighbours.
         el.style.cssText =
-          `position:absolute;left:${r.left - wrapRect.left}px;top:${r.top - wrapRect.top}px;` +
-          `width:${r.width}px;height:${r.height}px;line-height:${r.height}px;text-align:center;overflow:hidden;`;
+          `position:absolute;left:${r.left + r.width / 2 - wrapRect.left}px;top:${r.top - wrapRect.top}px;` +
+          `height:${r.height}px;line-height:${r.height}px;transform:translateX(-50%);white-space:pre;`;
         wrap.appendChild(el);
         overlays.push({ el, ch: text[i] });
       }
