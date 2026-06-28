@@ -161,10 +161,11 @@ html.dark {
 }
 
 /* Desktop NPC dialog: keep it clear of the bottom-corner HUD (sound button bottom-left, minimap
-   bottom-right, each ~min(28vw,24vh) wide). Reserve that corner zone on both sides so the centred
-   dialog stays full width (560px) on wide screens and shrinks only enough to not overlap them when
-   the window is narrow. */
-.npc-dialog-desktop { width: min(560px, calc(100vw - 2 * (min(28vw, 24vh) + 1.5rem))); }
+   bottom-right, each ~min(28vw,24vh) wide and offset ~24px from the edge). Reserve that corner zone
+   PLUS a gap on both sides so the centred dialog stays full width (560px) on wide screens and shrinks
+   just enough to leave daylight between it and the minimap when the window is narrow. (3rem = the
+   minimap's ~1.5rem edge offset + a ~1.5rem gap.) */
+.npc-dialog-desktop { width: min(560px, calc(100vw - 2 * (min(28vw, 24vh) + 3rem))); }
 
 /* NPC dialog on touch. Portrait: float above the bottom controls. Landscape: the
    viewport is short, so sit low and fill the gap between the joystick (left) and the
@@ -211,6 +212,7 @@ html.dark {
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
+  --font-hand: var(--font-caveat);
   --font-system-mono: ui-monospace, Menlo, Monaco, "Cascadia Code", "Segoe UI Mono", "Roboto Mono", monospace;
 
   /* popup surface layers */
