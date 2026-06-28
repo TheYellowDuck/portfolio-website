@@ -703,7 +703,9 @@ export default function GameCanvas({
           visible={isTouch && !isLoading && !activePopup && !bigMap}
           nearby={!!prompt}
           onMove={(x, y) => engineRef.current?.setMoveVector(x, y)}
-          onInteract={() => { startBgMusic(); engineRef.current?.triggerInteract(); }}
+          // Mid-conversation the engine ignores re-interact, so the E button would do nothing on
+          // touch — route it to advance/close the dialog instead (matches the keyboard E behaviour).
+          onInteract={() => { startBgMusic(); if (dialog) advanceDialog(); else engineRef.current?.triggerInteract(); }}
         />
       </div>
     </div>
