@@ -28,11 +28,6 @@ const FADE = 60; // px — width of the edge fade at each border
 const DWELL = 3000; // ms — hold on each centred card
 const MOVE = 850; // ms — glide to the next card (longer = smoother)
 const IDLE = 700; // ms — after interacting (drag/wheel/touch), wait this long, then settle + resume
-// Entrance "spin": the first time the rail scrolls into view it flings sideways and decelerates to a
-// stop on a centred card, like a wheel coming to rest, before the normal dwell/glide loop takes over.
-const SPIN_V0 = 95;        // px/frame — initial fling velocity
-const SPIN_DECAY = 0.945;  // per-16ms velocity decay (lower = settles sooner)
-const SPIN_MIN = 0.8;      // px/frame — below this it snaps to the nearest card and settles
 
 interface ArchiveItem {
   popup: ExhibitPopup;
@@ -140,7 +135,6 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
   const touchX = useRef(0);
   const interactUntil = useRef(0);
   const idxRef = useRef(items.length); // active card, persisted so re-renders never reset position
-  const hasSpunRef = useRef(false);    // entrance spin plays once, the first time the rail is on screen
   const bump = () => { interactUntil.current = performance.now() + IDLE; };
 
   // Auto-advancing carousel: centre a card → dwell → glide to the next, looping seamlessly.
@@ -178,7 +172,6 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
     let idx = idxRef.current; // active card — persisted across re-runs so position never resets
     let phase: "dwell" | "move" = "dwell";
     let elapsed = 0, from = 0, to = 0, raf = 0, lastT = 0, started = false, wasPaused = false, visible = true;
-    let spinning = false, spinVel = 0; // entrance fling state
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
     const ro = new ResizeObserver(() => { measure(); if (oneSet > 0 && started) el.scrollLeft = center(idx); });
@@ -198,24 +191,6 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
       // it) — not on hover, and not on a click/tap.
       const modalOpen = !!document.querySelector('[aria-modal="true"]');
       if (!visible || reduce || modalOpen || drag.current?.moved || t < interactUntil.current) { wasPaused = true; return; }
-      // First time the rail is on screen: fling it and let it decelerate to rest on a card (entrance).
-      if (!hasSpunRef.current) { hasSpunRef.current = true; spinning = true; spinVel = SPIN_V0; wasPaused = false; }
-      if (spinning) {
-        spinVel *= Math.pow(SPIN_DECAY, dt / 16);
-        el.scrollLeft += spinVel * (dt / 16);
-        if (el.scrollLeft >= low + oneSet) el.scrollLeft -= oneSet;
-        else if (el.scrollLeft < low) el.scrollLeft += oneSet;
-        if (spinVel <= SPIN_MIN) { // settle on the nearest card and hand off to the dwell/glide loop
-          spinning = false;
-          idx = forward();
-          while (idx >= 2 * N) idx -= N;
-          while (idx < N) idx += N;
-          el.scrollLeft = center(idx);
-          phase = "dwell"; elapsed = 0;
-        }
-        idxRef.current = idx;
-        return;
-      }
       if (wasPaused) { // resume: smoothly glide forward to the next card (never backward)
         wasPaused = false;
         idx = forward();
@@ -297,19 +272,16 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
 const DECK_DWELL = 3500; // ms between auto-advances
 const DECK_MOVE = 0.95;  // s — glide duration for advancing a card (manual swipe AND auto), kept
                          // deliberately slow so the stack motion reads clearly
-// The transform for a card at depth `o`: 0 = front. UPCOMING cards (o = 1/2) stack up-and-behind,
-// peeking above the front; the JUST-SEEN card (o = -1) slips down and out the bottom. Keeping those
-// two directions opposite is what makes the motion read: advancing forward sends the front card DOWN
-// and out while the next drops in from above, and swiping back is the exact mirror — the front
-// recedes UP into the stack while the previous card rises from the bottom to the front. Cards beyond
-// the fan are tucked fully out of view (used for entering/leaving) on the correct edge.
+// The transform for a card at depth `o`: 0 = front, 1/2 = fanned behind, -1 = the visible card at
+// the bottom of the pile, otherwise tucked fully behind (hidden, used for entering/leaving). The
+// manual swipe (see Deck) drives the card being brought IN, so dragging back lifts this -1 card up
+// to the front — a clean reverse of the forward (auto-advance) motion, with the original fan look.
 function deckSlot(o: number) {
   if (o === 0) return { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 30 };
-  if (o === 1) return { x: -16, y: -18, rotate: -5, scale: 0.95, opacity: 1, zIndex: 20 };
-  if (o === 2) return { x: 16, y: -34, rotate: 6, scale: 0.9, opacity: 1, zIndex: 10 };
-  if (o === -1) return { x: 0, y: 34, rotate: -2, scale: 0.9, opacity: 1, zIndex: 6 }; // slipping out the bottom
-  if (o > 0) return { x: 0, y: -52, rotate: 0, scale: 0.84, opacity: 0, zIndex: 3 };   // hidden above (upcoming)
-  return { x: 0, y: 60, rotate: 0, scale: 0.82, opacity: 0, zIndex: 3 };               // hidden below (just left)
+  if (o === 1) return { x: -12, y: 8, rotate: -4, scale: 0.965, opacity: 1, zIndex: 20 };
+  if (o === 2) return { x: 13, y: 16, rotate: 5, scale: 0.93, opacity: 1, zIndex: 10 };
+  if (o === -1) return { x: 0, y: 24, rotate: -2, scale: 0.9, opacity: 1, zIndex: 6 }; // bottom of the pile
+  return { x: 0, y: 30, rotate: 0, scale: 0.82, opacity: 0, zIndex: 3 }; // hidden (entering / leaving)
 }
 
 const hash = (s: number) => { const v = Math.sin(s * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
@@ -387,17 +359,15 @@ const SWIPE_COMMIT = 0.32; // release past this fraction commits the advance; be
 function Deck({ items, onOpen }: ArchiveScrollerProps) {
   const n = items.length;
   const [index, setIndex] = useState(0);
-  // Live horizontal drag: dir (+1 = forward, -1 = back) and progress 0..1 toward committing. The ref
-  // mirrors it so the pointer-up handler reads the latest value synchronously. null = at rest.
-  const [drag, setDrag] = useState<{ dir: 1 | -1; p: number } | null>(null);
+  // Live horizontal drag: dir (+1 = forward, -1 = back), progress 0..1 toward committing, and the raw
+  // px the finger has moved (dx) so the card being brought in tracks the finger. The ref mirrors it so
+  // the pointer-up handler reads the latest value synchronously. null = at rest.
+  type Drag = { dir: 1 | -1; p: number; dx: number };
+  const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef(drag);
-  const setDragBoth = (v: { dir: 1 | -1; p: number } | null) => { dragRef.current = v; setDrag(v); };
+  const setDragBoth = (v: Drag | null) => { dragRef.current = v; setDrag(v); };
   const interacting = useRef(false);
   const visibleRef = useRef(true);
-  const hasRiffledRef = useRef(false); // entrance riffle plays once, the first time the deck is on screen
-  // Per-advance glide duration (s). Normally the slow DECK_MOVE; the spin-to-stop entrance briefly
-  // overrides it for the fast riffle. A ref so changing it doesn't itself trigger a re-render.
-  const moveDur = useRef(DECK_MOVE);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   // Raw pointer-drag bookkeeping (in a ref so per-move updates don't each re-render until we setDrag).
@@ -417,32 +387,10 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
 
   useEffect(() => {
     if (n === 0) return;
-    let riffleTimer: ReturnType<typeof setTimeout> | undefined;
-    // Entrance "spin": the first time the deck is on screen, riffle several cards forward with a fast,
-    // decelerating cadence, then settle and let the slow auto-advance resume.
-    const startRiffle = () => {
-      const STEPS = 7;
-      let step = 0;
-      interacting.current = true; // hold auto-advance during the riffle
-      const tick = () => {
-        if (step >= STEPS) { moveDur.current = DECK_MOVE; interacting.current = false; restart(); return; }
-        moveDur.current = 0.2; // quick glide while riffling
-        setIndex((i) => i + 1);
-        step += 1;
-        riffleTimer = setTimeout(tick, 50 + step * step * 8); // accelerating gap => decelerating spin
-      };
-      tick();
-    };
-    const io = new IntersectionObserver(([e]) => {
-      visibleRef.current = e.isIntersecting;
-      if (e.isIntersecting && !hasRiffledRef.current) {
-        hasRiffledRef.current = true;
-        if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) startRiffle();
-      }
-    }, { rootMargin: "120px" });
+    const io = new IntersectionObserver(([e]) => { visibleRef.current = e.isIntersecting; }, { rootMargin: "120px" });
     if (wrapRef.current) io.observe(wrapRef.current);
     restart();
-    return () => { if (timer.current) clearInterval(timer.current); if (riffleTimer) clearTimeout(riffleTimer); io.disconnect(); };
+    return () => { if (timer.current) clearInterval(timer.current); io.disconnect(); };
   }, [n, restart]);
 
   // Manual horizontal swipe. Drag LEFT (forward) pulls the FRONT card down and out while the next
@@ -463,7 +411,7 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
       if (pt.axis === "x") { wrapRef.current?.setPointerCapture?.(pt.id); interacting.current = true; }
     }
     if (pt.axis !== "x") return;
-    setDragBoth({ dir: dx < 0 ? 1 : -1, p: Math.min(Math.abs(dx) / SWIPE_FULL, 1) });
+    setDragBoth({ dir: dx < 0 ? 1 : -1, p: Math.min(Math.abs(dx) / SWIPE_FULL, 1), dx });
   };
   const endPointer = (e: React.PointerEvent) => {
     const pt = pointer.current;
@@ -496,18 +444,21 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
       className="relative isolate mx-auto h-[440px] w-full max-w-[330px] cursor-grab select-none active:cursor-grabbing"
     >
       {DECK_WINDOW.map((o) => {
-        // While dragging, blend each card from its slot toward the slot one advance away (the active
-        // card — the one being pulled in — rides on top). At rest, settle into the lightly-messy fan.
+        // While dragging, blend each card from its slot toward the slot one advance away. The active
+        // card — the one being pulled in (front on forward, previous on back) — rides on top AND
+        // tracks the finger horizontally, so it feels like you're physically pulling that card in.
+        const isActive = drag ? o === (drag.dir === 1 ? 0 : -1) : false;
         const slot = drag
-          ? blendSlot(deckSlot(o), deckSlot(o - drag.dir), drag.p, o === (drag.dir === 1 ? 0 : -1))
+          ? blendSlot(deckSlot(o), deckSlot(o - drag.dir), drag.p, isActive)
           : deckTarget(o, index + o);
+        if (drag && isActive) slot.x += drag.dx;
         return (
           <motion.div
             key={(((index + o) % n) + n) % n} // keyed by item, so depth changes animate the same card
             className="pointer-events-none absolute inset-0"
             initial={deckSlot(o >= 0 ? o + 1 : o - 1)} // mount from the adjacent hidden slot
             animate={slot}
-            transition={drag ? { duration: 0 } : { duration: moveDur.current, ease: [0.22, 1, 0.36, 1] }}
+            transition={drag ? { duration: 0 } : { duration: DECK_MOVE, ease: [0.22, 1, 0.36, 1] }}
           >
             <DeckCard item={at(o)} />
           </motion.div>
