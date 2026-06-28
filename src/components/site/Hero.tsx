@@ -46,9 +46,9 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             onClick={onResume}
             className="text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
           >
-            {content.hero.resume}
+            <ScrambleText text={content.hero.resume} delay={620} />
           </button>
-          {QUICK_LINKS.map((l) => (
+          {QUICK_LINKS.map((l, i) => (
             <a
               key={l.label}
               href={l.url}
@@ -56,7 +56,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
               rel="noopener noreferrer"
               className="text-walnut/75 underline decoration-transparent underline-offset-4 transition-colors hover:text-pine hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
             >
-              {l.label} ↗
+              <ScrambleText text={l.label} delay={680 + i * 60} /> ↗
             </a>
           ))}
         </nav>
