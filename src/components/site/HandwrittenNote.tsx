@@ -14,12 +14,12 @@ const WIPE_MS = 165; // ms each word takes to ink in
 
 export default function HandwrittenNote({ text, className }: { text: string; className?: string }) {
   const words = text.split(/\s+/).filter(Boolean);
-  const [count, setCount] = useState(0); // words inked so far
+  // Words inked so far. Reduced motion starts fully inked (no animation). This component only ever
+  // mounts client-side (inside the open exhibit overlay), so the window check is safe here.
+  const [count, setCount] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? words.length : 0,
+  );
   const skipRef = useRef(false);
-
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setCount(words.length);
-  }, [words.length]);
 
   useEffect(() => {
     if (count >= words.length) return;

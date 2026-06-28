@@ -106,9 +106,12 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
   const mobile = width > 0 && width < 640;
   const expandedR = active !== null && groups[active] ? orbRadius(groups[active].items, mobile, width) : 0;
   const loop = active !== null && trackH > expandedR + 4;   // auto-scroll only when chips overflow
-  // The disks pop in in a RANDOM order (not left-to-right) so the field "populates" organically.
-  // Stable per mount; reduced motion drops the stagger to 0.
-  const entryDelays = useMemo(() => groups.map(() => Math.random() * 0.55), [groups.length]);
+  // The disks pop in in a scattered (non-left-to-right) order so the field "populates" organically.
+  // A pure per-index hash (stable, not Math.random in render) keeps it lint-clean and deterministic.
+  const entryDelays = useMemo(
+    () => Array.from({ length: groups.length }, (_, i) => { const v = Math.sin(i * 12.9898 + 4.137) * 43758.5453; return (v - Math.floor(v)) * 0.55; }),
+    [groups.length],
+  );
   const reduceMotion = typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
@@ -117,10 +120,11 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
     ro.observe(el); return () => ro.disconnect();
   }, []);
   // Entry animation is driven by scroll-into-view and REPLAYS every time the field re-enters view, so
-  // the disks visibly rise up + populate each time. Reduced motion keeps them shown.
+  // the disks visibly rise up + populate each time. Under reduced motion we skip the observer entirely
+  // and the render treats the field as always in view (no entrance animation).
   useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const el = ref.current; if (!el) return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setInView(true); return; }
     const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
     io.observe(el); return () => io.disconnect();
   }, []);
@@ -226,11 +230,11 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                 key={g.title}
                 layoutId={`blob-${i}`}
                 onClick={() => setActive(active === i ? null : i)}
-                initial={{ opacity: 0, y: 40, scale: 0.85 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}
                 animate={
                   active !== null
                     ? { opacity: active === i ? 0 : 0.07, y: 0, scale: 1 }
-                    : inView
+                    : inView || reduceMotion
                       ? { opacity: 1, y: 0, scale: 1 }            // rise up into place
                       : { opacity: 0, y: 40, scale: 0.85 }        // reset below view so it replays
                 }

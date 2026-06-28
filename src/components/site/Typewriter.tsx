@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 export interface TypeSegment {
   text: string;
@@ -25,51 +25,63 @@ const PAUSE: Record<string, number> = {
 
 /**
  * Types its text out character-by-character when it scrolls into view (once), pausing on punctuation.
- * The FULL text is the SSR / no-JS / screen-reader content (carried on aria-label and rendered up
- * front), so search engines and assistive tech always get it; the mount effect resets to empty and
- * types once the block is in view. Honors prefers-reduced-motion by showing everything immediately.
+ * The full text is the SSR / no-JS / screen-reader content (rendered up front, carried on aria-label),
+ * so search engines and assistive tech always get it. The animation mutates the segment spans'
+ * textContent directly — no per-frame React state — matching Reveal's effect-mutates-the-DOM pattern.
+ * Honors prefers-reduced-motion by leaving everything shown.
  */
 export default function Typewriter({ segments, className, speed = 13 }: TypewriterProps) {
-  const ref = useRef<HTMLSpanElement>(null);
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const caretRef = useRef<HTMLSpanElement>(null);
   const full = segments.map((s) => s.text).join("");
-  const total = full.length;
-  const [count, setCount] = useState(total); // SSR / pre-hydration: the whole thing
-  const [armed, setArmed] = useState(false);
 
-  // On mount: reduced motion keeps the full text; otherwise clear it and arm typing on scroll-in.
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setCount(total); return; }
-    setCount(0);
+  useLayoutEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return; // leave full text shown
+    const spans = spanRefs.current;
+    const caret = caretRef.current;
+    const total = full.length;
+    // Reveal `c` characters, distributed across the styled segments.
+    const reveal = (c: number) => {
+      let consumed = 0;
+      for (let i = 0; i < segments.length; i++) {
+        const len = segments[i].text.length;
+        if (spans[i]) spans[i]!.textContent = segments[i].text.slice(0, Math.max(0, Math.min(len, c - consumed)));
+        consumed += len;
+      }
+    };
+    reveal(0);                              // hide before the browser paints (no flash of the full text)
+    if (caret) caret.style.display = "none";
+
+    let count = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const type = () => {
+      if (count >= total) { if (caret) caret.style.display = "none"; return; }
+      reveal(count + 1);
+      const justTyped = full[count];
+      count += 1;
+      const delay = PAUSE[justTyped] != null ? PAUSE[justTyped] : speed + Math.random() * speed;
+      timer = setTimeout(type, delay);
+    };
     const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setArmed(true); io.disconnect(); } },
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        if (caret) caret.style.display = "";
+        type();
+      },
       { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
     );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [total]);
+    if (rootRef.current) io.observe(rootRef.current);
+    return () => { io.disconnect(); if (timer) clearTimeout(timer); };
+  }, [segments, full, speed]);
 
-  // Reveal the next character after a delay that lengthens following punctuation.
-  useEffect(() => {
-    if (!armed || count >= total) return;
-    const prev = full[count - 1];
-    const delay = count > 0 && PAUSE[prev] != null ? PAUSE[prev] : speed + Math.random() * speed;
-    const t = setTimeout(() => setCount((c) => c + 1), delay);
-    return () => clearTimeout(t);
-  }, [armed, count, total, full, speed]);
-
-  let consumed = 0;
   return (
-    <span className={className} aria-label={full}>
-      <span ref={ref} aria-hidden="true">
-        {segments.map((s, i) => {
-          const visible = Math.max(0, Math.min(s.text.length, count - consumed));
-          consumed += s.text.length;
-          return <span key={i} className={s.className}>{s.text.slice(0, visible)}</span>;
-        })}
-        {armed && count < total && <span className="tw-caret">▍</span>}
-      </span>
+    <span className={className} ref={rootRef} aria-label={full}>
+      {segments.map((s, i) => (
+        <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className} aria-hidden="true">{s.text}</span>
+      ))}
+      <span ref={caretRef} className="tw-caret" aria-hidden="true" style={{ display: "none" }}>▍</span>
     </span>
   );
 }
