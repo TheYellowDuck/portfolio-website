@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
+import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
 import { content } from "@/content";
 
@@ -26,17 +27,17 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
       {/* Left: identity */}
       <div className="flex-1">
         <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
-          {content.hero.eyebrow}
+          <ScrambleText text={content.hero.eyebrow} delay={0} />
         </p>
         <h1 className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
-          {PERSON.name}
+          <ScrambleText text={PERSON.name} delay={120} />
         </h1>
         <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
-          {content.hero.tagline}
+          <ScrambleText text={content.hero.tagline} delay={300} />
         </p>
         {currentStatus && (
           <p className="mt-2 font-mono text-[13px] text-walnut/55">
-            {content.hero.currentlyLabel} {currentStatus}
+            <ScrambleText text={`${content.hero.currentlyLabel} ${currentStatus}`} delay={480} />
           </p>
         )}
 
