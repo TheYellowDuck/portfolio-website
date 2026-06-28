@@ -38,9 +38,9 @@ export default function ScrambleText({ text, className, delay = 0 }: ScrambleTex
       for (const el of slots) {                    // pin each glyph's width (now that fonts are ready)
         el.style.width = `${el.getBoundingClientRect().width}px`;
         el.style.display = "inline-block";
-        el.style.overflow = "hidden";
         el.style.textAlign = "center";
-        el.style.whiteSpace = "pre";
+        // NB: no `overflow: hidden` — on an inline-block it shifts the baseline to the bottom edge,
+        // which changes the line height and makes the block jump in height when it settles to plain text.
       }
       const finals = slots.map((el) => el.dataset.ch ?? "");
       const perChar = SWEEP / Math.max(slots.length, 1);
