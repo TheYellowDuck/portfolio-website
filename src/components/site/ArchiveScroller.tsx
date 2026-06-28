@@ -28,6 +28,11 @@ const FADE = 60; // px — width of the edge fade at each border
 const DWELL = 3000; // ms — hold on each centred card
 const MOVE = 850; // ms — glide to the next card (longer = smoother)
 const IDLE = 700; // ms — after interacting (drag/wheel/touch), wait this long, then settle + resume
+// Entrance "spin": the first time the rail scrolls into view it flings sideways and decelerates to a
+// stop on a centred card, like a wheel coming to rest, before the normal dwell/glide loop takes over.
+const SPIN_V0 = 95;        // px/frame — initial fling velocity
+const SPIN_DECAY = 0.945;  // per-16ms velocity decay (lower = settles sooner)
+const SPIN_MIN = 0.8;      // px/frame — below this it snaps to the nearest card and settles
 
 interface ArchiveItem {
   popup: ExhibitPopup;
@@ -135,6 +140,7 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
   const touchX = useRef(0);
   const interactUntil = useRef(0);
   const idxRef = useRef(items.length); // active card, persisted so re-renders never reset position
+  const hasSpunRef = useRef(false);    // entrance spin plays once, the first time the rail is on screen
   const bump = () => { interactUntil.current = performance.now() + IDLE; };
 
   // Auto-advancing carousel: centre a card → dwell → glide to the next, looping seamlessly.
@@ -172,6 +178,7 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
     let idx = idxRef.current; // active card — persisted across re-runs so position never resets
     let phase: "dwell" | "move" = "dwell";
     let elapsed = 0, from = 0, to = 0, raf = 0, lastT = 0, started = false, wasPaused = false, visible = true;
+    let spinning = false, spinVel = 0; // entrance fling state
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
     const ro = new ResizeObserver(() => { measure(); if (oneSet > 0 && started) el.scrollLeft = center(idx); });
@@ -191,6 +198,24 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
       // it) — not on hover, and not on a click/tap.
       const modalOpen = !!document.querySelector('[aria-modal="true"]');
       if (!visible || reduce || modalOpen || drag.current?.moved || t < interactUntil.current) { wasPaused = true; return; }
+      // First time the rail is on screen: fling it and let it decelerate to rest on a card (entrance).
+      if (!hasSpunRef.current) { hasSpunRef.current = true; spinning = true; spinVel = SPIN_V0; wasPaused = false; }
+      if (spinning) {
+        spinVel *= Math.pow(SPIN_DECAY, dt / 16);
+        el.scrollLeft += spinVel * (dt / 16);
+        if (el.scrollLeft >= low + oneSet) el.scrollLeft -= oneSet;
+        else if (el.scrollLeft < low) el.scrollLeft += oneSet;
+        if (spinVel <= SPIN_MIN) { // settle on the nearest card and hand off to the dwell/glide loop
+          spinning = false;
+          idx = forward();
+          while (idx >= 2 * N) idx -= N;
+          while (idx < N) idx += N;
+          el.scrollLeft = center(idx);
+          phase = "dwell"; elapsed = 0;
+        }
+        idxRef.current = idx;
+        return;
+      }
       if (wasPaused) { // resume: smoothly glide forward to the next card (never backward)
         wasPaused = false;
         idx = forward();
@@ -369,6 +394,7 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
   const setDragBoth = (v: { dir: 1 | -1; p: number } | null) => { dragRef.current = v; setDrag(v); };
   const interacting = useRef(false);
   const visibleRef = useRef(true);
+  const hasRiffledRef = useRef(false); // entrance riffle plays once, the first time the deck is on screen
   // Per-advance glide duration (s). Normally the slow DECK_MOVE; the spin-to-stop entrance briefly
   // overrides it for the fast riffle. A ref so changing it doesn't itself trigger a re-render.
   const moveDur = useRef(DECK_MOVE);
@@ -391,10 +417,32 @@ function Deck({ items, onOpen }: ArchiveScrollerProps) {
 
   useEffect(() => {
     if (n === 0) return;
-    const io = new IntersectionObserver(([e]) => { visibleRef.current = e.isIntersecting; }, { rootMargin: "120px" });
+    let riffleTimer: ReturnType<typeof setTimeout> | undefined;
+    // Entrance "spin": the first time the deck is on screen, riffle several cards forward with a fast,
+    // decelerating cadence, then settle and let the slow auto-advance resume.
+    const startRiffle = () => {
+      const STEPS = 7;
+      let step = 0;
+      interacting.current = true; // hold auto-advance during the riffle
+      const tick = () => {
+        if (step >= STEPS) { moveDur.current = DECK_MOVE; interacting.current = false; restart(); return; }
+        moveDur.current = 0.2; // quick glide while riffling
+        setIndex((i) => i + 1);
+        step += 1;
+        riffleTimer = setTimeout(tick, 50 + step * step * 8); // accelerating gap => decelerating spin
+      };
+      tick();
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visibleRef.current = e.isIntersecting;
+      if (e.isIntersecting && !hasRiffledRef.current) {
+        hasRiffledRef.current = true;
+        if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) startRiffle();
+      }
+    }, { rootMargin: "120px" });
     if (wrapRef.current) io.observe(wrapRef.current);
     restart();
-    return () => { if (timer.current) clearInterval(timer.current); io.disconnect(); };
+    return () => { if (timer.current) clearInterval(timer.current); if (riffleTimer) clearTimeout(riffleTimer); io.disconnect(); };
   }, [n, restart]);
 
   // Manual horizontal swipe. Drag LEFT (forward) pulls the FRONT card down and out while the next
