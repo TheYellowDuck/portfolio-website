@@ -116,6 +116,29 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setActive(null);
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   }, [active]);
+  // Zoom should bring the orb to the middle of the screen: on open, remember the scroll position and
+  // scroll so the (centred) expanded orb sits at the viewport centre; on close, return to where we
+  // were. The container's top is fixed (it only grows downward), so we centre on its FINAL height.
+  // No explicit `behavior` → CSS `scroll-behavior` makes it smooth normally and instant under
+  // reduced-motion. There's plenty of page below the skills section, so the target is always reachable.
+  const savedScroll = useRef(0);
+  const prevActive = useRef<number | null>(null);
+  useEffect(() => {
+    const wasOpen = prevActive.current !== null;
+    const isOpen = active !== null;
+    if (isOpen) {
+      if (!wasOpen) savedScroll.current = window.scrollY;
+      const el = ref.current;
+      if (el) {
+        const finalH = expandedR * 2 + (mobile ? 20 : 28);
+        const topDoc = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: Math.max(0, topDoc + finalH / 2 - window.innerHeight / 2), left: 0 });
+      }
+    } else if (wasOpen) {
+      window.scrollTo({ top: savedScroll.current, left: 0 });
+    }
+    prevActive.current = active;
+  }, [active, expandedR, mobile]);
   // Measure one copy of the chip list (so the loop wraps by exactly one copy + gap → seamless).
   // ResizeObserver is a subscription, so no synchronous set-state-in-effect.
   useEffect(() => {
