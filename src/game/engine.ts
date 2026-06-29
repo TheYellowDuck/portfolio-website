@@ -300,6 +300,7 @@ export class GameEngine {
 
   stop() {
     cancelAnimationFrame(this.animationFrameId);
+    this.input.dispose(); // teardown only (sole caller is the canvas-unmount cleanup) → drop window listeners
   }
 
   private loop = (currentTime: number) => {
