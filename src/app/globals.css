@@ -39,20 +39,30 @@ html:has(body.game-active) { overflow: hidden; scrollbar-gutter: auto; }
    <CustomCursor> leaves the native cursor alone over text. Over anything clickable
    it shows a small ink dot; over content that opts in with [data-cursor="<word>"]
    the dot blooms into an ink disc bearing that word ("Open" / "Drag" / "Enter" …).
-   We hide the native arrow over every clickable so it never doubles up, but keep
-   the real caret on text-entry fields and anything tagged [data-native-cursor].
+   We hide the native arrow over every clickable so it never doubles up — but NEVER
+   over a text-entry field (search inputs, the volume slider…) or anything tagged
+   [data-native-cursor]: those are :not()-excluded so their real cursor/caret stays
+   (e.g. the slider keeps its pointer while you drag it, instead of going blank).
+   Excluding here, rather than restoring afterward, avoids a specificity fight.
    Gated to fine-pointer, motion-OK devices via .has-custom-cursor on <html>. */
 html.has-custom-cursor
   :is(a[href], button, [role="button"], [role="link"], summary, label[for],
-      .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor]),
+      .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor]):not(input, select, textarea, [contenteditable="true"], [data-native-cursor]),
 html.has-custom-cursor
   :is(a[href], button, [role="button"], [role="link"], summary, label[for],
-      .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor]) * {
+      .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor])
+  :not(input, select, textarea, [contenteditable="true"], [data-native-cursor]) {
   cursor: none !important;
 }
-html.has-custom-cursor :is(input, textarea, select, [contenteditable="true"]),
-html.has-custom-cursor [data-native-cursor],
-html.has-custom-cursor [data-native-cursor] * { cursor: auto !important; }
+
+/* Hidden while the page is scrolling — the custom dot/disc fades out so it isn't
+   left floating over content sliding past; it returns on the next move / scroll-end. */
+.cursor-cur { transition: opacity 140ms ease; }
+.cursor-cur[data-hidden] { opacity: 0; }
+/* …and while scrolling, hide EVERY native cursor too — arrow, text caret, the lot — so
+   nothing shows at all. The component toggles .cursor-scroll-hide on <html> during scroll. */
+html.cursor-scroll-hide,
+html.cursor-scroll-hide * { cursor: none !important; }
 
 .cursor-cur {
   position: fixed;
@@ -61,6 +71,18 @@ html.has-custom-cursor [data-native-cursor] * { cursor: auto !important; }
   z-index: 2147483646;
   pointer-events: none;
   will-change: transform;
+}
+/* Press feedback — the whole cursor dips toward the point on pointer-down. Kept on
+   its own layer so it composes with the per-tier scales below (and the wrap's own
+   translate) without fighting them. */
+.cursor-cur-scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 150ms ease;
+}
+.cursor-cur[data-pressed] .cursor-cur-scale {
+  transform: scale(0.8);
 }
 /* Both tiers stack on the same point and cross-fade; only one is ever visible. */
 .cursor-cur-dot,
