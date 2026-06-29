@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GameEngine } from '@/game/engine';
 import { museumMap, TILE_SIZE } from '@/game/tilemap';
 import { COLORS } from '@/styles/theme';
+import { PressButton } from "@/components/PressButton";
 
 const ZOOM_MIN = 0.05;
 const ZOOM_MAX = 2.0;
@@ -129,12 +130,12 @@ export default function MapSnapshot() {
         {status === 'loading' && <span style={{ color: '#888', fontFamily: 'monospace', fontSize: 13 }}>Loading sprites…</span>}
         {status === 'error'   && <span style={{ color: '#e87', fontFamily: 'monospace', fontSize: 13 }}>Render error — check console</span>}
         {status === 'ready'   && (
-          <button
+          <PressButton
             onClick={handleDownload}
             style={{ padding: '5px 14px', background: COLORS.SAGE, color: COLORS.CANVAS_BG, border: 'none', borderRadius: 4, cursor: 'pointer', fontFamily: 'monospace', fontSize: 13 }}
           >
             Download PNG
-          </button>
+          </PressButton>
         )}
         <span style={{ marginLeft: 'auto', color: '#555', fontFamily: 'monospace', fontSize: 12 }}>
           {Math.round(view.zoom * 100)}% · scroll to zoom · drag to pan

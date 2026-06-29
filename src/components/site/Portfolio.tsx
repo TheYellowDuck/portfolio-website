@@ -26,6 +26,7 @@ import SkillBlobs from "./SkillBlobs";
 import ArchiveScroller from "./ArchiveScroller";
 import CpStats from "@/components/CpStats";
 import { useIsMac } from "@/lib/use-is-mac";
+import { PressButton } from "@/components/PressButton";
 
 interface PortfolioProps {
   onEnter: (rect?: DOMRect) => void;
@@ -53,12 +54,12 @@ function useIsMobile() {
 function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number; onClick: () => void }) {
   return (
     <div className="mt-8 flex justify-center">
-      <button
+      <PressButton
         onClick={onClick}
         className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
       >
         {open ? "Show less" : `Show all ${total} →`}
-      </button>
+      </PressButton>
     </div>
   );
 }
@@ -119,19 +120,19 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button
+            <PressButton
               onClick={() => window.dispatchEvent(new Event("command-palette:open"))}
               aria-label={content.nav.paletteAria}
               className="hidden items-center rounded-md border border-[rgb(var(--c-line-rgb)_/_0.15)] px-2 py-1 font-mono text-[11px] text-walnut/55 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 sm:flex"
             >
               {isMac ? "⌘K" : "Ctrl K"}
-            </button>
-            <button
+            </PressButton>
+            <PressButton
               onClick={() => onEnter()}
               className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
             >
               {content.nav.enter}
-            </button>
+            </PressButton>
           </div>
         </div>
       </nav>
@@ -233,13 +234,13 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           </Reveal>
           <Reveal delay={80}>
             <div className="flex flex-col gap-3">
-              <button onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+              <PressButton onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                 {content.sections.about.resume}
-              </button>
+              </PressButton>
               {hasTranscript && (
-                <button onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                <PressButton onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                   {content.sections.about.transcript}
-                </button>
+                </PressButton>
               )}
             </div>
           </Reveal>
@@ -286,9 +287,9 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         <Reveal variant="fade">
           <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
             <span>© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
-            <button onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
+            <PressButton onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
               {content.footer.wander}
-            </button>
+            </PressButton>
           </div>
           <p className="mt-3 max-w-[68ch] font-mono text-[11px] leading-relaxed text-walnut/70">
             {content.footer.privacy}
@@ -316,9 +317,9 @@ function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
           </p>
         )}
         {long && (
-          <button onClick={() => setOpen((o) => !o)} className="mt-1.5 font-mono text-[12px] text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage">
+          <PressButton onClick={() => setOpen((o) => !o)} className="mt-1.5 font-mono text-[12px] text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage">
             {open ? "Show less" : "Read more"}
-          </button>
+          </PressButton>
         )}
         {popup.tech && popup.tech.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">

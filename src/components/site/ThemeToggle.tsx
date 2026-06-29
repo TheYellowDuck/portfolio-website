@@ -1,11 +1,12 @@
 "use client";
 
 import { useDarkMode, setDarkMode } from "@/lib/use-dark-mode";
+import { PressButton } from "@/components/PressButton";
 
 export default function ThemeToggle() {
   const dark = useDarkMode();
   return (
-    <button
+    <PressButton
       onClick={() => setDarkMode(!dark)}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       title={dark ? "Light mode" : "Dark mode"}
@@ -23,6 +24,6 @@ export default function ThemeToggle() {
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         </svg>
       )}
-    </button>
+    </PressButton>
   );
 }

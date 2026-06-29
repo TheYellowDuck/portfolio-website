@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { TranscriptData, SubjectGroup, CourseEntry } from "@/types/transcript";
 import { experienceExhibits } from "@/data/projects";
 import { PERSON } from "@/lib/site";
+import { PressButton } from "@/components/PressButton";
 
 let transcriptCache: TranscriptData | null = null;
 
@@ -172,14 +173,14 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
               <h2 className="m-0 font-mono text-[26px] text-pine tracking-[1px] leading-none">
                 Education
               </h2>
-              <button
+              <PressButton
                 onClick={onClose}
                 autoFocus
                 aria-label="Close"
                 className="select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
               >
                 close [`]
-              </button>
+              </PressButton>
             </div>
 
             {/* Row 2: boxed info card */}
@@ -229,7 +230,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
                 {(data?.groups ?? []).map((g) => {
                   const active = g.subject === activeSubject;
                   return (
-                    <button
+                    <PressButton
                       key={g.subject}
                       onClick={() => setActive(g.subject)}
                       className={[
@@ -241,7 +242,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
                     >
                       {g.subject}
                       <span className="ml-1 opacity-45 text-[10px]">{g.courses.length}</span>
-                    </button>
+                    </PressButton>
                   );
                 })}
               </div>

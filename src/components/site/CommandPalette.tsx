@@ -2,6 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { content } from "@/content";
+import { PressButton } from "@/components/PressButton";
 
 export interface Command {
   id: string;
@@ -98,7 +99,7 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
                     {c.group}
                   </p>
                 )}
-                <button
+                <PressButton
                   data-sel={i === selClamped}
                   onClick={() => run(c)}
                   onMouseMove={() => setSel(i)}
@@ -108,7 +109,7 @@ export default function CommandPalette({ commands, enabled = true }: { commands:
                 >
                   <span>{c.label}</span>
                   {c.hint && <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-walnut/40">{c.hint}</span>}
-                </button>
+                </PressButton>
               </Fragment>
             );
           })}

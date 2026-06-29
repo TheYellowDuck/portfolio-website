@@ -16,6 +16,7 @@ import LoadingScreen from "./LoadingScreen";
 import Minimap from "./Minimap";
 import TouchControls from "./TouchControls";
 import NpcDialog from "./NpcDialog";
+import { PressButton } from "@/components/PressButton";
 
 const BG_MUSIC_SRCS = [
   "/assets/audio/museum-theme.m4a",
@@ -656,14 +657,14 @@ export default function GameCanvas({
                 : { bottom: "2rem", left: "2rem" }),
             }}
           >
-            <button
+            <PressButton
               onClick={() => setShowSettings((s) => !s)}
               aria-label="Audio settings"
               aria-expanded={showSettings}
               className="rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.95)] px-3 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.2)] hover:bg-[rgba(234,229,216,0.95)] transition-colors"
             >
               ⚙ sound
-            </button>
+            </PressButton>
             {showSettings && (
               <div
                 className={`absolute w-52 rounded-2xl border border-[rgba(122,158,126,0.7)] bg-[rgba(254,249,236,0.97)] p-3.5 shadow-[0_8px_30px_rgba(28,21,8,0.3)] ${

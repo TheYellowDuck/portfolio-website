@@ -9,6 +9,7 @@ import { categoryColor } from "@/lib/skill-colors";
 import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
 import HandwrittenNote from "@/components/site/HandwrittenNote";
+import { PressButton } from "@/components/PressButton";
 
 // YouTube embeds don't autoplay/loop without params — add them so the popup video
 // plays muted on a loop (like the card preview); viewers can unmute via the controls.
@@ -226,13 +227,13 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                       </p>
                     )}
                   </div>
-                  <button
+                  <PressButton
                     onClick={onClose}
                     aria-label="Close"
                     className="shrink-0 select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                   >
                     close [`]
-                  </button>
+                  </PressButton>
                 </div>
 
                 {/* Body — on desktop the left column (video over description) scrolls on its
@@ -272,14 +273,14 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                               {popup.skills.map((group, i) => {
                                 const c = categoryColor(group.category);
                                 return (
-                                  <button
+                                  <PressButton
                                     key={group.category}
                                     onClick={() => skillRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" })}
                                     className="text-left font-mono text-[11px] rounded px-2 py-1 hover:bg-[rgb(var(--c-line-rgb)_/_0.08)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                                     style={{ color: c.solid }}
                                   >
                                     {group.category}
-                                  </button>
+                                  </PressButton>
                                 );
                               })}
                             </nav>

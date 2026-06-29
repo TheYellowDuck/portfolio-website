@@ -5,6 +5,7 @@ import PixelCharacter from "./PixelCharacter";
 import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
 import { content } from "@/content";
+import { PressButton } from "@/components/PressButton";
 
 interface HeroProps {
   /** rect = the doorway panel's screen box, so the portal can zoom from it. */
@@ -42,12 +43,12 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
         )}
 
         <nav className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[13px]">
-          <button
+          <PressButton
             onClick={onResume}
             className="text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
           >
             <ScrambleText text={content.hero.resume} delay={620} />
-          </button>
+          </PressButton>
           {QUICK_LINKS.map((l, i) => (
             <a
               key={l.label}
@@ -64,7 +65,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
 
       {/* Right: the doorway portal into the game */}
       <div className="flex flex-1 flex-col items-center md:items-end">
-        <button
+        <PressButton
           onClick={() => onEnter(doorRef.current?.getBoundingClientRect())}
           className="group relative w-full max-w-[360px] focus-visible:outline-none"
         >
@@ -94,7 +95,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
               </span>
             </div>
           </div>
-        </button>
+        </PressButton>
         <p className="mt-3 w-full max-w-[360px] text-center font-mono text-[12px] text-walnut/70 md:text-right">
           {content.hero.doorway.caption}
         </p>

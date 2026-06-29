@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ResumeData, ResumeEntry, ResumeSection } from "@/types/resume";
+import { PressButton } from "@/components/PressButton";
 
 const DISPLAY_LABELS: Record<string, string> = {
   "WORK EXPERIENCE":         "Experience",
@@ -137,14 +138,14 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     Download PDF
                   </a>
                 )}
-                <button
+                <PressButton
                   onClick={onClose}
                   autoFocus
                   aria-label="Close"
                   className="select-none bg-transparent border border-[rgb(var(--c-line-rgb)_/_0.25)] rounded text-walnut font-mono text-[13px] px-3 py-1 cursor-pointer transition-colors hover:bg-[rgb(var(--c-line-rgb)_/_0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 >
                   close [`]
-                </button>
+                </PressButton>
               </div>
             </div>
 
@@ -154,7 +155,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
               {(data?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
                 return (
-                  <button
+                  <PressButton
                     key={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     className={[
@@ -165,7 +166,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     ].join(" ")}
                   >
                     {sectionLabel(s.title)}
-                  </button>
+                  </PressButton>
                 );
               })}
               </div>

@@ -1,9 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import type { MouseEventHandler } from "react";
+import { motion, AnimatePresence, LayoutGroup, type HTMLMotionProps } from "framer-motion";
 import { useDarkMode } from "@/lib/use-dark-mode";
 import { categoryColor } from "@/lib/skill-colors";
+import { usePressActivate } from "@/components/PressButton";
+
+// A motion.button that activates only on a press that both starts and ends on it (reliable clicks,
+// robust to trackpad micro-drag) — same semantics as PressButton, but for framer-motion so the orbs
+// keep their layout/tap animations. Each instance owns its own press state, so dragging from one orb
+// and releasing on another never triggers the wrong one.
+function PressMotionButton({
+  onActivate,
+  ...rest
+}: HTMLMotionProps<"button"> & { onActivate?: MouseEventHandler<HTMLButtonElement> }) {
+  const press = usePressActivate<HTMLButtonElement>(onActivate);
+  return <motion.button {...rest} {...press} />;
+}
 
 export interface SkillBlobGroup {
   title: string;
@@ -263,10 +277,10 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
             // Label scales to the orb: fits its longest word, never larger than the orb can hold.
             const fs = Math.max(mobile ? 7.5 : 8.5, Math.min((nd.r * 2 * 0.8) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
             return (
-              <motion.button
+              <PressMotionButton
                 key={g.title}
                 layoutId={`blob-${i}`}
-                onClick={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
+                onActivate={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}
                 animate={
                   active !== null
@@ -293,7 +307,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                   <span>{g.title}</span>
                   <span className="font-mono text-[10px] opacity-55">{g.items.length}</span>
                 </span>
-              </motion.button>
+              </PressMotionButton>
             );
           })}
 
@@ -313,8 +327,8 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
               const chipRow = "flex w-full flex-wrap content-start justify-center gap-1.5";
               return (
                 <>
-                  <motion.button
-                    key="backdrop" aria-label="Close" onClick={() => setActive(null)}
+                  <PressMotionButton
+                    key="backdrop" aria-label="Close" onActivate={() => setActive(null)}
                     className="absolute inset-0 z-10 cursor-zoom-out"
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     style={{ background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)" }}

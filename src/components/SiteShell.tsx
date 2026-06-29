@@ -8,6 +8,7 @@ import IntroCurtain from "./site/IntroCurtain";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
 import KonamiEasterEgg from "./site/KonamiEasterEgg";
+import { PressButton } from "./PressButton";
 import { mainHallExhibits, archiveExhibits, giftShopExhibits, type ExhibitPopup } from "@/data/projects";
 import { getPopupBySlug, slugForPopup } from "@/lib/exhibit-slugs";
 import { PERSON } from "@/lib/site";
@@ -48,6 +49,9 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
   const scrollYRef = useRef(0);
+  // Set the instant a leave is requested so a single press can't fire it twice (pointerup + the
+  // synthetic click that follows) and jump two history entries back. Reset on each (re-)enter.
+  const leaveStartedRef = useRef(false);
 
   // Lock page scroll while off the plain site; restore scroll on return.
   useEffect(() => {
@@ -126,6 +130,7 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     gameReadyRef.current = false;
     fadeDoneRef.current = false;
     bgStartedRef.current = false;
+    leaveStartedRef.current = false; // arm the Leave button again for this visit
     // `instant` (browser Back/Forward, incl. the mobile back-swipe) jumps straight to the game with
     // no staged fade — the same path reduced-motion takes.
     if (reduceMotion || instant) { setGameOn(true); setStage("game"); return; }
@@ -154,7 +159,12 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   // browser/device Back — including the mobile back-swipe — leaves instantly (no animation, and none
   // of the staged-fade timers that a mid-swipe interruption could crash on).
   const leaveAnimatedRef = useRef(false);
-  const requestExitGame = useCallback(() => { leaveAnimatedRef.current = true; window.history.back(); }, []);
+  const requestExitGame = useCallback(() => {
+    if (leaveStartedRef.current || stage !== "game") return;
+    leaveStartedRef.current = true;
+    leaveAnimatedRef.current = true;
+    window.history.back();
+  }, [stage]);
 
   // Back/Forward across the museum entry → leave / re-enter the game. Direction comes from the
   // entry's own state: landing on the museum-marked entry enters, landing off it leaves. Each
@@ -323,14 +333,14 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
 
       {/* Leave affordance while playing. */}
       {stage === "game" && (
-        <button
+        <PressButton
           onClick={requestExitGame}
           aria-label="Leave the museum and return to the website"
-          className="game-warm fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-4 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+          className="game-warm fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-5 py-2 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
         >
           ← web
-        </button>
+        </PressButton>
       )}
 
       {/* Site detail modals reuse the game's exhibit overlay (text, tags, grouped
