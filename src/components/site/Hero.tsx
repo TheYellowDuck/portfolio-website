@@ -83,7 +83,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
             {/* Character standing in the doorway */}
             <div aria-hidden className="absolute bottom-[18%] left-1/2 -translate-x-1/2 transition-transform duration-300 group-hover:scale-105">
-              <PixelCharacter state="idle" dir="south" size={132} />
+              <PixelCharacter state="idle" dir="south" size={330} />
             </div>
             {/* Invitation */}
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5">
