@@ -22,6 +22,9 @@ export const IDLE_FRAMES = 5;
 export const WALK_FRAMES = 6;
 
 const RUN_MULTIPLIER = 1.9;
+// Distance (px) the character covers per walk-cycle frame. Holding this constant makes the animation
+// cadence scale with the ACTUAL speed, so the feet stay planted (no sliding) at any walk/run speed.
+const WALK_STRIDE = 17;
 // Analog joystick tuning (vector magnitude is 0..1).
 const ANALOG_DEAD = 0.16;   // ignore tiny nudges near center
 const ANALOG_RUN  = 0.92;   // push to the rim to sprint
@@ -55,7 +58,7 @@ export class Player {
   y = TILE_SIZE * PLAYER_SPAWN_ROW + TILE_SIZE / 2;
   width = TILE_SIZE / 2;
   height = TILE_SIZE / 2;
-  speed = 200;
+  speed = 280;
   facing: Direction = 'east';
   isMoving = false;
   animFrame = 0;
@@ -121,7 +124,7 @@ export class Player {
       this.animFrame = 0;
       this.animTimer = 0;
     }
-    const frameDuration = isMoving ? 0.085 / (running ? RUN_MULTIPLIER : 1) : 0.45;
+    const frameDuration = isMoving ? WALK_STRIDE / (this.speed * (running ? RUN_MULTIPLIER : 1)) : 0.45;
     const frameCount = isMoving ? WALK_FRAMES : IDLE_FRAMES;
     this.animTimer += dt;
     if (this.animTimer >= frameDuration) {
