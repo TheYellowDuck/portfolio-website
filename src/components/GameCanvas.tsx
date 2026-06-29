@@ -690,13 +690,17 @@ export default function GameCanvas({
           viewport space, so it wouldn't fade with the world otherwise). */}
       <ExhibitOverlay popup={leaving ? null : activePopup} onClose={handleClose} gentle={activePopup === CURATOR_REWARD} />
 
-      {/* NPC dialog (e.g. "me" at the desk) — sequential lines, advance on E / tap. */}
-      <NpcDialog
-        line={dialog ? dialog.lines[dialog.idx] : null}
-        hasNext={dialog ? dialog.idx < dialog.lines.length - 1 : false}
-        onAdvance={advanceDialog}
-        isTouch={isTouch}
-      />
+      {/* NPC dialog (e.g. "me" at the desk) — sequential lines, advance on E / tap.
+          Wrapped in the HUD's opacity fade so, if it's open during the portal transition,
+          it leaves in lockstep with the hints/HUD instead of lingering until unmount. */}
+      <div style={{ opacity: hudOpacity, transition: `opacity ${fadeMs}ms ease` }}>
+        <NpcDialog
+          line={dialog ? dialog.lines[dialog.idx] : null}
+          hasNext={dialog ? dialog.idx < dialog.lines.length - 1 : false}
+          onAdvance={advanceDialog}
+          isTouch={isTouch}
+        />
+      </div>
 
       {/* On-screen controls for touch devices — virtual joystick + interact button.
           Outside the scaled container so it sits in real (thumb-reachable) viewport space.
