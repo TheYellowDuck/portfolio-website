@@ -20,10 +20,13 @@ const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
 // player fades in → HUD fades in. Leave reverses it. Each step is one `FADE_MS` beat.
 type Stage =
   | "site"
-  | "in-fade" | "in-bg" | "in-player" | "game"
-  | "out-hud" | "out-player" | "out-bg" | "out-fade";
+  | "in-site" | "in-fade" | "in-bg" | "in-player" | "game"
+  | "out-hud" | "out-player" | "out-bg" | "out-fade" | "out-site";
 
 const FADE_MS = 420;
+// How far the header trails the content (and vice-versa) so the transition reads as content → header
+// → game. Also the extra time the dedicated site-fade beat (in-site) runs beyond one fade.
+const HEADER_LAG = Math.round(FADE_MS * 0.55);
 
 function usePrefersReducedMotion() {
   return useSyncExternalStore(
@@ -53,9 +56,13 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   // synthetic click that follows) and jump two history entries back. Reset on each (re-)enter.
   const leaveStartedRef = useRef(false);
 
-  // Lock page scroll while off the plain site; restore scroll on return.
+  // Lock page scroll while the game covers the screen; restore scroll otherwise. Stay unlocked for the
+  // beats where the header itself fades (in-site going in, out-site coming back), not just "site": body
+  // `overflow: hidden` breaks the nav's `position: sticky`, so otherwise the header would unpin from the
+  // top (scrolled out of view) and the content→header→game staging wouldn't be visible. The lock holds
+  // while the game backdrop covers the screen (in-fade through out-fade) and lifts again at out-site.
   useEffect(() => {
-    if (stage === "site") {
+    if (stage === "site" || stage === "in-site" || stage === "out-site") {
       document.body.classList.remove("game-active");
       window.scrollTo(0, scrollYRef.current);
     } else {
@@ -134,8 +141,8 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     // `instant` (browser Back/Forward, incl. the mobile back-swipe) jumps straight to the game with
     // no staged fade — the same path reduced-motion takes.
     if (reduceMotion || instant) { setGameOn(true); setStage("game"); return; }
-    setGameOn(false);   // fades to 1 on the next frame (in-fade effect)
-    setStage("in-fade");
+    setGameOn(false);   // the game backdrop stays hidden through in-site, then fades up at in-fade
+    setStage("in-site"); // first beat: content → header fade out on their own, before the game appears
   }, [stage, reduceMotion]);
 
   const enterGame = useCallback(() => {
@@ -244,6 +251,10 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
       return () => clearTimeout(t);
     };
     switch (stage) {
+      // Site fades out on its own first (content leads, header trails) while the game is still hidden,
+      // so the header reads as a distinct beat before the room appears. Long enough for the trailing
+      // header to finish: one fade plus the header's lag.
+      case "in-site":    return next("in-fade", HEADER_LAG + FADE_MS);
       case "in-fade": {
         fadeDoneRef.current = false;
         const raf = requestAnimationFrame(() => requestAnimationFrame(() => setGameOn(true)));
@@ -259,18 +270,37 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
         const t = window.setTimeout(() => { setGameOn(false); setStage("out-fade"); }, FADE_MS);
         return () => clearTimeout(t);
       }
-      case "out-fade":   return next("site");
+      // Game backdrop fades out to bare parchment, then the site fades back in as its own beat (header
+      // leads, content trails) — the mirror of in-site, so the header reads as a distinct return beat.
+      case "out-fade":   return next("out-site");
+      case "out-site":   return next("site", HEADER_LAG + FADE_MS);
     }
   }, [stage, maybeStartBg]);
 
   // Derived view state
   const gameMounted = stage !== "site";
-  const siteOpacity = stage === "site" || stage === "out-fade" ? 1 : 0;
+  const fadeMs = reduceMotion ? 0 : FADE_MS;
+  // Stage the header as its own beat in the game transition: the change reads content → header → game
+  // going in, and game → header → content coming back. The nav and the main content target the same
+  // opacity (shown on the plain site and during the out-fade cross-fade), but with a stagger — heading
+  // into the game the content leads and the header trails; coming back the header leads and the content
+  // trails. Opacity lives on the nav/content themselves (not an ancestor) so the nav's backdrop-filter
+  // keeps compositing through the fade.
+  const siteShown = stage === "site" || stage === "out-site";
+  const enteringGame = stage.startsWith("in") || stage === "game";
+  const headerLag = reduceMotion ? 0 : HEADER_LAG;
+  const navStyle = {
+    opacity: siteShown ? 1 : 0,
+    transition: `opacity ${fadeMs}ms ease ${enteringGame ? headerLag : 0}ms`,
+  };
+  const contentStyle = {
+    opacity: siteShown ? 1 : 0,
+    transition: `opacity ${fadeMs}ms ease ${enteringGame ? 0 : headerLag}ms`,
+  };
   const worldOpacity =
     stage === "in-bg" || stage === "in-player" || stage === "game" || stage === "out-hud" || stage === "out-player" ? 1 : 0;
   const playerVisible = stage === "in-player" || stage === "game" || stage === "out-hud";
   const hudOpacity = stage === "game" ? 1 : 0;
-  const fadeMs = reduceMotion ? 0 : FADE_MS;
   const audible = !stage.startsWith("out"); // fade music out across the leave stages
   const leaving = stage.startsWith("out");  // an open exhibit popup fades out first as we leave
 
@@ -280,16 +310,15 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
           The "lights coming up": warm lamp glow blooms, name + label + underline stage in. */}
       <IntroCurtain />
 
-      {/* Site layer — plain flow (sticky nav + scroll unaffected); fades out under the game. */}
+      {/* Site layer — plain flow (sticky nav + scroll unaffected). The header and content fade as
+          separate beats (see navStyle/contentStyle) so the transition reads content → header → game. */}
       <div
         aria-hidden={stage !== "site"}
-        style={{
-          opacity: siteOpacity,
-          transition: `opacity ${fadeMs}ms ease`,
-          pointerEvents: stage === "site" ? undefined : "none",
-        }}
+        style={{ pointerEvents: stage === "site" ? undefined : "none" }}
       >
         <Portfolio
+          navStyle={navStyle}
+          contentStyle={contentStyle}
           onEnter={enterGame}
           onResume={() => openPopup({ type: "resume" })}
           onTranscript={() => openPopup({ type: "transcript" })}

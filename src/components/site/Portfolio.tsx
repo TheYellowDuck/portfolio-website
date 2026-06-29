@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import type { CSSProperties } from "react";
 import {
   mainHallExhibits,
   inProgressExhibits,
@@ -35,6 +36,9 @@ interface PortfolioProps {
   onOpenProject: (popup: ExhibitPopup) => void;
   /** Hero's "Currently:" line — server-derived (role or academic term); see app/page.tsx. */
   currentStatus?: string;
+  /** Transition styles staged by SiteShell so the header and content fade as separate beats. */
+  navStyle?: CSSProperties;
+  contentStyle?: CSSProperties;
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -79,7 +83,7 @@ function Section({ id, eyebrow, title, intro, titleDuration, children }: {
   );
 }
 
-export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject, currentStatus }: PortfolioProps) {
+export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProject, currentStatus, navStyle, contentStyle }: PortfolioProps) {
   const isMac = useIsMac();
   const featured = withPopup(mainHallExhibits);
   const inProgress = withPopup(inProgressExhibits);
@@ -109,7 +113,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         Skip to content
       </a>
       {/* Slim sticky nav */}
-      <nav className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
+      <nav style={navStyle} className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-4">
           <a href="#top" className="font-display text-[17px] font-semibold tracking-tight text-walnut">{PERSON.name}</a>
           <div className="hidden items-center gap-6 font-mono text-[13px] text-walnut/65 sm:flex">
@@ -137,7 +141,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         </div>
       </nav>
 
-      <main id="main-content" tabIndex={-1} className="outline-none">
+      <main id="main-content" tabIndex={-1} style={contentStyle} className="outline-none">
         <div id="top" />
         <Hero onEnter={onEnter} onResume={onResume} currentStatus={currentStatus} />
 
