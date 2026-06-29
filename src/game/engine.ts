@@ -404,10 +404,18 @@ export class GameEngine {
       this.onEvent?.({ type: "leave" });
     }
 
-    // The exhibit's name floats in above it while you're standing at it (not the secret duck).
-    const labelOn = !!(this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && exhibitLabel(this.currentNearby.content.popup));
-    if (labelOn) this.lastNearby = this.currentNearby; // keep it so the label can fade out after leaving
-    this.labelAlpha += ((labelOn ? 1 : 0) - this.labelAlpha) * Math.min(1, dt * 9);
+    // The exhibit's name floats in above it while you're standing at it (not the secret duck). When
+    // you step straight from one pedestal to another, the OLD label fades fully out before the new one
+    // swaps in and fades up — otherwise the text would snap, because labelAlpha is still high.
+    const target = (this.currentNearby && this.currentNearby.tileType !== TILES.EASTER_EGG && exhibitLabel(this.currentNearby.content.popup))
+      ? this.currentNearby : null;
+    const k = Math.min(1, dt * 9);
+    if (this.lastNearby === target) {
+      this.labelAlpha += ((target ? 1 : 0) - this.labelAlpha) * k;   // showing the right label → fade to its target
+    } else {
+      this.labelAlpha -= this.labelAlpha * k;                        // a different label wants the stage → fade out first
+      if (this.labelAlpha < 0.02) this.lastNearby = target;          // then swap, and it fades back in next frames
+    }
 
     // Sparkles rise from the pedestal while the player lingers nearby (but not
     // from the easter-egg duck).
