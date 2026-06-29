@@ -1,0 +1,122 @@
+% George Zhang — Résumé (AI / ML variant)
+% Experience is reverse-chronological; AI emphasis lives in PROJECTS (RAG, RLHF, agents).
+% Compile with pdflatex (Overleaf-ready). Single-column, ATS-safe.
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{XCharter}
+\usepackage[letterspace=60]{microtype}
+\usepackage[letterpaper,margin=0.45in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Accent color (swap the one hex below to restyle the whole résumé) ----------
+% Oxblood 6F2436 (default) · Navy 1F3B5B · Teal 155E52 · Indigo 35386B · Near-black 2B2B2B
+\definecolor{accent}{HTML}{6F2436}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
+
+\titleformat{\section}
+  {\large\bfseries\scshape\color{accent}}{}{0em}{}[\vspace{-3pt}{\color{accent}\titlerule[0.9pt]}\vspace{2.5pt}]
+\titlespacing*{\section}{0pt}{3pt}{0pt}
+
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1} & {\small #2}\\[1pt]
+    {\small\itshape #3} & {\small\itshape #4}\\
+  \end{tabularx}%
+}
+
+\newcommand{\project}[3]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2} & {\small #3}\\
+  \end{tabularx}%
+}
+
+\newenvironment{bullets}
+  {\begin{itemize}[leftmargin=1.5em,labelsep=0.5em,itemsep=1pt,topsep=1pt,parsep=0pt,partopsep=0pt]\small}
+  {\end{itemize}\vspace{1pt}}
+
+\begin{document}
+
+% ================= HEADER =================
+\begin{center}
+  {\Huge\bfseries\color{accent}\textls[40]{George Zhang}}\\[5pt]
+  {\footnotesize
+  (778) 682-9123 \sep
+  \href{mailto:gzhang06@outlook.com}{gzhang06@outlook.com} \sep
+  \href{https://linkedin.com/in/iamgeorgezhang}{linkedin.com/in/iamgeorgezhang} \sep
+  \href{https://github.com/TheYellowDuck}{github.com/TheYellowDuck} \sep
+  \href{https://georgezhang.ca}{georgezhang.ca}
+  \\[3pt]Canadian \& Hong Kong citizen \; · \; eligible for U.S. internships (J-1); TN-eligible post-graduation}
+\end{center}
+
+% ================= EDUCATION =================
+\section{Education}
+\entry{University of Waterloo}{Waterloo, ON}{Bachelor of Computer Science (Honours, Co-op)}{Sep 2024 -- May 2029}
+\begin{bullets}
+  \item Relevant coursework: Probability \& Statistics, Linear Algebra, Data Structures \& Algorithms, Optimization, Logic \& Computation, OOP (C++).
+\end{bullets}
+
+% ================= EXPERIENCE =================
+\section{Experience}
+
+\entry{Ford Motor Company}{Waterloo, ON}{Software Developer Intern --- Android Automotive OS}{May 2026 -- Present}
+\begin{bullets}
+  \item Build features for the in-vehicle Car Dialer app on Android Automotive OS (multi-module Java/Kotlin, Android Telecom + Bluetooth HFP), with unit testing (Robolectric) and CI via Gradle and AOSP/Soong.
+\end{bullets}
+
+\entry{University of British Columbia}{Vancouver, BC}{Undergraduate Research Assistant --- Centre for Brain Health}{Jun 2025 -- Aug 2025}
+\begin{bullets}
+  \item Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.
+  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at $\sim$90\% accuracy with $<$100\,ms latency, fully on-device to meet PIPEDA/GDPR requirements.
+  \item Designed activity-heatmap dashboards that cut clinician monitoring overhead by 30\%; presented at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
+\end{bullets}
+
+% ================= PROJECTS =================
+\section{Projects}
+
+\project{Code-Aware RAG System}{Python, Transformers}{github.com/TheYellowDuck/RAG-codebase}
+\begin{bullets}
+  \item Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers --- AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).
+  \item Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder proved net-negative on code.
+\end{bullets}
+
+\project{RLHF Pipeline}{PyTorch}{github.com/TheYellowDuck/rlhf-pipeline}
+\begin{bullets}
+  \item Reproduced the LLM post-training stack (SFT, reward modeling, PPO) with the RL core written from scratch: GAE, the clipped policy-gradient surrogate, per-token KL-to-reference shaping, and an adaptive KL controller.
+  \item Added DPO and GRPO alternatives, LoRA parameter-efficient fine-tuning, multi-GPU training (HuggingFace Accelerate), and an independent LLM-as-judge win-rate evaluation with position-bias control.
+\end{bullets}
+
+\project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
+\begin{bullets}
+  \item Built a ReAct + reflection agent (browser accessibility tree, provider-agnostic across Claude/GPT/Gemini) with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability.
+\end{bullets}
+
+% ================= SKILLS =================
+\section{Technical Skills}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  \textbf{Languages} & Python, C++, Java, Kotlin, TypeScript/JavaScript, SQL\\
+  \textbf{ML / AI} & PyTorch, Transformers, RAG, RLHF (PPO/DPO/GRPO), LLM agents, prompt engineering, LLM-as-judge eval\\
+  \textbf{Data} & NumPy, Pandas, scikit-learn, Matplotlib, OpenCV, MediaPipe, embeddings, statistics\\
+  \textbf{Tools} & Git, Linux, Docker, GitHub Actions, HuggingFace, Playwright, Anthropic/OpenAI APIs\\
+  \textbf{Concepts} & Data Structures \& Algorithms, Evaluation \& Statistical Rigor, Computer Vision, OOP\\
+\end{tabularx}
+
+% ================= AWARDS =================
+\section{Awards \& Competitive Programming}
+\begin{bullets}
+  \item President's Scholarship of Distinction \& Entrance Scholarship in Mathematics, University of Waterloo
+  \item ICPC Local (Waterloo) --- Rank 28 / $\sim$100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
+  \item Canadian Computing Competition --- Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction
+  \item RoboCup International Junior Maze Rescue 2023 (Captain) --- 2nd Place Supergroup, 17th Individual
+\end{bullets}
+
+\end{document}

@@ -13,8 +13,9 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { PDFParse } from "pdf-parse";
 import { parseResumeText } from "../src/lib/resume-parser.ts";
+import { parseResumeTex } from "../src/lib/resume-tex.ts";
 import { parseTranscript } from "../src/lib/transcript-parser.ts";
-import type { ResumeData } from "../src/types/resume.ts";
+import type { ResumeVariant, ResumeCollection } from "../src/types/resume.ts";
 import type { TranscriptData } from "../src/types/transcript.ts";
 
 const ROOT = process.cwd();
@@ -63,17 +64,64 @@ async function fetchCourseDescriptions(subjects: string[]): Promise<Map<string, 
   return map;
 }
 
+// Each résumé in resume/*.tex becomes a selectable variant in the popup's tab switcher. The default
+// (variants[0]) is also mirrored at the top level so existing consumers (llms.txt, linkedin.txt,
+// /api/resume) keep working unchanged. SWE leads, then quant, then ai, then any others alphabetically.
+const VARIANT_ORDER = ["swe", "quant", "ai"];
+const variantId = (texFile: string): string => texFile.replace(/\.tex$/i, "").replace(/^resume[-_]?/i, "") || "resume";
+const variantRank = (id: string): number => {
+  const i = VARIANT_ORDER.indexOf(id);
+  return i === -1 ? VARIANT_ORDER.length : i;
+};
+
 async function syncResume(): Promise<void> {
-  const dir = path.join(ROOT, "public/assets/resume");
-  const file = firstPdf(dir);
-  if (!file) {
-    console.warn("sync-docs: no résumé PDF found — skipping");
-    return;
+  const texDir = path.join(ROOT, "resume");
+  const pdfDir = path.join(ROOT, "public/assets/resume");
+  const variants: ResumeVariant[] = [];
+
+  // Path A — generate from the .tex sources (canonical; deterministic, no LaTeX/PDF needed).
+  let texFiles: string[] = [];
+  try {
+    texFiles = readdirSync(texDir).filter((f) => f.toLowerCase().endsWith(".tex"));
+  } catch {
+    /* no resume/ dir — fall through to the PDF path */
   }
-  const text = await pdfText(path.join(dir, file));
-  const data: ResumeData = { ...parseResumeText(text), pdfPath: `/assets/resume/${file}` };
+  for (const file of texFiles) {
+    const parsed = parseResumeTex(readFileSync(path.join(texDir, file), "utf8"));
+    const id = variantId(file);
+    variants.push({
+      id,
+      label: parsed.label || id.toUpperCase(),
+      name: parsed.name,
+      contact: parsed.contact,
+      sections: parsed.sections,
+      pdfPath: `/assets/resume/${file.replace(/\.tex$/i, "")}.pdf`,
+    });
+  }
+  variants.sort((a, b) => variantRank(a.id) - variantRank(b.id) || a.id.localeCompare(b.id));
+
+  // Path B — fallback: no .tex sources, parse the first PDF with the hardened parser.
+  if (variants.length === 0) {
+    const file = firstPdf(pdfDir);
+    if (!file) {
+      console.warn("sync-docs: no résumé .tex or PDF found — skipping");
+      return;
+    }
+    const parsed = parseResumeText(await pdfText(path.join(pdfDir, file)));
+    variants.push({ id: "resume", label: "Résumé", ...parsed, pdfPath: `/assets/resume/${file}` });
+  }
+
+  // Mirror the default variant's ResumeData fields at the top level (backward-compat), plus variants.
+  const def = variants[0];
+  const data: ResumeCollection = {
+    name: def.name,
+    contact: def.contact,
+    sections: def.sections,
+    pdfPath: def.pdfPath,
+    variants,
+  };
   writeJson("src/data/resume.generated.json", data);
-  console.log(`sync-docs: résumé → ${data.sections.length} sections from "${file}"`);
+  console.log(`sync-docs: résumé → ${variants.length} variant(s) [${variants.map((v) => v.id).join(", ")}]`);
 }
 
 async function syncTranscript(): Promise<void> {

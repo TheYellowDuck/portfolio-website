@@ -3,114 +3,474 @@
   "contact": {
     "phone": "(778) 682-9123",
     "email": "gzhang06@outlook.com",
-    "linkedin": "linkedin.com/in/iamgeorgezhang/",
+    "linkedin": "linkedin.com/in/iamgeorgezhang",
     "github": "https://github.com/TheYellowDuck"
   },
   "sections": [
     {
-      "title": "SKILLS",
-      "bullets": [
-        "Languages: Python, Java, C/C++, Kotlin, HTML, SQL",
-        "Frameworks & Libraries: OpenCV, MediaPipe, Numpy, Android SDK, Room Persistence Library",
-        "Tools & Platforms: Git, Linux, Google Play Console, Android Studio",
-        "Concepts: Algorithms & Data Structures, Object-Oriented Design, Computer Vision, Full-Stack Development"
-      ]
-    },
-    {
-      "title": "EDUCATION",
+      "title": "Education",
       "entries": [
         {
           "title": "University of Waterloo",
+          "location": "Waterloo, ON",
+          "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
           "period": "Sep 2024 – May 2029",
-          "bullets": [],
-          "subtitle": "Bachelor of Computer Science",
-          "location": "Waterloo, ON"
+          "bullets": [
+            "Relevant coursework: Data Structures & Algorithms, OOP (C++), Computer Organization, Logic & Computation, Optimization, Probability & Statistics."
+          ]
         }
       ]
     },
     {
-      "title": "WORK EXPERIENCE",
+      "title": "Experience",
       "entries": [
         {
-          "title": "Undergraduate Research Assistant",
+          "title": "Ford Motor Company",
+          "location": "Waterloo, ON",
+          "subtitle": "Software Developer Intern — Android Automotive OS",
+          "period": "May 2026 – Present",
+          "bullets": [
+            "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
+            "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+          ]
+        },
+        {
+          "title": "University of British Columbia",
+          "location": "Vancouver, BC",
+          "subtitle": "Undergraduate Research Assistant — Centre for Brain Health",
           "period": "Jun 2025 – Aug 2025",
           "bullets": [
-            "Took charge of the development of two full-stack applications including HandEase and Palm & Plant to assist in Parkinson's rehabilitation, projecting to aid medically patients in hospitals across 10+ countries.",
-            "Developed a computer vision pipeline using Python, OpenCV, and MediaPipe – AI hand library to detect and collect rehabilitation data on 7 hand exercise gestures of patients, resulting in ~90% accuracy for medical analysis.",
-            "Optimized Apps to run in real time (<100ms latency) on local hardware, delivering immediate results and feedback to create polished and consistent user experiences.",
-            "Designed dashboards with activity heatmap and daily metrics using Python to improve monitoring efficiency for practitioners by 30% and streamline long-term medical care for patients.",
-            "Led end-to-end project lifecycle from requirements, development, testing, and deployment, which was presented in the 11th Singapore International Parkinson Disease & Movement Disorders Symposium.",
-            "Engineered 10 applications with 4 team members and updated weekly progress to clinicians at the Djavad Mowafaghian Centre for Brain Health, receiving positive reviews."
-          ],
-          "subtitle": "University of British Columbia",
-          "location": "Vancouver, BC"
-        },
-        {
-          "title": "Math & Reading Instructor",
-          "period": "Aug 2021 – May 2024",
-          "bullets": [
-            "Invited by Kumon Supervisor to join their team due to outstanding performance in Math and Literature",
-            "Mentored 100+ students in math/reading, marked their homework, adapted lessons to individual needs, and provided optimal and precise guidance",
-            "Managed class flow and delivered feedback according to students personal understanding and performance, leading to students’ significant improvement in tests and classroom behavior"
-          ],
-          "subtitle": "Kumon Inc.",
-          "location": "Vancouver, BC"
+            "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
+            "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
+            "Presented the work at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
+          ]
         }
       ]
     },
     {
-      "title": "PROJECTS",
+      "title": "Projects",
       "entries": [
         {
-          "title": "My Fridge App",
+          "title": "Interactive Portfolio & Game Engine",
           "tech": [
-            "Kotlin",
-            "Android SDK",
-            "Room Database"
+            "TypeScript",
+            "Next.js",
+            "React",
+            "Canvas",
+            "Redis"
           ],
-          "period": "Jun 2023 – Aug 2023",
+          "link": "georgezhang.ca",
           "bullets": [
-            "Designed an Android application managing fridge inventory and published on Google Play, reducing food waste by 20% and inducing healthy eating habits.",
-            "Implemented Room DB + push notifications reminding users of expiry dates and track shopping lists with >95% reliability, constructing efficient food usage and enhancing shopping experiences."
+            "Built a personal site with two faces — a fast web portfolio and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps) — plus multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions pipeline auto-refreshing all content from one source."
           ]
         },
         {
-          "title": "RoboCup Junior Maze Rescue - Captain",
+          "title": "Code-Aware RAG System",
           "tech": [
             "Python",
-            "OpenMV",
-            "LiDAR",
-            "Algorithms"
+            "tree-sitter",
+            "embeddings"
           ],
-          "period": "Jun 2022 – Jul 2023",
+          "link": "github.com/TheYellowDuck/RAG-codebase",
           "bullets": [
-            "Architected a prioritized maze navigation algorithm with modified Dijkstra’s and LiDAR-based positioning for multi-level point-based maps.",
-            "Facilitated CV logic for letter and color detection with >90% accuracy, reacting to maze events effectively.",
-            "Designed a robot achieving 85% maze success rate and completing runs <2 mins, which led team to place 2nd in the Supergroup Category and 17th in the Individual Component out of 50+ teams at RoboCup International 2023."
+            "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
+            "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
           ]
         },
         {
-          "title": "Game Development Portfolio",
+          "title": "Limit Order Book & Matching Engine",
           "tech": [
-            "Java"
+            "C++20"
           ],
-          "period": "Feb 2021 – Jul 2022",
+          "link": "github.com/TheYellowDuck/limit-order-book",
           "bullets": [
-            "Created 3 Java games of ~3000 LOC to strengthen OOP/design skills, and implemented DFS group capture for Go, randomized cascade reveal for Minesweeper, and custom 2D physics in platformer parkour game."
+            "Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
+            "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
+          ]
+        },
+        {
+          "title": "Autonomous LLM Web Agent",
+          "tech": [
+            "Python",
+            "Playwright"
+          ],
+          "link": "github.com/TheYellowDuck/web-agent",
+          "bullets": [
+            "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
           ]
         }
       ]
     },
     {
-      "title": "AWARDS AND ACHIEVEMENTS",
+      "title": "Technical Skills",
       "bullets": [
-        "International Collegiate Programming Contest Local Competition (Waterloo) | Rank 28 out of ~100",
-        "RoboCup International Junior Maze Rescue | 2nd Place Supergroup, 17th Individual",
-        "Avogadro’s Chemistry Contest | Certificate of Distinction",
-        "AIME (American Invitational Mathematics Examination) Qualifier (top >10% of 150,000)",
-        "COMC (Canadian Open Mathematics Challenge) Distinction"
+        "Languages: C++, Python, Java, Kotlin, TypeScript/JavaScript, SQL, C, HTML/CSS",
+        "Frameworks: React, Next.js, PyTorch, OpenCV, MediaPipe, NumPy, Pandas, Android SDK/Jetpack, Tailwind",
+        "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio",
+        "Concepts: Data Structures & Algorithms, Concurrency, OOP & Design Patterns, LLMs / RAG, Computer Vision"
+      ]
+    },
+    {
+      "title": "Awards & Competitive Programming",
+      "bullets": [
+        "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
+        "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+        "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
+        "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
       ]
     }
   ],
-  "pdfPath": "/assets/resume/George Zhang Resume - V8.pdf"
+  "pdfPath": "/assets/resume/resume-swe.pdf",
+  "variants": [
+    {
+      "id": "swe",
+      "label": "General SWE / Big Tech",
+      "name": "George Zhang",
+      "contact": {
+        "phone": "(778) 682-9123",
+        "email": "gzhang06@outlook.com",
+        "linkedin": "linkedin.com/in/iamgeorgezhang",
+        "github": "https://github.com/TheYellowDuck"
+      },
+      "sections": [
+        {
+          "title": "Education",
+          "entries": [
+            {
+              "title": "University of Waterloo",
+              "location": "Waterloo, ON",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "period": "Sep 2024 – May 2029",
+              "bullets": [
+                "Relevant coursework: Data Structures & Algorithms, OOP (C++), Computer Organization, Logic & Computation, Optimization, Probability & Statistics."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Experience",
+          "entries": [
+            {
+              "title": "Ford Motor Company",
+              "location": "Waterloo, ON",
+              "subtitle": "Software Developer Intern — Android Automotive OS",
+              "period": "May 2026 – Present",
+              "bullets": [
+                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
+                "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+              ]
+            },
+            {
+              "title": "University of British Columbia",
+              "location": "Vancouver, BC",
+              "subtitle": "Undergraduate Research Assistant — Centre for Brain Health",
+              "period": "Jun 2025 – Aug 2025",
+              "bullets": [
+                "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
+                "Presented the work at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Projects",
+          "entries": [
+            {
+              "title": "Interactive Portfolio & Game Engine",
+              "tech": [
+                "TypeScript",
+                "Next.js",
+                "React",
+                "Canvas",
+                "Redis"
+              ],
+              "link": "georgezhang.ca",
+              "bullets": [
+                "Built a personal site with two faces — a fast web portfolio and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps) — plus multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions pipeline auto-refreshing all content from one source."
+              ]
+            },
+            {
+              "title": "Code-Aware RAG System",
+              "tech": [
+                "Python",
+                "tree-sitter",
+                "embeddings"
+              ],
+              "link": "github.com/TheYellowDuck/RAG-codebase",
+              "bullets": [
+                "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
+                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
+              ]
+            },
+            {
+              "title": "Limit Order Book & Matching Engine",
+              "tech": [
+                "C++20"
+              ],
+              "link": "github.com/TheYellowDuck/limit-order-book",
+              "bullets": [
+                "Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
+                "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
+              ]
+            },
+            {
+              "title": "Autonomous LLM Web Agent",
+              "tech": [
+                "Python",
+                "Playwright"
+              ],
+              "link": "github.com/TheYellowDuck/web-agent",
+              "bullets": [
+                "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Technical Skills",
+          "bullets": [
+            "Languages: C++, Python, Java, Kotlin, TypeScript/JavaScript, SQL, C, HTML/CSS",
+            "Frameworks: React, Next.js, PyTorch, OpenCV, MediaPipe, NumPy, Pandas, Android SDK/Jetpack, Tailwind",
+            "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio",
+            "Concepts: Data Structures & Algorithms, Concurrency, OOP & Design Patterns, LLMs / RAG, Computer Vision"
+          ]
+        },
+        {
+          "title": "Awards & Competitive Programming",
+          "bullets": [
+            "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
+            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
+            "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
+          ]
+        }
+      ],
+      "pdfPath": "/assets/resume/resume-swe.pdf"
+    },
+    {
+      "id": "quant",
+      "label": "Quant / Trading",
+      "name": "George Zhang",
+      "contact": {
+        "phone": "(778) 682-9123",
+        "email": "gzhang06@outlook.com",
+        "linkedin": "linkedin.com/in/iamgeorgezhang",
+        "github": "https://github.com/TheYellowDuck"
+      },
+      "sections": [
+        {
+          "title": "Education",
+          "entries": [
+            {
+              "title": "University of Waterloo",
+              "location": "Waterloo, ON",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "period": "Sep 2024 – May 2029",
+              "bullets": [
+                "Relevant coursework: Optimization, Probability & Statistics, Combinatorics, Data Structures & Algorithms, OOP (C++), Computer Organization."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Experience",
+          "entries": [
+            {
+              "title": "Ford Motor Company",
+              "location": "Waterloo, ON",
+              "subtitle": "Software Developer Intern — Android Automotive OS",
+              "period": "May 2026 – Present",
+              "bullets": [
+                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
+                "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+              ]
+            },
+            {
+              "title": "University of British Columbia",
+              "location": "Vancouver, BC",
+              "subtitle": "Undergraduate Research Assistant — Centre for Brain Health",
+              "period": "Jun 2025 – Aug 2025",
+              "bullets": [
+                "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at ~90% accuracy with <100 ms latency, plus dashboards that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Projects",
+          "entries": [
+            {
+              "title": "Limit Order Book & Matching Engine",
+              "tech": [
+                "C++20"
+              ],
+              "link": "github.com/TheYellowDuck/limit-order-book",
+              "bullets": [
+                "Built a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures — a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.",
+                "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
+              ]
+            },
+            {
+              "title": "Code-Aware RAG System",
+              "tech": [
+                "Python",
+                "tree-sitter",
+                "embeddings"
+              ],
+              "link": "github.com/TheYellowDuck/RAG-codebase",
+              "bullets": [
+                "Built a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.",
+                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with recall@k, bootstrap CIs, and paired significance tests."
+              ]
+            },
+            {
+              "title": "Autonomous LLM Web Agent",
+              "tech": [
+                "Python",
+                "Playwright"
+              ],
+              "link": "github.com/TheYellowDuck/web-agent",
+              "bullets": [
+                "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).",
+                "Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) — a 100%-one-directional disagreement ($$ = 0.66)."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Technical Skills",
+          "bullets": [
+            "Languages: C++, Python, Java, C, Kotlin, TypeScript/JavaScript, SQL",
+            "Systems: Lock-free / wait-free concurrency, cache-aware data structures, multithreading, low-latency design",
+            "Math & ML: Statistics, significance testing, probability, NumPy, Pandas, PyTorch",
+            "Tools: Git, Linux, CMake, Docker, GitHub Actions, sanitizers, gdb",
+            "Concepts: Data Structures & Algorithms, Benchmarking & Evaluation, Systems Programming, OOP"
+          ]
+        },
+        {
+          "title": "Awards & Competitive Programming",
+          "bullets": [
+            "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
+            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
+            "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
+          ]
+        }
+      ],
+      "pdfPath": "/assets/resume/resume-quant.pdf"
+    },
+    {
+      "id": "ai",
+      "label": "AI / ML",
+      "name": "George Zhang",
+      "contact": {
+        "phone": "(778) 682-9123",
+        "email": "gzhang06@outlook.com",
+        "linkedin": "linkedin.com/in/iamgeorgezhang",
+        "github": "https://github.com/TheYellowDuck"
+      },
+      "sections": [
+        {
+          "title": "Education",
+          "entries": [
+            {
+              "title": "University of Waterloo",
+              "location": "Waterloo, ON",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "period": "Sep 2024 – May 2029",
+              "bullets": [
+                "Relevant coursework: Probability & Statistics, Linear Algebra, Data Structures & Algorithms, Optimization, Logic & Computation, OOP (C++)."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Experience",
+          "entries": [
+            {
+              "title": "Ford Motor Company",
+              "location": "Waterloo, ON",
+              "subtitle": "Software Developer Intern — Android Automotive OS",
+              "period": "May 2026 – Present",
+              "bullets": [
+                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (multi-module Java/Kotlin, Android Telecom + Bluetooth HFP), with unit testing (Robolectric) and CI via Gradle and AOSP/Soong."
+              ]
+            },
+            {
+              "title": "University of British Columbia",
+              "location": "Vancouver, BC",
+              "subtitle": "Undergraduate Research Assistant — Centre for Brain Health",
+              "period": "Jun 2025 – Aug 2025",
+              "bullets": [
+                "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements.",
+                "Designed activity-heatmap dashboards that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Projects",
+          "entries": [
+            {
+              "title": "Code-Aware RAG System",
+              "tech": [
+                "Python",
+                "Transformers"
+              ],
+              "link": "github.com/TheYellowDuck/RAG-codebase",
+              "bullets": [
+                "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers — AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).",
+                "Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder proved net-negative on code."
+              ]
+            },
+            {
+              "title": "RLHF Pipeline",
+              "tech": [
+                "PyTorch"
+              ],
+              "link": "github.com/TheYellowDuck/rlhf-pipeline",
+              "bullets": [
+                "Reproduced the LLM post-training stack (SFT, reward modeling, PPO) with the RL core written from scratch: GAE, the clipped policy-gradient surrogate, per-token KL-to-reference shaping, and an adaptive KL controller.",
+                "Added DPO and GRPO alternatives, LoRA parameter-efficient fine-tuning, multi-GPU training (HuggingFace Accelerate), and an independent LLM-as-judge win-rate evaluation with position-bias control."
+              ]
+            },
+            {
+              "title": "Autonomous LLM Web Agent",
+              "tech": [
+                "Python",
+                "Playwright"
+              ],
+              "link": "github.com/TheYellowDuck/web-agent",
+              "bullets": [
+                "Built a ReAct + reflection agent (browser accessibility tree, provider-agnostic across Claude/GPT/Gemini) with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Technical Skills",
+          "bullets": [
+            "Languages: Python, C++, Java, Kotlin, TypeScript/JavaScript, SQL",
+            "ML / AI: PyTorch, Transformers, RAG, RLHF (PPO/DPO/GRPO), LLM agents, prompt engineering, LLM-as-judge eval",
+            "Data: NumPy, Pandas, scikit-learn, Matplotlib, OpenCV, MediaPipe, embeddings, statistics",
+            "Tools: Git, Linux, Docker, GitHub Actions, HuggingFace, Playwright, Anthropic/OpenAI APIs",
+            "Concepts: Data Structures & Algorithms, Evaluation & Statistical Rigor, Computer Vision, OOP"
+          ]
+        },
+        {
+          "title": "Awards & Competitive Programming",
+          "bullets": [
+            "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
+            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
+            "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
+          ]
+        }
+      ],
+      "pdfPath": "/assets/resume/resume-ai.pdf"
+    }
+  ]
 }

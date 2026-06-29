@@ -1,0 +1,123 @@
+% George Zhang — Résumé (Quant / Trading variant)
+% Leads PROJECTS with the C++ matching engine; experience stays reverse-chronological.
+% Compile with pdflatex (Overleaf-ready). Single-column, ATS-safe.
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{XCharter}
+\usepackage[letterspace=60]{microtype}
+\usepackage[letterpaper,margin=0.45in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Accent color (swap the one hex below to restyle the whole résumé) ----------
+% Oxblood 6F2436 (default) · Navy 1F3B5B · Teal 155E52 · Indigo 35386B · Near-black 2B2B2B
+\definecolor{accent}{HTML}{6F2436}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
+
+\titleformat{\section}
+  {\large\bfseries\scshape\color{accent}}{}{0em}{}[\vspace{-3pt}{\color{accent}\titlerule[0.9pt]}\vspace{2.5pt}]
+\titlespacing*{\section}{0pt}{3pt}{0pt}
+
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1} & {\small #2}\\[1pt]
+    {\small\itshape #3} & {\small\itshape #4}\\
+  \end{tabularx}%
+}
+
+\newcommand{\project}[3]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2} & {\small #3}\\
+  \end{tabularx}%
+}
+
+\newenvironment{bullets}
+  {\begin{itemize}[leftmargin=1.5em,labelsep=0.5em,itemsep=1pt,topsep=1pt,parsep=0pt,partopsep=0pt]\small}
+  {\end{itemize}\vspace{1pt}}
+
+\begin{document}
+
+% ================= HEADER =================
+\begin{center}
+  {\Huge\bfseries\color{accent}\textls[40]{George Zhang}}\\[5pt]
+  {\footnotesize
+  (778) 682-9123 \sep
+  \href{mailto:gzhang06@outlook.com}{gzhang06@outlook.com} \sep
+  \href{https://linkedin.com/in/iamgeorgezhang}{linkedin.com/in/iamgeorgezhang} \sep
+  \href{https://github.com/TheYellowDuck}{github.com/TheYellowDuck} \sep
+  \href{https://georgezhang.ca}{georgezhang.ca}
+  \\[3pt]Canadian \& Hong Kong citizen \; · \; eligible for U.S. internships (J-1); TN-eligible post-graduation}
+\end{center}
+
+% ================= EDUCATION =================
+\section{Education}
+\entry{University of Waterloo}{Waterloo, ON}{Bachelor of Computer Science (Honours, Co-op)}{Sep 2024 -- May 2029}
+\begin{bullets}
+  \item Relevant coursework: Optimization, Probability \& Statistics, Combinatorics, Data Structures \& Algorithms, OOP (C++), Computer Organization.
+\end{bullets}
+
+% ================= EXPERIENCE =================
+\section{Experience}
+
+\entry{Ford Motor Company}{Waterloo, ON}{Software Developer Intern --- Android Automotive OS}{May 2026 -- Present}
+\begin{bullets}
+  \item Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.
+  \item Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team.
+\end{bullets}
+
+\entry{University of British Columbia}{Vancouver, BC}{Undergraduate Research Assistant --- Centre for Brain Health}{Jun 2025 -- Aug 2025}
+\begin{bullets}
+  \item Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.
+  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at $\sim$90\% accuracy with $<$100\,ms latency, plus dashboards that cut clinician monitoring overhead by 30\%; presented at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
+\end{bullets}
+
+% ================= PROJECTS =================
+\section{Projects}
+
+\project{Limit Order Book \& Matching Engine}{C++20}{github.com/TheYellowDuck/limit-order-book}
+\begin{bullets}
+  \item Built a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures --- a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.
+  \item Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers.
+\end{bullets}
+
+\project{Code-Aware RAG System}{Python, tree-sitter, embeddings}{github.com/TheYellowDuck/RAG-codebase}
+\begin{bullets}
+  \item Built a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.
+  \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder was net-negative on code --- with recall@k, bootstrap CIs, and paired significance tests.
+\end{bullets}
+
+\project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
+\begin{bullets}
+  \item Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).
+  \item Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) --- a 100\%-one-directional disagreement ($\kappa$ = 0.66).
+\end{bullets}
+
+% ================= SKILLS =================
+\section{Technical Skills}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  \textbf{Languages} & C++, Python, Java, C, Kotlin, TypeScript/JavaScript, SQL\\
+  \textbf{Systems} & Lock-free / wait-free concurrency, cache-aware data structures, multithreading, low-latency design\\
+  \textbf{Math \& ML} & Statistics, significance testing, probability, NumPy, Pandas, PyTorch\\
+  \textbf{Tools} & Git, Linux, CMake, Docker, GitHub Actions, sanitizers, gdb\\
+  \textbf{Concepts} & Data Structures \& Algorithms, Benchmarking \& Evaluation, Systems Programming, OOP\\
+\end{tabularx}
+
+% ================= AWARDS =================
+\section{Awards \& Competitive Programming}
+\begin{bullets}
+  \item President's Scholarship of Distinction \& Entrance Scholarship in Mathematics, University of Waterloo
+  \item ICPC Local (Waterloo) --- Rank 28 / $\sim$100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
+  \item Canadian Computing Competition --- Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction
+  \item RoboCup International Junior Maze Rescue 2023 (Captain) --- 2nd Place Supergroup, 17th Individual
+\end{bullets}
+
+\end{document}

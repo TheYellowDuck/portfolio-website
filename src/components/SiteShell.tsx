@@ -207,7 +207,13 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   }, []);
   // Open the matching exhibit from the hash on load, and follow Back/Forward + nav.
   useEffect(() => {
-    const sync = () => setActivePopup(getPopupBySlug(decodeURIComponent(window.location.hash.slice(1))));
+    const sync = () => {
+      const slug = decodeURIComponent(window.location.hash.slice(1));
+      // A hash that points to a real on-page section is in-page navigation (a header nav anchor like
+      // #skills, whose id collides with the Skills exhibit slug) — scroll there, never open a popup.
+      if (slug && document.getElementById(slug)) { setActivePopup(null); return; }
+      setActivePopup(getPopupBySlug(slug));
+    };
     sync();
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
@@ -237,7 +243,7 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     const { hints, commands } = content.palette;
     const actions: Command[] = [
       { id: "enter", label: commands.enter, group: actionsGroup, hint: hints.game, keywords: "play explore pixel", run: () => enterGame() },
-      { id: "resume", label: commands.resume, group: actionsGroup, hint: hints.doc, keywords: "cv", run: () => openPopup({ type: "resume" }) },
+      { id: "resume", label: commands.resume, group: actionsGroup, hint: hints.doc, keywords: "cv resume résumé", run: () => openPopup({ type: "resume" }) },
       { id: "transcript", label: commands.transcript, group: actionsGroup, hint: hints.doc, keywords: "school waterloo grades", run: () => openPopup({ type: "transcript" }) },
       { id: "email", label: commands.copyEmail, group: actionsGroup, hint: hints.contact, keywords: "mail reach", run: () => navigator.clipboard?.writeText(email) },
     ];

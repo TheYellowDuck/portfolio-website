@@ -71,8 +71,10 @@ function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number;
 function Section({ id, eyebrow, title, intro, titleDuration, children }: {
   id: string; eyebrow: string; title: string; intro?: string; titleDuration?: number; children: React.ReactNode;
 }) {
+  // No scroll-mt: the section's own top padding (py-16/24) already clears the sticky nav when an
+  // anchor jumps here, so adding scroll-margin on top of it left a large empty gap above the title.
   return (
-    <section id={id} className="mx-auto max-w-[1080px] scroll-mt-20 px-6 py-16 sm:py-24">
+    <section id={id} className="mx-auto max-w-[1080px] px-6 py-16 sm:py-24">
       <Reveal variant="fade" duration={titleDuration}>
         <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-pine">{eyebrow}</p>
         <h2 className="mt-3 font-display text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
@@ -120,6 +122,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             <a href="#work" className="transition-colors hover:text-pine">{content.nav.links.work}</a>
             <a href="#experience" className="transition-colors hover:text-pine">{content.nav.links.experience}</a>
             <a href="#skills" className="transition-colors hover:text-pine">{content.nav.links.skills}</a>
+            <a href="#about" className="transition-colors hover:text-pine">{content.nav.links.about}</a>
             <a href="#contact" className="transition-colors hover:text-pine">{content.nav.links.contact}</a>
           </div>
           <div className="flex items-center gap-2">

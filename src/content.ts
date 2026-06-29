@@ -46,7 +46,7 @@ const en = {
     doorway: { label: "The museum", cta: "Step inside →", caption: "an explorable, pixel-art version" },
   },
   nav: {
-    links: { work: "Work", experience: "Experience", skills: "Skills", contact: "Contact" },
+    links: { work: "Work", experience: "Experience", skills: "Skills", about: "About", contact: "Contact" },
     paletteAria: "Open command palette",
     enter: "Step inside →",
   },

@@ -15,6 +15,7 @@ export interface ResumeEntry {
   period?: string;
   location?: string;
   tech?: string[];
+  link?: string;
   bullets: string[];
 }
 
@@ -29,4 +30,17 @@ export interface ResumeData {
   contact: ContactInfo;
   sections: ResumeSection[];
   pdfPath: string;
+}
+
+// One selectable résumé in the popup's variant tabs (e.g. SWE / Quant / AI).
+export interface ResumeVariant extends ResumeData {
+  id: string;     // slug from the source filename, e.g. "swe"
+  label: string;  // human tab label, e.g. "General SWE / Big Tech"
+}
+
+// What /api/resume serves and resume.generated.json holds. Backward-compatible: the top-level
+// ResumeData fields mirror the DEFAULT variant (variants[0]) so existing consumers (llms.txt,
+// linkedin.txt) keep working, while the popup reads `variants` to offer the tab switcher.
+export interface ResumeCollection extends ResumeData {
+  variants: ResumeVariant[];
 }

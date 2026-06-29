@@ -1,0 +1,132 @@
+% George Zhang — Résumé (General SWE / Big Tech variant)
+% Compile with pdflatex (Overleaf-ready). Single-column, ATS-safe.
+% Shared preamble across all three variants — edit once, copy to the others.
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{XCharter}                       % refined serif body
+\usepackage[letterspace=60]{microtype}      % crisper spacing + \textls tracking
+\usepackage[letterpaper,margin=0.45in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Accent color (swap the one hex below to restyle the whole résumé) ----------
+% Oxblood 6F2436 (default) · Navy 1F3B5B · Teal 155E52 · Indigo 35386B · Near-black 2B2B2B
+\definecolor{accent}{HTML}{6F2436}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+% ---------- Contact separator ----------
+\newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
+
+% ---------- Section heading: navy small-caps + accent rule ----------
+\titleformat{\section}
+  {\large\bfseries\scshape\color{accent}}{}{0em}{}[\vspace{-3pt}{\color{accent}\titlerule[0.9pt]}\vspace{2.5pt}]
+\titlespacing*{\section}{0pt}{3pt}{0pt}
+
+% ---------- Entry: line 1 = bold org + location, line 2 = italic role + dates ----------
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1} & {\small #2}\\[1pt]
+    {\small\itshape #3} & {\small\itshape #4}\\
+  \end{tabularx}%
+}
+
+% ---------- Project: one-line header (name + stack | link) ----------
+\newcommand{\project}[3]{%
+  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
+    \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2} & {\small #3}\\
+  \end{tabularx}%
+}
+
+% ---------- Tight bullets ----------
+\newenvironment{bullets}
+  {\begin{itemize}[leftmargin=1.5em,labelsep=0.5em,itemsep=1pt,topsep=1pt,parsep=0pt,partopsep=0pt]\small}
+  {\end{itemize}\vspace{1pt}}
+
+\begin{document}
+
+% ================= HEADER =================
+\begin{center}
+  {\Huge\bfseries\color{accent}\textls[40]{George Zhang}}\\[5pt]
+  {\footnotesize
+  (778) 682-9123 \sep
+  \href{mailto:gzhang06@outlook.com}{gzhang06@outlook.com} \sep
+  \href{https://linkedin.com/in/iamgeorgezhang}{linkedin.com/in/iamgeorgezhang} \sep
+  \href{https://github.com/TheYellowDuck}{github.com/TheYellowDuck} \sep
+  \href{https://georgezhang.ca}{georgezhang.ca}
+  \\[3pt]Canadian \& Hong Kong citizen \; · \; eligible for U.S. internships (J-1); TN-eligible post-graduation}
+\end{center}
+
+% ================= EDUCATION =================
+\section{Education}
+\entry{University of Waterloo}{Waterloo, ON}{Bachelor of Computer Science (Honours, Co-op)}{Sep 2024 -- May 2029}
+\begin{bullets}
+  \item Relevant coursework: Data Structures \& Algorithms, OOP (C++), Computer Organization, Logic \& Computation, Optimization, Probability \& Statistics.
+\end{bullets}
+
+% ================= EXPERIENCE =================
+\section{Experience}
+
+\entry{Ford Motor Company}{Waterloo, ON}{Software Developer Intern --- Android Automotive OS}{May 2026 -- Present}
+\begin{bullets}
+  \item Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.
+  \item Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team.
+\end{bullets}
+
+\entry{University of British Columbia}{Vancouver, BC}{Undergraduate Research Assistant --- Centre for Brain Health}{Jun 2025 -- Aug 2025}
+\begin{bullets}
+  \item Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.
+  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at $\sim$90\% accuracy with $<$100\,ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30\%.
+  \item Presented the work at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
+\end{bullets}
+
+% ================= PROJECTS =================
+\section{Projects}
+
+\project{Interactive Portfolio \& Game Engine}{TypeScript, Next.js, React, Canvas, Redis}{georgezhang.ca}
+\begin{bullets}
+  \item Built a personal site with two faces --- a fast web portfolio and an explorable pixel-art ``museum'' on a custom HTML5 Canvas engine (60\,fps loop, AABB collision, A* pathfinding, particles, procedural maps) --- plus multiplayer ``ghost trails'' (Upstash Redis) and a daily GitHub Actions pipeline auto-refreshing all content from one source.
+\end{bullets}
+
+\project{Code-Aware RAG System}{Python, tree-sitter, embeddings}{github.com/TheYellowDuck/RAG-codebase}
+\begin{bullets}
+  \item Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.
+  \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder was net-negative on code --- with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local).
+\end{bullets}
+
+\project{Limit Order Book \& Matching Engine}{C++20}{github.com/TheYellowDuck/limit-order-book}
+\begin{bullets}
+  \item Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.
+  \item Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers.
+\end{bullets}
+
+\project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
+\begin{bullets}
+  \item Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability.
+\end{bullets}
+
+% ================= SKILLS =================
+\section{Technical Skills}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  \textbf{Languages} & C++, Python, Java, Kotlin, TypeScript/JavaScript, SQL, C, HTML/CSS\\
+  \textbf{Frameworks} & React, Next.js, PyTorch, OpenCV, MediaPipe, NumPy, Pandas, Android SDK/Jetpack, Tailwind\\
+  \textbf{Tools} & Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio\\
+  \textbf{Concepts} & Data Structures \& Algorithms, Concurrency, OOP \& Design Patterns, LLMs / RAG, Computer Vision\\
+\end{tabularx}
+
+% ================= AWARDS =================
+\section{Awards \& Competitive Programming}
+\begin{bullets}
+  \item President's Scholarship of Distinction \& Entrance Scholarship in Mathematics, University of Waterloo
+  \item ICPC Local (Waterloo) --- Rank 28 / $\sim$100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
+  \item Canadian Computing Competition --- Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction
+  \item RoboCup International Junior Maze Rescue 2023 (Captain) --- 2nd Place Supergroup, 17th Individual
+\end{bullets}
+
+\end{document}

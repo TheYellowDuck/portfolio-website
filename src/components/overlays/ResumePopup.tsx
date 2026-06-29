@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { ResumeData, ResumeEntry, ResumeSection } from "@/types/resume";
+import type { ResumeCollection, ResumeVariant, ResumeEntry, ResumeSection } from "@/types/resume";
 import { PressButton } from "@/components/PressButton";
 
 const DISPLAY_LABELS: Record<string, string> = {
@@ -15,21 +15,32 @@ const DISPLAY_LABELS: Record<string, string> = {
 
 function sectionLabel(title: string): string {
   return DISPLAY_LABELS[title] ?? title.split(" ").map(
-    (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    (w) => (w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w)
   ).join(" ");
 }
 
-let resumeCache: ResumeData | null = null;
+// Accept the new multi-variant shape, but tolerate an older single-résumé JSON (or a stale cache)
+// by wrapping it as a one-entry collection.
+function toCollection(d: ResumeCollection | (Omit<ResumeCollection, "variants"> & { variants?: ResumeVariant[] })): ResumeCollection {
+  if (Array.isArray(d.variants) && d.variants.length > 0) return d as ResumeCollection;
+  const { name, contact, sections, pdfPath } = d;
+  return { name, contact, sections, pdfPath, variants: [{ id: "resume", label: "Résumé", name, contact, sections, pdfPath }] };
+}
+
+const hrefify = (url: string) => (/^https?:\/\//i.test(url) ? url : `https://${url}`);
+
+let resumeCache: ResumeCollection | null = null;
 
 interface ResumePopupProps {
   onClose: () => void;
 }
 
 export default function ResumePopup({ onClose }: ResumePopupProps) {
-  const [data, setData]               = useState<ResumeData | null>(resumeCache);
-  const [error, setError]             = useState(false);
+  const [collection, setCollection] = useState<ResumeCollection | null>(resumeCache);
+  const [error, setError]           = useState(false);
+  const [variantId, setVariantId]   = useState<string | null>(resumeCache?.variants[0]?.id ?? null);
   const [activeTitle, setActiveTitle] = useState<string | null>(
-    resumeCache?.sections[0]?.title ?? null
+    resumeCache?.variants[0]?.sections[0]?.title ?? null
   );
 
   useEffect(() => {
@@ -38,34 +49,45 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
       .then((r) => r.json())
       .then((d) => {
         if (d.error) { setError(true); return; }
-        const parsed = d as ResumeData;
+        const parsed = toCollection(d);
         resumeCache = parsed;
-        setData(parsed);
-        if (parsed.sections.length > 0) setActiveTitle(parsed.sections[0].title);
+        setCollection(parsed);
+        setVariantId(parsed.variants[0]?.id ?? null);
+        setActiveTitle(parsed.variants[0]?.sections[0]?.title ?? null);
       })
       .catch(() => setError(true));
   }, []);
 
-  const section: ResumeSection | undefined = data?.sections.find(
-    (s) => s.title === activeTitle
-  );
+  const variants = collection?.variants ?? [];
+  const variant: ResumeVariant | undefined = variants.find((v) => v.id === variantId) ?? variants[0];
+  const section: ResumeSection | undefined = variant?.sections.find((s) => s.title === activeTitle);
+
+  // Switch variant; keep the same section if the new variant has it (titles line up across variants).
+  const selectVariant = (id: string) => {
+    const next = variants.find((v) => v.id === id);
+    if (!next) return;
+    setVariantId(id);
+    if (!next.sections.some((s) => s.title === activeTitle)) {
+      setActiveTitle(next.sections[0]?.title ?? null);
+    }
+  };
 
   useEffect(() => {
-    if (!data) return;
+    if (!variant) return;
     const handleKey = (e: KeyboardEvent) => {
       const prev = e.key === "ArrowLeft"  || e.key === "a" || e.key === "A";
       const next = e.key === "ArrowRight" || e.key === "d" || e.key === "D";
       if (!prev && !next) return;
       e.preventDefault();
-      const idx     = data.sections.findIndex((s) => s.title === activeTitle);
+      const idx     = variant.sections.findIndex((s) => s.title === activeTitle);
       const nextIdx = prev
-        ? (idx - 1 + data.sections.length) % data.sections.length
-        : (idx + 1) % data.sections.length;
-      setActiveTitle(data.sections[nextIdx].title);
+        ? (idx - 1 + variant.sections.length) % variant.sections.length
+        : (idx + 1) % variant.sections.length;
+      setActiveTitle(variant.sections[nextIdx].title);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [data, activeTitle]);
+  }, [variant, activeTitle]);
 
   return (
     <>
@@ -87,7 +109,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
           key="resume-popup"
           role="dialog"
           aria-modal="true"
-          aria-label={data?.name ?? "Résumé"}
+          aria-label={collection?.name ?? "Résumé"}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
@@ -100,24 +122,24 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="m-0 font-mono text-[24px] text-pine tracking-[1px]">
-                  {data?.name ?? "Resume"}
+                  {collection?.name ?? "Resume"}
                 </h2>
-                {data && (
+                {collection && (
                   <div className="flex flex-wrap gap-x-3.5 gap-y-1 mt-1.5 font-mono text-[12px] text-walnut opacity-80">
-                    {data.contact.phone && <span>{data.contact.phone}</span>}
-                    {data.contact.email && <span>{data.contact.email}</span>}
-                    {data.contact.linkedin && (
+                    {variant?.contact.phone && <span>{variant.contact.phone}</span>}
+                    {variant?.contact.email && <span>{variant.contact.email}</span>}
+                    {variant?.contact.linkedin && (
                       <a
-                        href={`https://${data.contact.linkedin.replace(/^https?:\/\//, "")}`}
+                        href={`https://${variant.contact.linkedin.replace(/^https?:\/\//, "")}`}
                         target="_blank" rel="noopener noreferrer"
                         className="text-pine no-underline transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
                       >
                         LinkedIn ↗
                       </a>
                     )}
-                    {data.contact.github && (
+                    {variant?.contact.github && (
                       <a
-                        href={data.contact.github}
+                        href={hrefify(variant.contact.github)}
                         target="_blank" rel="noopener noreferrer"
                         className="text-pine no-underline transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
                       >
@@ -129,9 +151,9 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
               </div>
 
               <div className="flex gap-2 items-center shrink-0">
-                {data && (
+                {variant && (
                   <a
-                    href={data.pdfPath}
+                    href={variant.pdfPath}
                     download
                     className="font-mono text-[12px] text-walnut no-underline whitespace-nowrap bg-[rgba(122,158,126,0.15)] border border-[rgba(122,158,126,0.55)] rounded px-3 py-1 transition-colors hover:bg-[rgba(122,158,126,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                   >
@@ -149,10 +171,37 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
               </div>
             </div>
 
-            {/* Tab bar */}
+            {/* Variant switcher — one tab per résumé in the resume/ folder */}
+            {variants.length > 1 && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                <span className="font-mono text-[11px] text-walnut opacity-50 mr-0.5 uppercase tracking-wide">
+                  Version
+                </span>
+                {variants.map((v) => {
+                  const active = v.id === variant?.id;
+                  return (
+                    <PressButton
+                      key={v.id}
+                      onClick={() => selectVariant(v.id)}
+                      aria-pressed={active}
+                      className={[
+                        "shrink-0 whitespace-nowrap font-mono text-[11px] px-2.5 py-1 cursor-pointer rounded-full border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
+                        active
+                          ? "bg-pine text-parchment border-pine font-bold shadow-[0_1px_4px_rgba(28,21,8,0.25)]"
+                          : "bg-transparent text-walnut border-[rgb(var(--c-line-rgb)/0.25)] opacity-60 hover:opacity-90 hover:bg-[rgb(var(--c-line-rgb)/0.06)]",
+                      ].join(" ")}
+                    >
+                      {v.label}
+                    </PressButton>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Section tab bar */}
             <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
               <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {(data?.sections ?? []).map((s) => {
+              {(variant?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
                 return (
                   <PressButton
@@ -178,13 +227,13 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
 
           {/* ── Body ────────────────────────────────────────────────── */}
           <div className="px-6 py-4 bg-parchment">
-            {!data && !error && <LoadingState />}
-            {error            && <ErrorState />}
+            {!collection && !error && <LoadingState />}
+            {error             && <ErrorState />}
 
-            {data && section && (
+            {variant && section && (
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={activeTitle}
+                  key={`${variant.id}:${activeTitle}`}
                   initial={{ opacity: 0, y: 6  }}
                   animate={{ opacity: 1, y: 0  }}
                   exit={{    opacity: 0, y: -6 }}
@@ -194,13 +243,13 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     <EntryCard key={i} entry={entry} />
                   ))}
                   {section.bullets && (
-                    <BulletList bullets={section.bullets} styled={section.title === "SKILLS"} />
+                    <BulletList bullets={section.bullets} styled={/skill/i.test(section.title)} />
                   )}
                 </motion.div>
               </AnimatePresence>
             )}
 
-            {data && !section && (
+            {variant && !section && (
               <p className="font-mono text-[13px] text-walnut opacity-50">
                 No data found for this section.
               </p>
@@ -221,11 +270,19 @@ function EntryCard({ entry }: { entry: ResumeEntry }) {
         <span className="font-mono text-[14px] font-bold text-pine">
           {entry.title}
         </span>
-        {entry.period && (
+        {entry.period ? (
           <span className="shrink-0 font-mono text-[12px] text-walnut opacity-60 whitespace-nowrap">
             {entry.period}
           </span>
-        )}
+        ) : entry.link ? (
+          <a
+            href={hrefify(entry.link)}
+            target="_blank" rel="noopener noreferrer"
+            className="shrink-0 font-mono text-[12px] text-pine no-underline opacity-80 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
+          >
+            {entry.link.replace(/^https?:\/\//, "")} ↗
+          </a>
+        ) : null}
       </div>
 
       {(entry.subtitle || entry.location) && (
