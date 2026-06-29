@@ -142,7 +142,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
       if (e.key === "Escape") { onClose(); return; }
       if (e.key !== "Tab") return;
       const f = focusables();
-      if (f.length === 0) { e.preventDefault(); modalRef.current?.focus(); return; }
+      if (f.length === 0) { e.preventDefault(); modalRef.current?.focus({ preventScroll: true }); return; }
       const first = f[0], last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -151,7 +151,9 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("keydown", onKey);
-      restoreTo?.focus?.();
+      // preventScroll so returning focus to the trigger doesn't scroll it into view — that would jump
+      // the page away from where it was when the popup opened (e.g. an archive card with "Show all" on).
+      restoreTo?.focus?.({ preventScroll: true });
     };
   }, [popup, onClose]);
 

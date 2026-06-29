@@ -325,10 +325,11 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
       {stage === "game" && (
         <button
           onClick={requestExitGame}
+          aria-label="Leave the museum and return to the website"
           className="game-warm fixed left-1/2 z-60 -translate-x-1/2 rounded-full border border-[rgba(122,158,126,0.6)] bg-[rgba(254,249,236,0.92)] px-4 py-1.5 font-mono text-[13px] text-walnut shadow-[0_4px_20px_rgba(28,21,8,0.35)] backdrop-blur transition-colors hover:bg-[rgba(234,229,216,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
         >
-          ← Leave<span className="hidden sm:inline"> museum</span>
+          ← web
         </button>
       )}
 
