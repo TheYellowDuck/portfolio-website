@@ -87,8 +87,8 @@ const southBranches: BranchDef[] = [
 // LAYOUT CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const COL_MARGIN      = 2;  // tiles from interior edge to first/last pedestal column
-const COL_GAP         = 3;  // tiles between adjacent pedestal column centers
+const COL_MARGIN      = 3;  // tiles from interior edge to first/last pedestal column (matches COL_GAP spacing)
+const COL_GAP         = 4;  // tiles between adjacent pedestal column centers (matches ROW_GAP)
 const ROW_GAP         = 4;  // tiles between adjacent pedestal row centers
 const ENTRANCE_BUFFER = 4;  // rows between connector entrance and nearest exhibit row
 const END_BUFFER      = 2;  // rows between end wall and farthest exhibit row
@@ -108,12 +108,13 @@ function gridDims(count: number): { gc: number; gr: number } {
   return { gc, gr };
 }
 
-// Even gc (2, 4, …) uses COL_GAP+1 so the room width stays odd in all cases.
-// An odd room width means the room center is always a whole tile, which makes
-// the connector align exactly with the center of the pedestal group.
-// Odd gc (1, 3, …) uses COL_GAP as-is — the pedestal center already lands on a whole tile.
+// Even gc (2, 4, …) needs an EVEN pedestal gap so the room width stays odd in all
+// cases. An odd room width means the room center is always a whole tile, which makes
+// the connector align exactly with the center of the pedestal group. So when COL_GAP
+// is odd we bump even-gc rooms by one; when COL_GAP is already even, use it as-is.
+// Odd gc (1, 3, …) lands on a whole-tile center for any gap.
 function effectiveColGap(gc: number): number {
-  return gc % 2 === 0 ? COL_GAP + 1 : COL_GAP;
+  return gc % 2 === 0 && COL_GAP % 2 === 1 ? COL_GAP + 1 : COL_GAP;
 }
 
 // Interior width is always odd so floor(intWidth/2) is the exact center tile.
