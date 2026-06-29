@@ -2158,10 +2158,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "Python",
-        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
+        "Python",
+        "Jupyter Notebook",
         "C++",
         "Java",
         "CSS",
@@ -2199,10 +2199,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
-        "A* Pathfinding",
         "Hybrid search",
         "Code graph construction",
         "Performance optimization",
@@ -2241,10 +2241,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
-        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
+        "Distributed / multi-GPU training",
         "Parallel evaluation",
         "Concurrency",
         "Wait-free synchronization",
@@ -2357,8 +2357,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
-        "Testing",
         "CI/CD & DevOps",
+        "Testing",
         "Property-Based Testing",
         "Packaging",
         "Gradle build system",
@@ -2398,12 +2398,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
+        "pip",
         "Playwright",
         "Docker",
         "CMake",
@@ -2418,15 +2418,6 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
-        "Policy-gradient methods",
-        "Reward modeling",
-        "Generalized Advantage Estimation (GAE)",
-        "Adaptive KL control",
-        "Numerical stability",
-        "Reward-hacking mitigation",
-        "Checkpointing and resumability",
-        "Software design",
-        "Data Analysis",
         "Framer Motion",
         "R",
         "GraphQL",
@@ -2444,6 +2435,15 @@ export const generatedSkills: Exhibit[] = [
         "Game Development",
         "Automation / Scraping",
         "Game Physics",
+        "Policy-gradient methods",
+        "Reward modeling",
+        "Generalized Advantage Estimation (GAE)",
+        "Adaptive KL control",
+        "Numerical stability",
+        "Reward-hacking mitigation",
+        "Checkpointing and resumability",
+        "Software design",
+        "Data Analysis",
         "Assembly",
         "Cross-encoder reranking",
         "Personalized PageRank",
@@ -2589,5 +2589,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-28T08:43:52.961Z"
+  "syncedAt": "2026-06-29T10:25:07.477Z"
 };
