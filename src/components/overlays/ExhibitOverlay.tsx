@@ -114,13 +114,23 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
   const modalRef = useRef<HTMLDivElement>(null);
   const skillRefs = useRef<(HTMLDivElement | null)[]>([]); // skill-group anchors for the left tab rail
 
-  // Lock background page scroll while a popup is open, so scrolling past the end of the
-  // popup doesn't chain into (and scroll) the page behind it.
+  // Lock background page scroll while a popup is open, so the page behind never scrolls (e.g. when the
+  // pointer is over the popup's skills section). The viewport scrolls via the root <html> element, so
+  // `overflow: hidden` has to go on documentElement — setting it on <body> alone does nothing. Pad for
+  // the now-missing scrollbar so the page behind doesn't shift (a no-op with macOS overlay scrollbars).
   useEffect(() => {
     if (!popup) return;
-    const prev = document.body.style.overflow;
+    const docEl = document.documentElement;
+    const scrollbar = window.innerWidth - docEl.clientWidth;
+    const prev = { html: docEl.style.overflow, body: document.body.style.overflow, pad: document.body.style.paddingRight };
+    docEl.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`;
+    return () => {
+      docEl.style.overflow = prev.html;
+      document.body.style.overflow = prev.body;
+      document.body.style.paddingRight = prev.pad;
+    };
   }, [popup]);
 
   // While a popup is open: Esc closes it, focus moves into the dialog and is trapped
