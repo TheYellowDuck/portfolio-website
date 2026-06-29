@@ -39,6 +39,7 @@ function StatCard({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      data-cursor="Visit"
       className="group rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-4 transition-colors hover:border-[rgba(122,158,126,0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
     >
       <div className="flex items-center justify-between gap-2">

@@ -302,6 +302,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                   pointerEvents: active !== null ? "none" : "auto",
                 }}
                 aria-label={`${g.title}, ${g.items.length} skills`}
+                data-cursor="Expand"
               >
                 <span className="flex h-[84%] w-[84%] flex-col items-center justify-center gap-1 text-center" style={{ overflowWrap: "normal", wordBreak: "normal" }}>
                   <span>{g.title}</span>
@@ -329,6 +330,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
                 <>
                   <PressMotionButton
                     key="backdrop" aria-label="Close" onActivate={() => setActive(null)}
+                    data-cursor="Close"
                     className="absolute inset-0 z-10 cursor-zoom-out"
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     style={{ background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)" }}

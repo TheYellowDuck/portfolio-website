@@ -1,21 +1,11 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-// Elements that make the ring "grab" — grow + fill — so the cursor reads as
-// interactive over them. Mirrors the cursor-pointer utilities used across the
-// site; add [data-cursor="grow"] to opt anything else in.
-const INTERACTIVE =
-  'a, button, [role="button"], summary, label, input, select, textarea, .cursor-pointer, [data-cursor="grow"]';
-
-// Spring lag for the trailing ring — light + quick so it feels alive, not floaty.
-const RING_SPRING = { stiffness: 380, damping: 30, mass: 0.5 } as const;
-
-// The custom cursor only makes sense with a precise pointer (mouse/trackpad),
-// and never when the user asks for reduced motion. Read reactively so plugging
-// in a mouse or toggling the OS setting flips it without a reload — same
-// useSyncExternalStore pattern as use-is-mac / use-dark-mode.
+// The cursor only makes sense with a precise pointer (mouse/trackpad), and never
+// when the user asks for reduced motion. Read reactively so plugging in a mouse or
+// toggling the OS setting flips it live — same useSyncExternalStore pattern as
+// use-is-mac / use-dark-mode.
 const MEDIA = ["(pointer: fine)", "(prefers-reduced-motion: reduce)"] as const;
 function subscribeMedia(cb: () => void) {
   const mqls = MEDIA.map((q) => window.matchMedia(q));
@@ -32,104 +22,119 @@ function useCursorEnabled() {
   return useSyncExternalStore(subscribeMedia, readEnabled, () => false);
 }
 
-// A precise dot rides the real pointer; a softer ring trails behind it and swells
-// over interactive elements. Color comes from --c-accent, so it flips with the
-// light/dark theme automatically. Mounted once in the layout (like FaviconSwitcher).
+// Every non-text clickable. Elements that declare an intent via [data-cursor="Word"]
+// get the labelled disc; everything else here gets a small dot. Text-entry fields are
+// excluded below so the caret stays native.
+const CLICKABLE =
+  'a[href], button, [role="button"], [role="link"], summary, label[for], ' +
+  ".cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor]";
+
+function isEditable(el: Element) {
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (el as HTMLElement).isContentEditable;
+}
+
+type Mode = "idle" | "dot" | "label";
+
+// A two-tier contextual cursor. The native OS cursor is left alone over text — we only
+// take over on clickable things: a small ink dot for generic links/buttons, and an ink
+// disc bearing a word ("Open" / "Drag" / "Enter" …) over content that declares one. It
+// follows with smooth lerp easing (no spring overshoot) and re-tests what's beneath it on
+// scroll, not just on move. Mounted once in the layout, like FaviconSwitcher.
 export default function CustomCursor() {
   const enabled = useCursorEnabled();
-
-  // Raw pointer position — the dot sits here exactly.
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  // The ring follows the same target through a spring, so it lags and settles.
-  const ringX = useSpring(x, RING_SPRING);
-  const ringY = useSpring(y, RING_SPRING);
-
-  const [visible, setVisible] = useState(false); // hide until first move / off-screen
-  const [active, setActive] = useState(false); // hovering something interactive
-  const [pressed, setPressed] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<Mode>("idle");
+  const [label, setLabel] = useState("");
 
   useEffect(() => {
     if (!enabled) return;
+    const wrap = wrapRef.current;
+    if (!wrap) return;
     document.documentElement.classList.add("has-custom-cursor");
 
-    const onMove = (e: PointerEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      setVisible(true); // React bails out once it's already true
-    };
-    const onOver = (e: PointerEvent) => {
-      const target = e.target as Element | null;
-      setActive(!!target?.closest?.(INTERACTIVE));
-    };
-    const onDown = () => setPressed(true);
-    const onUp = () => setPressed(false);
-    const hide = () => setVisible(false);
+    let tx = -100;
+    let ty = -100; // target = real pointer
+    let cx = tx;
+    let cy = ty; // current = lerped
+    let lastX = -100;
+    let lastY = -100; // last known pointer, for re-testing on scroll
+    let started = false;
+    let raf = 0;
+    // Mirror the rendered state so we only call setState on an actual change.
+    let curMode: Mode = "idle";
+    let curLabel = "";
 
+    const apply = (m: Mode, l: string) => {
+      if (m !== curMode) {
+        curMode = m;
+        setMode(m);
+      }
+      if (l !== curLabel) {
+        curLabel = l;
+        setLabel(l);
+      }
+    };
+    // Decide the cursor from whatever element is under the pointer.
+    const resolve = (el: Element | null) => {
+      if (!el) return apply("idle", "");
+      const labeled = el.closest("[data-cursor]") as HTMLElement | null;
+      if (labeled) return apply("label", labeled.dataset.cursor || "");
+      const click = el.closest(CLICKABLE);
+      if (click && !isEditable(click)) return apply("dot", "");
+      return apply("idle", "");
+    };
+
+    // Critically-damped follow: eases toward the pointer and settles, never wobbles.
+    const tick = () => {
+      cx += (tx - cx) * 0.2;
+      cy += (ty - cy) * 0.2;
+      wrap.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onMove = (e: PointerEvent) => {
+      tx = lastX = e.clientX;
+      ty = lastY = e.clientY;
+      if (!started) {
+        // Snap to the first position so nothing slides in from a corner.
+        started = true;
+        cx = tx;
+        cy = ty;
+      }
+      resolve(e.target as Element | null);
+    };
+    // Scrolling slides elements under a stationary pointer — re-test what's beneath it.
+    const onScroll = () => {
+      if (started) resolve(document.elementFromPoint(lastX, lastY));
+    };
+    const clear = () => apply("idle", "");
+
+    const scrollOpts = { passive: true, capture: true } as const;
+    raf = requestAnimationFrame(tick);
     window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerover", onOver, { passive: true });
-    window.addEventListener("pointerdown", onDown, { passive: true });
-    window.addEventListener("pointerup", onUp, { passive: true });
-    window.addEventListener("blur", onUp);
-    document.addEventListener("pointerleave", hide);
+    window.addEventListener("scroll", onScroll, scrollOpts);
+    document.addEventListener("pointerleave", clear);
+    window.addEventListener("blur", clear);
 
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerover", onOver);
-      window.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("blur", onUp);
-      document.removeEventListener("pointerleave", hide);
+      window.removeEventListener("scroll", onScroll, scrollOpts);
+      document.removeEventListener("pointerleave", clear);
+      window.removeEventListener("blur", clear);
       document.documentElement.classList.remove("has-custom-cursor");
     };
-  }, [enabled, x, y]);
+  }, [enabled]);
 
   if (!enabled) return null;
 
-  const ringScale = pressed ? 0.7 : active ? 1.8 : 1;
-
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-2147483646">
-      {/* Trailing ring — lags via spring, swells over interactive elements. */}
-      <motion.div
-        className="absolute top-0 left-0"
-        style={{ x: ringX, y: ringY, opacity: visible ? 1 : 0 }}
-      >
-        <motion.div
-          className="rounded-full border"
-          style={{
-            width: 30,
-            height: 30,
-            marginLeft: -15,
-            marginTop: -15,
-            borderColor: "var(--c-accent)",
-            willChange: "transform",
-          }}
-          animate={{
-            scale: ringScale,
-            backgroundColor: active ? "var(--c-accent)" : "rgba(0,0,0,0)",
-            opacity: active ? 0.18 : 0.55,
-          }}
-          transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.4 }}
-        />
-      </motion.div>
-
-      {/* Precise dot — rides the real pointer exactly. */}
-      <motion.div
-        className="absolute top-0 left-0"
-        style={{ x, y, opacity: visible ? 1 : 0 }}
-      >
-        <div
-          className="rounded-full"
-          style={{
-            width: 6,
-            height: 6,
-            marginLeft: -3,
-            marginTop: -3,
-            backgroundColor: "var(--c-accent)",
-          }}
-        />
-      </motion.div>
+    <div ref={wrapRef} aria-hidden className="cursor-cur" data-mode={mode}>
+      <span className="cursor-cur-dot" />
+      <span className="cursor-cur-disc">
+        <span className="cursor-cur-word">{label}</span>
+      </span>
     </div>
   );
 }

@@ -45,6 +45,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
         <nav className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[13px]">
           <PressButton
             onClick={onResume}
+            data-cursor="View"
             className="text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
           >
             <ScrambleText text={content.hero.resume} delay={620} />
@@ -67,6 +68,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
       <div className="flex flex-1 flex-col items-center md:items-end">
         <PressButton
           onClick={() => onEnter(doorRef.current?.getBoundingClientRect())}
+          data-cursor="Enter"
           className="group relative w-full max-w-[360px] focus-visible:outline-none"
         >
           <div

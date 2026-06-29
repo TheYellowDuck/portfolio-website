@@ -61,6 +61,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       onClick={onOpen}
       role={onOpen ? "button" : undefined}
       tabIndex={onOpen ? 0 : undefined}
+      data-cursor={onOpen ? "Open" : undefined}
       aria-label={onOpen ? `Open ${popup.title ?? "project"}` : undefined}
       onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } : undefined}
       className={`group flex flex-col rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_14px_36px_rgba(28,21,8,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 ${onOpen ? "cursor-pointer" : ""}`}

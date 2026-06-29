@@ -255,6 +255,7 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onClickCapture={onClickCapture}
+      data-cursor="Drag"
       style={{ WebkitMaskImage: mask, maskImage: mask }}
       className="no-scrollbar relative flex cursor-grab gap-4 overflow-x-auto overscroll-x-contain px-1 py-2 active:cursor-grabbing"
     >
