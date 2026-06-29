@@ -185,13 +185,14 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                       onClick={() => selectVariant(v.id)}
                       aria-pressed={active}
                       className={[
-                        // No background transition: iOS Safari can leave a stale painted layer when the
-                        // bg animates between states, which made deselected pills stay green. Switch the
-                        // colour instantly; only opacity eases. No hover-bg (sticks on touch) + no tap flash.
-                        "shrink-0 whitespace-nowrap font-mono text-[11px] px-2.5 py-1 cursor-pointer rounded-full border transition-[opacity] duration-150 [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
+                        // iOS Safari leaves a STALE painted layer when the bg both animates AND the element
+                        // is promoted to its own compositing layer (a transition or element-opacity does
+                        // that) — that's why deselected pills stayed green. Fix: NO transition (instant
+                        // repaint in normal flow) and dim via the text colour's alpha, never element opacity.
+                        "shrink-0 whitespace-nowrap font-mono text-[11px] px-2.5 py-1 cursor-pointer rounded-full border [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
                         active
                           ? "bg-pine text-parchment border-pine font-bold shadow-[0_1px_4px_rgba(28,21,8,0.25)]"
-                          : "bg-transparent text-walnut border-[rgb(var(--c-line-rgb)/0.25)] opacity-60 hover:opacity-90",
+                          : "bg-transparent text-walnut/60 border-[rgb(var(--c-line-rgb)/0.25)]",
                       ].join(" ")}
                     >
                       {v.label}
@@ -211,10 +212,10 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
                     key={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     className={[
-                      "shrink-0 whitespace-nowrap font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-[opacity] duration-150 [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
+                      "shrink-0 whitespace-nowrap font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",
                       active
-                        ? "bg-[rgba(122,158,126,0.15)] border-[rgba(122,158,126,0.5)] border-b-parchment text-pine opacity-100"
-                        : "bg-transparent border-transparent text-walnut opacity-60 hover:opacity-80",
+                        ? "bg-[rgba(122,158,126,0.15)] border-[rgba(122,158,126,0.5)] border-b-parchment text-pine"
+                        : "bg-transparent border-transparent text-walnut/60",
                     ].join(" ")}
                   >
                     {sectionLabel(s.title)}

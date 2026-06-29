@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Bricolage_Grotesque, Pixelify_Sans, Caveat } from "n
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import FaviconSwitcher from "@/components/FaviconSwitcher";
+import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, PERSON } from "@/lib/site";
 import { currentRole } from "@/data/projects";
@@ -159,6 +160,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <CustomCursor />
         <FaviconSwitcher />
         <Analytics />
         <SpeedInsights />

@@ -35,6 +35,19 @@ html { scroll-behavior: smooth; }
 body.game-active { overflow: hidden; }
 html:has(body.game-active) { overflow: hidden; scrollbar-gutter: auto; }
 
+/* ── Custom follower cursor ──────────────────────────────────────────────────
+   <CustomCursor> adds .has-custom-cursor to <html> only on fine-pointer,
+   motion-OK devices, then paints its own dot + trailing ring — so we hide the
+   native arrow everywhere (incl. over buttons; the ring's swell is the hover
+   cue). Text fields and anything tagged [data-native-cursor] keep the real
+   cursor so the caret and precise interactions stay usable. !important is
+   deliberate — it overrides the cursor-* utilities scattered across the UI. */
+html.has-custom-cursor,
+html.has-custom-cursor * { cursor: none !important; }
+html.has-custom-cursor :is(input, textarea, select, [contenteditable="true"]),
+html.has-custom-cursor [data-native-cursor],
+html.has-custom-cursor [data-native-cursor] * { cursor: auto !important; }
+
 /* ── Light / dark theme tokens ───────────────────────────────────────────────
    The site flips with .dark on <html>. The game UI stays warm regardless of the
    site theme: the .game-warm subtree re-asserts the light values, so the museum
