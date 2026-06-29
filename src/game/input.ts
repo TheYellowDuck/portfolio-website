@@ -16,6 +16,12 @@ class InputManager {
       this.keys.delete(e.key);
       this.keys.delete(e.key.toLowerCase());
     });
+
+    // Release every held key when the window loses focus or is hidden — otherwise the keyup never
+    // arrives (you switched window/tab/app mid-press) and the player stays locked in that movement
+    // until the key is pressed and released again.
+    window.addEventListener("blur", () => this.clear());
+    document.addEventListener("visibilitychange", () => { if (document.hidden) this.clear(); });
   }
 
   isDown(key: string): boolean {
