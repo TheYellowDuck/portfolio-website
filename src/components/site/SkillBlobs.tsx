@@ -17,6 +17,23 @@ const SCROLL_SPEED = 25;     // px/s cruising drift speed
 const SCROLL_DELAY = 600;    // ms of stillness after opening / after manual scroll before it drifts
 const SCROLL_RAMP = 1100;    // ms to ease the speed up on (re)start AND down to a stop on hover
 
+// The zoom-to-centre scroll runs on the SAME duration + easing as the orb's layout morph, so the two
+// move as one motion (with matching curves the orb's on-screen path is a clean line to the centre).
+const ZOOM_MS = 500;
+function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+  const ax = 1 - 3 * x2 + 3 * x1, bx = 3 * x2 - 6 * x1, cx = 3 * x1;
+  const ay = 1 - 3 * y2 + 3 * y1, by = 3 * y2 - 6 * y1, cy = 3 * y1;
+  const fx = (t: number) => ((ax * t + bx) * t + cx) * t;
+  const fy = (t: number) => ((ay * t + by) * t + cy) * t;
+  const dfx = (t: number) => (3 * ax * t + 2 * bx) * t + cx;
+  return (x: number) => {            // solve fx(t)=x (Newton), then return fy(t)
+    let t = x;
+    for (let i = 0; i < 5; i++) { const d = dfx(t); if (Math.abs(d) < 1e-6) break; t -= (fx(t) - x) / d; }
+    return fy(Math.max(0, Math.min(1, t)));
+  };
+}
+const ZOOM_EASE = cubicBezier(0.22, 1, 0.36, 1); // == the orb morph's ease
+
 // Shared chip look — identical to the project cards, so a skill reads the same everywhere.
 const CHIP_CLASS = "rounded border px-2 py-0.5 font-mono text-[11px]";
 // Soft top/bottom edge fade for the scrolling chip band, so chips dissolve in/out instead of clipping.
@@ -133,28 +150,44 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setActive(null);
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   }, [active]);
-  // Zoom should bring the orb to the middle of the screen: on open, remember the scroll position and
-  // scroll so the (centred) expanded orb sits at the viewport centre; on close, return to where we
-  // were. The container's top is fixed (it only grows downward), so we centre on its FINAL height.
-  // No explicit `behavior` → CSS `scroll-behavior` makes it smooth normally and instant under
-  // reduced-motion. There's plenty of page below the skills section, so the target is always reachable.
+  // Zoom should bring the orb to the middle of the screen as ONE motion with the orb morph: on open,
+  // remember the scroll position and scroll so the (centred) expanded orb sits at the viewport centre;
+  // on close, return. The scroll is hand-animated on the orb morph's curve/duration (per-frame
+  // behavior:"instant" so the page's CSS smooth-scroll doesn't fight it). The container's top is fixed
+  // (it only grows downward), so we centre on its FINAL height; there's plenty of page below, so the
+  // target is always reachable.
   const savedScroll = useRef(0);
   const prevActive = useRef<number | null>(null);
+  const scrollRaf = useRef(0);
   useEffect(() => {
     const wasOpen = prevActive.current !== null;
     const isOpen = active !== null;
+    const reduce = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const scrollToY = (targetY: number) => {
+      cancelAnimationFrame(scrollRaf.current);
+      const startY = window.scrollY, dist = targetY - startY;
+      if (reduce || Math.abs(dist) < 1) { window.scrollTo({ top: targetY, left: 0 }); return; }
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - t0) / ZOOM_MS);
+        window.scrollTo({ top: startY + dist * ZOOM_EASE(t), left: 0, behavior: "instant" });
+        if (t < 1) scrollRaf.current = requestAnimationFrame(step);
+      };
+      scrollRaf.current = requestAnimationFrame(step);
+    };
     if (isOpen) {
       if (!wasOpen) savedScroll.current = window.scrollY;
       const el = ref.current;
       if (el) {
         const finalH = expandedR * 2 + (mobile ? 20 : 28);
         const topDoc = el.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: Math.max(0, topDoc + finalH / 2 - window.innerHeight / 2), left: 0 });
+        scrollToY(Math.max(0, topDoc + finalH / 2 - window.innerHeight / 2));
       }
     } else if (wasOpen) {
-      window.scrollTo({ top: savedScroll.current, left: 0 });
+      scrollToY(savedScroll.current);
     }
     prevActive.current = active;
+    return () => cancelAnimationFrame(scrollRaf.current);
   }, [active, expandedR, mobile]);
   // Measure one copy of the chip list (so the loop wraps by exactly one copy + gap → seamless).
   // ResizeObserver is a subscription, so no synchronous set-state-in-effect.
