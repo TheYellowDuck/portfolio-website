@@ -176,19 +176,20 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
       scrollRaf.current = requestAnimationFrame(step);
     };
     if (isOpen) {
-      if (!wasOpen) savedScroll.current = window.scrollY;
+      // savedScroll is captured in the open click handler. Centre the orb (which sits at the centre of
+      // the fixed-height section) by measuring the section box directly.
       const el = ref.current;
       if (el) {
-        const finalH = expandedR * 2 + (mobile ? 20 : 28);
-        const topDoc = el.getBoundingClientRect().top + window.scrollY;
-        scrollToY(Math.max(0, topDoc + finalH / 2 - window.innerHeight / 2));
+        const rect = el.getBoundingClientRect();
+        const topDoc = rect.top + window.scrollY;
+        scrollToY(Math.max(0, topDoc + rect.height / 2 - window.innerHeight / 2));
       }
     } else if (wasOpen) {
       scrollToY(savedScroll.current);
     }
     prevActive.current = active;
     return () => cancelAnimationFrame(scrollRaf.current);
-  }, [active, expandedR, mobile]);
+  }, [active]);
   // Measure one copy of the chip list (so the loop wraps by exactly one copy + gap → seamless).
   // ResizeObserver is a subscription, so no synchronous set-state-in-effect.
   useEffect(() => {
@@ -242,7 +243,10 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
   }, [active, loop, trackH]);
 
   const layout = useMemo(() => (width > 0 ? packField(groups, width, mobile) : null), [groups, width, mobile]);
-  const containerH = !layout ? 360 : active !== null ? expandedR * 2 + (mobile ? 20 : 28) : layout.height;
+  // The section keeps the packed-field height even while an orb is open (the orb expands centred over
+  // it), so opening/closing NEVER changes the document height — which would otherwise shift the scroll
+  // out from under the zoom-to-centre animation and stop it landing back at the right spot.
+  const containerH = layout ? layout.height : 360;
 
   return (
     <>
@@ -250,7 +254,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
         {groups.map((g) => <li key={g.title}>{g.title}: {g.items.join(", ")}</li>)}
       </ul>
 
-      <div ref={ref} className="relative w-full" aria-hidden style={{ height: containerH, transition: "height 0.5s cubic-bezier(0.22,1,0.36,1)" }}>
+      <div ref={ref} className="relative w-full" aria-hidden style={{ height: containerH }}>
         <LayoutGroup>
           {layout && groups.map((g, i) => {
             const nd = layout.nodes[i];
@@ -262,7 +266,7 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
               <motion.button
                 key={g.title}
                 layoutId={`blob-${i}`}
-                onClick={() => setActive(active === i ? null : i)}
+                onClick={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}
                 animate={
                   active !== null
