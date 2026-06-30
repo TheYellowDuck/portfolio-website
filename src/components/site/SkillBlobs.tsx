@@ -57,6 +57,10 @@ const SCROLL_FADE =
   "linear-gradient(to bottom," +
   " transparent 0%, rgba(0,0,0,0.12) 2%, rgba(0,0,0,0.5) 5%, #000 9%," +
   " #000 91%, rgba(0,0,0,0.5) 95%, rgba(0,0,0,0.12) 98%, transparent 100%)";
+// Soft top/bottom dissolve for the dim+blur backdrop so it doesn't read as a hard-edged rectangle
+// over the field. Its left/right run off-screen (w-screen), so only the top/bottom edges would show;
+// masking the element fades the backdrop-blur too, not just the tint — no crisp blur boundary.
+const DIM_FADE = "linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%)";
 
 // Paper disc with a soft top sheen + deeper underside, plus the group's hue (from skillColorFor) as a
 // top-down wash on the surface. Dark needs a touch more wash to read on the dark surface.
@@ -385,7 +389,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             <motion.div
               key="skills-dim" aria-hidden
               className="absolute top-0 left-1/2 z-0 w-screen -ml-[50vw]"
-              style={{ height: containerH, background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)" }}
+              style={{ height: containerH, background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)", maskImage: DIM_FADE, WebkitMaskImage: DIM_FADE }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             />
             <PressMotionButton
