@@ -1,13 +1,23 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { PERSON, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
+// Read the asset from disk (Node runtime) so the OG card can embed the actual game sprite.
+export const runtime = "nodejs";
 export const alt = `${PERSON.name} — interactive museum portfolio`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Cozy, editorial OG card in the museum palette (parchment + walnut + sage),
-// with a lamplit "doorway" hinting at the explorable game.
-export default function OpengraphImage() {
+// Cozy, editorial OG card in the museum palette (parchment + walnut + sage): identity on the left,
+// and on the right the pixel-art player character standing in a lamplit doorway — the same character
+// you walk around the explorable museum as, so the social preview actually shows the game.
+export default async function OpengraphImage() {
+  const sprite = await readFile(
+    join(process.cwd(), "public/assets/sprites/character/states/standing/rotations/south.png"),
+  );
+  const character = `data:image/png;base64,${sprite.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -54,25 +64,31 @@ export default function OpengraphImage() {
           </div>
         </div>
 
-        {/* Right: the lamplit doorway */}
+        {/* Right: the player character in a lamplit doorway */}
         <div style={{ display: "flex", alignItems: "center", paddingLeft: 56 }}>
           <div
             style={{
+              position: "relative",
               width: 340,
               height: 440,
               borderRadius: 28,
               border: "1px solid rgba(58,46,30,0.18)",
-              background: "radial-gradient(120% 90% at 50% 24%, #2c2310 0%, #1c1508 70%)",
+              // Warm pool of lamplight low-centre (around the character) over the dark room.
+              background:
+                "radial-gradient(58% 40% at 50% 68%, rgba(240,206,120,0.32), rgba(0,0,0,0) 64%)," +
+                "radial-gradient(120% 90% at 50% 22%, #2c2310 0%, #1c1508 72%)",
               display: "flex",
-              alignItems: "flex-end",
+              alignItems: "center",
               justifyContent: "center",
-              paddingBottom: 36,
             }}
           >
+            <img src={character} alt="" width={300} height={300} style={{ imageRendering: "pixelated" }} />
             <div
               style={{
+                position: "absolute",
+                bottom: 26,
                 color: "#f0ce78",
-                fontSize: 22,
+                fontSize: 20,
                 letterSpacing: 4,
                 fontFamily: "ui-monospace, monospace",
               }}
