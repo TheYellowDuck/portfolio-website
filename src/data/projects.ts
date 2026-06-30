@@ -80,31 +80,9 @@ export const mainHallExhibits: Exhibit[] = generatedMainHall;
 // deliberately kept OUT of the scored ranking so an unfinished repo isn't judged as minor work.
 export const inProgressExhibits: Exhibit[] = generatedInProgress;
 
-// Tile 12 — SKILLS & TECH WING
-// Auto-generated repo skills, plus a dynamic "Coursework" group derived from the transcript.
-const courseworkSkills = deriveCourseworkSkills(transcript as unknown as TranscriptData);
-export const skillsExhibits: Exhibit[] = [
-  ...generatedSkills,
-  ...(courseworkSkills.length
-    ? [{ popup: { title: "Coursework", description: "Skills from my University of Waterloo coursework.", tech: courseworkSkills } }]
-    : []),
-];
-
-// Maps a skill/tech name → the category it belongs to, so bare chips on project, experience, and
-// archive cards can be coloured by their category — the same scheme as the Skills wing. The wing's
-// aggregated groups come FIRST (authoritative category for each canonical name), then each project's
-// own `popup.skills` groups (whose RAW strings match the card chips, so aliased concept phrases like
-// "Object-oriented design" still resolve). First claim wins. Names in no group fall back to neutral.
-export const skillCategoryMap: Record<string, string> = {};
-const claimSkill = (name: string, category: string) => {
-  if (name && category && !(name in skillCategoryMap)) skillCategoryMap[name] = category;
-};
-for (const e of skillsExhibits) for (const item of e.popup?.tech ?? []) claimSkill(item, e.popup?.title ?? "");
-for (const e of [...generatedMainHall, ...generatedInProgress, ...generatedArchive])
-  for (const g of e.popup?.skills ?? []) for (const item of g.items) claimSkill(item, g.category);
-// Static taxonomy fallback (from the config) — colours tech that never appears in a scanned repo,
-// e.g. Experience-only tools, so no chip is left uncategorised.
-for (const [name, category] of Object.entries(generatedSkillCategories)) claimSkill(name, category);
+// Tile 12 — SKILLS & TECH WING and the skill→category map are built FURTHER DOWN (`skillsExhibits`),
+// just after `experienceExhibits`: the wing now aggregates work-experience skills too, so it can only
+// be assembled once the experience data exists.
 
 // Tile 13 — ARCHIVE / OTHER PROJECTS
 export const archiveExhibits: Exhibit[] = generatedArchive;
@@ -154,6 +132,62 @@ export const experienceExhibits: Exhibit[] = [
       ],    },
   },
 ];
+
+// ── Tile 12 — SKILLS & TECH WING (built here: it aggregates experienceExhibits, defined above) ──
+// One orb per CATEGORY, merging every skill from PROJECTS (the GitHub-scanned generatedSkills,
+// already category-grouped), WORK EXPERIENCE (each role's grouped `skills`, a few categories aliased
+// into the shared scheme), and COURSEWORK (transcript-derived, each carrying its category) — deduped.
+// So e.g. "Frameworks" gathers framework skills from everywhere; nothing is hand-maintained twice.
+const WORK_CAT_ALIAS: Record<string, string> = {
+  Practice: "Concepts & Practices",
+  "AI & Vision": "AI & ML",
+  Team: "Soft Skills",
+  Management: "Teaching",
+};
+const courseworkSkills = deriveCourseworkSkills(transcript as unknown as TranscriptData);
+const skillCatOrder: string[] = [];
+const skillCatItems = new Map<string, string[]>();
+const skillCatDesc = new Map<string, string>();
+const addSkillToCat = (category: string | undefined, name: string) => {
+  const cat = category?.trim();
+  if (!cat || !name) return;
+  if (!skillCatItems.has(cat)) { skillCatItems.set(cat, []); skillCatOrder.push(cat); }
+  const items = skillCatItems.get(cat)!;
+  if (!items.includes(name)) items.push(name);
+};
+// 1) Projects — seed category order + descriptions from the generated wing.
+for (const e of generatedSkills) {
+  const cat = e.popup?.title;
+  if (!cat) continue;
+  if (e.popup?.description && !skillCatDesc.has(cat)) skillCatDesc.set(cat, e.popup.description);
+  for (const t of e.popup?.tech ?? []) addSkillToCat(cat, t);
+}
+// 2) Work experience — grouped skills by their (aliased) category, plus flat tech the taxonomy knows.
+for (const e of experienceExhibits) {
+  for (const g of e.popup?.skills ?? []) for (const item of g.items) addSkillToCat(WORK_CAT_ALIAS[g.category] ?? g.category, item);
+  for (const t of e.popup?.tech ?? []) addSkillToCat(generatedSkillCategories[t], t);
+}
+// 3) Coursework — each skill carries the category its keyword rule assigned.
+for (const { skill, category } of courseworkSkills) addSkillToCat(category, skill);
+
+export const skillsExhibits: Exhibit[] = skillCatOrder.map((title) => {
+  const description = skillCatDesc.get(title);
+  const tech = skillCatItems.get(title)!;
+  return { popup: description ? { title, description, tech } : { title, tech } };
+});
+
+// Maps a skill/tech name → its category, so bare chips on project, experience, and archive cards can
+// be coloured by category — the same scheme as the Skills wing. The wing's aggregated groups come
+// FIRST (authoritative category per canonical name), then each project's own `popup.skills` groups
+// (whose RAW strings match the card chips), then the static taxonomy. First claim wins.
+export const skillCategoryMap: Record<string, string> = {};
+const claimSkill = (name: string, category: string) => {
+  if (name && category && !(name in skillCategoryMap)) skillCategoryMap[name] = category;
+};
+for (const e of skillsExhibits) for (const item of e.popup?.tech ?? []) claimSkill(item, e.popup?.title ?? "");
+for (const e of [...generatedMainHall, ...generatedInProgress, ...generatedArchive])
+  for (const g of e.popup?.skills ?? []) for (const item of g.items) claimSkill(item, g.category);
+for (const [name, category] of Object.entries(generatedSkillCategories)) claimSkill(name, category);
 
 /** The current role — the experience entry whose date reads "Present"/"current", or undefined.
  *  Single source for "where George works now": the hero's status line and the Person `worksFor`

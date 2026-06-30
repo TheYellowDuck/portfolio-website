@@ -10,8 +10,8 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 - **Seamless portal** — a continuous camera-pan transition hands off from the DOM site into the game and back, with a `prefers-reduced-motion` crossfade fallback.
 - **Explorable museum** — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press **E** to inspect glowing exhibits.
 - **Ghost trails (multiplayer presence)** — other visitors appear as drifting wisps that wander between exhibits and linger to "view" them; their paths are recorded, stored, and replayed back to future visitors.
-- **Live, self-updating content** — GitHub repos populate Projects + Skills (with skills also drawn from coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.
-- **Skills wing** — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Groups are aggregated and de-duplicated across every project plus coursework, with no hand-maintained allowlist.
+- **Live, self-updating content** — GitHub repos populate Projects + Skills (with skills also drawn from work experience and coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.
+- **Skills wing** — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Each orb is one category, aggregated and de-duplicated across every project, work-experience entry, and coursework, with no hand-maintained allowlist.
 - **Dynamic documents** — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.
 - **Atmosphere** — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg.
 
@@ -23,7 +23,7 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 
 **Ghost trails.** The engine samples the player's path; on leave it's `POST`ed to a route handler and stored in **Redis** (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a `GhostSystem` replays them as additive-blended **particle** wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured.
 
-**Data pipeline.** A daily **GitHub Actions** cron scans the owner's repos (languages, dependency manifests, READMEs, demo videos) and fetches LeetCode (GraphQL) + DMOJ stats, committing them as static data the site reads — so the live site never makes those third-party calls at runtime. The Skills wing is then aggregated from those per-project skill categories plus the parsed transcript's coursework, de-duplicated via canonical/alias maps. A CI workflow gates every PR on `tsc` + lint + tests, and Dependabot keeps dependencies current.
+**Data pipeline.** A daily **GitHub Actions** cron scans the owner's repos (languages, dependency manifests, READMEs, demo videos) and fetches LeetCode (GraphQL) + DMOJ stats, committing them as static data the site reads — so the live site never makes those third-party calls at runtime. The Skills wing is then aggregated from those per-project skill categories plus each work-experience entry's skills and the parsed transcript's coursework, grouped into one orb per category and de-duplicated via canonical/alias maps. A CI workflow gates every PR on `tsc` + lint + tests, and Dependabot keeps dependencies current.
 
 ## Skills Demonstrated
 
@@ -156,7 +156,7 @@ src/
 | `tile-ids.ts` | `TILES` constant — all tile ID definitions |
 | `interactables.ts` | Auto-scans the map for interactable tiles and links each to its exhibit |
 
-All exhibit content lives in [`src/data/projects.ts`](src/data/projects.ts) — **the one file to edit for content.** The `mainHall`, `archive`, and `skills` arrays are re-exported from `github.generated.ts` and refreshed by the daily sync, so don't hand-edit those (use the sync config's `overrides` instead); the rest (`experience`, `office`, `giftShop`, `resume`, `easterEgg`) are hand-written. See [`src/data/ADDING_EXHIBITS.md`](src/data/ADDING_EXHIBITS.md).
+All exhibit content lives in [`src/data/projects.ts`](src/data/projects.ts) — **the one file to edit for content.** The `mainHall` and `archive` arrays are re-exported from `github.generated.ts` and refreshed by the daily sync, so don't hand-edit those (use the sync config's `overrides` instead); the `skills` wing is assembled in `projects.ts` by merging those generated per-project skills with each `experience` entry's skills and the transcript-derived coursework, grouped by category; the rest (`experience`, `office`, `giftShop`, `resume`, `easterEgg`) are hand-written. See [`src/data/ADDING_EXHIBITS.md`](src/data/ADDING_EXHIBITS.md).
 
 ---
 
@@ -267,7 +267,7 @@ All exhibit content lives in [`src/data/projects.ts`](src/data/projects.ts) as p
 | `archiveExhibits` | Archive (north right) | auto-generated from GitHub |
 | `officeExhibits` | About Me (south left) | hand-written |
 | `giftShopExhibits` | Links (south right) | hand-written |
-| `skillsExhibits` | Skills wing | auto-generated from GitHub repos + coursework |
+| `skillsExhibits` | Skills wing | category orbs merged from GitHub repos + work experience + coursework |
 | `resumeExhibit` | Hallway pedestal | hand-written |
 | `easterEggExhibits` | Hidden in the hallway | hand-written |
 
@@ -300,7 +300,7 @@ Response types live in [`src/types/`](src/types/) and are shared by each route a
 
 `.github/workflows/sync-github.yml` runs daily (and on demand via "Run workflow"), committing refreshed data so the live site reads it statically and never calls these APIs at runtime:
 
-- `npm run sync:github` → scans repos → `src/data/github.generated.ts` (Projects + Skills; the Skills wing also folds in coursework from the parsed transcript).
+- `npm run sync:github` → scans repos → `src/data/github.generated.ts` (Projects + per-project Skills; `projects.ts` then merges those with work-experience and transcript-coursework skills into the category orbs).
 - `npm run sync:cp-stats` → LeetCode + DMOJ → `src/data/cp-stats.generated.json` (with last-good fallback so a transient block never wipes the numbers).
 - `npm run sync:docs` → résumé + transcript PDFs → `src/data/{resume,transcript}.generated.json`, so the API routes serve static JSON instead of running pdfjs in the serverless runtime.
 
