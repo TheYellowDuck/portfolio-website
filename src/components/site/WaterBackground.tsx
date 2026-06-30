@@ -188,50 +188,66 @@ export default function WaterBackground() {
     disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3);
 
     let frame = 0;
-    let raf = 0;
-    const tick = () => {
-      if (!paused()) {
-        // Occasional gentle ambient ripple in the VISIBLE viewport so the water is never quite still.
-        if (frame++ % AMBIENT_EVERY === 0) {
-          disturb(fx(Math.random() * window.innerWidth), fy(Math.random() * window.innerHeight), AMBIENT_FORCE, 2);
-        }
-        // Propagate the wave field (classic two-buffer water).
-        for (let y = 1; y < rows - 1; y++) {
-          const row = y * cols;
-          for (let x = 1; x < cols - 1; x++) {
-            const i = row + x;
-            cur[i] = ((prev[i - 1] + prev[i + 1] + prev[i - cols] + prev[i + cols]) * 0.5 - cur[i]) * DAMP;
-          }
-        }
-        const t = prev;
-        prev = cur;
-        cur = t; // prev now holds the latest frame
-
-        // Light the surface from the top-left by the diagonal slope of the height field. Crests
-        // get a SPECULAR glint (the ramp is squared, so only the steep faces light up — crisp,
-        // not a broad emboss); troughs get a faint warm shadow for depth.
-        const data = img.data;
-        for (let y = 0; y < rows; y++) {
-          const row = y * cols;
-          for (let x = 0; x < cols; x++) {
-            const i = row + x;
-            const lum =
-              ((x > 0 ? prev[i - 1] : prev[i]) - (x < cols - 1 ? prev[i + 1] : prev[i])) +
-              ((y > 0 ? prev[i - cols] : prev[i]) - (y < rows - 1 ? prev[i + cols] : prev[i]));
-            const o = i * 4;
-            if (lum >= 0) {
-              const s = Math.min(lum * K_LIGHT, 1);
-              data[o] = HI[0]; data[o + 1] = HI[1]; data[o + 2] = HI[2];
-              data[o + 3] = s * s * HI_A * 255; // squared → sharp, clean glints
-            } else {
-              data[o] = LO[0]; data[o + 1] = LO[1]; data[o + 2] = LO[2];
-              data[o + 3] = Math.min(-lum * K_SHADE, SH_A) * 255;
-            }
-          }
-        }
-        ctx.putImageData(img, 0, 0);
+    // Advance the wave field ONE fixed step (ambient impulse + two-buffer propagation + buffer swap).
+    const advance = () => {
+      // Occasional gentle ambient ripple in the VISIBLE viewport so the water is never quite still.
+      if (frame++ % AMBIENT_EVERY === 0) {
+        disturb(fx(Math.random() * window.innerWidth), fy(Math.random() * window.innerHeight), AMBIENT_FORCE, 2);
       }
+      for (let y = 1; y < rows - 1; y++) {
+        const row = y * cols;
+        for (let x = 1; x < cols - 1; x++) {
+          const i = row + x;
+          cur[i] = ((prev[i - 1] + prev[i + 1] + prev[i - cols] + prev[i + cols]) * 0.5 - cur[i]) * DAMP;
+        }
+      }
+      const t = prev;
+      prev = cur;
+      cur = t; // prev now holds the latest frame
+    };
+    // Light the surface from the top-left by the diagonal slope of the height field. Crests get a
+    // SPECULAR glint (the ramp is squared, so only the steep faces light up — crisp, not a broad
+    // emboss); troughs get a faint warm shadow for depth.
+    const render = () => {
+      const data = img.data;
+      for (let y = 0; y < rows; y++) {
+        const row = y * cols;
+        for (let x = 0; x < cols; x++) {
+          const i = row + x;
+          const lum =
+            ((x > 0 ? prev[i - 1] : prev[i]) - (x < cols - 1 ? prev[i + 1] : prev[i])) +
+            ((y > 0 ? prev[i - cols] : prev[i]) - (y < rows - 1 ? prev[i + cols] : prev[i]));
+          const o = i * 4;
+          if (lum >= 0) {
+            const s = Math.min(lum * K_LIGHT, 1);
+            data[o] = HI[0]; data[o + 1] = HI[1]; data[o + 2] = HI[2];
+            data[o + 3] = s * s * HI_A * 255; // squared → sharp, clean glints
+          } else {
+            data[o] = LO[0]; data[o + 1] = LO[1]; data[o + 2] = LO[2];
+            data[o + 3] = Math.min(-lum * K_SHADE, SH_A) * 255;
+          }
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    };
+
+    // Run the sim on a FIXED timestep so the wave speed is identical on any refresh rate — a 120Hz
+    // Chrome and a 60Hz Safari would otherwise advance the field at different rates (it looked faster
+    // on Chrome). Accumulate real elapsed time, take as many 60Hz steps as it buys, then render once.
+    const STEP_MS = 1000 / 60;
+    let raf = 0;
+    let lastT = 0;
+    let acc = 0;
+    const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
+      if (paused()) { lastT = now; acc = 0; return; }
+      if (!lastT) lastT = now;
+      acc += now - lastT;
+      lastT = now;
+      if (acc > STEP_MS * 5) acc = STEP_MS * 5; // clamp catch-up after a stall — no spiral of death
+      let stepped = false;
+      while (acc >= STEP_MS) { acc -= STEP_MS; advance(); stepped = true; }
+      if (stepped) render();
     };
     raf = requestAnimationFrame(tick);
 
