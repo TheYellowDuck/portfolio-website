@@ -111,7 +111,8 @@ function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: numb
  * with edges fading into the page. Pauses on hover/drag; manual mouse drag-to-scroll.
  */
 function Rail({ items, onOpen }: ArchiveScrollerProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null); // clips + masks + receives input
+  const trackRef = useRef<HTMLDivElement>(null);    // the moving flex row (CSS transform)
   const [aspects, setAspects] = useState<Record<number, number>>({});
 
   // Measure each local clip's aspect from its poster so the media keeps its real shape.
@@ -132,40 +133,49 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
 
   // Manual drag state + "actively interacting" window (timestamp until which we pause).
   const drag = useRef<{ startX: number; lastX: number; moved: boolean } | null>(null);
-  const touchX = useRef(0);
+  const touch = useRef<{ x: number; y: number; panning: boolean } | null>(null);
   const interactUntil = useRef(0);
   const idxRef = useRef(items.length); // active card, persisted so re-renders never reset position
-  const bump = () => { interactUntil.current = performance.now() + IDLE; };
+  // The rail is positioned by a CSS transform on the track (NOT native scroll). A native
+  // overflow-scroll clamps at its real edge, and the infinite-loop re-anchor then jumps a whole copy
+  // back every frame, so a drag/flick to the edge spun wildly in the opposite direction. A transform
+  // has no edge to clamp against. `pos` = how far the track is shifted left; the band [low,low+oneSet)
+  // is one copy, mirrored to refs so the input handlers can fold any offset back into it.
+  const posRef = useRef(0);
+  const oneSetRef = useRef(0);
+  const lowRef = useRef(0);
+  const bump = useCallback(() => { interactUntil.current = performance.now() + IDLE; }, []);
+  const apply = useCallback(() => { const t = trackRef.current; if (t) t.style.transform = `translate3d(${-posRef.current}px,0,0)`; }, []);
+  // Fold any offset back into the middle copy [low, low+oneSet); the copies are identical so the shift
+  // is invisible — the seamless infinite loop, now pure arithmetic (no scroll, nothing to clamp).
+  const wrapPos = useCallback((pos: number) => {
+    const o = oneSetRef.current, low = lowRef.current;
+    if (o <= 0) return pos;
+    const rel = pos - low;
+    return low + (((rel % o) + o) % o);
+  }, []);
 
   // Auto-advancing carousel: centre a card → dwell → glide to the next, looping seamlessly.
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const vp = viewportRef.current, track = trackRef.current;
+    if (!vp || !track) return;
     const N = items.length;
     if (N === 0) return;
     let oneSet = 0; // width of one copy (distance from copy A's first card to copy B's first card)
-    let low = 0; // scrollLeft that centres the middle copy's first card — start of the wrap band
-    const center = (i: number) => { const c = el.children[i] as HTMLElement; return c.offsetLeft - (el.clientWidth - c.offsetWidth) / 2; };
-    const measure = () => { const k = el.children; if (k.length > N) { oneSet = (k[N] as HTMLElement).offsetLeft - (k[0] as HTMLElement).offsetLeft; low = center(N); } };
-    // Keep MANUAL scroll inside one copy's band [low, low+oneSet); shifting by a whole copy is
-    // invisible (the copies are identical), so dragging/scrolling loops forever. Skipped during
-    // auto-advance — the auto path re-anchors itself exactly (offsetLeft rounding across copies
-    // means low+oneSet isn't pixel-exact, so relying on this listener there scrolls backward).
-    const wrap = () => {
-      if (oneSet <= 0) return;
-      if (!drag.current?.moved && performance.now() >= interactUntil.current) return; // auto: leave it
-      if (el.scrollLeft >= low + oneSet) el.scrollLeft -= oneSet;
-      else if (el.scrollLeft < low) el.scrollLeft += oneSet;
-    };
+    let low = 0; // track offset that centres the middle copy's first card — start of the wrap band
+    const vw = () => vp.clientWidth;
+    const center = (i: number) => { const c = track.children[i] as HTMLElement; return c.offsetLeft - (vw() - c.offsetWidth) / 2; };
+    const measure = () => { const k = track.children; if (k.length > N) { oneSet = (k[N] as HTMLElement).offsetLeft - (k[0] as HTMLElement).offsetLeft; low = center(N); oneSetRef.current = oneSet; lowRef.current = low; } };
+    const setPos = (p: number) => { posRef.current = p; apply(); };
     // The next card whose centre is at/ahead of the current centre, so resuming always continues
     // forward (rightward) — never snaps back to a card we just scrolled past.
     const forward = () => {
-      const mid = el.scrollLeft + el.clientWidth / 2;
-      for (let i = 0; i < el.children.length; i++) {
-        const c = el.children[i] as HTMLElement;
+      const mid = posRef.current + vw() / 2;
+      for (let i = 0; i < track.children.length; i++) {
+        const c = track.children[i] as HTMLElement;
         if (c.offsetLeft + c.offsetWidth / 2 >= mid - 4) return i;
       }
-      return el.children.length - 1;
+      return track.children.length - 1;
     };
     const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2); // easeInOutCubic
 
@@ -174,11 +184,18 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
     let elapsed = 0, from = 0, to = 0, raf = 0, lastT = 0, started = false, wasPaused = false, visible = true;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
-    const ro = new ResizeObserver(() => { measure(); if (oneSet > 0 && started) el.scrollLeft = center(idx); });
-    ro.observe(el);
+    const ro = new ResizeObserver(() => { measure(); if (oneSet > 0 && started) setPos(center(idx)); });
+    ro.observe(vp);
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { rootMargin: "200px" });
-    io.observe(el);
-    el.addEventListener("scroll", wrap, { passive: true });
+    io.observe(vp);
+    // Manual wheel/trackpad pan (no native scroll now): a horizontal-dominant wheel pans the rail —
+    // and we preventDefault so it can't trigger the browser's back/forward swipe — while a vertical
+    // wheel falls through so the page scrolls. Any wheel pauses the auto-advance.
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) >= Math.abs(e.deltaY) && e.deltaX !== 0) { e.preventDefault(); setPos(wrapPos(posRef.current + e.deltaX)); }
+      bump();
+    };
+    vp.addEventListener("wheel", onWheel, { passive: false });
 
     const frame = (t: number) => {
       raf = requestAnimationFrame(frame);
@@ -186,82 +203,95 @@ function Rail({ items, onOpen }: ArchiveScrollerProps) {
       lastT = t;
       if (oneSet <= 0) { measure(); }
       if (oneSet <= 0) return;
-      if (!started) { el.scrollLeft = center(idx); started = true; return; } // idx persisted across re-runs
-      // Pause while actively scrolling/dragging, or while a popup/modal is open (the rail is behind
-      // it) — not on hover, and not on a click/tap.
+      if (!started) { setPos(center(idx)); started = true; return; } // idx persisted across re-runs
+      // Pause while actively panning/dragging, or while a popup/modal is open (the rail is behind it)
+      // — not on hover, and not on a click/tap.
       const modalOpen = !!document.querySelector('[aria-modal="true"]');
       if (!visible || reduce || modalOpen || drag.current?.moved || t < interactUntil.current) { wasPaused = true; return; }
       if (wasPaused) { // resume: smoothly glide forward to the next card (never backward)
         wasPaused = false;
         idx = forward();
-        from = el.scrollLeft; to = center(idx); phase = "move"; elapsed = 0;
+        from = posRef.current; to = center(idx); phase = "move"; elapsed = 0;
       }
       elapsed += dt;
       if (phase === "dwell") {
-        if (elapsed >= DWELL) { phase = "move"; elapsed = 0; from = el.scrollLeft; idx += 1; to = center(idx); }
+        if (elapsed >= DWELL) { phase = "move"; elapsed = 0; from = posRef.current; idx += 1; to = center(idx); }
       } else {
         const p = Math.min(elapsed / MOVE, 1);
-        el.scrollLeft = from + (to - from) * ease(p);
+        setPos(from + (to - from) * ease(p));
         if (p >= 1) { // settle, then re-anchor exactly to the middle copy (seamless, no rounding drift)
           phase = "dwell"; elapsed = 0;
           while (idx >= 2 * N) idx -= N;
           while (idx < N) idx += N;
-          el.scrollLeft = center(idx);
+          setPos(center(idx));
         }
       }
       idxRef.current = idx; // persist so a re-render (e.g. opening a card popup) never resets position
     };
     raf = requestAnimationFrame(frame);
 
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); el.removeEventListener("scroll", wrap); };
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); vp.removeEventListener("wheel", onWheel); };
     // Keyed on item COUNT, not the array identity — the parent passes a fresh items array each
     // render, so depending on `items` would re-run this effect (resetting position) on every re-render.
-  }, [items.length, aspects]);
+  }, [items.length, aspects, bump, apply, wrapPos]);
 
-  // Mouse drag-to-scroll. A plain click never counts as interaction (no bump) so it doesn't move
-  // the carousel; only a real drag (moved past threshold) does. Delta-based so it survives the
-  // scrollLeft wrapping (which re-anchors mid-drag for the infinite loop).
+  // Mouse/pen drag-to-pan. A plain click never counts as interaction (no bump) so it doesn't move
+  // the carousel; only a real drag (moved past threshold) does. Delta-based and folded into the
+  // middle copy, so it loops seamlessly and never reaches an edge.
   const onPointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === "touch" || !scrollRef.current) return;
+    if (e.pointerType === "touch") return;
     drag.current = { startX: e.clientX, lastX: e.clientX, moved: false };
   };
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag.current || !scrollRef.current) return;
+    if (!drag.current) return;
     if (!drag.current.moved && Math.abs(e.clientX - drag.current.startX) > 4) {
-      drag.current.moved = true; scrollRef.current.setPointerCapture?.(e.pointerId);
+      drag.current.moved = true; viewportRef.current?.setPointerCapture?.(e.pointerId);
     }
-    if (drag.current.moved) { bump(); scrollRef.current.scrollLeft += drag.current.lastX - e.clientX; }
+    if (drag.current.moved) { bump(); posRef.current = wrapPos(posRef.current + (drag.current.lastX - e.clientX)); apply(); }
     drag.current.lastX = e.clientX;
   };
   const endDrag = () => { if (drag.current?.moved) bump(); drag.current = null; };
   const onClickCapture = (e: React.MouseEvent) => {
     if (drag.current?.moved) { e.stopPropagation(); e.preventDefault(); }
   };
-  // Touch: bump only on a real swipe (not a tap), so tapping a card doesn't move the carousel.
-  const onTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0]?.clientX ?? 0; };
-  const onTouchMove = (e: React.TouchEvent) => { if (Math.abs((e.touches[0]?.clientX ?? 0) - touchX.current) > 6) bump(); };
+  // Touch drag-to-pan (tablets ≥640px; phones get the Deck). touch-action:pan-y lets a vertical swipe
+  // scroll the page, while a horizontal-dominant swipe pans the rail. Bump only once it's really a
+  // pan, so a tap still opens the card.
+  const onTouchStart = (e: React.TouchEvent) => { const t = e.touches[0]; touch.current = t ? { x: t.clientX, y: t.clientY, panning: false } : null; };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const t = e.touches[0]; if (!t || !touch.current) return;
+    const dx = touch.current.x - t.clientX, dy = touch.current.y - t.clientY;
+    if (!touch.current.panning && Math.abs(dx) <= Math.abs(dy)) { touch.current = null; return; } // vertical → page scroll
+    touch.current.panning = true;
+    bump(); posRef.current = wrapPos(posRef.current + dx); apply();
+    touch.current.x = t.clientX; touch.current.y = t.clientY;
+  };
+  const onTouchEnd = () => { touch.current = null; };
 
   const mask = `linear-gradient(to right, transparent 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), transparent 100%)`;
   const loop = [...items, ...items, ...items]; // 3 copies so the centred card always has neighbours
 
   return (
     <div
-      ref={scrollRef}
+      ref={viewportRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onWheel={bump}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
       onClickCapture={onClickCapture}
       data-cursor="Drag"
-      style={{ WebkitMaskImage: mask, maskImage: mask }}
-      className="no-scrollbar relative flex cursor-grab gap-4 overflow-x-auto overscroll-x-contain px-1 py-2 active:cursor-grabbing"
+      style={{ WebkitMaskImage: mask, maskImage: mask, touchAction: "pan-y" }}
+      className="relative cursor-grab select-none overflow-hidden px-1 py-2 active:cursor-grabbing"
     >
-      {loop.map((item, i) => (
-        <ArchiveCard key={i} item={item} aspect={aspects[i % items.length] ?? 16 / 9} onOpen={() => onOpen(item.popup)} />
-      ))}
+      <div ref={trackRef} className="flex w-max gap-4 will-change-transform">
+        {loop.map((item, i) => (
+          <ArchiveCard key={i} item={item} aspect={aspects[i % items.length] ?? 16 / 9} onOpen={() => onOpen(item.popup)} />
+        ))}
+      </div>
     </div>
   );
 }
