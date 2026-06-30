@@ -125,13 +125,23 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Data & Visualization",
+          "items": [
+            "PDF parsing"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Accessibility and performance"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Framer Motion",
             "R",
-            "React and Next.js (App Router)",
-            "PDF parsing",
-            "Accessibility and performance"
+            "React and Next.js (App Router)"
           ]
         }
       ],
@@ -219,8 +229,12 @@ export const generatedMainHall: Exhibit[] = [
             "Transformers",
             "Retrieval-Augmented Generation (RAG)",
             "Semantic search & embeddings",
+            "Cross-encoder reranking",
             "Listwise LLM reranking",
+            "Personalized PageRank",
+            "Approximate nearest neighbor (ANN)",
             "LLM-as-judge & faithfulness (RAGAS-style)",
+            "Grounded generation",
             "Prompt engineering",
             "Machine Learning",
             "Generative AI / LLMs"
@@ -261,6 +275,7 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "DevOps",
             "Testing",
+            "Benchmarking",
             "CI / DevOps"
           ]
         },
@@ -274,19 +289,24 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Data & Visualization",
+          "items": [
+            "Interactive data visualization",
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Incremental computation",
+            "Resilience engineering"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Assembly",
-            "Cross-encoder reranking",
-            "Personalized PageRank",
-            "Approximate nearest neighbor (ANN)",
-            "Grounded generation",
-            "Benchmarking",
-            "Incremental computation",
-            "Resilience engineering",
-            "Interactive data visualization",
-            "CLI design",
-            "Data Analysis"
+            "CLI design"
           ]
         }
       ],
@@ -376,16 +396,26 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "OpenAI API",
             "Anthropic API",
+            "ReAct agent loop",
+            "Reflection / self-correction",
             "LLM-as-judge evaluation",
+            "Accessibility-tree observation",
+            "Set-of-Marks visual grounding",
             "Provider-agnostic LLM abstraction",
+            "Structured outputs",
+            "Typed action space with validation",
+            "Agent Workflow Memory (AWM)",
+            "Anti-hallucination engineering",
             "Generative AI / LLMs"
           ]
         },
         {
           "category": "Statistics & Evaluation",
           "items": [
+            "Deterministic benchmark scoring",
             "Statistical rigor",
             "Significance testing",
+            "Cross-evaluator agreement",
             "Reproducible experiment logging",
             "Statistics & Evaluation"
           ]
@@ -422,27 +452,27 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Data & Visualization",
           "items": [
             "Pillow",
+            "Data visualization",
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Failure taxonomy"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
             "JavaScript",
             "HTML",
-            "ReAct agent loop",
-            "Reflection / self-correction",
-            "Accessibility-tree observation",
-            "Set-of-Marks visual grounding",
-            "Structured outputs",
             "Prompt caching",
-            "Typed action space with validation",
-            "Deterministic benchmark scoring",
-            "Cross-evaluator agreement",
-            "Agent Workflow Memory (AWM)",
-            "Failure taxonomy",
-            "Data visualization",
             "Docker sandbox integration",
-            "Anti-hallucination engineering",
-            "Cost/token accounting",
-            "Data Analysis"
+            "Cost/token accounting"
           ]
         }
       ],
@@ -653,6 +683,8 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "Testing",
             "Differential and property-based testing",
+            "Benchmarking methodology",
+            "Build and CI engineering",
             "DevOps"
           ]
         },
@@ -689,9 +721,7 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "Concepts & Practices",
           "items": [
-            "R",
-            "Benchmarking methodology",
-            "Build and CI engineering"
+            "R"
           ]
         }
       ],
@@ -758,7 +788,11 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Systems & Embedded",
           "items": [
             "Robotics & Embedded",
-            "Robotics & embedded programming"
+            "Robotics & embedded programming",
+            "Sensor integration & fusion",
+            "Motor control",
+            "Serial communication",
+            "Hardware calibration"
           ]
         },
         {
@@ -793,15 +827,16 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Data & Visualization",
+          "items": [
+            "Image processing"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Processing",
-            "Image processing",
-            "Sensor integration & fusion",
-            "Motor control",
-            "Serial communication",
-            "Iterative engineering",
-            "Hardware calibration"
+            "Iterative engineering"
           ]
         }
       ],
@@ -885,6 +920,7 @@ export const generatedMainHall: Exhibit[] = [
             "Local persistence",
             "Repository design pattern",
             "Navigation",
+            "Component reuse",
             "Lifecycle awareness",
             "OOP & Design Patterns"
           ]
@@ -910,13 +946,17 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Platform & I/O",
           "items": [
-            "Processing",
             "Local notifications",
             "Preferences storage",
-            "Component reuse",
             "Mobile Development"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Processing"
           ]
         }
       ],
@@ -1015,11 +1055,21 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Reliability & Ops",
+          "items": [
+            "Performance optimisation"
+          ]
+        },
+        {
+          "category": "Platform & I/O",
+          "items": [
+            "Input handling"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
-            "Processing",
-            "Input handling",
-            "Performance optimisation"
+            "Processing"
           ]
         }
       ],
@@ -1106,8 +1156,10 @@ export const generatedMainHall: Exhibit[] = [
             "Transformers",
             "Computer Vision",
             "LLM application development",
+            "Structured outputs",
             "Computer vision / multimodal AI",
             "Semantic embeddings",
+            "Hierarchical classification",
             "Machine Learning",
             "Generative AI / LLMs"
           ]
@@ -1147,21 +1199,29 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Data & Visualization",
           "items": [
             "Pillow",
-            "Requests",
-            "Prompt caching",
-            "Structured outputs",
-            "Hierarchical classification",
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
             "Fault tolerance",
             "Crash-safe file operations",
             "Secrets management",
-            "CLI design",
             "Cost engineering",
             "Privacy engineering",
-            "Automatic dependency management",
-            "Data Analysis"
+            "Automatic dependency management"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Requests",
+            "Prompt caching",
+            "CLI design"
           ]
         }
       ],
@@ -1237,11 +1297,16 @@ export const generatedInProgress: Exhibit[] = [
             "Anthropic API",
             "Transformers",
             "Reinforcement Learning from Human Feedback (RLHF)",
+            "Policy-gradient methods",
+            "Reward modeling",
+            "Generalized Advantage Estimation (GAE)",
+            "Adaptive KL control",
             "Supervised fine-tuning (SFT)",
             "Deep learning with PyTorch",
             "HuggingFace Transformers",
             "Parameter-efficient fine-tuning",
             "LLM-as-judge evaluation",
+            "Reward-hacking mitigation",
             "Machine Learning",
             "Generative AI / LLMs"
           ]
@@ -1274,6 +1339,12 @@ export const generatedInProgress: Exhibit[] = [
           ]
         },
         {
+          "category": "Architecture & Design",
+          "items": [
+            "Software design"
+          ]
+        },
+        {
           "category": "Testing & Delivery",
           "items": [
             "Testing",
@@ -1287,16 +1358,15 @@ export const generatedInProgress: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Data & Visualization",
           "items": [
-            "Policy-gradient methods",
-            "Reward modeling",
-            "Generalized Advantage Estimation (GAE)",
-            "Adaptive KL control",
-            "Reward-hacking mitigation",
-            "Checkpointing and resumability",
-            "Software design",
             "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Checkpointing and resumability"
           ]
         }
       ],
@@ -1361,6 +1431,7 @@ export const generatedArchive: Exhibit[] = [
             "Object-oriented design",
             "Polymorphism & abstract base classes",
             "Inheritance",
+            "Strategy-style effect system",
             "Model–view separation (MVC)",
             "OOP & Design Patterns"
           ]
@@ -1396,12 +1467,16 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Platform & I/O",
+          "items": [
+            "File I/O"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
-            "Strategy-style effect system",
             "Conditional compilation",
-            "Command parsing",
-            "File I/O"
+            "Command parsing"
           ]
         }
       ],
@@ -1412,6 +1487,99 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "embedUrl": "https://www.youtube.com/embed/kgbDw50uphA"
+    }
+  },
+  {
+    "popup": {
+      "title": "Minesweeper",
+      "description": "A fully-featured Minesweeper clone built in Java with a custom dark-themed UI, a probability-based AI solver, BFS flood-fill reveals, and dynamic tile scaling. Custom rendered board — 3D bevel tiles drawn with Graphics2D, distinct highlight/shadow edges for unrevealed vs. revealed states; Probability-based AI solver — constraint propagation fixpoint loop deduces guaranteed mines; remaining cells ranked by local mine probability; random tie-breaking when probabilities are equal; Auto Solve mode — checkbox triggers the AI on a 500 ms Swing Timer; runs on the EDT without blocking the UI; Configurable grid — dialog lets you set columns, rows, and mine count; tile size auto-scales to fill the screen while keeping tiles between 20–60 px; Restart — resets board, AI state, and mine counter without reopening the setup dialog; Instructions dialog — in-game \"How to Play\" reference; Dynamic mine counter — tracks remaining unflagged mines in real time; Platform-aware icon — programmatically generated app icon reusing the same drawRaised / drawMine helpers; set on the macOS dock via the Taskbar API The game logic, AI, and UI are kept in separate classes (MineSweeper, AI, Main). Revealing an empty cell triggers a BFS flood-fill that cascades outward through all connected zero-count cells, opening their neighbours in one sweep. The AI solver runs a constraint-propagation fixpoint loop: it repeatedly scans every numbered cell, and whenever a cell's number equals its count of adjacent unknowns it flags those as guaranteed mines (and conversely opens cells that are provably safe), iterating until no new deductions are possible. When pure deduction stalls, it falls back to probabilistic reasoning — ranking the remaining unknown cells by their local mine probability and breaking ties randomly — so it can keep making the statistically best move. Auto-solve mode steps this engine on a 500 ms Swing Timer, entirely on the Event Dispatch Thread so the UI never freezes. Object-oriented design — game logic, AI solver, and UI in separate classes; Event-driven programming — Swing mouse and window listeners, timer-driven auto-solve; 2D rendering — Graphics2D 3D-bevel tiles with highlight/shadow edges; BFS flood-fill — cascading reveal of connected zero-count cells; Constraint-propagation solver — fixpoint deduction of guaranteed mines and safe cells; Probabilistic reasoning — local mine-probability ranking with random tie-breaking; Algorithm design — combined deterministic + probabilistic AI strategy; Dynamic UI scaling — tile size auto-scales (20–60 px) to grid and screen size; Procedural graphics — programmatically generated app icon and dock integration via Taskbar; Input handling — mouse listener for reveal/flag, window listener for lifecycle; Layout management — Swing layout managers and SpringUtilities; JAR packaging — distributed as a standalone runnable JAR Java 17; Java Swing / AWT (JFrame, JPanel, Graphics2D, javax.swing.Timer, layout managers); Taskbar API for the macOS dock icon; Packaged as a standalone runnable JAR (MineSweeper.jar)",
+      "tech": [
+        "Java",
+        "Swing",
+        "Object-oriented design",
+        "Event-driven programming",
+        "2D rendering",
+        "BFS flood-fill",
+        "Constraint-propagation solver",
+        "Probabilistic reasoning",
+        "Algorithm design",
+        "Dynamic UI scaling",
+        "Procedural graphics",
+        "Input handling",
+        "Layout management",
+        "JAR packaging"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Java"
+          ]
+        },
+        {
+          "category": "Frameworks",
+          "items": [
+            "Swing"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Probabilistic reasoning"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Constraint-propagation solver",
+            "Algorithm design",
+            "Algorithms & DS"
+          ]
+        },
+        {
+          "category": "UI & 2D",
+          "items": [
+            "2D rendering",
+            "Dynamic UI scaling"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Object-oriented design",
+            "Event-driven programming",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "JAR packaging"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "BFS flood-fill",
+            "Procedural graphics",
+            "Game Development"
+          ]
+        },
+        {
+          "category": "Platform & I/O",
+          "items": [
+            "Input handling",
+            "Layout management"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/minesweeper"
+        }
+      ],
+      "videoUrl": "/videos/minesweeper.mp4"
     }
   },
   {
@@ -1494,15 +1662,30 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Data & Visualization",
           "items": [
-            "Processing",
             "Image processing",
             "Grayscale conversion",
-            "Image scaling",
-            "Keyboard shortcut system",
-            "Layout management",
+            "Image scaling"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
             "Error handling"
+          ]
+        },
+        {
+          "category": "Platform & I/O",
+          "items": [
+            "Keyboard shortcut system",
+            "Layout management"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Processing"
           ]
         }
       ],
@@ -1585,12 +1768,22 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Reliability & Ops",
           "items": [
-            "Set operations",
-            "Robust error handling",
+            "Robust error handling"
+          ]
+        },
+        {
+          "category": "Platform & I/O",
+          "items": [
             "Automatic driver management",
             "Clipboard integration"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Set operations"
           ]
         }
       ],
@@ -1658,7 +1851,9 @@ export const generatedArchive: Exhibit[] = [
           "category": "Architecture & Design",
           "items": [
             "Object-oriented design",
+            "Event-driven programming",
             "Game loop architecture",
+            "Java Platform Module System",
             "OOP & Design Patterns"
           ]
         },
@@ -1685,11 +1880,9 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Platform & I/O",
           "items": [
-            "Event-driven programming",
-            "Input handling",
-            "Java Platform Module System"
+            "Input handling"
           ]
         }
       ],
@@ -1763,8 +1956,10 @@ export const generatedArchive: Exhibit[] = [
           "category": "Architecture & Design",
           "items": [
             "Object-oriented design",
+            "Event-driven programming",
             "Game loop architecture",
             "Object lifecycle management",
+            "Java Platform Module System",
             "OOP & Design Patterns"
           ]
         },
@@ -1785,13 +1980,21 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Reliability & Ops",
+          "items": [
+            "Performance optimisation"
+          ]
+        },
+        {
+          "category": "Platform & I/O",
+          "items": [
+            "Input handling"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
-            "Event-driven programming",
-            "Performance optimisation",
-            "Stochastic behaviour",
-            "Input handling",
-            "Java Platform Module System"
+            "Stochastic behaviour"
           ]
         }
       ],
@@ -1862,6 +2065,7 @@ export const generatedArchive: Exhibit[] = [
             "Object-oriented design",
             "Inheritance & polymorphism",
             "Game loop architecture",
+            "Java Platform Module System",
             "OOP & Design Patterns"
           ]
         },
@@ -1882,12 +2086,11 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Platform & I/O",
           "items": [
             "Input handling",
             "Audio playback",
-            "File I/O",
-            "Java Platform Module System"
+            "File I/O"
           ]
         }
       ],
@@ -1898,94 +2101,6 @@ export const generatedArchive: Exhibit[] = [
         }
       ],
       "embedUrl": "https://www.youtube.com/embed/cbCoB_rXNRQ"
-    }
-  },
-  {
-    "popup": {
-      "title": "Minesweeper",
-      "description": "A fully-featured Minesweeper clone built in Java with a custom dark-themed UI, a probability-based AI solver, BFS flood-fill reveals, and dynamic tile scaling. Custom rendered board — 3D bevel tiles drawn with Graphics2D, distinct highlight/shadow edges for unrevealed vs. revealed states; Probability-based AI solver — constraint propagation fixpoint loop deduces guaranteed mines; remaining cells ranked by local mine probability; random tie-breaking when probabilities are equal; Auto Solve mode — checkbox triggers the AI on a 500 ms Swing Timer; runs on the EDT without blocking the UI; Configurable grid — dialog lets you set columns, rows, and mine count; tile size auto-scales to fill the screen while keeping tiles between 20–60 px; Restart — resets board, AI state, and mine counter without reopening the setup dialog; Instructions dialog — in-game \"How to Play\" reference; Dynamic mine counter — tracks remaining unflagged mines in real time; Platform-aware icon — programmatically generated app icon reusing the same drawRaised / drawMine helpers; set on the macOS dock via the Taskbar API The game logic, AI, and UI are kept in separate classes (MineSweeper, AI, Main). Revealing an empty cell triggers a BFS flood-fill that cascades outward through all connected zero-count cells, opening their neighbours in one sweep. The AI solver runs a constraint-propagation fixpoint loop: it repeatedly scans every numbered cell, and whenever a cell's number equals its count of adjacent unknowns it flags those as guaranteed mines (and conversely opens cells that are provably safe), iterating until no new deductions are possible. When pure deduction stalls, it falls back to probabilistic reasoning — ranking the remaining unknown cells by their local mine probability and breaking ties randomly — so it can keep making the statistically best move. Auto-solve mode steps this engine on a 500 ms Swing Timer, entirely on the Event Dispatch Thread so the UI never freezes. Object-oriented design — game logic, AI solver, and UI in separate classes; Event-driven programming — Swing mouse and window listeners, timer-driven auto-solve; 2D rendering — Graphics2D 3D-bevel tiles with highlight/shadow edges; BFS flood-fill — cascading reveal of connected zero-count cells; Constraint-propagation solver — fixpoint deduction of guaranteed mines and safe cells; Probabilistic reasoning — local mine-probability ranking with random tie-breaking; Algorithm design — combined deterministic + probabilistic AI strategy; Dynamic UI scaling — tile size auto-scales (20–60 px) to grid and screen size; Procedural graphics — programmatically generated app icon and dock integration via Taskbar; Input handling — mouse listener for reveal/flag, window listener for lifecycle; Layout management — Swing layout managers and SpringUtilities; JAR packaging — distributed as a standalone runnable JAR Java 17; Java Swing / AWT (JFrame, JPanel, Graphics2D, javax.swing.Timer, layout managers); Taskbar API for the macOS dock icon; Packaged as a standalone runnable JAR (MineSweeper.jar)",
-      "tech": [
-        "Java",
-        "Swing",
-        "Object-oriented design",
-        "Event-driven programming",
-        "2D rendering",
-        "BFS flood-fill",
-        "Constraint-propagation solver",
-        "Probabilistic reasoning",
-        "Algorithm design",
-        "Dynamic UI scaling",
-        "Procedural graphics",
-        "Input handling",
-        "Layout management",
-        "JAR packaging"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Java"
-          ]
-        },
-        {
-          "category": "Frameworks",
-          "items": [
-            "Swing"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Constraint-propagation solver",
-            "Algorithm design",
-            "Algorithms & DS"
-          ]
-        },
-        {
-          "category": "UI & 2D",
-          "items": [
-            "2D rendering",
-            "Dynamic UI scaling"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Object-oriented design",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "JAR packaging"
-          ]
-        },
-        {
-          "category": "Game Dev",
-          "items": [
-            "BFS flood-fill",
-            "Procedural graphics",
-            "Game Development"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Event-driven programming",
-            "Probabilistic reasoning",
-            "Input handling",
-            "Layout management"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/minesweeper"
-        }
-      ],
-      "videoUrl": "/videos/minesweeper.mp4"
     }
   },
   {
@@ -2114,8 +2229,11 @@ export const generatedArchive: Exhibit[] = [
           "category": "Architecture & Design",
           "items": [
             "Object-oriented design",
+            "Event-driven programming",
             "Game loop architecture",
+            "Separation of concerns",
             "Application lifecycle handling",
+            "Java Platform Module System",
             "OOP & Design Patterns"
           ]
         },
@@ -2134,13 +2252,10 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Platform & I/O",
           "items": [
-            "Event-driven programming",
             "Input handling",
-            "Separation of concerns",
-            "File I/O",
-            "Java Platform Module System"
+            "File I/O"
           ]
         }
       ],
@@ -2186,10 +2301,15 @@ export const generatedArchive: Exhibit[] = [
         {
           "category": "Algorithms & DS",
           "items": [
+            "Competitive programming",
             "Algorithms & data structures",
             "Graph algorithms",
             "Dynamic programming",
+            "Sorting & searching",
+            "Tree & set structures",
+            "String processing",
             "Math & combinatorics",
+            "Computational geometry",
             "Complexity & optimization",
             "Algorithms & DS"
           ]
@@ -2204,11 +2324,6 @@ export const generatedArchive: Exhibit[] = [
           "category": "Concepts & Practices",
           "items": [
             "Processing",
-            "Competitive programming",
-            "Sorting & searching",
-            "Tree & set structures",
-            "String processing",
-            "Computational geometry",
             "Multi-language fluency"
           ]
         }
@@ -2338,20 +2453,39 @@ export const generatedSkills: Exhibit[] = [
         "Anthropic API",
         "Transformers",
         "Reinforcement Learning from Human Feedback (RLHF)",
+        "Policy-gradient methods",
+        "Reward modeling",
+        "Generalized Advantage Estimation (GAE)",
+        "Adaptive KL control",
         "Supervised fine-tuning (SFT)",
         "Deep learning with PyTorch",
         "Parameter-efficient fine-tuning",
         "LLM-as-Judge Evaluation",
+        "Reward-hacking mitigation",
         "Machine Learning",
         "Generative AI / LLMs",
         "OpenAI API",
         "Retrieval-Augmented Generation (RAG)",
         "Semantic Search & Embeddings",
+        "Cross-encoder reranking",
         "Listwise LLM reranking",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "Grounded generation",
         "Prompt engineering",
+        "ReAct agent loop",
+        "Reflection / self-correction",
+        "Accessibility-tree observation",
+        "Set-of-Marks visual grounding",
         "Provider-agnostic LLM abstraction",
+        "Structured outputs",
+        "Typed action space with validation",
+        "Agent Workflow Memory (AWM)",
+        "Anti-hallucination engineering",
         "Computer Vision",
-        "LLM application development"
+        "LLM application development",
+        "Hierarchical classification",
+        "Probabilistic reasoning"
       ]
     }
   },
@@ -2374,7 +2508,12 @@ export const generatedSkills: Exhibit[] = [
         "Graph algorithms",
         "Graph traversal & validation",
         "Combinatorics & Math",
+        "Competitive programming",
         "Dynamic programming",
+        "Sorting & searching",
+        "Tree & set structures",
+        "String processing",
+        "Computational geometry",
         "Complexity & optimization",
         "Algorithmic navigation",
         "Breadth-first search",
@@ -2392,7 +2531,9 @@ export const generatedSkills: Exhibit[] = [
         "Reproducibility and static analysis",
         "Evaluation methodology",
         "Statistical rigor",
+        "Deterministic benchmark scoring",
         "Significance testing",
+        "Cross-evaluator agreement",
         "Reproducible experiment logging"
       ]
     }
@@ -2431,7 +2572,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Systems & Embedded",
       "tech": [
-        "Robotics & Embedded"
+        "Robotics & Embedded",
+        "Sensor integration & fusion",
+        "Motor control",
+        "Serial communication",
+        "Hardware calibration"
       ]
     }
   },
@@ -2576,6 +2721,7 @@ export const generatedSkills: Exhibit[] = [
       "title": "Architecture & Design",
       "tech": [
         "Game engine architecture",
+        "Software design",
         "Factory pattern",
         "Object-Oriented Design",
         "Provider abstraction (strategy pattern)",
@@ -2584,17 +2730,22 @@ export const generatedSkills: Exhibit[] = [
         "Local persistence",
         "Repository design pattern",
         "Navigation",
+        "Component reuse",
         "Lifecycle awareness",
         "Cross-browser abstraction",
         "Data modelling",
         "Persistence",
         "Inheritance & polymorphism",
         "Game loop architecture",
+        "Java Platform Module System",
         "Game state management",
+        "Event-driven programming",
         "Object lifecycle management",
         "Polymorphism & abstract base classes",
         "Inheritance",
+        "Strategy-style effect system",
         "Model–view separation (MVC)",
+        "Separation of concerns",
         "Application lifecycle handling"
       ]
     }
@@ -2605,13 +2756,37 @@ export const generatedSkills: Exhibit[] = [
       "tech": [
         "CI/CD & DevOps",
         "Testing",
+        "Benchmarking",
         "Property-Based Testing",
+        "Benchmarking methodology",
+        "Build and CI engineering",
         "Packaging",
         "Gradle build system",
         "Shipping to production",
         "JAR Packaging",
         "Debugging with invariants",
         "Cross-Platform Builds"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Reliability & Ops",
+      "tech": [
+        "Accessibility and performance",
+        "Checkpointing and resumability",
+        "Incremental computation",
+        "Resilience engineering",
+        "Failure taxonomy",
+        "Fault tolerance",
+        "Crash-safe file operations",
+        "Secrets management",
+        "Cost engineering",
+        "Privacy engineering",
+        "Automatic dependency management",
+        "Robust error handling",
+        "Error handling",
+        "Performance optimisation"
       ]
     }
   },
@@ -2642,6 +2817,38 @@ export const generatedSkills: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Data & Visualization",
+      "tech": [
+        "PDF parsing",
+        "Data Analysis",
+        "Interactive data visualization",
+        "Pillow",
+        "Data visualization",
+        "Image processing",
+        "Grayscale conversion",
+        "Image scaling"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Platform & I/O",
+      "tech": [
+        "Local notifications",
+        "Preferences storage",
+        "Mobile Development",
+        "Automatic driver management",
+        "Clipboard integration",
+        "Keyboard shortcut system",
+        "Layout management",
+        "Input handling",
+        "Audio playback",
+        "File I/O"
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Tools",
       "tech": [
         "TypeScript",
@@ -2667,99 +2874,28 @@ export const generatedSkills: Exhibit[] = [
         "Framer Motion",
         "R",
         "React and Next.js (App Router)",
-        "PDF parsing",
-        "Accessibility and performance",
-        "Policy-gradient methods",
-        "Reward modeling",
-        "Generalized Advantage Estimation (GAE)",
-        "Adaptive KL control",
-        "Reward-hacking mitigation",
-        "Checkpointing and resumability",
-        "Software design",
-        "Data Analysis",
         "Assembly",
-        "Cross-encoder reranking",
-        "Personalized PageRank",
-        "Approximate nearest neighbor (ANN)",
-        "Grounded generation",
-        "Benchmarking",
-        "Incremental computation",
-        "Resilience engineering",
-        "Interactive data visualization",
         "CLI design",
-        "Pillow",
         "JavaScript",
         "HTML",
-        "ReAct agent loop",
-        "Reflection / self-correction",
-        "Accessibility-tree observation",
-        "Set-of-Marks visual grounding",
-        "Structured outputs",
         "Prompt caching",
-        "Typed action space with validation",
-        "Deterministic benchmark scoring",
-        "Cross-evaluator agreement",
-        "Agent Workflow Memory (AWM)",
-        "Failure taxonomy",
-        "Data visualization",
         "Docker sandbox integration",
-        "Anti-hallucination engineering",
         "Cost/token accounting",
-        "Benchmarking methodology",
-        "Build and CI engineering",
         "Requests",
-        "Hierarchical classification",
-        "Fault tolerance",
-        "Crash-safe file operations",
-        "Secrets management",
-        "Cost engineering",
-        "Privacy engineering",
-        "Automatic dependency management",
         "Practical utilities",
         "Teaching & mentoring",
         "Self-directed learning",
         "Processing",
-        "Competitive programming",
-        "Sorting & searching",
-        "Tree & set structures",
-        "String processing",
-        "Computational geometry",
         "Multi-language fluency",
-        "Image processing",
-        "Sensor integration & fusion",
-        "Motor control",
-        "Serial communication",
         "Iterative engineering",
-        "Hardware calibration",
-        "Local notifications",
-        "Preferences storage",
-        "Component reuse",
-        "Mobile Development",
         "Set operations",
-        "Robust error handling",
-        "Automatic driver management",
-        "Clipboard integration",
-        "Grayscale conversion",
-        "Image scaling",
-        "Keyboard shortcut system",
-        "Layout management",
-        "Error handling",
         "Java",
-        "Input handling",
-        "Audio playback",
-        "File I/O",
-        "Java Platform Module System",
-        "Performance optimisation",
         "Go",
         "Suicide-move prevention",
         "Processing framework",
-        "Event-driven programming",
         "Stochastic behaviour",
-        "Probabilistic reasoning",
-        "Strategy-style effect system",
         "Conditional compilation",
-        "Command parsing",
-        "Separation of concerns"
+        "Command parsing"
       ]
     }
   },
@@ -2777,5 +2913,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-30T23:01:57.825Z"
+  "syncedAt": "2026-06-30T23:15:12.331Z"
 };
