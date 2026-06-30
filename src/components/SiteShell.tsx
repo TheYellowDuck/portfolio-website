@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import Portfolio from "./site/Portfolio";
 import { content } from "@/content";
 import IntroCurtain from "./site/IntroCurtain";
+import WaterBackground from "./site/WaterBackground";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
 import KonamiEasterEgg from "./site/KonamiEasterEgg";
@@ -312,6 +313,9 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
 
   return (
     <>
+      {/* Water surface behind everything — ripples on tap/click, flows as you move/drag. */}
+      <WaterBackground />
+
       {/* Intro curtain — masks first paint, then lifts once web fonts are ready (not on a timer).
           The "lights coming up": warm lamp glow blooms, name + label + underline stage in. */}
       <IntroCurtain />

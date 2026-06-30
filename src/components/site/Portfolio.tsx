@@ -105,8 +105,10 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
   const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
 
+  // No bg on the root — the html parchment + the WaterBackground canvas (fixed, -z-10) show through
+  // behind the content (the body is transparent). Cards/sections keep their own opaque surfaces.
   return (
-    <div className="min-h-[100svh] bg-parchment text-walnut">
+    <div className="min-h-[100svh] text-walnut">
       {/* Keyboard skip link — first focusable element, revealed on focus. */}
       <a
         href="#main-content"

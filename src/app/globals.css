@@ -12,9 +12,12 @@
   }
 }
 
-html, body {
+html {
   background: var(--c-bg);     /* themeable; the game layer paints its own dark bg */
 }
+/* Body stays transparent so the WaterBackground canvas (fixed, -z-10) is visible over the html
+   background. If the body painted its own bg it would cover the canvas. */
+body { background: transparent; }
 /* Clip horizontal overflow + suppress pull-to-refresh on the page scroll container
    (<html>) ONLY. Putting overflow-x on <body> too makes the body a scroll container
    whose content fits exactly, so it can't scroll — and overscroll-behavior:none then
