@@ -44,7 +44,14 @@ html:has(body.game-active) { overflow: hidden; scrollbar-gutter: auto; }
    [data-native-cursor]: those are :not()-excluded so their real cursor/caret stays
    (e.g. the slider keeps its pointer while you drag it, instead of going blank).
    Excluding here, rather than restoring afterward, avoids a specificity fight.
-   Gated to fine-pointer, motion-OK devices via .has-custom-cursor on <html>. */
+   Gated to fine-pointer, motion-OK devices via .has-custom-cursor on <html>.
+   We hide via a transparent 1×1 cursor IMAGE, not `cursor: none`: WebKit drops the special
+   `none` value (reverting to the system arrow) on the theme-swap style recalc and won't
+   re-resolve it until the next pointer move. An explicit image is owned by the page and
+   survives the recalc, so the native cursor never reappears mid-toggle. */
+:root {
+  --cursor-hide: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=") 0 0, auto;
+}
 html.has-custom-cursor
   :is(a[href], button, [role="button"], [role="link"], summary, label[for],
       .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor]):not(input, select, textarea, [contenteditable="true"], [data-native-cursor]),
@@ -52,7 +59,7 @@ html.has-custom-cursor
   :is(a[href], button, [role="button"], [role="link"], summary, label[for],
       .cursor-pointer, .cursor-grab, .cursor-zoom-in, .cursor-zoom-out, [data-cursor])
   :not(input, select, textarea, [contenteditable="true"], [data-native-cursor]) {
-  cursor: none !important;
+  cursor: var(--cursor-hide) !important;
 }
 
 /* Hidden while the page is scrolling — the custom dot/disc fades out so it isn't
@@ -62,7 +69,7 @@ html.has-custom-cursor
 /* …and while scrolling, hide EVERY native cursor too — arrow, text caret, the lot — so
    nothing shows at all. The component toggles .cursor-scroll-hide on <html> during scroll. */
 html.cursor-scroll-hide,
-html.cursor-scroll-hide * { cursor: none !important; }
+html.cursor-scroll-hide * { cursor: var(--cursor-hide) !important; }
 
 .cursor-cur {
   position: fixed;
@@ -184,6 +191,17 @@ html.dark {
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-transition, .theme-transition * { transition: none !important; }
+}
+/* Nested elements that INHERIT a colour an ancestor is fading must NOT run their own
+   colour transition during a theme swap — otherwise each re-transitions against its
+   already-animating ancestor, lagging then snapping at the end (the hero scramble text,
+   the nav tabs, the footer copyright, the About typewriter…). Opt them out so they track
+   the ancestor's single smooth fade live. Two utilities, by where the colour is declared:
+     .theme-fade-self   — the element ITSELF inherits  → disable it AND its subtree
+     .theme-fade-inner  — the element DECLARES the colour → keep it; disable only its subtree
+   Higher specificity + !important beats the `.theme-transition *` rule above. */
+.theme-transition :is(.theme-fade-self, .theme-fade-self *, .theme-fade-inner *) {
+  transition: none !important;
 }
 
 /* Intro curtain — covers the first paint (hiding header hydration flicker), then lifts once web

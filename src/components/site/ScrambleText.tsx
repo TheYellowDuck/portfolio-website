@@ -83,7 +83,7 @@ export default function ScrambleText({ text, className, delay = 0 }: ScrambleTex
   }, [text, delay]);
 
   return (
-    <span ref={wrapRef} className={className} style={{ position: "relative", display: "inline-block", maxWidth: "100%" }}>
+    <span ref={wrapRef} className={`theme-fade-self ${className ?? ""}`} style={{ position: "relative", display: "inline-block", maxWidth: "100%" }}>
       <span ref={textRef} aria-hidden="true">{text}</span>
       <span className="sr-only">{text}</span>
     </span>

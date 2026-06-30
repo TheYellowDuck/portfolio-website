@@ -69,6 +69,7 @@ export default function CustomCursor() {
     let lastY = -100; // last known pointer, for re-testing on scroll
     let started = false;
     let raf = 0;
+    let themeRaf = 0;
     let hidden = false; // faded out while the page is scrolling
     let scrollEndTimer = 0;
     // Magnet target (centre of a compact hovered element), in viewport coords.
@@ -178,6 +179,21 @@ export default function CustomCursor() {
     };
     const down = () => setPressed(true);
     const up = () => setPressed(false);
+    // After a theme swap, WebKit drops the hidden native cursor to the system arrow for a
+    // frame or two on the recalc, until the next mouse move. Re-assert the hide by toggling
+    // the gating class atomically (with a reflow between) so WebKit re-resolves it. Do it NOW
+    // — synchronously, before the toggle's own paint, so the cursor can stay hidden from that
+    // very frame (shortest possible) — and again next frame as a fallback once the recalc lands.
+    const reassertHide = () => {
+      root.classList.remove("has-custom-cursor");
+      void root.offsetWidth;
+      root.classList.add("has-custom-cursor");
+    };
+    const refreshCursor = () => {
+      reassertHide();
+      cancelAnimationFrame(themeRaf);
+      themeRaf = requestAnimationFrame(reassertHide);
+    };
 
     raf = requestAnimationFrame(tick);
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -190,9 +206,11 @@ export default function CustomCursor() {
     document.addEventListener("pointerleave", clear);
     window.addEventListener("blur", up);
     window.addEventListener("blur", clear);
+    window.addEventListener("museum:themechange", refreshCursor);
 
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(themeRaf);
       clearTimeout(scrollEndTimer);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
@@ -202,6 +220,7 @@ export default function CustomCursor() {
       document.removeEventListener("pointerleave", clear);
       window.removeEventListener("blur", up);
       window.removeEventListener("blur", clear);
+      window.removeEventListener("museum:themechange", refreshCursor);
       document.documentElement.classList.remove("has-custom-cursor");
       document.documentElement.classList.remove("cursor-scroll-hide");
     };

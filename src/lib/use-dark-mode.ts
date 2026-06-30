@@ -23,5 +23,13 @@ export function setDarkMode(dark: boolean) {
   root.classList.add("theme-transition");
   root.classList.toggle("dark", dark);
   try { localStorage.setItem("museum:theme", dark ? "dark" : "light"); } catch { /* ignore */ }
-  window.setTimeout(() => root.classList.remove("theme-transition"), 400);
+  // A theme swap's style recalc (and the color-scheme flip) makes some browsers — Safari
+  // notably — drop the displayed native cursor to the system arrow for a frame or two. Tell
+  // the custom cursor to re-assert its hide so it resolves back as fast as possible — once at
+  // the toggle, once after the transition class is removed (the two recalc points).
+  window.dispatchEvent(new Event("museum:themechange"));
+  window.setTimeout(() => {
+    root.classList.remove("theme-transition");
+    window.dispatchEvent(new Event("museum:themechange"));
+  }, 400);
 }

@@ -118,7 +118,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       <nav style={navStyle} className="sticky top-0 z-20 border-b border-[rgb(var(--c-line-rgb)_/_0.08)] bg-[rgb(var(--c-bg-rgb)_/_0.82)] backdrop-blur-md">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 py-4">
           <a href="#top" className="font-display text-[17px] font-semibold tracking-tight text-walnut">{PERSON.name}</a>
-          <div className="hidden items-center gap-6 font-mono text-[13px] text-walnut/65 sm:flex">
+          <div className="theme-fade-inner hidden items-center gap-6 font-mono text-[13px] text-walnut/65 sm:flex">
             <a href="#work" className="transition-colors hover:text-pine">{content.nav.links.work}</a>
             <a href="#experience" className="transition-colors hover:text-pine">{content.nav.links.experience}</a>
             <a href="#skills" className="transition-colors hover:text-pine">{content.nav.links.skills}</a>
@@ -226,7 +226,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
           <Reveal>
             <Typewriter
-              className="block whitespace-pre-wrap text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85"
+              className="theme-fade-inner block whitespace-pre-wrap text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85"
               segments={[
                 ...(aboutText ? [{ text: aboutText }] : []),
                 ...(aboutText && interests ? [{ text: "\n\n" }] : []),
@@ -293,7 +293,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       <footer className="mx-auto max-w-[1080px] px-6 pb-16 pt-8">
         <Reveal variant="fade">
           <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
-            <span>© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
+            <span className="theme-fade-self">© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
             <PressButton onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
               {content.footer.wander}
             </PressButton>
