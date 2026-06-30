@@ -233,8 +233,8 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
       { id: "s-work", label: content.sections.work.title, group: goTo, keywords: "projects portfolio", run: scrollTo("work") },
       { id: "s-exp", label: content.sections.experience.title, group: goTo, keywords: "work jobs", run: scrollTo("experience") },
       { id: "s-skills", label: content.sections.skills.title, group: goTo, keywords: "tech stack", run: scrollTo("skills") },
-      { id: "s-about", label: content.sections.about.title, group: goTo, keywords: "bio me", run: scrollTo("about") },
       { id: "s-cp", label: content.sections.competitive.title, group: goTo, keywords: "leetcode dmoj problems grind", run: scrollTo("competitive") },
+      { id: "s-about", label: content.sections.about.title, group: goTo, keywords: "bio me", run: scrollTo("about") },
       { id: "s-contact", label: content.sections.contact.title, group: goTo, keywords: "email reach", run: scrollTo("contact") },
     ];
     const projects: Command[] = [...mainHallExhibits, ...archiveExhibits]

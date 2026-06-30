@@ -219,6 +219,12 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         />
       </Section>
 
+      {/* ── Competitive Programming — live stats from LeetCode + DMOJ ── */}
+      <Section id="competitive" eyebrow={content.sections.competitive.eyebrow} title={content.sections.competitive.title}
+        intro={content.sections.competitive.intro}>
+        <Reveal><CpStats /></Reveal>
+      </Section>
+
       {/* ── About ── */}
       <Section id="about" eyebrow={content.sections.about.eyebrow} title={content.sections.about.title}>
         <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
@@ -250,12 +256,6 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             </div>
           </Reveal>
         </div>
-      </Section>
-
-      {/* ── Competitive Programming — live stats from LeetCode + DMOJ ── */}
-      <Section id="competitive" eyebrow={content.sections.competitive.eyebrow} title={content.sections.competitive.title}
-        intro={content.sections.competitive.intro}>
-        <Reveal><CpStats /></Reveal>
       </Section>
 
       {/* ── Contact ── */}
