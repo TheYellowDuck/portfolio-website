@@ -124,12 +124,19 @@ export default function CustomCursor() {
       magnetOn = false;
     };
 
-    // Critically-damped follow: eases toward the (optionally magnetised) target, never wobbles.
-    const tick = () => {
+    // Critically-damped follow: eases toward the (optionally magnetised) target, never wobbles. The
+    // ease is TIME-based (exp of dt / time-constant) so the follow feels identical on 60Hz and 120Hz —
+    // a fixed per-frame factor would catch up ~2x faster on a high-refresh display.
+    const FOLLOW_TAU = 75; // ms — matches the old 0.2-per-frame feel at 60fps
+    let lastT = 0;
+    const tick = (now: number) => {
+      const dt = lastT ? Math.min(now - lastT, 100) : 1000 / 60;
+      lastT = now;
+      const k = 1 - Math.exp(-dt / FOLLOW_TAU);
       const gx = magnetOn ? tx + (magnetX - tx) * MAGNET_PULL : tx;
       const gy = magnetOn ? ty + (magnetY - ty) * MAGNET_PULL : ty;
-      cx += (gx - cx) * 0.2;
-      cy += (gy - cy) * 0.2;
+      cx += (gx - cx) * k;
+      cy += (gy - cy) * k;
       wrap.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
       raf = requestAnimationFrame(tick);
     };
