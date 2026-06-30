@@ -204,7 +204,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       <Section id="experience" eyebrow={content.sections.experience.eyebrow} title={content.sections.experience.title}>
         <div className="relative ml-1 space-y-12 border-l border-[rgba(122,158,126,0.4)] pl-6 sm:pl-8">
           {experienceExhibits.map((e, i) =>
-            e.popup ? <ExperienceItem key={i} popup={e.popup} /> : null
+            e.popup ? <ExperienceItem key={i} popup={e.popup} onOpen={() => onOpenProject(e.popup!)} /> : null
           )}
         </div>
       </Section>
@@ -305,8 +305,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   );
 }
 
-function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
-  const [open, setOpen] = useState(false);
+function ExperienceItem({ popup, onOpen }: { popup: ExhibitPopup; onOpen: () => void }) {
   const dark = useDarkMode();
   const long = (popup.description?.length ?? 0) > 280;
   return (
@@ -317,13 +316,13 @@ function ExperienceItem({ popup }: { popup: ExhibitPopup }) {
         <h3 className="mt-1 font-display text-[19px] font-semibold text-pine">{popup.title}</h3>
         {popup.subtitle && <p className="text-[14px] text-walnut/70">{popup.subtitle}</p>}
         {popup.description && (
-          <p className={`mt-2.5 max-w-[68ch] text-[14px] leading-relaxed dark:leading-[1.72] text-walnut/80 ${long && !open ? "line-clamp-4" : ""}`}>
+          <p className={`mt-2.5 max-w-[68ch] text-[14px] leading-relaxed dark:leading-[1.72] text-walnut/80 ${long ? "line-clamp-4" : ""}`}>
             {popup.description}
           </p>
         )}
         {long && (
-          <PressButton onClick={() => setOpen((o) => !o)} className="mt-1.5 font-mono text-[12px] text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage">
-            {open ? "Show less" : "Read more"}
+          <PressButton onClick={onOpen} data-cursor="Open" className="mt-1.5 font-mono text-[12px] text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage">
+            Read more
           </PressButton>
         )}
         {popup.tech && popup.tech.length > 0 && (
