@@ -637,7 +637,7 @@ const SKILL_ALIASES = {
 const SKILL_FILLER = new Set(["design", "programming", "development", "patterns", "pattern", "based", "the", "a", "an", "of", "for", "with", "using", "and", "to"]);
 const skillKey = (s) => s.toLowerCase().replace(/[^a-z0-9+]+/g, " ").trim().split(" ").filter((w) => w && !SKILL_FILLER.has(w)).join("");
 // Display order for the aggregate Skills section (hard/impressive areas first).
-const SKILL_GROUP_ORDER = ["AI & ML", "Algorithms & DS", "Statistics & Evaluation", "Concurrency & Networking", "3D Graphics", "Systems & Embedded", "Security & Crypto", "Compilers & Languages", "Distributed & Data", "Game AI", "UI & 2D", "Architecture & Design", "Testing & Delivery", "Frameworks", "ML / Data", "Databases", "Tools", "Concepts & Practices"];
+const SKILL_GROUP_ORDER = ["AI & ML", "Algorithms & DS", "Statistics & Evaluation", "Concurrency & Networking", "3D Graphics", "Systems & Embedded", "Systems & Performance", "Security & Crypto", "Compilers & Languages", "Distributed & Data", "Finance & Trading", "Game AI", "Game Dev", "UI & 2D", "Web & Backend", "Architecture & Design", "Testing & Delivery", "Frameworks", "ML / Data", "Databases", "Tools", "Concepts & Practices"];
 
 // Exact wording-variants of the SAME concept → one canonical label. Anchored (^…$) so only the
 // confirmed phrasings merge — distinct skills (e.g. "Differential testing", "PPO") are untouched.

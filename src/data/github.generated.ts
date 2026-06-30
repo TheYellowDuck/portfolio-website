@@ -6,7 +6,7 @@ export const generatedMainHall: Exhibit[] = [
   {
     "popup": {
       "title": "Portfolio Website",
-      "description": "An interactive personal portfolio with two faces: a fast, content-first web portfolio at /, and a lazy-loaded pixel-art museum game you can step into — built on a custom HTML5 Canvas game engine with a 60fps requestAnimationFrame loop, tile-based AABB collision, A\\ pathfinding, particle systems, and a procedurally generated map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source. Other visitors drift through the museum as warm glowing \"ghost\" wisps — a lightweight multiplayer-presence feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) refreshes automatically through a daily GitHub Actions pipeline. Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Upstash Redis. Dual experience — a fast static web portfolio and an explorable canvas museum, both driven by one projects.ts content source (edit once, both update).; Seamless portal — a continuous camera-pan transition hands off from the DOM site into the game and back, with a prefers-reduced-motion crossfade fallback.; Explorable museum — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press E to inspect glowing exhibits.; Ghost trails (multiplayer presence) — other visitors appear as drifting wisps that wander between exhibits and linger to \"view\" them; their paths are recorded, stored, and replayed back to future visitors.; Live, self-updating content — GitHub repos populate Projects + Skills (with skills also drawn from coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.; Skills wing — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Groups are aggregated and de-duplicated across every project plus coursework, with no hand-maintained allowlist.; Dynamic documents — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.; Atmosphere — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg. Engine ↔ React split. A standalone canvas GameEngine runs the 60fps game loop and never imports React; it talks to the UI only through an onEvent callback. The web portfolio (SiteShell / Portfolio) is server-rendered for instant load, and the heavier GameCanvas is lazy-mounted only once a visitor steps inside. Rendering & world. The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is procedurally generated from a list of branch definitions, so adding a room is one array entry. Movement uses tile-based AABB collision detection decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run A\\ pathfinding — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass. Ghost trails. The engine samples the player's path; on leave it's POSTed to a route handler and stored in Redis (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a GhostSystem replays them as additive-blended particle wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured. Data pipeline. A daily GitHub Actions cron scans the owner's repos (languages, dependency manifests, READMEs, demo videos) and fetches LeetCode (GraphQL) + DMOJ stats, committing them as static data the site reads — so the live site never makes those third-party calls at runtime.",
+      "description": "An interactive personal portfolio with two faces: a fast, content-first web portfolio at /, and a lazy-loaded pixel-art museum game you can step into — built on a custom HTML5 Canvas game engine with a 60fps requestAnimationFrame loop, tile-based AABB collision, A\\ pathfinding, particle systems, and a procedurally generated map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source. Other visitors drift through the museum as warm glowing \"ghost\" wisps — a lightweight multiplayer-presence feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) refreshes automatically through a daily GitHub Actions pipeline. Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Upstash Redis. Dual experience — a fast static web portfolio and an explorable canvas museum, both driven by one projects.ts content source (edit once, both update).; Seamless portal — a continuous camera-pan transition hands off from the DOM site into the game and back, with a prefers-reduced-motion crossfade fallback.; Explorable museum — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press E to inspect glowing exhibits.; Ghost trails (multiplayer presence) — other visitors appear as drifting wisps that wander between exhibits and linger to \"view\" them; their paths are recorded, stored, and replayed back to future visitors.; Live, self-updating content — GitHub repos populate Projects + Skills (with skills also drawn from work experience and coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.; Skills wing — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Each orb is one category, aggregated and de-duplicated across every project, work-experience entry, and coursework, with no hand-maintained allowlist.; Dynamic documents — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.; Atmosphere — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg. Engine ↔ React split. A standalone canvas GameEngine runs the 60fps game loop and never imports React; it talks to the UI only through an onEvent callback. The web portfolio (SiteShell / Portfolio) is server-rendered for instant load, and the heavier GameCanvas is lazy-mounted only once a visitor steps inside. Rendering & world. The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is procedurally generated from a list of branch definitions, so adding a room is one array entry. Movement uses tile-based AABB collision detection decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run A\\ pathfinding — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass. Ghost trails. The engine samples the player's path; on leave it's POSTed to a route handler and stored in Redis (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a GhostSystem replays them as additive-blended particle wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured. Data pipeline.",
       "tech": [
         "TypeScript",
         "JavaScript",
@@ -103,25 +103,35 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "GraphQL",
+            "REST",
+            "REST API and route handlers",
+            "Redis with Upstash REST API",
+            "External API integration",
+            "Web Development",
+            "Backend / APIs",
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "Collision detection & physics",
+            "Particle systems",
+            "Game Development",
+            "Game Physics"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Framer Motion",
             "R",
-            "GraphQL",
-            "REST",
-            "Collision detection & physics",
-            "Particle systems",
             "React and Next.js (App Router)",
-            "REST API and route handlers",
-            "Redis with Upstash REST API",
-            "External API integration",
             "PDF parsing",
-            "Accessibility and performance",
-            "Web Development",
-            "Backend / APIs",
-            "Game Development",
-            "Automation / Scraping",
-            "Game Physics"
+            "Accessibility and performance"
           ]
         }
       ],
@@ -255,6 +265,15 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Provider-agnostic API design",
+            "HTTP server",
+            "MCP (Model Context Protocol) server",
+            "Backend / APIs"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Assembly",
@@ -262,16 +281,12 @@ export const generatedMainHall: Exhibit[] = [
             "Personalized PageRank",
             "Approximate nearest neighbor (ANN)",
             "Grounded generation",
-            "Provider-agnostic API design",
             "Benchmarking",
             "Incremental computation",
             "Resilience engineering",
             "Interactive data visualization",
-            "HTTP server",
             "CLI design",
-            "MCP (Model Context Protocol) server",
-            "Data Analysis",
-            "Backend / APIs"
+            "Data Analysis"
           ]
         }
       ],
@@ -397,9 +412,18 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Web & Backend",
           "items": [
             "LiteLLM",
+            "Browser automation",
+            "Rate-limit resilience",
+            "Web Development",
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
             "Pillow",
             "JavaScript",
             "HTML",
@@ -410,19 +434,15 @@ export const generatedMainHall: Exhibit[] = [
             "Structured outputs",
             "Prompt caching",
             "Typed action space with validation",
-            "Browser automation",
             "Deterministic benchmark scoring",
             "Cross-evaluator agreement",
             "Agent Workflow Memory (AWM)",
             "Failure taxonomy",
             "Data visualization",
-            "Rate-limit resilience",
             "Docker sandbox integration",
             "Anti-hallucination engineering",
             "Cost/token accounting",
-            "Data Analysis",
-            "Web Development",
-            "Automation / Scraping"
+            "Data Analysis"
           ]
         }
       ],
@@ -532,12 +552,22 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Java",
-            "R",
-            "Game Development",
-            "Automation / Scraping"
+            "R"
           ]
         }
       ],
@@ -627,9 +657,14 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Web & Backend",
           "items": [
-            "R",
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Systems & Performance",
+          "items": [
             "Low-latency systems programming",
             "Bit manipulation",
             "Custom memory allocation",
@@ -637,16 +672,26 @@ export const generatedMainHall: Exhibit[] = [
             "Lock-free programming",
             "C++ memory model",
             "Template metaprogramming",
+            "Fuzzing",
+            "Sanitizers"
+          ]
+        },
+        {
+          "category": "Finance & Trading",
+          "items": [
             "Matching-engine domain",
             "Financial-exchange order types",
             "Event sourcing and deterministic replay",
             "Pre-trade risk management",
-            "Binary protocol design",
-            "Fuzzing",
-            "Sanitizers",
+            "Binary protocol design"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "R",
             "Benchmarking methodology",
-            "Build and CI engineering",
-            "Automation / Scraping"
+            "Build and CI engineering"
           ]
         }
       ],
@@ -729,19 +774,34 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "Maze mapping",
+            "Game Development"
+          ]
+        },
+        {
+          "category": "Systems & Performance",
+          "items": [
+            "Bitmasking & state encoding"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Processing",
             "Image processing",
             "Sensor integration & fusion",
             "Motor control",
-            "Maze mapping",
-            "Bitmasking & state encoding",
             "Serial communication",
             "Iterative engineering",
-            "Hardware calibration",
-            "Game Development",
-            "Automation / Scraping"
+            "Hardware calibration"
           ]
         }
       ],
@@ -838,14 +898,24 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Web Development"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Processing",
             "Local notifications",
             "Preferences storage",
             "Component reuse",
-            "Web Development",
-            "Game Development",
             "Mobile Development"
           ]
         }
@@ -934,17 +1004,22 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Game Dev",
           "items": [
-            "Processing",
             "Entity–component modelling",
             "Collision detection & physics",
             "Spatial partitioning",
             "Game systems design",
-            "Input handling",
-            "Performance optimisation",
             "Game Development",
             "Game Physics"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Processing",
+            "Input handling",
+            "Performance optimisation"
           ]
         }
       ],
@@ -1064,6 +1139,14 @@ export const generatedMainHall: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Rate-limit handling",
+            "Content extraction",
+            "Backend / APIs"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Pillow",
@@ -1071,17 +1154,14 @@ export const generatedMainHall: Exhibit[] = [
             "Prompt caching",
             "Structured outputs",
             "Hierarchical classification",
-            "Rate-limit handling",
             "Fault tolerance",
             "Crash-safe file operations",
             "Secrets management",
-            "Content extraction",
             "CLI design",
             "Cost engineering",
             "Privacy engineering",
             "Automatic dependency management",
-            "Data Analysis",
-            "Backend / APIs"
+            "Data Analysis"
           ]
         }
       ],
@@ -1201,13 +1281,18 @@ export const generatedInProgress: Exhibit[] = [
           ]
         },
         {
+          "category": "Systems & Performance",
+          "items": [
+            "Numerical stability"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Policy-gradient methods",
             "Reward modeling",
             "Generalized Advantage Estimation (GAE)",
             "Adaptive KL control",
-            "Numerical stability",
             "Reward-hacking mitigation",
             "Checkpointing and resumability",
             "Software design",
@@ -1289,19 +1374,34 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Web & Backend",
+          "items": [
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Game Dev",
+          "items": [
+            "Collision detection",
+            "Game logic",
+            "Game Development",
+            "Game Physics"
+          ]
+        },
+        {
+          "category": "Systems & Performance",
+          "items": [
+            "RAII & smart pointers",
+            "Modern C++20"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Strategy-style effect system",
-            "RAII & smart pointers",
-            "Modern C++20",
-            "Collision detection",
             "Conditional compilation",
             "Command parsing",
-            "File I/O",
-            "Game logic",
-            "Game Development",
-            "Automation / Scraping",
-            "Game Physics"
+            "File I/O"
           ]
         }
       ],
@@ -1388,6 +1488,12 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Processing",
@@ -1396,8 +1502,7 @@ export const generatedArchive: Exhibit[] = [
             "Image scaling",
             "Keyboard shortcut system",
             "Layout management",
-            "Error handling",
-            "Game Development"
+            "Error handling"
           ]
         }
       ],
@@ -1471,16 +1576,21 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Web & Backend",
           "items": [
             "Browser automation",
             "Anti-bot stealth",
             "Dynamic web scraping",
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
             "Set operations",
             "Robust error handling",
             "Automatic driver management",
-            "Clipboard integration",
-            "Automation / Scraping"
+            "Clipboard integration"
           ]
         }
       ],
@@ -1559,17 +1669,27 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Web & Backend",
+          "items": [
+            "Automation / Scraping"
+          ]
+        },
+        {
+          "category": "Game Dev",
           "items": [
             "Game Physics",
-            "Event-driven programming",
             "Game physics",
             "Collision detection",
             "Vector math & trigonometry",
+            "Game Development"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Event-driven programming",
             "Input handling",
-            "Java Platform Module System",
-            "Game Development",
-            "Automation / Scraping"
+            "Java Platform Module System"
           ]
         }
       ],
@@ -1656,17 +1776,22 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "Vector math",
+            "Collision & hit detection",
+            "Game Development",
+            "Game Physics"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Event-driven programming",
-            "Vector math",
             "Performance optimisation",
-            "Collision & hit detection",
             "Stochastic behaviour",
             "Input handling",
-            "Java Platform Module System",
-            "Game Development",
-            "Game Physics"
+            "Java Platform Module System"
           ]
         }
       ],
@@ -1747,17 +1872,22 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Game Dev",
           "items": [
             "Collision detection & physics",
-            "Input handling",
-            "Audio playback",
             "Tile-map system",
-            "File I/O",
             "Combat systems design",
-            "Java Platform Module System",
             "Game Development",
             "Game Physics"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Input handling",
+            "Audio playback",
+            "File I/O",
+            "Java Platform Module System"
           ]
         }
       ],
@@ -1832,15 +1962,20 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "BFS flood-fill",
+            "Procedural graphics",
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Event-driven programming",
-            "BFS flood-fill",
             "Probabilistic reasoning",
-            "Procedural graphics",
             "Input handling",
-            "Layout management",
-            "Game Development"
+            "Layout management"
           ]
         }
       ],
@@ -1909,17 +2044,22 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "Game-rule engine",
+            "BFS flood-fill",
+            "Ko-rule detection",
+            "Territory scoring",
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Go",
             "Processing",
-            "Game-rule engine",
-            "BFS flood-fill",
-            "Ko-rule detection",
             "Suicide-move prevention",
-            "Territory scoring",
-            "Processing framework",
-            "Game Development"
+            "Processing framework"
           ]
         }
       ],
@@ -1986,16 +2126,21 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "Collision detection",
+            "Game Development",
+            "Game Physics"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Event-driven programming",
-            "Collision detection",
             "Input handling",
             "Separation of concerns",
             "File I/O",
-            "Java Platform Module System",
-            "Game Development",
-            "Game Physics"
+            "Java Platform Module System"
           ]
         }
       ],
@@ -2050,6 +2195,12 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
+          "category": "Game Dev",
+          "items": [
+            "Game Development"
+          ]
+        },
+        {
           "category": "Concepts & Practices",
           "items": [
             "Processing",
@@ -2058,8 +2209,7 @@ export const generatedArchive: Exhibit[] = [
             "Tree & set structures",
             "String processing",
             "Computational geometry",
-            "Multi-language fluency",
-            "Game Development"
+            "Multi-language fluency"
           ]
         }
       ],
@@ -2131,14 +2281,24 @@ export const generatedArchive: Exhibit[] = [
           ]
         },
         {
-          "category": "Concepts & Practices",
+          "category": "Web & Backend",
+          "items": [
+            "Web Development"
+          ]
+        },
+        {
+          "category": "Systems & Performance",
           "items": [
             "C++",
-            "C++ fundamentals",
+            "C++ fundamentals"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
             "Practical utilities",
             "Teaching & mentoring",
-            "Self-directed learning",
-            "Web Development"
+            "Self-directed learning"
           ]
         }
       ],
@@ -2277,6 +2437,28 @@ export const generatedSkills: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Systems & Performance",
+      "tech": [
+        "Numerical stability",
+        "Low-latency systems programming",
+        "Bit manipulation",
+        "Custom memory allocation",
+        "Open-addressing hash map",
+        "Lock-free programming",
+        "C++ memory model",
+        "Template metaprogramming",
+        "Fuzzing",
+        "Sanitizers",
+        "C++",
+        "C++ fundamentals",
+        "Bitmasking & state encoding",
+        "RAII & smart pointers",
+        "Modern C++20"
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Security & Crypto",
       "tech": [
         "Security & secret hygiene"
@@ -2294,11 +2476,50 @@ export const generatedSkills: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Finance & Trading",
+      "tech": [
+        "Matching-engine domain",
+        "Financial-exchange order types",
+        "Event sourcing and deterministic replay",
+        "Pre-trade risk management",
+        "Binary protocol design"
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Game AI",
       "tech": [
         "Procedural generation",
         "State-machine AI",
         "Game AI & steering behaviours"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Game Dev",
+      "tech": [
+        "Collision detection & physics",
+        "Particle systems",
+        "Game Development",
+        "Game Physics",
+        "Maze mapping",
+        "Tile-map system",
+        "Combat systems design",
+        "Entity–component modelling",
+        "Spatial partitioning",
+        "Game systems design",
+        "Game-rule engine",
+        "BFS flood-fill",
+        "Ko-rule detection",
+        "Territory scoring",
+        "Vector math",
+        "Collision & hit detection",
+        "Procedural graphics",
+        "Collision detection",
+        "Game logic",
+        "Vector math & trigonometry"
       ]
     }
   },
@@ -2315,13 +2536,38 @@ export const generatedSkills: Exhibit[] = [
         "Swing GUI from scratch",
         "Off-screen rendering",
         "Pan & zoom UX",
+        "Interaction design",
         "Sprite animation system",
         "Custom 2D rendering",
-        "Interaction design",
         "Interactive UI",
         "Animation",
         "2D rendering",
         "Dynamic UI scaling"
+      ]
+    }
+  },
+  {
+    "popup": {
+      "title": "Web & Backend",
+      "tech": [
+        "GraphQL",
+        "REST",
+        "REST API and route handlers",
+        "Redis with Upstash REST API",
+        "External API integration",
+        "Web Development",
+        "Backend / APIs",
+        "Automation / Scraping",
+        "Provider-agnostic API design",
+        "HTTP server",
+        "MCP (Model Context Protocol) server",
+        "LiteLLM",
+        "Browser automation",
+        "Rate-limit resilience",
+        "Rate-limit handling",
+        "Content extraction",
+        "Anti-bot stealth",
+        "Dynamic web scraping"
       ]
     }
   },
@@ -2340,10 +2586,10 @@ export const generatedSkills: Exhibit[] = [
         "Navigation",
         "Lifecycle awareness",
         "Cross-browser abstraction",
-        "Inheritance & polymorphism",
-        "Game loop architecture",
         "Data modelling",
         "Persistence",
+        "Inheritance & polymorphism",
+        "Game loop architecture",
         "Game state management",
         "Object lifecycle management",
         "Polymorphism & abstract base classes",
@@ -2420,26 +2666,13 @@ export const generatedSkills: Exhibit[] = [
       "tech": [
         "Framer Motion",
         "R",
-        "GraphQL",
-        "REST",
-        "Collision detection & physics",
-        "Particle systems",
         "React and Next.js (App Router)",
-        "REST API and route handlers",
-        "Redis with Upstash REST API",
-        "External API integration",
         "PDF parsing",
         "Accessibility and performance",
-        "Web Development",
-        "Backend / APIs",
-        "Game Development",
-        "Automation / Scraping",
-        "Game Physics",
         "Policy-gradient methods",
         "Reward modeling",
         "Generalized Advantage Estimation (GAE)",
         "Adaptive KL control",
-        "Numerical stability",
         "Reward-hacking mitigation",
         "Checkpointing and resumability",
         "Software design",
@@ -2449,15 +2682,11 @@ export const generatedSkills: Exhibit[] = [
         "Personalized PageRank",
         "Approximate nearest neighbor (ANN)",
         "Grounded generation",
-        "Provider-agnostic API design",
         "Benchmarking",
         "Incremental computation",
         "Resilience engineering",
         "Interactive data visualization",
-        "HTTP server",
         "CLI design",
-        "MCP (Model Context Protocol) server",
-        "LiteLLM",
         "Pillow",
         "JavaScript",
         "HTML",
@@ -2468,44 +2697,24 @@ export const generatedSkills: Exhibit[] = [
         "Structured outputs",
         "Prompt caching",
         "Typed action space with validation",
-        "Browser automation",
         "Deterministic benchmark scoring",
         "Cross-evaluator agreement",
         "Agent Workflow Memory (AWM)",
         "Failure taxonomy",
         "Data visualization",
-        "Rate-limit resilience",
         "Docker sandbox integration",
         "Anti-hallucination engineering",
         "Cost/token accounting",
-        "Low-latency systems programming",
-        "Bit manipulation",
-        "Custom memory allocation",
-        "Open-addressing hash map",
-        "Lock-free programming",
-        "C++ memory model",
-        "Template metaprogramming",
-        "Matching-engine domain",
-        "Financial-exchange order types",
-        "Event sourcing and deterministic replay",
-        "Pre-trade risk management",
-        "Binary protocol design",
-        "Fuzzing",
-        "Sanitizers",
         "Benchmarking methodology",
         "Build and CI engineering",
         "Requests",
         "Hierarchical classification",
-        "Rate-limit handling",
         "Fault tolerance",
         "Crash-safe file operations",
         "Secrets management",
-        "Content extraction",
         "Cost engineering",
         "Privacy engineering",
         "Automatic dependency management",
-        "C++",
-        "C++ fundamentals",
         "Practical utilities",
         "Teaching & mentoring",
         "Self-directed learning",
@@ -2519,8 +2728,6 @@ export const generatedSkills: Exhibit[] = [
         "Image processing",
         "Sensor integration & fusion",
         "Motor control",
-        "Maze mapping",
-        "Bitmasking & state encoding",
         "Serial communication",
         "Iterative engineering",
         "Hardware calibration",
@@ -2528,8 +2735,6 @@ export const generatedSkills: Exhibit[] = [
         "Preferences storage",
         "Component reuse",
         "Mobile Development",
-        "Anti-bot stealth",
-        "Dynamic web scraping",
         "Set operations",
         "Robust error handling",
         "Automatic driver management",
@@ -2539,38 +2744,21 @@ export const generatedSkills: Exhibit[] = [
         "Keyboard shortcut system",
         "Layout management",
         "Error handling",
+        "Java",
         "Input handling",
         "Audio playback",
-        "Tile-map system",
         "File I/O",
-        "Combat systems design",
         "Java Platform Module System",
-        "Java",
-        "Entity–component modelling",
-        "Spatial partitioning",
-        "Game systems design",
         "Performance optimisation",
         "Go",
-        "Game-rule engine",
-        "BFS flood-fill",
-        "Ko-rule detection",
         "Suicide-move prevention",
-        "Territory scoring",
         "Processing framework",
         "Event-driven programming",
-        "Vector math",
-        "Collision & hit detection",
         "Stochastic behaviour",
         "Probabilistic reasoning",
-        "Procedural graphics",
         "Strategy-style effect system",
-        "RAII & smart pointers",
-        "Modern C++20",
-        "Collision detection",
         "Conditional compilation",
         "Command parsing",
-        "Game logic",
-        "Vector math & trigonometry",
         "Separation of concerns"
       ]
     }
@@ -2589,5 +2777,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-30T08:59:03.625Z"
+  "syncedAt": "2026-06-30T23:01:57.825Z"
 };
