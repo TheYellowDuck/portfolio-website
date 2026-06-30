@@ -77,11 +77,22 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
   }, [segments, full, speed]);
 
   return (
-    <span className={className} ref={rootRef} aria-label={full}>
-      {segments.map((s, i) => (
-        <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className} aria-hidden="true">{s.text}</span>
-      ))}
-      <span ref={caretRef} className="tw-caret" aria-hidden="true" style={{ display: "none" }}>▍</span>
+    <span className={className} ref={rootRef} aria-label={full} style={{ position: "relative", display: "block" }}>
+      {/* Invisible sizer: the FULL text, holding its final wrapped height from the first paint — so
+          typing never grows the box and shoves the content below it down (no layout shift). */}
+      <span aria-hidden="true" style={{ visibility: "hidden" }}>
+        {segments.map((s, i) => (
+          <span key={i} className={s.className}>{s.text}</span>
+        ))}
+      </span>
+      {/* The animated text, overlaid on the sizer and absolutely positioned, so revealing characters
+          changes nothing about the layout. Same width as the sizer → identical wrapping. */}
+      <span aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
+        {segments.map((s, i) => (
+          <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className}>{s.text}</span>
+        ))}
+        <span ref={caretRef} className="tw-caret" style={{ display: "none" }}>▍</span>
+      </span>
     </span>
   );
 }
