@@ -477,6 +477,12 @@ const CONCEPT_BUCKETS = [
   { name: "UI & 2D",                  re: /\b2d\b|sprite|tilemap|\bcanvas\b|\bgui\b|\bui\b|\bux\b|interaction design|material design|declarative|reactive state|animation|render(?:ing|er)?\b/i },
   { name: "Architecture & Design",    re: /object-?oriented|\boop\b|design pattern|\bpattern\b|architecture|\bmvvm\b|\bmvc\b|modular|encapsulat|abstraction|repository|observer|factory|singleton|state management|lifecycle|persistence|data model|\bnavigation\b|dependency injection|inheritance|polymorph/i },
   { name: "Testing & Delivery",       re: /\btest|debug|invariant|ci.?\/?cd|coverage|packaging|deploy|shipping|build system|cross-platform|devops/i },
+  // Appended last so they only catch what the broader buckets above leave behind — keeps the
+  // "Concepts & Practices" catch-all from swallowing whole domains (web, game, systems, finance).
+  { name: "Web & Backend",            re: /\bapi\b|\brest\b|graphql|\bhttp\b|backend|route handler|scrap|browser automation|\bredis\b|web develop|rate-limit|content extraction|\bmcp\b|litellm|\bserver\b|stealth/i },
+  { name: "Game Dev",                 re: /\bgame\b|collision|particle|tile-?map|combat|procedural graphic|entity.component|spatial|\bmaze\b|territory|ko-rule|flood-fill|hit detection|vector math|trigonometr/i },
+  { name: "Systems & Performance",    re: /c\+\+|memory model|lock-free|smart pointer|low-latency|bit ?mask|bit manipulation|memory alloc|\braii\b|template metaprogram|sanitizer|\bfuzz|hash map|open-addressing|numerical stability/i },
+  { name: "Finance & Trading",        re: /matching-engine|order type|order book|risk management|\bexchange\b|financial|event sourcing|binary protocol|pre-trade|\btrading\b/i },
 ];
 function groupExhibitSkills(scan, domains) {
   const langs = scan.languages.slice(0, 6);

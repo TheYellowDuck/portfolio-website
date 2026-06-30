@@ -30,8 +30,8 @@
           "subtitle": "Software Developer Intern — Android Automotive OS",
           "period": "May 2026 – Present",
           "bullets": [
-            "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
-            "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+            "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
+            "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
           ]
         },
         {
@@ -156,8 +156,8 @@
               "subtitle": "Software Developer Intern — Android Automotive OS",
               "period": "May 2026 – Present",
               "bullets": [
-                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
-                "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
+                "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
               ]
             },
             {
@@ -282,8 +282,8 @@
               "subtitle": "Software Developer Intern — Android Automotive OS",
               "period": "May 2026 – Present",
               "bullets": [
-                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment system, across a multi-module Java/Kotlin codebase.",
-                "Implement call-management flows on the Android Telecom framework and integrate Bluetooth Hands-Free Profile (HFP); write unit tests with Robolectric and build with Gradle and AOSP/Soong in an Agile team."
+                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
+                "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
               ]
             },
             {
@@ -395,7 +395,7 @@
               "subtitle": "Software Developer Intern — Android Automotive OS",
               "period": "May 2026 – Present",
               "bullets": [
-                "Build features for the in-vehicle Car Dialer app on Android Automotive OS (multi-module Java/Kotlin, Android Telecom + Bluetooth HFP), with unit testing (Robolectric) and CI via Gradle and AOSP/Soong."
+                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS — Ford's production infotainment platform — across a multi-module Java/Kotlin codebase (Android Telecom, Bluetooth HFP), with Robolectric unit tests and Gradle / AOSP-Soong CI."
               ]
             },
             {

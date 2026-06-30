@@ -155,7 +155,8 @@ const addSkillToCat = (category: string | undefined, name: string) => {
   const items = skillCatItems.get(cat)!;
   if (!items.includes(name)) items.push(name);
 };
-// 1) Projects — seed category order + descriptions from the generated wing.
+// 1) Projects — seed category order + descriptions from the generated wing (its own categories come
+//    from the sync's CONCEPT_BUCKETS, so the categorisation stays dynamic / regenerated from source).
 for (const e of generatedSkills) {
   const cat = e.popup?.title;
   if (!cat) continue;

@@ -29,6 +29,10 @@ const PAUSE: Record<string, number> = {
  * so search engines and assistive tech always get it. The animation mutates the segment spans'
  * textContent directly — no per-frame React state — matching Reveal's effect-mutates-the-DOM pattern.
  * Honors prefers-reduced-motion by leaving everything shown.
+ *
+ * The box grows naturally as it types (the typewriter look). But once it has scrolled ABOVE the
+ * viewport, each newly-wrapped line would shove the content you're now reading downward — so we
+ * compensate the page scroll by the exact growth, keeping your position locked.
  */
 export default function Typewriter({ segments, className, speed = 13 }: TypewriterProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
@@ -38,6 +42,7 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
 
   useLayoutEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return; // leave full text shown
+    const root = rootRef.current;
     const spans = spanRefs.current;
     const caret = caretRef.current;
     const total = full.length;
@@ -53,11 +58,22 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
     reveal(0);                              // hide before the browser paints (no flash of the full text)
     if (caret) caret.style.display = "none";
 
+    const scroller = document.scrollingElement ?? document.documentElement;
+    let lastH = root?.offsetHeight ?? 0;
     let count = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const type = () => {
       if (count >= total) { if (caret) caret.style.display = "none"; return; }
       reveal(count + 1);
+      // If a line just wrapped, the box grew. When it's entirely above the viewport, undo the push by
+      // scrolling the same amount — so what you're reading below doesn't jump.
+      if (root) {
+        const h = root.offsetHeight;
+        if (h !== lastH) {
+          if (root.getBoundingClientRect().bottom <= 0) scroller.scrollTop += h - lastH;
+          lastH = h;
+        }
+      }
       const justTyped = full[count];
       count += 1;
       const delay = PAUSE[justTyped] != null ? PAUSE[justTyped] : speed + Math.random() * speed;
@@ -68,31 +84,21 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
         if (!e.isIntersecting) return;
         io.disconnect();
         if (caret) caret.style.display = "";
+        lastH = root?.offsetHeight ?? lastH; // baseline from the collapsed (pre-typing) box
         type();
       },
       { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
     );
-    if (rootRef.current) io.observe(rootRef.current);
+    if (root) io.observe(root);
     return () => { io.disconnect(); if (timer) clearTimeout(timer); };
   }, [segments, full, speed]);
 
   return (
-    <span className={className} ref={rootRef} aria-label={full} style={{ position: "relative", display: "block" }}>
-      {/* Invisible sizer: the FULL text, holding its final wrapped height from the first paint — so
-          typing never grows the box and shoves the content below it down (no layout shift). */}
-      <span aria-hidden="true" style={{ visibility: "hidden" }}>
-        {segments.map((s, i) => (
-          <span key={i} className={s.className}>{s.text}</span>
-        ))}
-      </span>
-      {/* The animated text, overlaid on the sizer and absolutely positioned, so revealing characters
-          changes nothing about the layout. Same width as the sizer → identical wrapping. */}
-      <span aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
-        {segments.map((s, i) => (
-          <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className}>{s.text}</span>
-        ))}
-        <span ref={caretRef} className="tw-caret" style={{ display: "none" }}>▍</span>
-      </span>
+    <span className={className} ref={rootRef} aria-label={full}>
+      {segments.map((s, i) => (
+        <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className} aria-hidden="true">{s.text}</span>
+      ))}
+      <span ref={caretRef} className="tw-caret" aria-hidden="true" style={{ display: "none" }}>▍</span>
     </span>
   );
 }
