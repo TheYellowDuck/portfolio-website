@@ -6,6 +6,7 @@ import { motion, AnimatePresence, LayoutGroup, type HTMLMotionProps } from "fram
 import { useDarkMode } from "@/lib/use-dark-mode";
 import { categoryColor } from "@/lib/skill-colors";
 import { usePressActivate } from "@/components/PressButton";
+import Reveal from "./Reveal";
 
 // A motion.button that activates only on a press that both starts and ends on it (reliable clicks,
 // robust to trackpad micro-drag) — same semantics as PressButton, but for framer-motion so the orbs
@@ -124,7 +125,7 @@ function orbRadius(items: string[], mobile: boolean, width: number) {
   return Math.max(mobile ? 122 : 152, Math.min(maxR, R));
 }
 
-export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
+export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[]; note?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -268,6 +269,8 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
         {groups.map((g) => <li key={g.title}>{g.title}: {g.items.join(", ")}</li>)}
       </ul>
 
+      {/* Wrap the blob field AND the note so the close backdrop can cover both. */}
+      <div className="relative w-full">
       <div ref={ref} className="relative w-full" aria-hidden style={{ height: containerH }}>
         <LayoutGroup>
           {layout && groups.map((g, i) => {
@@ -328,13 +331,6 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
               const chipRow = "flex w-full flex-wrap content-start justify-center gap-1.5";
               return (
                 <>
-                  <PressMotionButton
-                    key="backdrop" aria-label="Close" onActivate={() => setActive(null)}
-                    data-cursor="Close"
-                    className="absolute inset-0 z-10 cursor-zoom-out"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    style={{ background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)" }}
-                  />
                   <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ pointerEvents: "none" }}>
                     <motion.div
                       layoutId={`blob-${active}`}
@@ -371,6 +367,35 @@ export default function SkillBlobs({ groups }: { groups: SkillBlobGroup[] }) {
             })()}
           </AnimatePresence>
         </LayoutGroup>
+      </div>
+
+      {note && (
+        <Reveal variant="fade">
+          <p className="mx-auto mt-7 max-w-[60ch] text-center font-mono text-[11px] leading-relaxed text-walnut/55">{note}</p>
+        </Reveal>
+      )}
+
+      {/* Close zone. The dim+blur (z-0) covers ONLY the blob field, so the note below stays sharp
+          and readable. A separate TRANSPARENT catcher (z-1) extends the clickable close range
+          full-width across the field, the note, and a bit below it — click anywhere there to
+          close. Both sit below the centred orb (z-10) and the sticky nav (z-20). */}
+      <AnimatePresence>
+        {active !== null && (
+          <>
+            <motion.div
+              key="skills-dim" aria-hidden
+              className="absolute top-0 left-1/2 z-0 w-screen -ml-[50vw]"
+              style={{ height: containerH, background: "rgb(var(--c-bg-rgb) / 0.66)", backdropFilter: "blur(7px)" }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            />
+            <PressMotionButton
+              key="skills-catcher" aria-label="Close" onActivate={() => setActive(null)}
+              data-cursor="Close"
+              className="absolute top-0 -bottom-24 left-1/2 z-[1] w-screen -ml-[50vw] cursor-zoom-out"
+            />
+          </>
+        )}
+      </AnimatePresence>
       </div>
     </>
   );

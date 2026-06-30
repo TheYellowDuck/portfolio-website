@@ -213,12 +213,8 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           groups={skillsExhibits.flatMap((e) =>
             e.popup?.title ? [{ title: e.popup.title, description: e.popup.description, items: e.popup.tech ?? [] }] : [],
           )}
+          note={content.sections.skills.note}
         />
-        <Reveal variant="fade">
-          <p className="mx-auto mt-7 max-w-[60ch] text-center font-mono text-[11px] leading-relaxed text-walnut/55">
-            {content.sections.skills.note}
-          </p>
-        </Reveal>
       </Section>
 
       {/* ── About ── */}
