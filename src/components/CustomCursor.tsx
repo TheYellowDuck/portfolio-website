@@ -194,16 +194,19 @@ export default function CustomCursor() {
       cancelAnimationFrame(themeRaf);
       themeRaf = requestAnimationFrame(reassertHide);
     };
-    // Returning to a backgrounded tab can leave the cursor broken: the follow rAF may have been
-    // dropped while hidden, a scroll-hide could be left applied, and the displayed native cursor
-    // can revert to the system arrow (like a theme recalc) until the next move. On re-show,
-    // restart the loop, clear any leftover hide, restore the mode under the pointer, and re-assert.
+    // Returning to a backgrounded tab: the follow rAF may have been dropped while hidden, a
+    // scroll-hide could be left applied, and the displayed native cursor can revert. The REAL
+    // pointer position is unknown until it next moves, so don't restore at the stale position
+    // (that looks stuck/wrong). Reset to a clean idle state — started=false makes the first move
+    // SNAP the cursor to where the pointer actually is (no fly-across) — restart the loop, clear
+    // any leftover hide, and re-assert the native hide.
     const onVisible = () => {
       if (document.hidden) return;
+      started = false;
+      apply("idle", "");
+      show();
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
-      show();
-      if (started) resolve(document.elementFromPoint(lastX, lastY));
       refreshCursor();
     };
 
