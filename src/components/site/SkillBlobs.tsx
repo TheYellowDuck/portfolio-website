@@ -381,8 +381,9 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
 
       {/* Close zone. The dim+blur (z-0) covers ONLY the blob field, so the note below stays sharp
           and readable. A separate TRANSPARENT catcher (z-1) extends the clickable close range
-          full-width across the field, the note, and a bit below it — click anywhere there to
-          close. Both sit below the centred orb (z-10) and the sticky nav (z-20). */}
+          full-width: UP over the section heading (-top-40), across the field + note, and a bit
+          below it — click anywhere there to close. Both sit below the centred orb (z-10) and the
+          sticky nav (z-20). */}
       <AnimatePresence>
         {active !== null && (
           <>
@@ -395,7 +396,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             <PressMotionButton
               key="skills-catcher" aria-label="Close" onActivate={() => setActive(null)}
               data-cursor="Close"
-              className="absolute top-0 -bottom-24 left-1/2 z-[1] w-screen -ml-[50vw] cursor-zoom-out"
+              className="absolute -top-40 -bottom-24 left-1/2 z-[1] w-screen -ml-[50vw] cursor-zoom-out"
             />
           </>
         )}
