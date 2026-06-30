@@ -194,6 +194,18 @@ export default function CustomCursor() {
       cancelAnimationFrame(themeRaf);
       themeRaf = requestAnimationFrame(reassertHide);
     };
+    // Returning to a backgrounded tab can leave the cursor broken: the follow rAF may have been
+    // dropped while hidden, a scroll-hide could be left applied, and the displayed native cursor
+    // can revert to the system arrow (like a theme recalc) until the next move. On re-show,
+    // restart the loop, clear any leftover hide, restore the mode under the pointer, and re-assert.
+    const onVisible = () => {
+      if (document.hidden) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+      show();
+      if (started) resolve(document.elementFromPoint(lastX, lastY));
+      refreshCursor();
+    };
 
     raf = requestAnimationFrame(tick);
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -207,6 +219,7 @@ export default function CustomCursor() {
     window.addEventListener("blur", up);
     window.addEventListener("blur", clear);
     window.addEventListener("museum:themechange", refreshCursor);
+    document.addEventListener("visibilitychange", onVisible);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -221,6 +234,7 @@ export default function CustomCursor() {
       window.removeEventListener("blur", up);
       window.removeEventListener("blur", clear);
       window.removeEventListener("museum:themechange", refreshCursor);
+      document.removeEventListener("visibilitychange", onVisible);
       document.documentElement.classList.remove("has-custom-cursor");
       document.documentElement.classList.remove("cursor-scroll-hide");
     };
