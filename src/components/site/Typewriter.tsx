@@ -74,7 +74,11 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
     );
     if (rootRef.current) io.observe(rootRef.current);
     return () => { io.disconnect(); if (timer) clearTimeout(timer); };
-  }, [segments, full, speed]);
+    // Key on `full` (the joined text), NOT the `segments` array identity (the parent rebuilds it each
+    // render), so a re-render — e.g. opening or closing a popup — never restarts the typing. React
+    // leaves the already-typed spans untouched because each span's text prop is unchanged.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [full, speed]);
 
   return (
     <span className={className} ref={rootRef} aria-label={full}>
