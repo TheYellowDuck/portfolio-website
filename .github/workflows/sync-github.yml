@@ -17,7 +17,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Push the daily data commit with a PAT (the repo admin) so it bypasses the "Require CI on
           # main" ruleset — admins are exempt, github-actions[bot] is not. Until SYNC_PAT is set this
