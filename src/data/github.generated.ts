@@ -6,7 +6,7 @@ export const generatedMainHall: Exhibit[] = [
   {
     "popup": {
       "title": "Portfolio Website",
-      "description": "An interactive personal portfolio with two faces: a fast, content-first web portfolio at /, and a lazy-loaded pixel-art museum game you can step into — built on a custom HTML5 Canvas game engine with a 60fps requestAnimationFrame loop, tile-based AABB collision, A\\ pathfinding, particle systems, and a procedurally generated map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source. Other visitors drift through the museum as warm glowing \"ghost\" wisps — a lightweight multiplayer-presence feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) refreshes automatically through a daily GitHub Actions pipeline. Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Upstash Redis. Dual experience — a fast static web portfolio and an explorable canvas museum, both driven by one projects.ts content source (edit once, both update).; Seamless portal — a continuous camera-pan transition hands off from the DOM site into the game and back, with a prefers-reduced-motion crossfade fallback.; Explorable museum — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press E to inspect glowing exhibits.; Ghost trails (multiplayer presence) — other visitors appear as drifting wisps that wander between exhibits and linger to \"view\" them; their paths are recorded, stored, and replayed back to future visitors.; Live, self-updating content — GitHub repos populate Projects + Skills (with skills also drawn from work experience and coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.; Skills wing — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Each orb is one category, aggregated and de-duplicated across every project, work-experience entry, and coursework, with no hand-maintained allowlist.; Dynamic documents — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.; Atmosphere — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg. Engine ↔ React split. A standalone canvas GameEngine runs the 60fps game loop and never imports React; it talks to the UI only through an onEvent callback. The web portfolio (SiteShell / Portfolio) is server-rendered for instant load, and the heavier GameCanvas is lazy-mounted only once a visitor steps inside. Rendering & world. The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is procedurally generated from a list of branch definitions, so adding a room is one array entry. Movement uses tile-based AABB collision detection decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run A\\ pathfinding — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass. Ghost trails. The engine samples the player's path; on leave it's POSTed to a route handler and stored in Redis (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a GhostSystem replays them as additive-blended particle wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured. Data pipeline.",
+      "description": "An interactive personal portfolio with two faces: a fast, content-first web portfolio at /, and a lazy-loaded pixel-art museum game you can step into — built on a custom HTML5 Canvas game engine with a 60fps requestAnimationFrame loop, tile-based AABB collision, A\\ pathfinding, particle systems, and a procedurally generated map. Walk a character through auto-built themed rooms and open exhibits showcasing projects, skills, experience, and contact info; both faces render from a single content source. Other visitors drift through the museum as warm glowing \"ghost\" wisps — a lightweight multiplayer-presence feature that records anonymous movement paths and replays them with their own exhibit-visiting AI. Project, skills, and competitive-programming data (GitHub, LeetCode, DMOJ) refreshes automatically through a daily GitHub Actions pipeline. Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Upstash Redis. Dual experience — a fast static web portfolio and an explorable canvas museum, both driven by one projects.ts content source (edit once, both update).; Seamless portal — a continuous camera-pan transition hands off from the DOM site into the game and back, with a prefers-reduced-motion crossfade fallback.; Explorable museum — move with WASD / arrow keys / click-to-move / an on-screen touch joystick; press E to inspect glowing exhibits.; Ghost trails (multiplayer presence) — other visitors appear as drifting wisps that wander between exhibits and linger to \"view\" them; their paths are recorded, stored, and replayed back to future visitors.; Live, self-updating content — GitHub repos populate Projects + Skills (with skills also drawn from work experience and coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.; Skills wing — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Each orb is one category, aggregated and de-duplicated across every project, work-experience entry, and coursework, with no hand-maintained allowlist.; Dynamic documents — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.; Tactile web surface — a contextual custom cursor (an ink dot over anything clickable, a labelled disc over content, with light magnetism on buttons) plus a subtle canvas water-ripple background that flows as you move and ripples on tap — all motion-safe.; Atmosphere — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg. Engine ↔ React split. A standalone canvas GameEngine runs the 60fps game loop and never imports React; it talks to the UI only through an onEvent callback. The web portfolio (SiteShell / Portfolio) is server-rendered for instant load, and the heavier GameCanvas is lazy-mounted only once a visitor steps inside. Rendering & world. The scene draws in three y-sorted passes (floor/walls → entities → glow) for a top-down 2.5D depth effect — entities further south draw last and appear in front. The whole museum map (rooms, doorways, perimeter walls) is procedurally generated from a list of branch definitions, so adding a room is one array entry. Movement uses tile-based AABB collision detection decoupled from tile type (sprites can overhang their tiles), and click-to-move / minimap taps run A\\ pathfinding — 8-directional with diagonal corner-cut prevention and a line-of-sight string-pulling smoothing pass. Ghost trails. The engine samples the player's path; on leave it's POSTed to a route handler and stored in Redis (Upstash REST API) as a capped, trimmed list. New visitors fetch the recent paths and a GhostSystem replays them as additive-blended particle wisps that pathfind between exhibits, respect collisions, hover, and never revisit the same one — degrading gracefully to fully procedural wanderers when the store is empty or unconfigured.",
       "tech": [
         "TypeScript",
         "JavaScript",
@@ -2433,10 +2433,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "TypeScript",
-        "JavaScript",
         "Python",
         "Jupyter Notebook",
+        "TypeScript",
+        "JavaScript",
         "C++",
         "Java",
         "CSS",
@@ -2493,10 +2493,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
-        "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
+        "A* Pathfinding",
         "Hybrid search",
         "Code graph construction",
         "Performance optimization",
@@ -2542,10 +2542,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
+        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
-        "Distributed / multi-GPU training",
         "Parallel evaluation",
         "Concurrency",
         "Wait-free synchronization",
@@ -2681,9 +2681,9 @@ export const generatedSkills: Exhibit[] = [
         "Swing GUI from scratch",
         "Off-screen rendering",
         "Pan & zoom UX",
-        "Interaction design",
         "Sprite animation system",
         "Custom 2D rendering",
+        "Interaction design",
         "Interactive UI",
         "Animation",
         "2D rendering",
@@ -2720,8 +2720,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
-        "Game engine architecture",
         "Software design",
+        "Game engine architecture",
         "Factory pattern",
         "Object-Oriented Design",
         "Provider abstraction (strategy pattern)",
@@ -2733,11 +2733,11 @@ export const generatedSkills: Exhibit[] = [
         "Component reuse",
         "Lifecycle awareness",
         "Cross-browser abstraction",
-        "Data modelling",
-        "Persistence",
         "Inheritance & polymorphism",
         "Game loop architecture",
         "Java Platform Module System",
+        "Data modelling",
+        "Persistence",
         "Game state management",
         "Event-driven programming",
         "Object lifecycle management",
@@ -2754,8 +2754,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
-        "CI/CD & DevOps",
         "Testing",
+        "CI/CD & DevOps",
         "Benchmarking",
         "Property-Based Testing",
         "Benchmarking methodology",
@@ -2773,8 +2773,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
-        "Accessibility and performance",
         "Checkpointing and resumability",
+        "Accessibility and performance",
         "Incremental computation",
         "Resilience engineering",
         "Failure taxonomy",
@@ -2819,8 +2819,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
-        "PDF parsing",
         "Data Analysis",
+        "PDF parsing",
         "Interactive data visualization",
         "Pillow",
         "Data visualization",
@@ -2851,12 +2851,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
+        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
-        "pip",
         "Playwright",
         "Docker",
         "CMake",
@@ -2913,5 +2913,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-06-30T23:15:12.331Z"
+  "syncedAt": "2026-07-01T09:32:14.882Z"
 };
