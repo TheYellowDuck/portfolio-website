@@ -13,6 +13,7 @@ Other visitors drift through the museum as warm glowing **"ghost" wisps** — a 
 - **Live, self-updating content** — GitHub repos populate Projects + Skills (with skills also drawn from work experience and coursework) and LeetCode/DMOJ stats populate a competitive-programming panel — all refreshed daily, no manual edits.
 - **Skills wing** — skill-group orbs sized by how many skills each holds; click one to zoom in and reveal its skills as an auto-scrolling, infinite list. Each orb is one category, aggregated and de-duplicated across every project, work-experience entry, and coursework, with no hand-maintained allowlist.
 - **Dynamic documents** — résumé and transcript PDFs are parsed at build time into structured JSON, then served to themed popups.
+- **Tactile web surface** — a contextual custom cursor (an ink dot over anything clickable, a labelled disc over content, with light magnetism on buttons) plus a subtle canvas water-ripple background that flows as you move and ripples on tap — all motion-safe.
 - **Atmosphere** — a slow golden-hour day/night colour wash, ambient dust, footstep audio, a live minimap, and a hidden easter egg.
 
 ## How It Works
