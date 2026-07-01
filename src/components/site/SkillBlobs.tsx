@@ -281,8 +281,9 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             const nd = layout.nodes[i];
             if (!nd) return null;
             const sc = categoryColor(g.title);
-            // Label scales to the orb: fits its longest word, never larger than the orb can hold.
-            const fs = Math.max(mobile ? 7.5 : 8.5, Math.min((nd.r * 2 * 0.8) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
+            // Label scales to the orb: fits its longest word within ~70% of the diameter (leaving a
+            // bit of breathing room at the edges), and never larger than the orb can hold.
+            const fs = Math.max(mobile ? 7.5 : 8.5, Math.min((nd.r * 2 * 0.7) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
             return (
               <PressMotionButton
                 key={g.title}
