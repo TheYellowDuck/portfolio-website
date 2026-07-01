@@ -61,7 +61,7 @@
           ],
           "link": "georgezhang.ca",
           "bullets": [
-            "Built a personal site with two faces — a fast web portfolio and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps) — plus multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions pipeline auto-refreshing all content from one source."
+            "Built a personal site with two faces — a fast web portfolio (custom cursor + water-ripple canvas) and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps), with multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions content pipeline."
           ]
         },
         {
@@ -187,7 +187,7 @@
               ],
               "link": "georgezhang.ca",
               "bullets": [
-                "Built a personal site with two faces — a fast web portfolio and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps) — plus multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions pipeline auto-refreshing all content from one source."
+                "Built a personal site with two faces — a fast web portfolio (custom cursor + water-ripple canvas) and an explorable pixel-art “museum” on a custom HTML5 Canvas engine (60 fps loop, AABB collision, A* pathfinding, particles, procedural maps), with multiplayer “ghost trails” (Upstash Redis) and a daily GitHub Actions content pipeline."
               ]
             },
             {
