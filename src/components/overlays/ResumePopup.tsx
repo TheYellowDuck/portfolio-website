@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ResumeCollection, ResumeVariant, ResumeEntry, ResumeSection } from "@/types/resume";
 import { PressButton } from "@/components/PressButton";
@@ -42,6 +42,7 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
   const [activeTitle, setActiveTitle] = useState<string | null>(
     resumeCache?.variants[0]?.sections[0]?.title ?? null
   );
+  const tabBarRef = useRef<HTMLDivElement>(null); // section tab bar — lets a keyboard switch move focus with it
 
   useEffect(() => {
     if (resumeCache) return;
@@ -83,7 +84,14 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
       const nextIdx = prev
         ? (idx - 1 + variant.sections.length) % variant.sections.length
         : (idx + 1) % variant.sections.length;
-      setActiveTitle(variant.sections[nextIdx].title);
+      const nextTitle = variant.sections[nextIdx].title;
+      setActiveTitle(nextTitle);
+      // If a section tab currently has focus, move it to the newly-selected tab so the focus ring
+      // follows the active tab — rather than lingering (mismatched) on the tab you switched away from.
+      const focused = document.activeElement as HTMLElement | null;
+      if (focused?.dataset.sectionTab != null) {
+        tabBarRef.current?.querySelector<HTMLElement>(`[data-section-tab="${nextTitle}"]`)?.focus();
+      }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -204,12 +212,13 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
 
             {/* Section tab bar */}
             <div className="flex items-end justify-between gap-2 mt-3 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
-              <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div ref={tabBarRef} className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {(variant?.sections ?? []).map((s) => {
                 const active = s.title === activeTitle;
                 return (
                   <PressButton
                     key={s.title}
+                    data-section-tab={s.title}
                     onClick={() => setActiveTitle(s.title)}
                     className={[
                       "shrink-0 whitespace-nowrap font-mono text-[12px] px-3.5 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50",

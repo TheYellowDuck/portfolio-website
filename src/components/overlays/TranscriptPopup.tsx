@@ -44,6 +44,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
   const [activeSubject, setActive] = useState<string | null>(
     transcriptCache?.groups[0]?.subject ?? null
   );
+  const tabBarRef = useRef<HTMLDivElement>(null); // subject tab bar — lets a keyboard switch move focus with it
   const [cursorIdx, setCursorIdx]       = useState<number | null>(null);
   const [expandedCode, setExpandedCode] = useState<string | null>(null);
 
@@ -87,7 +88,13 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
         const nextIdx = tabPrev
           ? (idx - 1 + data.groups.length) % data.groups.length
           : (idx + 1) % data.groups.length;
-        setActive(data.groups[nextIdx].subject);
+        const nextSubject = data.groups[nextIdx].subject;
+        setActive(nextSubject);
+        // Move focus with the switch so the focus ring follows the active tab (see ResumePopup).
+        const focused = document.activeElement as HTMLElement | null;
+        if (focused?.dataset.sectionTab != null) {
+          tabBarRef.current?.querySelector<HTMLElement>(`[data-section-tab="${nextSubject}"]`)?.focus();
+        }
         return;
       }
       if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
@@ -226,12 +233,13 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
 
             {/* Subject tabs + nav hint */}
             <div className="flex items-end justify-between gap-2 mt-4 border-b border-[rgb(var(--c-line-rgb)_/_0.15)]">
-              <div className="flex gap-1 flex-wrap">
+              <div ref={tabBarRef} className="flex gap-1 flex-wrap">
                 {(data?.groups ?? []).map((g) => {
                   const active = g.subject === activeSubject;
                   return (
                     <PressButton
                       key={g.subject}
+                      data-section-tab={g.subject}
                       onClick={() => setActive(g.subject)}
                       className={[
                         "font-mono text-[12px] px-3 py-1 cursor-pointer rounded-tl rounded-tr -mb-px border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 whitespace-nowrap",
