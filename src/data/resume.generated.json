@@ -73,7 +73,7 @@
           ],
           "link": "github.com/TheYellowDuck/RAG-codebase",
           "bullets": [
-            "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
+            "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
             "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
           ]
         },
@@ -84,7 +84,7 @@
           ],
           "link": "github.com/TheYellowDuck/limit-order-book",
           "bullets": [
-            "Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
+            "Architected a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
             "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
           ]
         },
@@ -96,7 +96,7 @@
           ],
           "link": "github.com/TheYellowDuck/web-agent",
           "bullets": [
-            "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+            "Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
           ]
         }
       ]
@@ -199,7 +199,7 @@
               ],
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
-                "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
+                "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
                 "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
               ]
             },
@@ -210,7 +210,7 @@
               ],
               "link": "github.com/TheYellowDuck/limit-order-book",
               "bullets": [
-                "Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
+                "Architected a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.",
                 "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
               ]
             },
@@ -222,7 +222,7 @@
               ],
               "link": "github.com/TheYellowDuck/web-agent",
               "bullets": [
-                "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+                "Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
               ]
             }
           ]
@@ -308,7 +308,7 @@
               ],
               "link": "github.com/TheYellowDuck/limit-order-book",
               "bullets": [
-                "Built a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures — a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.",
+                "Architected a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures — a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.",
                 "Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers."
               ]
             },
@@ -321,7 +321,7 @@
               ],
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
-                "Built a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.",
+                "Engineered a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.",
                 "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with recall@k, bootstrap CIs, and paired significance tests."
               ]
             },
@@ -333,7 +333,7 @@
               ],
               "link": "github.com/TheYellowDuck/web-agent",
               "bullets": [
-                "Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).",
+                "Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).",
                 "Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) — a 100%-one-directional disagreement ($$ = 0.66)."
               ]
             }
@@ -422,7 +422,7 @@
               ],
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
-                "Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers — AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).",
+                "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers — AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).",
                 "Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder proved net-negative on code."
               ]
             },
@@ -445,7 +445,7 @@
               ],
               "link": "github.com/TheYellowDuck/web-agent",
               "bullets": [
-                "Built a ReAct + reflection agent (browser accessibility tree, provider-agnostic across Claude/GPT/Gemini) with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+                "Designed a ReAct + reflection agent (browser accessibility tree, provider-agnostic across Claude/GPT/Gemini) with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
               ]
             }
           ]

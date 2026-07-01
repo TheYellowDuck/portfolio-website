@@ -85,19 +85,19 @@
 
 \project{Limit Order Book \& Matching Engine}{C++20}{github.com/TheYellowDuck/limit-order-book}
 \begin{bullets}
-  \item Built a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures --- a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.
+  \item Architected a low-latency, lock-free matching engine (strict price-time priority, 9 order types + pro-rata) on custom cache-optimized structures --- a two-level hierarchical-bitmap price ladder and intrusive order pool give O(1) level access and O(1) cancels via hardware bit-scan, with integer-tick prices for exact, deterministic matching.
   \item Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers.
 \end{bullets}
 
 \project{Code-Aware RAG System}{Python, tree-sitter, embeddings}{github.com/TheYellowDuck/RAG-codebase}
 \begin{bullets}
-  \item Built a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.
+  \item Engineered a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.
   \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder was net-negative on code --- with recall@k, bootstrap CIs, and paired significance tests.
 \end{bullets}
 
 \project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
 \begin{bullets}
-  \item Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).
+  \item Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).
   \item Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) --- a 100\%-one-directional disagreement ($\kappa$ = 0.66).
 \end{bullets}
 

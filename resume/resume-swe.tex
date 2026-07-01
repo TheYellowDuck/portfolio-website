@@ -96,19 +96,19 @@
 
 \project{Code-Aware RAG System}{Python, tree-sitter, embeddings}{github.com/TheYellowDuck/RAG-codebase}
 \begin{bullets}
-  \item Built a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.
+  \item Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.
   \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder was net-negative on code --- with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local).
 \end{bullets}
 
 \project{Limit Order Book \& Matching Engine}{C++20}{github.com/TheYellowDuck/limit-order-book}
 \begin{bullets}
-  \item Built a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.
+  \item Architected a low-latency, lock-free matching engine with strict price-time priority and 9 order types (limit, market, IOC, FOK, stop, iceberg, pegged) on custom cache-optimized data structures.
   \item Engineered a wait-free runtime (SPSC ring buffer, single-writer matcher, seqlock market-data publishing) with deterministic journaling/replay; validated with differential, property-based, and fuzz testing under sanitizers.
 \end{bullets}
 
 \project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
 \begin{bullets}
-  \item Built a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability.
+  \item Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability.
 \end{bullets}
 
 % ================= SKILLS =================
