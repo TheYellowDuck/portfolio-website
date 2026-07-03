@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { describe, it, expect } from "vitest";
 import { findPath, findPathToward, smoothPath, type Cell } from "./pathfinding";
 import { solidMap, PLAYER_SPAWN_COL, PLAYER_SPAWN_ROW } from "./tilemap";

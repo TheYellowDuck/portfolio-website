@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // ── GitHub → website sync ────────────────────────────────────────────────────
 // Fetches your repos, detects languages / frameworks / tools, and writes
 // src/data/github.generated.ts (consumed by both the web portfolio and the game).

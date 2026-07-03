@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Derive skills from university coursework DYNAMICALLY — keyword rules applied to each
 // course's title + description (the same philosophy as the repo skill-inference). No
 // per-course hard-coding: a new course on the transcript maps itself via these rules.

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Easter-egg duck — a little state machine that animates a 32px spritesheet
 // (public/assets/sprites/duck.png, 15 cols × 22 rows). Animation index N lives on
 // sheet row N-1; row 11 (index 12, "swim") is intentionally unused. The duck starts

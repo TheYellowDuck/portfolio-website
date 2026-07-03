@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // ── LeetCode + DMOJ → static data sync ─────────────────────────────────────────
 // Writes src/data/cp-stats.generated.json so the site serves competitive-programming
 // stats statically instead of fetching LeetCode at runtime from Vercel's datacenter

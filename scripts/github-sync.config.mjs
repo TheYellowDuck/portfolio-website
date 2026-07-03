@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // ── GitHub → website sync config ────────────────────────────────────────────
 // Edit this file to control what shows up. Run `npm run sync:github` (or let the
 // scheduled GitHub Action do it) to regenerate src/data/github.generated.ts.

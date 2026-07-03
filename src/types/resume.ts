@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Shared resume types — produced by the /api/resume route, consumed by the
 // ResumePopup component. Kept here (rather than in the route file) so client
 // components don't import from a server route module.

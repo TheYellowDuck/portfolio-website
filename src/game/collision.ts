@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Tile-based AABB collision resolution, extracted from engine.ts.
 //
 // Solidity is read from `solidMap` (decoupled from tile type so sprites can

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { TILES } from "@/game/tile-ids";
 import { LINKS } from "@/lib/site";
 // Projects + skills are auto-generated from GitHub — see scripts/sync-github.mjs.

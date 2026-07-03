@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // localStorage-backed game preferences. Used only inside the (client-only)
 // GameCanvas, so `localStorage` is always available.
 

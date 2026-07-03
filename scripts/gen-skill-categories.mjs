@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Emits src/data/skill-categories.generated.ts — a { skill/tech name → category } map derived from
 // the static taxonomy in github-sync.config.mjs (SKILL_CATEGORY + EXTRA_SKILL_CATEGORIES). This lets
 // the site colour ANY chip by its category, including tech that never appears in a scanned repo (e.g.

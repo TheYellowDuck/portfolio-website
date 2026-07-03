@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Ghost trails — other visitors, drifting through the museum as soft glowing wisps. Each ghost
 // first replays a recorded path (always at a serene WALK pace, so a recorded sprint is gentled),
 // then wanders on its own via pathfinding. When there aren't enough real recordings, the room is

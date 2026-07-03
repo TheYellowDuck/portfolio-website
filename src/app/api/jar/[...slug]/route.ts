@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { NextRequest, NextResponse } from "next/server";
 
 function fromBase64Url(encoded: string): string {

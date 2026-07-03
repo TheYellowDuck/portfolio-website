@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Hardened résumé-text parser (path "B"): turns the plain text pdf-parse extracts from a résumé PDF
 // into structured ResumeData. Handles BOTH layouts:
 //   • the original V8 export — tab/wide-space separated columns, UPPERCASE section headers; and

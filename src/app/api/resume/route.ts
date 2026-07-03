@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { NextResponse } from "next/server";
 import resumeData from "@/data/resume.generated.json";
 import type { ResumeCollection } from "@/types/resume";

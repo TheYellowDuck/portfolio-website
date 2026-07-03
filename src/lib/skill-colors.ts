@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // One source of truth for skill colours, keyed on CATEGORY so colour carries meaning: every skill in
 // a group shares that group's colour, and a skill keeps that colour wherever it appears (the Skills
 // wing, project cards, the Archive, Work experience, exhibit popups). The hue is a stable hash of the

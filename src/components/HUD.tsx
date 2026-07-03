@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // HUD — PLANNED (not yet wired into GameCanvas).
 //
 // Intended purpose: a transient room-name title that fades in as the player

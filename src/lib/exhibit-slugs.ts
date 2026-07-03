@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Deep-link slugs for exhibits. A slug in the URL hash (e.g. `/#minesweeper`)
 // opens that exhibit's modal on load, and is shareable / bookmarkable.
 

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import Link from "next/link";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";

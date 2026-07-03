@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Site-wide canonical URL for metadata, OG, sitemap, robots, and structured data. Auto-detected
 // so it "just works" on deploy with no config. Precedence:
 //   1. NEXT_PUBLIC_SITE_URL          — explicit override; pin an exact domain on any host.

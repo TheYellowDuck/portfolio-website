@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Single source of truth for all colors used across the museum portfolio.
 // Import COLORS wherever a hex/rgba value is needed — never hardcode colors elsewhere.
 

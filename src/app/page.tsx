@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import SiteShell from "@/components/SiteShell";
 import { currentRole } from "@/data/projects";
 import transcript from "@/data/transcript.generated.json";

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // This tracks which keys are currently held down.
 // Instead of reacting to individual key presses, the game loop
 // checks "is ArrowUp held?" every frame — this gives smooth movement.

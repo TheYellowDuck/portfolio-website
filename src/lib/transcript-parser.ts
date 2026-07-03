@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Pure transcript-text parser (extracted from the /api/transcript route so it can
 // be unit tested without pdf-parse). Input is the plain text pdf-parse extracts
 // from the UW transcript PDF. Course descriptions are fetched separately in the route.

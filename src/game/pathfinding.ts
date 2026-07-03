@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Grid A* over the tile `solidMap`, for click-to-move. 8-directional with diagonal
 // corner-cutting prevention so the player never tries to squeeze through a wall corner.
 

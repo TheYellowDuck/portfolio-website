@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Sprite loading + readiness tracking, extracted from engine.ts.
 //
 // Every sprite the renderer might draw is registered here. `_total` is

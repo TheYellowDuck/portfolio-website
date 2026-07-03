@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Particle system, extracted from engine.ts.
 //
 // Pure particle mechanics — spawning, integration, and drawing. The *timing*

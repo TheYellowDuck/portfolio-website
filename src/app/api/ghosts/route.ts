@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Ghost trails — anonymous visitor movement paths. Visitors POST their walk; the GET returns the
 // most-recent few (capped at 15) for the next visitors to replay as drifting "ghosts". Stored in
 // Upstash Redis via its REST API (no SDK dependency). If Upstash isn't configured, this degrades

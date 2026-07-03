@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Parses the LaTeX résumé sources (resume/*.tex) into the structured ResumeData the site renders.
 // This is the PRIMARY résumé pipeline (path "A"): the .tex files use a small, regular set of macros
 // (\section, \entry, \project, the `bullets` env, and a skills `tabularx`), so we parse them

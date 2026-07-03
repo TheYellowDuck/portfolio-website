@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Player state, movement, facing, and walk/idle animation — extracted from
 // engine.ts. The engine owns the input manager and calls `move()` once per
 // update tick; everything the renderer needs (position, facing, frame) lives on

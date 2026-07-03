@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { COLORS } from "@/styles/theme";
 import { TILES } from "./tile-ids";
 import {

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { describe, it, expect } from "vitest";
 import { parseResumeTex, delatex } from "@/lib/resume-tex";
 

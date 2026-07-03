@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // /linkedin.txt — a copy-paste "update pack" for keeping the LinkedIn profile in sync with this
 // site. The website (src/data/projects.ts, GitHub-synced) is the single source of truth; LinkedIn
 // has NO public API to write your profile (the Profile Edit API is enterprise-partner-only), so

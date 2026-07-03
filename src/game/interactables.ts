@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 import { museumMap, TILE_SIZE, INTERACTABLE_TILES, NPC_COL, NPC_ROW } from "./tilemap";
 import { Exhibit, roomRegistry, meExhibit } from "@/data/projects";
 

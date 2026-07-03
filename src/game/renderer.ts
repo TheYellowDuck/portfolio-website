@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // Scene rendering, extracted from engine.ts.
 //
 // `drawScene` is a pure function of (sprites, particles, camera window, player,

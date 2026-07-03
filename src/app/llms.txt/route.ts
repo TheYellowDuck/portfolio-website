@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 // /llms.txt — a machine-readable brief for AI assistants, LLM search crawlers (ChatGPT,
 // Perplexity, etc.), and scrapers, following the emerging llms.txt convention. NOT shown in
 // the site UI. Everything here is GENERATED from the same data the portfolio renders — projects,

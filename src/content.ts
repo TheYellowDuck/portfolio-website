@@ -1,3 +1,6 @@
+// Copyright (c) 2026 George Zhang. All rights reserved.
+// Unauthorized copying, modification, or distribution of this file is prohibited.
+
 /**
  * content.ts — every user-facing UI-chrome string in one place ("the strings file").
  *
