@@ -2433,10 +2433,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "Python",
-        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
+        "Python",
+        "Jupyter Notebook",
         "C++",
         "Java",
         "CSS",
@@ -2493,10 +2493,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
-        "A* Pathfinding",
         "Hybrid search",
         "Code graph construction",
         "Performance optimization",
@@ -2542,10 +2542,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
-        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
+        "Distributed / multi-GPU training",
         "Parallel evaluation",
         "Concurrency",
         "Wait-free synchronization",
@@ -2720,8 +2720,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
-        "Software design",
         "Game engine architecture",
+        "Software design",
         "Factory pattern",
         "Object-Oriented Design",
         "Provider abstraction (strategy pattern)",
@@ -2754,8 +2754,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
-        "Testing",
         "CI/CD & DevOps",
+        "Testing",
         "Benchmarking",
         "Property-Based Testing",
         "Benchmarking methodology",
@@ -2773,8 +2773,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
-        "Checkpointing and resumability",
         "Accessibility and performance",
+        "Checkpointing and resumability",
         "Incremental computation",
         "Resilience engineering",
         "Failure taxonomy",
@@ -2819,8 +2819,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
-        "Data Analysis",
         "PDF parsing",
+        "Data Analysis",
         "Interactive data visualization",
         "Pillow",
         "Data visualization",
@@ -2851,12 +2851,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
+        "pip",
         "Playwright",
         "Docker",
         "CMake",
@@ -2913,5 +2913,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-07-02T08:44:56.137Z"
+  "syncedAt": "2026-07-03T08:51:29.067Z"
 };
