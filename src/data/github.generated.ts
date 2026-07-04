@@ -2433,16 +2433,16 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "TypeScript",
-        "JavaScript",
-        "Python",
-        "Jupyter Notebook",
-        "C++",
         "Java",
-        "CSS",
+        "C++",
+        "Python",
+        "Processing",
         "C",
         "Kotlin",
-        "Processing"
+        "CSS",
+        "Jupyter Notebook",
+        "TypeScript",
+        "JavaScript"
       ]
     }
   },
@@ -2450,8 +2450,17 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "AI & ML",
       "tech": [
+        "Probabilistic reasoning",
+        "Computer Vision",
+        "OpenAI API",
         "Anthropic API",
         "Transformers",
+        "LLM application development",
+        "Structured outputs",
+        "Semantic Search & Embeddings",
+        "Hierarchical classification",
+        "Machine Learning",
+        "Generative AI / LLMs",
         "Reinforcement Learning from Human Feedback (RLHF)",
         "Policy-gradient methods",
         "Reward modeling",
@@ -2462,11 +2471,7 @@ export const generatedSkills: Exhibit[] = [
         "Parameter-efficient fine-tuning",
         "LLM-as-Judge Evaluation",
         "Reward-hacking mitigation",
-        "Machine Learning",
-        "Generative AI / LLMs",
-        "OpenAI API",
         "Retrieval-Augmented Generation (RAG)",
-        "Semantic Search & Embeddings",
         "Cross-encoder reranking",
         "Listwise LLM reranking",
         "Personalized PageRank",
@@ -2478,14 +2483,9 @@ export const generatedSkills: Exhibit[] = [
         "Accessibility-tree observation",
         "Set-of-Marks visual grounding",
         "Provider-agnostic LLM abstraction",
-        "Structured outputs",
         "Typed action space with validation",
         "Agent Workflow Memory (AWM)",
-        "Anti-hallucination engineering",
-        "Computer Vision",
-        "LLM application development",
-        "Hierarchical classification",
-        "Probabilistic reasoning"
+        "Anti-hallucination engineering"
       ]
     }
   },
@@ -2493,34 +2493,34 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
-        "A* Pathfinding",
+        "Constraint-propagation solver",
+        "Algorithms & Data Structures",
+        "Graph Connectivity Analysis",
+        "BFS flow-field pathfinding",
+        "Algorithmic navigation",
+        "Breadth-first search",
+        "State-space reduction",
+        "Competitive programming",
+        "Graph algorithms",
+        "Dynamic programming",
+        "Sorting & searching",
+        "Tree & set structures",
+        "String processing",
+        "Combinatorics & Math",
+        "Computational geometry",
+        "Complexity & optimization",
+        "Performance optimization",
+        "Custom data structure design",
+        "Intrusive data structures",
+        "Cache optimization",
+        "Data Structures",
+        "Graph traversal & validation",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
         "Hybrid search",
         "Code graph construction",
-        "Performance optimization",
-        "Custom data structure design",
-        "Intrusive data structures",
-        "Cache optimization",
-        "Algorithms & Data Structures",
-        "Data Structures",
-        "Graph algorithms",
-        "Graph traversal & validation",
-        "Combinatorics & Math",
-        "Competitive programming",
-        "Dynamic programming",
-        "Sorting & searching",
-        "Tree & set structures",
-        "String processing",
-        "Computational geometry",
-        "Complexity & optimization",
-        "Algorithmic navigation",
-        "Breadth-first search",
-        "State-space reduction",
-        "BFS flow-field pathfinding",
-        "Graph Connectivity Analysis",
-        "Constraint-propagation solver"
+        "A* Pathfinding"
       ]
     }
   },
@@ -2542,19 +2542,19 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
-        "Multiplayer presence",
-        "Real-time animation",
         "Networking",
-        "Distributed / multi-GPU training",
-        "Parallel evaluation",
         "Concurrency",
+        "Real-time state propagation",
+        "Real-time control loop",
+        "Producer–consumer queue",
+        "Background processing",
+        "Thread-safe state",
         "Wait-free synchronization",
         "Distributed Systems",
-        "Thread-safe state",
-        "Real-time control loop",
-        "Background processing",
-        "Producer–consumer queue",
-        "Real-time state propagation"
+        "Distributed / multi-GPU training",
+        "Parallel evaluation",
+        "Multiplayer presence",
+        "Real-time animation"
       ]
     }
   },
@@ -2584,7 +2584,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Systems & Performance",
       "tech": [
-        "Numerical stability",
+        "RAII & smart pointers",
+        "Modern C++20",
+        "Bitmasking & state encoding",
         "Low-latency systems programming",
         "Bit manipulation",
         "Custom memory allocation",
@@ -2596,9 +2598,7 @@ export const generatedSkills: Exhibit[] = [
         "Sanitizers",
         "C++",
         "C++ fundamentals",
-        "Bitmasking & state encoding",
-        "RAII & smart pointers",
-        "Modern C++20"
+        "Numerical stability"
       ]
     }
   },
@@ -2635,9 +2635,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Game AI",
       "tech": [
+        "Game AI & steering behaviours",
         "Procedural generation",
-        "State-machine AI",
-        "Game AI & steering behaviours"
+        "State-machine AI"
       ]
     }
   },
@@ -2645,26 +2645,26 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Game Dev",
       "tech": [
-        "Collision detection & physics",
-        "Particle systems",
+        "Collision detection",
         "Game Development",
         "Game Physics",
-        "Maze mapping",
-        "Tile-map system",
-        "Combat systems design",
-        "Entity–component modelling",
-        "Spatial partitioning",
-        "Game systems design",
-        "Game-rule engine",
-        "BFS flood-fill",
-        "Ko-rule detection",
-        "Territory scoring",
+        "Game logic",
+        "Vector math & trigonometry",
         "Vector math",
         "Collision & hit detection",
+        "BFS flood-fill",
         "Procedural graphics",
-        "Collision detection",
-        "Game logic",
-        "Vector math & trigonometry"
+        "Game-rule engine",
+        "Ko-rule detection",
+        "Territory scoring",
+        "Entity–component modelling",
+        "Collision detection & physics",
+        "Spatial partitioning",
+        "Game systems design",
+        "Tile-map system",
+        "Combat systems design",
+        "Maze mapping",
+        "Particle systems"
       ]
     }
   },
@@ -2672,22 +2672,22 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "UI & 2D",
       "tech": [
-        "HTML5 Canvas rendering",
-        "GUI programming",
-        "Declarative UI",
-        "Reactive state management",
-        "Material Design 3",
+        "2D rendering",
+        "Custom 2D rendering",
+        "Animation",
+        "Dynamic UI scaling",
+        "Interactive UI",
+        "Sprite animation system",
+        "Interaction design",
         "UX engineering",
+        "GUI development",
         "Swing GUI from scratch",
         "Off-screen rendering",
         "Pan & zoom UX",
-        "Sprite animation system",
-        "Custom 2D rendering",
-        "Interaction design",
-        "Interactive UI",
-        "Animation",
-        "2D rendering",
-        "Dynamic UI scaling"
+        "Declarative UI",
+        "Reactive state management",
+        "Material Design 3",
+        "HTML5 Canvas rendering"
       ]
     }
   },
@@ -2695,24 +2695,24 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Web & Backend",
       "tech": [
-        "GraphQL",
-        "REST",
-        "REST API and route handlers",
-        "Redis with Upstash REST API",
-        "External API integration",
-        "Web Development",
-        "Backend / APIs",
         "Automation / Scraping",
+        "Browser automation",
+        "Anti-bot stealth",
+        "Dynamic web scraping",
+        "Web Development",
+        "Rate-limit handling",
+        "Content extraction",
+        "Backend / APIs",
         "Provider-agnostic API design",
         "HTTP server",
         "MCP (Model Context Protocol) server",
         "LiteLLM",
-        "Browser automation",
         "Rate-limit resilience",
-        "Rate-limit handling",
-        "Content extraction",
-        "Anti-bot stealth",
-        "Dynamic web scraping"
+        "GraphQL",
+        "REST",
+        "REST API and route handlers",
+        "Redis with Upstash REST API",
+        "External API integration"
       ]
     }
   },
@@ -2720,33 +2720,33 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
-        "Game engine architecture",
-        "Software design",
-        "Factory pattern",
         "Object-Oriented Design",
-        "Provider abstraction (strategy pattern)",
+        "Event-driven programming",
+        "Game loop architecture",
+        "Separation of concerns",
+        "Application lifecycle handling",
+        "Java Platform Module System",
+        "Polymorphism & abstract base classes",
+        "Inheritance",
+        "Strategy-style effect system",
+        "Model–view separation (MVC)",
+        "Object lifecycle management",
+        "Game state management",
+        "Inheritance & polymorphism",
         "Autonomous navigation",
+        "Data modelling",
+        "Persistence",
+        "Cross-browser abstraction",
         "MVVM architecture",
         "Local persistence",
         "Repository design pattern",
         "Navigation",
         "Component reuse",
         "Lifecycle awareness",
-        "Cross-browser abstraction",
-        "Inheritance & polymorphism",
-        "Game loop architecture",
-        "Java Platform Module System",
-        "Data modelling",
-        "Persistence",
-        "Game state management",
-        "Event-driven programming",
-        "Object lifecycle management",
-        "Polymorphism & abstract base classes",
-        "Inheritance",
-        "Strategy-style effect system",
-        "Model–view separation (MVC)",
-        "Separation of concerns",
-        "Application lifecycle handling"
+        "Provider abstraction (strategy pattern)",
+        "Software design",
+        "Factory pattern",
+        "Game engine architecture"
       ]
     }
   },
@@ -2754,18 +2754,18 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
+        "JAR Packaging",
+        "Cross-Platform Builds",
         "CI/CD & DevOps",
         "Testing",
-        "Benchmarking",
-        "Property-Based Testing",
-        "Benchmarking methodology",
-        "Build and CI engineering",
         "Packaging",
+        "Property-Based Testing",
+        "Debugging with invariants",
         "Gradle build system",
         "Shipping to production",
-        "JAR Packaging",
-        "Debugging with invariants",
-        "Cross-Platform Builds"
+        "Benchmarking methodology",
+        "Build and CI engineering",
+        "Benchmarking"
       ]
     }
   },
@@ -2773,20 +2773,20 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
-        "Accessibility and performance",
-        "Checkpointing and resumability",
-        "Incremental computation",
-        "Resilience engineering",
-        "Failure taxonomy",
+        "Performance optimisation",
+        "Robust error handling",
+        "Error handling",
         "Fault tolerance",
         "Crash-safe file operations",
         "Secrets management",
         "Cost engineering",
         "Privacy engineering",
         "Automatic dependency management",
-        "Robust error handling",
-        "Error handling",
-        "Performance optimisation"
+        "Checkpointing and resumability",
+        "Incremental computation",
+        "Resilience engineering",
+        "Failure taxonomy",
+        "Accessibility and performance"
       ]
     }
   },
@@ -2794,11 +2794,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
-        "Next.js",
-        "React",
         "Swing",
+        "SDL2",
         "Jetpack Compose",
-        "SDL2"
+        "React",
+        "Next.js"
       ]
     }
   },
@@ -2807,11 +2807,11 @@ export const generatedSkills: Exhibit[] = [
       "title": "ML / Data",
       "tech": [
         "NumPy",
+        "scikit-learn",
         "PyTorch",
         "Pandas",
         "Matplotlib",
-        "SciPy",
-        "scikit-learn"
+        "SciPy"
       ]
     }
   },
@@ -2819,14 +2819,14 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
-        "PDF parsing",
-        "Data Analysis",
-        "Interactive data visualization",
-        "Pillow",
-        "Data visualization",
         "Image processing",
         "Grayscale conversion",
-        "Image scaling"
+        "Image scaling",
+        "Pillow",
+        "Data Analysis",
+        "Interactive data visualization",
+        "Data visualization",
+        "PDF parsing"
       ]
     }
   },
@@ -2834,16 +2834,16 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Platform & I/O",
       "tech": [
-        "Local notifications",
-        "Preferences storage",
-        "Mobile Development",
+        "Input handling",
+        "File I/O",
+        "Layout management",
+        "Audio playback",
         "Automatic driver management",
         "Clipboard integration",
         "Keyboard shortcut system",
-        "Layout management",
-        "Input handling",
-        "Audio playback",
-        "File I/O"
+        "Local notifications",
+        "Preferences storage",
+        "Mobile Development"
       ]
     }
   },
@@ -2851,19 +2851,19 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "TypeScript",
         "GitHub Actions",
-        "Vitest",
-        "ESLint",
-        "Tailwind",
-        "pip",
-        "Playwright",
-        "Docker",
         "CMake",
-        "Make",
+        "pip",
+        "Selenium",
         "Gradle",
         "JUnit",
-        "Selenium"
+        "Make",
+        "Playwright",
+        "Docker",
+        "TypeScript",
+        "Vitest",
+        "ESLint",
+        "Tailwind"
       ]
     }
   },
@@ -2871,31 +2871,31 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
-        "Framer Motion",
+        "Conditional compilation",
+        "Command parsing",
+        "Stochastic behaviour",
+        "Go",
+        "Processing",
+        "Suicide-move prevention",
+        "Processing framework",
+        "Iterative engineering",
+        "Java",
         "R",
-        "React and Next.js (App Router)",
-        "Assembly",
-        "CLI design",
-        "JavaScript",
-        "HTML",
-        "Prompt caching",
-        "Docker sandbox integration",
-        "Cost/token accounting",
+        "Set operations",
+        "Multi-language fluency",
         "Requests",
+        "Prompt caching",
+        "CLI design",
         "Practical utilities",
         "Teaching & mentoring",
         "Self-directed learning",
-        "Processing",
-        "Multi-language fluency",
-        "Iterative engineering",
-        "Set operations",
-        "Java",
-        "Go",
-        "Suicide-move prevention",
-        "Processing framework",
-        "Stochastic behaviour",
-        "Conditional compilation",
-        "Command parsing"
+        "Assembly",
+        "JavaScript",
+        "HTML",
+        "Docker sandbox integration",
+        "Cost/token accounting",
+        "Framer Motion",
+        "React and Next.js (App Router)"
       ]
     }
   },
@@ -2913,5 +2913,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-07-03T08:51:29.067Z"
+  "syncedAt": "2026-07-04T08:26:11.786Z"
 };
