@@ -27,6 +27,7 @@ interface Entry {
   el: HTMLElement;
   max: number;
   lift: number;
+  calmInside: boolean;                // lean on approach only; flat while the pointer is INSIDE
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
   fl: number;                         // current influence 0..1 (drives the depth layers)
   styled: boolean;                    // inline overrides currently applied
@@ -85,11 +86,16 @@ function tick() {
         const dOut = Math.hypot(Math.max(0, Math.abs(dx) - hw), Math.max(0, Math.abs(dy) - hh));
         if (dOut < RANGE) {
           inRange = true;
-          const f = smooth(1 - dOut / RANGE); // 1 over the element → 0 at range's edge
-          tx = -clamp1(dy / hh) * e.max * f;
-          ty = clamp1(dx / hw) * e.max * f;
-          tl = e.lift * f;
-          tf = f;
+          // calmInside surfaces (the orb field) hold FLAT while the pointer is over them — a big
+          // plane full of hover targets can't rotate under the cursor without its hit boundaries
+          // swimming (hover/custom-cursor flicker). They lean on approach, settle to interact.
+          if (!(e.calmInside && dOut === 0)) {
+            const f = smooth(1 - dOut / RANGE); // 1 over the element → 0 at range's edge
+            tx = -clamp1(dy / hh) * e.max * f;
+            ty = clamp1(dx / hw) * e.max * f;
+            tl = e.lift * f;
+            tf = f;
+          }
         }
       }
     }
@@ -152,7 +158,7 @@ function ensureListeners() {
   document.addEventListener("visibilitychange", start);
 }
 
-export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0 }: { max?: number; lift?: number } = {}) {
+export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, calmInside = false }: { max?: number; lift?: number; calmInside?: boolean } = {}) {
   const entryRef = useRef<Entry | null>(null);
 
   const ref = useCallback((el: T | null) => {
@@ -165,10 +171,10 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ensureListeners();
-    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
+    entryRef.current = { el, max, lift, calmInside, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
     entries.add(entryRef.current);
     start();
-  }, [max, lift]);
+  }, [max, lift, calmInside]);
 
   useEffect(() => () => {
     if (entryRef.current) {
