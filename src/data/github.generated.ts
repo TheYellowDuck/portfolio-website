@@ -2433,6 +2433,8 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "TypeScript",
+        "JavaScript",
         "Java",
         "C++",
         "Python",
@@ -2440,9 +2442,7 @@ export const generatedSkills: Exhibit[] = [
         "C",
         "Kotlin",
         "CSS",
-        "Jupyter Notebook",
-        "TypeScript",
-        "JavaScript"
+        "Jupyter Notebook"
       ]
     }
   },
@@ -2493,6 +2493,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "A* Pathfinding",
         "Constraint-propagation solver",
         "Algorithms & Data Structures",
         "Graph Connectivity Analysis",
@@ -2519,8 +2520,7 @@ export const generatedSkills: Exhibit[] = [
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
         "Hybrid search",
-        "Code graph construction",
-        "A* Pathfinding"
+        "Code graph construction"
       ]
     }
   },
@@ -2542,6 +2542,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
+        "Multiplayer presence",
+        "Real-time animation",
         "Networking",
         "Concurrency",
         "Real-time state propagation",
@@ -2552,9 +2554,7 @@ export const generatedSkills: Exhibit[] = [
         "Wait-free synchronization",
         "Distributed Systems",
         "Distributed / multi-GPU training",
-        "Parallel evaluation",
-        "Multiplayer presence",
-        "Real-time animation"
+        "Parallel evaluation"
       ]
     }
   },
@@ -2635,8 +2635,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Game AI",
       "tech": [
-        "Game AI & steering behaviours",
         "Procedural generation",
+        "Game AI & steering behaviours",
         "State-machine AI"
       ]
     }
@@ -2645,9 +2645,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Game Dev",
       "tech": [
-        "Collision detection",
+        "Collision detection & physics",
+        "Particle systems",
         "Game Development",
         "Game Physics",
+        "Collision detection",
         "Game logic",
         "Vector math & trigonometry",
         "Vector math",
@@ -2658,13 +2660,11 @@ export const generatedSkills: Exhibit[] = [
         "Ko-rule detection",
         "Territory scoring",
         "Entity–component modelling",
-        "Collision detection & physics",
         "Spatial partitioning",
         "Game systems design",
         "Tile-map system",
         "Combat systems design",
-        "Maze mapping",
-        "Particle systems"
+        "Maze mapping"
       ]
     }
   },
@@ -2672,6 +2672,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "UI & 2D",
       "tech": [
+        "HTML5 Canvas rendering",
         "2D rendering",
         "Custom 2D rendering",
         "Animation",
@@ -2686,8 +2687,7 @@ export const generatedSkills: Exhibit[] = [
         "Pan & zoom UX",
         "Declarative UI",
         "Reactive state management",
-        "Material Design 3",
-        "HTML5 Canvas rendering"
+        "Material Design 3"
       ]
     }
   },
@@ -2695,24 +2695,24 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Web & Backend",
       "tech": [
-        "Automation / Scraping",
-        "Browser automation",
-        "Anti-bot stealth",
-        "Dynamic web scraping",
-        "Web Development",
-        "Rate-limit handling",
-        "Content extraction",
-        "Backend / APIs",
-        "Provider-agnostic API design",
-        "HTTP server",
-        "MCP (Model Context Protocol) server",
-        "LiteLLM",
-        "Rate-limit resilience",
         "GraphQL",
         "REST",
         "REST API and route handlers",
         "Redis with Upstash REST API",
-        "External API integration"
+        "External API integration",
+        "Web Development",
+        "Backend / APIs",
+        "Automation / Scraping",
+        "Browser automation",
+        "Anti-bot stealth",
+        "Dynamic web scraping",
+        "Rate-limit handling",
+        "Content extraction",
+        "Provider-agnostic API design",
+        "HTTP server",
+        "MCP (Model Context Protocol) server",
+        "LiteLLM",
+        "Rate-limit resilience"
       ]
     }
   },
@@ -2720,6 +2720,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
+        "Game engine architecture",
         "Object-Oriented Design",
         "Event-driven programming",
         "Game loop architecture",
@@ -2745,8 +2746,7 @@ export const generatedSkills: Exhibit[] = [
         "Lifecycle awareness",
         "Provider abstraction (strategy pattern)",
         "Software design",
-        "Factory pattern",
-        "Game engine architecture"
+        "Factory pattern"
       ]
     }
   },
@@ -2754,9 +2754,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
+        "CI/CD & DevOps",
         "JAR Packaging",
         "Cross-Platform Builds",
-        "CI/CD & DevOps",
         "Testing",
         "Packaging",
         "Property-Based Testing",
@@ -2773,6 +2773,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
+        "Accessibility and performance",
         "Performance optimisation",
         "Robust error handling",
         "Error handling",
@@ -2785,8 +2786,7 @@ export const generatedSkills: Exhibit[] = [
         "Checkpointing and resumability",
         "Incremental computation",
         "Resilience engineering",
-        "Failure taxonomy",
-        "Accessibility and performance"
+        "Failure taxonomy"
       ]
     }
   },
@@ -2794,11 +2794,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
+        "Next.js",
+        "React",
         "Swing",
         "SDL2",
-        "Jetpack Compose",
-        "React",
-        "Next.js"
+        "Jetpack Compose"
       ]
     }
   },
@@ -2819,14 +2819,14 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
+        "PDF parsing",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
         "Pillow",
         "Data Analysis",
         "Interactive data visualization",
-        "Data visualization",
-        "PDF parsing"
+        "Data visualization"
       ]
     }
   },
@@ -2851,7 +2851,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
+        "TypeScript",
         "GitHub Actions",
+        "Vitest",
+        "ESLint",
+        "Tailwind",
         "CMake",
         "pip",
         "Selenium",
@@ -2859,11 +2863,7 @@ export const generatedSkills: Exhibit[] = [
         "JUnit",
         "Make",
         "Playwright",
-        "Docker",
-        "TypeScript",
-        "Vitest",
-        "ESLint",
-        "Tailwind"
+        "Docker"
       ]
     }
   },
@@ -2871,6 +2871,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
+        "Framer Motion",
+        "R",
+        "React and Next.js (App Router)",
         "Conditional compilation",
         "Command parsing",
         "Stochastic behaviour",
@@ -2880,9 +2883,8 @@ export const generatedSkills: Exhibit[] = [
         "Processing framework",
         "Iterative engineering",
         "Java",
-        "R",
-        "Set operations",
         "Multi-language fluency",
+        "Set operations",
         "Requests",
         "Prompt caching",
         "CLI design",
@@ -2893,9 +2895,7 @@ export const generatedSkills: Exhibit[] = [
         "JavaScript",
         "HTML",
         "Docker sandbox integration",
-        "Cost/token accounting",
-        "Framer Motion",
-        "React and Next.js (App Router)"
+        "Cost/token accounting"
       ]
     }
   },
@@ -2913,5 +2913,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-07-04T08:26:11.786Z"
+  "syncedAt": "2026-07-05T08:43:07.434Z"
 };
