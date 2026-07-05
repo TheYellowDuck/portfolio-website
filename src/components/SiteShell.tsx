@@ -28,7 +28,7 @@ let plipEl: HTMLAudioElement | null = null;
 function playPlip() {
   try {
     plipEl ??= new Audio("/assets/audio/plip.mp3");
-    plipEl.volume = 0.35;
+    plipEl.volume = 0.15; // soft — an accent under the transition, not a foreground sound
     plipEl.currentTime = 0;
     void plipEl.play().catch(() => { /* blocked/unsupported — the splash still reads visually */ });
   } catch { /* ignore */ }
@@ -163,15 +163,9 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     setStage("in-site"); // first beat: content → header fade out on their own, before the game appears
   }, [stage, reduceMotion]);
 
-  const enterGame = useCallback((rect?: DOMRect) => {
+  const enterGame = useCallback(() => {
     if (stage !== "site") return;
-    // The water reacts to the door opening: a strong splash blooms from whichever control
-    // triggered the enter (doorway panel, nav button, footer link — the ⌘K palette falls back to
-    // the viewport centre), visible through the site's fade-out beat.
-    window.dispatchEvent(new CustomEvent("water:splash", rect
-      ? { detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } }
-      : undefined));
-    playPlip();
+    playPlip(); // the click's own natural ripple + one soft plip — no extra wave
     // Push a marked history entry (preserving Next's router state) with no URL change, so the
     // browser/device Back button leaves the museum and Forward walks back in — invisibly, and
     // clear of the #slug popup deep-link system.

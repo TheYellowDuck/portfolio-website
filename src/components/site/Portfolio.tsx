@@ -144,7 +144,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
               {isMac ? "⌘K" : "Ctrl K"}
             </PressButton>
             <PressButton
-              onClick={(e) => onEnter(e.currentTarget.getBoundingClientRect())}
+              onClick={() => onEnter()}
               className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-3.5 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
             >
               {content.nav.enter}
@@ -299,7 +299,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
         <Reveal variant="fade">
           <div className="flex flex-col items-start justify-between gap-3 border-t border-[rgb(var(--c-line-rgb)_/_0.1)] pt-6 font-mono text-[12px] text-walnut/70 sm:flex-row sm:items-center">
             <span className="theme-fade-self">© {new Date().getFullYear()} {PERSON.name} · {content.footer.builtWith}</span>
-            <PressButton onClick={(e) => onEnter(e.currentTarget.getBoundingClientRect())} className="text-pine/80 transition-colors hover:text-pine">
+            <PressButton onClick={() => onEnter()} className="text-pine/80 transition-colors hover:text-pine">
               {content.footer.wander}
             </PressButton>
           </div>
