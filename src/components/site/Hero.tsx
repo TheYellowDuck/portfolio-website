@@ -5,6 +5,7 @@
 
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
+import CausticLight from "./CausticLight";
 import HeroOrb from "./HeroOrb";
 import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
@@ -28,7 +29,10 @@ const QUICK_LINKS = [
 export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   const doorRef = useRef<HTMLDivElement>(null);
   return (
-    <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
+    <header className="relative isolate mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
+      {/* Caustic lamplight breathing across the parchment behind the hero — pure atmosphere,
+          behind the content (-z-10 inside this header's isolated stacking context). */}
+      <CausticLight className="absolute inset-0 -z-10" />
       {/* Left: identity */}
       <div className="flex-1">
         <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
