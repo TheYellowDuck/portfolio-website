@@ -21,6 +21,7 @@ import { PERSON } from "@/lib/site";
 import { content } from "@/content";
 import { skillColorFor } from "@/lib/skill-colors";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { useTilt } from "@/lib/use-tilt";
 import Reveal from "./Reveal";
 import Typewriter from "./Typewriter";
 import ProjectCard from "./ProjectCard";
@@ -107,6 +108,9 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
   const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
   const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
+  // About's document cards lean toward the pointer like everything else on the wall.
+  const resumeTilt = useTilt<HTMLButtonElement>({ max: 4 });
+  const transcriptTilt = useTilt<HTMLButtonElement>({ max: 4 });
 
   // No bg on the root — the html parchment + the WaterBackground canvas (fixed, -z-10) show through
   // behind the content (the body is transparent). Cards/sections keep their own opaque surfaces.
@@ -248,11 +252,11 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
           </Reveal>
           <Reveal delay={80}>
             <div className="flex flex-col gap-3">
-              <PressButton onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+              <PressButton ref={resumeTilt} onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-all hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                 {content.sections.about.resume}
               </PressButton>
               {hasTranscript && (
-                <PressButton onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                <PressButton ref={transcriptTilt} onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-all hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                   {content.sections.about.transcript}
                 </PressButton>
               )}

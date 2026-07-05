@@ -4,8 +4,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { MouseEventHandler } from "react";
-import { motion, AnimatePresence, LayoutGroup, type HTMLMotionProps } from "framer-motion";
+import type { MouseEventHandler, PointerEvent as RPointerEvent } from "react";
+import { motion, AnimatePresence, LayoutGroup, useMotionValue, useSpring, type HTMLMotionProps } from "framer-motion";
 import { useDarkMode } from "@/lib/use-dark-mode";
 import { categoryColor } from "@/lib/skill-colors";
 import { usePressActivate } from "@/components/PressButton";
@@ -15,12 +15,46 @@ import Reveal from "./Reveal";
 // robust to trackpad micro-drag) — same semantics as PressButton, but for framer-motion so the orbs
 // keep their layout/tap animations. Each instance owns its own press state, so dragging from one orb
 // and releasing on another never triggers the wrong one.
+//
+// `tilt` adds a pointer-tracked 3D lean (the orb tips toward the cursor) as framer motion values,
+// so it composes with the layout morph / hover / tap animations instead of fighting them. Springs
+// give it the soft physical follow; fine-pointer + reduced-motion guards keep touch/a11y unchanged.
+const TILT_MAX = 8; // deg — orbs are round and playful; a touch more lean than the flat cards
 function PressMotionButton({
   onActivate,
+  tilt = false,
+  style,
   ...rest
-}: HTMLMotionProps<"button"> & { onActivate?: MouseEventHandler<HTMLButtonElement> }) {
+}: HTMLMotionProps<"button"> & { onActivate?: MouseEventHandler<HTMLButtonElement>; tilt?: boolean }) {
   const press = usePressActivate<HTMLButtonElement>(onActivate);
-  return <motion.button {...rest} {...press} />;
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 260, damping: 20 });
+  const sry = useSpring(ry, { stiffness: 260, damping: 20 });
+  const tiltOn =
+    tilt &&
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tiltHandlers = tiltOn
+    ? {
+        onPointerMove: (e: RPointerEvent<HTMLButtonElement>) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          rx.set(-(((e.clientY - r.top) / r.height) * 2 - 1) * TILT_MAX);
+          ry.set((((e.clientX - r.left) / r.width) * 2 - 1) * TILT_MAX);
+        },
+        onPointerLeave: () => { rx.set(0); ry.set(0); },
+      }
+    : {};
+  return (
+    <motion.button
+      {...rest}
+      {...press}
+      {...tiltHandlers}
+      style={{ ...style, ...(tiltOn ? { rotateX: srx, rotateY: sry, transformPerspective: 700 } : {}) }}
+    />
+  );
 }
 
 export interface SkillBlobGroup {
@@ -291,6 +325,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             return (
               <PressMotionButton
                 key={g.title}
+                tilt
                 layoutId={`blob-${i}`}
                 onActivate={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}

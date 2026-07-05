@@ -9,6 +9,7 @@ import { videoPoster } from "@/lib/video";
 import { content } from "@/content";
 import { skillColorFor } from "@/lib/skill-colors";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { useTilt } from "@/lib/use-tilt";
 
 /**
  * A muted autoplay preview that only fetches its source once it's near the viewport — so a page of
@@ -57,10 +58,13 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ index, popup, compact = false, inProgress = false, onOpen }: ProjectCardProps) {
   const dark = useDarkMode();
+  // 3D lean toward the pointer — lift folds in the hover:-translate-y-1 the inline transform overrides.
+  const tiltRef = useTilt<HTMLElement>({ max: 4, lift: 4 });
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
     <article
+      ref={tiltRef}
       onClick={onOpen}
       role={onOpen ? "button" : undefined}
       tabIndex={onOpen ? 0 : undefined}

@@ -9,6 +9,7 @@ import type { ExhibitPopup } from "@/data/projects";
 import { videoPoster } from "@/lib/video";
 import { skillColorFor } from "@/lib/skill-colors";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { useTilt } from "@/lib/use-tilt";
 import { LazyVideo } from "./ProjectCard";
 
 // Mobile (<640px) gets a swipeable card deck; wider screens get the auto-scrolling rail.
@@ -74,9 +75,12 @@ function CardMedia({ popup, aspect }: { popup: ExhibitPopup; aspect: number }) {
 function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: number; onOpen: () => void }) {
   const { popup, index } = item;
   const dark = useDarkMode();
+  // 3D lean toward the pointer (lift folds in the hover:-translate-y-0.5 the transform overrides).
+  const tiltRef = useTilt<HTMLElement>({ max: 4, lift: 2 });
   const hasMedia = !!(popup.videoUrl || popup.embedUrl);
   return (
     <article
+      ref={tiltRef}
       onClick={onOpen}
       role="button"
       tabIndex={0}

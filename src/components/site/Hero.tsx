@@ -11,6 +11,7 @@ import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
 import { content } from "@/content";
 import { PressButton } from "@/components/PressButton";
+import { useTilt } from "@/lib/use-tilt";
 
 interface HeroProps {
   /** rect = the doorway panel's screen box, so the portal can zoom from it. */
@@ -28,6 +29,9 @@ const QUICK_LINKS = [
 
 export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   const doorRef = useRef<HTMLDivElement>(null);
+  // The doorway leans toward the pointer like a display case under inspection (folds in the
+  // group-hover -translate-y-1 the inline transform would otherwise override).
+  const doorTilt = useTilt<HTMLDivElement>({ max: 6, lift: 4 });
   return (
     <header className="relative isolate mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
       {/* Caustic lamplight breathing across the parchment behind the hero — pure atmosphere,
@@ -82,7 +86,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
           className="group relative w-full max-w-[360px] focus-visible:outline-none"
         >
           <div
-            ref={doorRef}
+            ref={(el) => { doorRef.current = el; doorTilt(el); }}
             className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-[rgb(var(--c-line-rgb)_/_0.18)] shadow-[0_18px_50px_rgba(28,21,8,0.28)] transition-transform duration-300 group-hover:-translate-y-1"
             style={{ background: "radial-gradient(125% 90% at 50% 22%, #2c2310 0%, #1c1508 68%)" }}
           >
