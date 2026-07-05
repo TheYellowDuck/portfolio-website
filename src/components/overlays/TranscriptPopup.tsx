@@ -9,6 +9,7 @@ import type { TranscriptData, SubjectGroup, CourseEntry } from "@/types/transcri
 import { experienceExhibits } from "@/data/projects";
 import { PERSON } from "@/lib/site";
 import { PressButton } from "@/components/PressButton";
+import { useTilt } from "@/lib/use-tilt";
 
 let transcriptCache: TranscriptData | null = null;
 
@@ -42,6 +43,8 @@ interface TranscriptPopupProps {
 }
 
 export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
+  // Whisper-subtle 3D lean on the popup card (it's a large reading surface).
+  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
   const [data, setData]            = useState<TranscriptData | null>(transcriptCache);
   const [error, setError]          = useState(false);
   const [activeSubject, setActive] = useState<string | null>(
@@ -165,6 +168,7 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
       >
         <motion.div
           key="transcript-popup"
+          ref={popupTilt}
           role="dialog"
           aria-modal="true"
           aria-label="Education & transcript"
