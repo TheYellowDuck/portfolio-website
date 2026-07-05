@@ -12,10 +12,6 @@ import { useCallback, useEffect, useRef } from "react";
 // makes MOVING surfaces react too: the archive rail auto-scrolling a card under a stationary
 // pointer tilts it exactly as if the pointer had swept across.
 //
-// Touch devices have no hover, so coarse pointers get SCROLL-driven tilt instead: each surface
-// leans by its viewport position (top of screen tips back, centre flat, bottom tips forward — a
-// curved wall of exhibits facing the viewer), updating as you scroll and holding when you stop.
-//
 // While a surface is stirred, its `transition` is overridden to cover only NON-transform properties
 // (hover border/shadow/color fades keep working; the transform itself is rAF-lerped — buttery, all
 // directions). Once settled, every inline override is removed and the classes take back over.
@@ -28,14 +24,10 @@ const GLINT_A = 0.13;  // peak glint alpha — the soft light catching the displ
 const NON_TRANSFORM_TRANSITIONS =
   "border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease, color 300ms ease, opacity 300ms ease";
 
-const SCROLL_MAX = 5;      // deg cap for the scroll-driven (mobile) lean
-const SCROLL_HOLD = 250;   // ms the loop keeps polling after the last scroll event
-
 interface Entry {
   el: HTMLElement;
   max: number;
   lift: number;
-  mode: "pointer" | "scroll";
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
   styled: boolean;                    // inline overrides currently applied
   glintEl: HTMLDivElement | null;     // the sliding specular sheen (null = disabled)
@@ -61,7 +53,6 @@ function makeGlint(el: HTMLElement): HTMLDivElement {
 const entries = new Set<Entry>();
 let px = 0, py = 0;
 let pointerKnown = false;
-let lastScrollT = -1e9;
 let raf = 0;
 let listening = false;
 
@@ -85,14 +76,7 @@ function tick() {
   const vw = window.innerWidth, vh = window.innerHeight;
   for (const e of entries) {
     let tx = 0, ty = 0, tl = 0, gf = 0, gx = 50, gy = 50;
-    if (e.mode === "scroll" && !document.hidden) {
-      // lean by viewport position: above centre tips back, below tips forward
-      const r = e.el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < vh) {
-        const t = clamp1((r.top + r.height / 2 - vh / 2) / (vh / 2));
-        tx = -t * Math.min(e.max, SCROLL_MAX);
-      }
-    } else if (e.mode === "pointer" && pointerKnown && !document.hidden) {
+    if (pointerKnown && !document.hidden) {
       const r = e.el.getBoundingClientRect();
       // skip empty (display:none) and fully offscreen elements — their targets stay 0
       if (r.width > 0 && r.height > 0 && r.bottom > -RANGE && r.top < vh + RANGE && r.right > -RANGE && r.left < vw + RANGE) {
@@ -119,11 +103,7 @@ function tick() {
       if (e.styled) settle(e);
       continue;
     }
-    // converged at a NON-zero lean (scroll mode between scrolls): hold the transform, don't poll —
-    // otherwise a page of tilted cards would keep the rAF loop alive forever.
-    const converged =
-      Math.abs(tx - e.rx) < EPS && Math.abs(ty - e.ry) < EPS && Math.abs(tl - e.lf) < EPS;
-    if (!converged) busy = true;
+    busy = true;
     if (!e.styled) {
       e.el.style.transition = NON_TRANSFORM_TRANSITIONS;
       e.el.style.willChange = "transform";
@@ -138,9 +118,9 @@ function tick() {
       e.glintEl.style.setProperty("--ga", (GLINT_A * gf).toFixed(3));
     }
   }
-  // keep polling while anything is stirred, while the pointer is on the page and could stir a
-  // moving element (auto-scroll), or briefly after a scroll (mobile) — otherwise stop entirely.
-  if (busy || ((pointerKnown || performance.now() - lastScrollT < SCROLL_HOLD) && !document.hidden && entries.size > 0)) {
+  // keep polling while anything is stirred, or while the pointer is on the page and could stir a
+  // moving element (auto-scroll) — stop entirely only when idle with the pointer gone.
+  if (busy || (pointerKnown && !document.hidden && entries.size > 0)) {
     raf = requestAnimationFrame(tick);
   }
 }
@@ -155,8 +135,6 @@ function ensureListeners() {
   document.documentElement.addEventListener("pointerleave", () => { pointerKnown = false; start(); });
   window.addEventListener("blur", () => { pointerKnown = false; start(); });
   document.addEventListener("visibilitychange", start);
-  // capture-phase so ELEMENT scrolls (the mobile archive deck) wake the loop too, not just the page
-  window.addEventListener("scroll", () => { lastScrollT = performance.now(); start(); }, { capture: true, passive: true });
 }
 
 export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, glint = true }: { max?: number; lift?: number; glint?: boolean } = {}) {
@@ -173,18 +151,11 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
   const ref = useCallback((el: T | null) => {
     remove();
     if (!el || typeof window === "undefined") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // fine pointer → proximity mode; coarse (touch) → scroll-driven lean, no glint/lift (no hover)
-    const fine = window.matchMedia("(pointer: fine)").matches;
     ensureListeners();
-    entryRef.current = {
-      el, max, mode: fine ? "pointer" : "scroll",
-      lift: fine ? lift : 0,
-      rx: 0, ry: 0, lf: 0, styled: false,
-      glintEl: fine && glint ? makeGlint(el) : null,
-    };
+    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, styled: false, glintEl: glint ? makeGlint(el) : null };
     entries.add(entryRef.current);
-    lastScrollT = performance.now(); // let the loop run once so scroll entries take their initial lean
     start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [max, lift, glint]);
