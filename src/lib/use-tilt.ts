@@ -28,7 +28,9 @@ interface Entry {
   max: number;
   lift: number;
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
+  fl: number;                         // current influence 0..1 (drives the depth layers)
   styled: boolean;                    // inline overrides currently applied
+  depth: { el: HTMLElement; d: number }[] | null; // [data-depth] children, captured on engage
 }
 
 const entries = new Set<Entry>();
@@ -43,11 +45,14 @@ const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 function settle(e: Entry) {
-  e.rx = 0; e.ry = 0; e.lf = 0;
+  e.rx = 0; e.ry = 0; e.lf = 0; e.fl = 0;
   if (e.styled) {
     e.el.style.transform = "";
     e.el.style.transition = "";
     e.el.style.willChange = "";
+    e.el.style.transformStyle = "";
+    if (e.depth) for (const c of e.depth) c.el.style.transform = "";
+    e.depth = null;
     e.styled = false;
   }
 }
@@ -67,7 +72,7 @@ function tick() {
   let inRange = false;
   const vw = window.innerWidth, vh = window.innerHeight;
   for (const e of entries) {
-    let tx = 0, ty = 0, tl = 0;
+    let tx = 0, ty = 0, tl = 0, tf = 0;
     if (pointerKnown && !document.hidden) {
       const r = e.el.getBoundingClientRect();
       // skip empty (display:none) and fully offscreen elements — their targets stay 0
@@ -81,13 +86,15 @@ function tick() {
           tx = -clamp1(dy / hh) * e.max * f;
           ty = clamp1(dx / hw) * e.max * f;
           tl = e.lift * f;
+          tf = f;
         }
       }
     }
     e.rx += (tx - e.rx) * FOLLOW;
     e.ry += (ty - e.ry) * FOLLOW;
     e.lf += (tl - e.lf) * FOLLOW;
-    const atRest = tx === 0 && ty === 0 && Math.abs(e.rx) < EPS && Math.abs(e.ry) < EPS && e.lf < EPS;
+    e.fl += (tf - e.fl) * FOLLOW;
+    const atRest = tx === 0 && ty === 0 && Math.abs(e.rx) < EPS && Math.abs(e.ry) < EPS && e.lf < EPS && e.fl < EPS;
     if (atRest) {
       if (e.styled) settle(e);
       continue;
@@ -96,11 +103,23 @@ function tick() {
     if (!e.styled) {
       e.el.style.transition = NON_TRANSFORM_TRANSITIONS;
       e.el.style.willChange = "transform";
+      // Depth layers: direct children marked data-depth pop out on their own planes while the
+      // surface leans (preserve-3d keeps their translateZ in the card's 3D context). Captured on
+      // engage, so React re-renders between hovers never leave stale nodes. Their depth rides the
+      // same influence ramp (e.fl) — layers rise from flat, nothing jumps at the range boundary.
+      // NOTE: children of overflow:hidden surfaces flatten (CSS grouping property) — those
+      // surfaces simply don't mark depth children.
+      e.el.style.transformStyle = "preserve-3d";
+      e.depth = Array.from(e.el.querySelectorAll<HTMLElement>(":scope > [data-depth]"))
+        .map((c) => ({ el: c, d: parseFloat(c.dataset.depth || "0") || 0 }));
       e.styled = true;
     }
     e.el.style.transform =
       `perspective(900px) rotateX(${e.rx.toFixed(3)}deg) rotateY(${e.ry.toFixed(3)}deg)` +
       (e.lf > 0.01 ? ` translateY(${(-e.lf).toFixed(2)}px)` : "");
+    if (e.depth) {
+      for (const c of e.depth) c.el.style.transform = `translateZ(${(c.d * e.fl).toFixed(2)}px)`;
+    }
   }
   coldTicks = busy || inRange ? 0 : coldTicks + 1;
   // keep polling while anything is stirred, or while the pointer is on the page and could stir a
@@ -135,7 +154,7 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ensureListeners();
-    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, styled: false };
+    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null };
     entries.add(entryRef.current);
     start();
   }, [max, lift]);

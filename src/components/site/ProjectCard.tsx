@@ -75,7 +75,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
     >
       {/* Demo preview — local video autoplays muted; a YouTube embed shows its thumbnail. */}
       {hasMedia && (
-        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
+        <div data-depth="22" className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
           {popup.videoUrl ? (
             <LazyVideo src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" />
           ) : (
@@ -95,15 +95,15 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {inProgress ? (
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
+        <span data-depth="10" className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
           <span className="h-1.5 w-1.5 rounded-full bg-sage" aria-hidden="true" />
           {content.sections.work.inProgressTag}
         </span>
       ) : (
-        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+        <span data-depth="10" className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
       )}
 
-      <h3 className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
+      <h3 data-depth="14" className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
         {popup.title}
       </h3>
 
@@ -114,7 +114,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {popup.tech && popup.tech.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div data-depth="8" className="mt-4 flex flex-wrap gap-1.5">
           {popup.tech.slice(0, compact ? 4 : 8).map((t) => {
             const c = skillColorFor(t);
             return (

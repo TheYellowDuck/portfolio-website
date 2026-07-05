@@ -49,15 +49,15 @@ function StatCard({
       data-cursor="Visit"
       className="group rounded-xl border border-[rgb(var(--c-line-rgb)_/_0.12)] bg-surface p-4 transition-colors hover:border-[rgba(122,158,126,0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
     >
-      <div className="flex items-center justify-between gap-2">
+      <div data-depth="10" className="flex items-center justify-between gap-2">
         <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-pine">{label}</span>
         <span className="font-mono text-[11px] text-walnut/55">{meta ?? ""}</span>
       </div>
-      <div className="mt-1.5 font-display text-[30px] font-semibold leading-none text-walnut">
+      <div data-depth="20" className="mt-1.5 font-display text-[30px] font-semibold leading-none text-walnut">
         {big ?? "—"}
         <span className="ml-1.5 font-sans text-[13px] font-normal text-walnut/55">{unit}</span>
       </div>
-      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[11px] text-walnut/60">
+      <div data-depth="8" className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[11px] text-walnut/60">
         {rating != null && (
           <span
             className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-medium"
