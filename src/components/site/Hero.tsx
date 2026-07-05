@@ -5,8 +5,6 @@
 
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
-import CausticLight from "./CausticLight";
-import DustMotes from "./DustMotes";
 import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
 import { content } from "@/content";
@@ -33,10 +31,7 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   // group-hover -translate-y-1 the inline transform would otherwise override).
   const doorTilt = useTilt<HTMLDivElement>({ max: 6, lift: 4 });
   return (
-    <header className="relative isolate mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
-      {/* Caustic lamplight breathing across the parchment behind the hero — pure atmosphere,
-          behind the content (-z-10 inside this header's isolated stacking context). */}
-      <CausticLight className="absolute inset-0 -z-10" />
+    <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
       {/* Left: identity */}
       <div className="flex-1">
         <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
@@ -92,8 +87,6 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
               className="pointer-events-none absolute left-1/2 top-0 h-2/3 w-2/3 -translate-x-1/2 opacity-70 transition-opacity duration-300 group-hover:opacity-100"
               style={{ background: "radial-gradient(closest-side, rgba(240,206,120,0.40), transparent 75%)" }}
             />
-            {/* Dust motes drifting in the beam — behind the character, inside the panel's clip. */}
-            <DustMotes className="absolute inset-0" />
             {/* Floor line */}
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
             {/* Character standing in the doorway */}
