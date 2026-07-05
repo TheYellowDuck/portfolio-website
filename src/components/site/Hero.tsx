@@ -27,10 +27,11 @@ const QUICK_LINKS = [
 
 export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   const doorRef = useRef<HTMLDivElement>(null);
-  // The doorway leans toward the pointer like a display case under inspection (folds in the
-  // group-hover -translate-y-1 the inline transform would otherwise override). Its overflow-hidden
-  // clip flattens internal 3D, so it pops as one body — more lean + a taller rise instead.
-  const doorTilt = useTilt<HTMLDivElement>({ max: 9, lift: 14 });
+  // The doorway leans toward the pointer like a display case under inspection. The tilt lives on
+  // the (unclipped) button wrapper, NOT the panel: the panel's overflow-hidden would flatten any
+  // internal 3D, so the character is re-parented beside it on her own depth plane — she pops OUT
+  // of the doorway while the room leans behind her.
+  const doorTilt = useTilt<HTMLButtonElement>({ max: 9, lift: 14 });
   // The identity block is a 3D scene of its own: a whisper of lean, with the name floating
   // highest, then eyebrow/tagline/links on descending planes — the hero pops without a card.
   const identityTilt = useTilt<HTMLDivElement>({ max: 4 });
@@ -77,12 +78,13 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
       {/* Right: the doorway portal into the game */}
       <div className="flex flex-1 flex-col items-center md:items-end">
         <PressButton
+          ref={doorTilt}
           onClick={() => onEnter(doorRef.current?.getBoundingClientRect())}
           data-cursor="Enter"
           className="group relative w-full max-w-[360px] focus-visible:outline-none"
         >
           <div
-            ref={(el) => { doorRef.current = el; doorTilt(el); }}
+            ref={doorRef}
             className="relative aspect-[4/5] w-full overflow-hidden rounded-[20px] border border-[rgb(var(--c-line-rgb)_/_0.18)] shadow-[0_18px_50px_rgba(28,21,8,0.28)] transition-transform duration-300 group-hover:-translate-y-1"
             style={{ background: "radial-gradient(125% 90% at 50% 22%, #2c2310 0%, #1c1508 68%)" }}
           >
@@ -93,10 +95,6 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             />
             {/* Floor line */}
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
-            {/* Character standing in the doorway */}
-            <div aria-hidden className="absolute bottom-[18%] left-1/2 -translate-x-1/2 transition-transform duration-300 group-hover:scale-105">
-              <PixelCharacter state="idle" dir="south" size={330} />
-            </div>
             {/* Invitation */}
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5">
               <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[rgba(240,228,196,0.6)]">
@@ -105,6 +103,14 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
               <span className="font-mono text-[15px] text-[rgba(240,228,196,0.95)] transition-colors group-hover:text-[#f0ce78]">
                 {content.hero.doorway.cta}
               </span>
+            </div>
+          </div>
+          {/* Character standing in the doorway — OUTSIDE the panel's clip, on her own depth plane,
+              so she pops out of the door while the room leans behind her. The depth transform lands
+              on this wrapper; the inner div keeps its centering/hover-scale classes untouched. */}
+          <div data-depth="44" aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 transition-transform duration-300 group-hover:scale-105">
+              <PixelCharacter state="idle" dir="south" size={330} />
             </div>
           </div>
         </PressButton>

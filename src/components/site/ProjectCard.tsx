@@ -59,7 +59,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ index, popup, compact = false, inProgress = false, onOpen }: ProjectCardProps) {
   const dark = useDarkMode();
   // 3D lean toward the pointer — lift folds in the hover:-translate-y-1 the inline transform overrides.
-  const tiltRef = useTilt<HTMLElement>({ max: 4.5, lift: 4 });
+  const tiltRef = useTilt<HTMLElement>({ max: 3.5, lift: 4 });
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
@@ -95,15 +95,15 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {inProgress ? (
-        <span data-depth="12" className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
+        <span data-depth="8" className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
           <span className="h-1.5 w-1.5 rounded-full bg-sage" aria-hidden="true" />
           {content.sections.work.inProgressTag}
         </span>
       ) : (
-        <span data-depth="18" className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+        <span data-depth="8" className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
       )}
 
-      <h3 data-depth="26" className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
+      <h3 data-depth="10" className="mt-2 font-display text-[19px] font-semibold leading-snug text-pine">
         {popup.title}
       </h3>
 
@@ -114,7 +114,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {popup.tech && popup.tech.length > 0 && (
-        <div data-depth="10" className="mt-4 flex flex-wrap gap-1.5">
+        <div data-depth="6" className="mt-4 flex flex-wrap gap-1.5">
           {popup.tech.slice(0, compact ? 4 : 8).map((t) => {
             const c = skillColorFor(t);
             return (
