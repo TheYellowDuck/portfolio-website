@@ -209,11 +209,25 @@ function ensureListeners() {
     const DOE = (typeof DeviceOrientationEvent !== "undefined" ? DeviceOrientationEvent : undefined) as PermissionedDOE | undefined;
     if (!DOE) return;
     if (typeof DOE.requestPermission === "function") {
+      // Broad arming, per the user-activation spec: touchend / pointerup(non-mouse) / keydown /
+      // click all carry activation — and a SCROLL ends with a touchend when the finger lifts, so
+      // the first scroll can raise the prompt. touchstart never qualifies (last attempt's bug) and
+      // the listeners must be NON-passive for activation to be honored. One request in flight at a
+      // time; a rejection (no activation on that particular event) keeps us armed for the next
+      // contact, and only an ANSWERED prompt (granted/denied resolves) removes the listeners.
+      const GESTURES = ["touchend", "pointerup", "keydown", "click"] as const;
+      let inFlight = false;
       const arm = () => {
-        window.removeEventListener("click", arm, true);
-        DOE.requestPermission!().then((res) => { if (res === "granted") attachGyro(); }).catch(() => { /* denied — visual-only */ });
+        if (inFlight) return;
+        inFlight = true;
+        DOE.requestPermission!()
+          .then((res) => {
+            for (const t of GESTURES) window.removeEventListener(t, arm, true);
+            if (res === "granted") attachGyro();
+          })
+          .catch(() => { inFlight = false; /* no activation on this event — stay armed */ });
       };
-      window.addEventListener("click", arm, { capture: true });
+      for (const t of GESTURES) window.addEventListener(t, arm, { capture: true });
     } else {
       attachGyro();
     }
