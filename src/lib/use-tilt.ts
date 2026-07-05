@@ -115,7 +115,7 @@ function tick() {
       e.styled = true;
     }
     e.el.style.transform =
-      `perspective(900px) rotateX(${e.rx.toFixed(3)}deg) rotateY(${e.ry.toFixed(3)}deg)` +
+      `perspective(700px) rotateX(${e.rx.toFixed(3)}deg) rotateY(${e.ry.toFixed(3)}deg)` +
       (e.lf > 0.01 ? ` translateY(${(-e.lf).toFixed(2)}px)` : "");
     if (e.depth) {
       for (const c of e.depth) c.el.style.transform = `translateZ(${(c.d * e.fl).toFixed(2)}px)`;
