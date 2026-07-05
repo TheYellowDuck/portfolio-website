@@ -190,6 +190,16 @@ export default function WaterBackground() {
     // Opening splash at the current viewport centre so the surface visibly comes alive on load.
     disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3);
 
+    // Imperative splash hook: anything can drop a strong ripple at client coords by dispatching
+    // `water:splash` (detail {x, y}) — entering the museum splashes from the door you clicked.
+    const onSplash = (e: Event) => {
+      const d = (e as CustomEvent<{ x?: number; y?: number }>).detail ?? {};
+      const x = d.x ?? window.innerWidth / 2;
+      const y = d.y ?? window.innerHeight / 2;
+      disturb(fx(x), fy(y), RIPPLE_FORCE * 3.2, 3); // a real impact — stronger than a tap
+    };
+    window.addEventListener("water:splash", onSplash);
+
     let frame = 0;
     // Advance the wave field ONE fixed step (ambient impulse + two-buffer propagation + buffer swap).
     const advance = () => {
@@ -257,6 +267,7 @@ export default function WaterBackground() {
     return () => {
       cancelAnimationFrame(raf);
       ro?.disconnect();
+      window.removeEventListener("water:splash", onSplash);
       window.removeEventListener("resize", maybeResize);
       window.removeEventListener("pointerdown", onPointerDown, { capture: true });
       window.removeEventListener("pointermove", onPointerMove, { capture: true });
