@@ -334,12 +334,16 @@ function deckTarget(o: number, seed: number) {
 function DeckCard({ item }: { item: ArchiveItem }) {
   const { popup, index } = item;
   const dark = useDarkMode();
+  // The deck also shows on a NARROW DESKTOP window (fine pointer), where the lean works — on touch
+  // the hook no-ops as everywhere else. Root clip removed so the depth layers aren't flattened;
+  // the media pane rounds its own top corners instead.
+  const tiltRef = useTilt<HTMLDivElement>({ max: 3.5 });
   const id = ytId(popup);
   const hasMedia = !!(popup.videoUrl || id);
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[rgb(var(--c-line-rgb)/0.12)] bg-surface shadow-[0_12px_34px_rgba(28,21,8,0.16)]">
+    <div ref={tiltRef} className="flex h-full flex-col rounded-2xl border border-[rgb(var(--c-line-rgb)/0.12)] bg-surface shadow-[0_12px_34px_rgba(28,21,8,0.16)]">
       {hasMedia && (
-        <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-black/5">
+        <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-t-[15px] bg-black/5">
           {popup.videoUrl ? (
             <LazyVideo src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" />
           ) : (
@@ -355,13 +359,13 @@ function DeckCard({ item }: { item: ArchiveItem }) {
         </div>
       )}
       <div className="flex min-h-0 flex-1 flex-col p-4">
-        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
-        <h3 className="mt-1.5 line-clamp-2 font-display text-[18px] font-semibold leading-snug text-pine">{popup.title}</h3>
+        <span data-depth="8" className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+        <h3 data-depth="10" className="mt-1.5 line-clamp-2 font-display text-[18px] font-semibold leading-snug text-pine">{popup.title}</h3>
         {popup.description && (
           <p className={`mt-2 flex-1 font-sans text-[13px] leading-relaxed text-walnut/80 dark:leading-[1.6] ${hasMedia ? "line-clamp-3" : "line-clamp-6"}`}>{popup.description}</p>
         )}
         {popup.tech && popup.tech.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div data-depth="6" className="mt-3 flex flex-wrap gap-1.5">
             {popup.tech.slice(0, 4).map((t) => {
               const c = skillColorFor(t);
               return (
