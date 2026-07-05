@@ -36,6 +36,8 @@ let px = 0, py = 0;
 let pointerKnown = false;
 let raf = 0;
 let listening = false;
+let frameNo = 0;
+let coldTicks = 0; // consecutive full passes that found nothing stirred and nothing in range
 
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -52,7 +54,17 @@ function settle(e: Entry) {
 
 function tick() {
   raf = 0;
+  // Idle throttle: with the pointer parked far from every surface there's nothing to animate, but
+  // we can't stop outright — the archive rail can still slide a card under the stationary pointer.
+  // So after ~0.5s of nothing stirred, poll at 1/8 rate (a card entering range is picked up within
+  // ~130ms — imperceptible, since its influence ramps from zero anyway) instead of burning 60fps.
+  frameNo++;
+  if (coldTicks > 30 && frameNo % 8 !== 0) {
+    if (pointerKnown && !document.hidden && entries.size > 0) raf = requestAnimationFrame(tick);
+    return;
+  }
   let busy = false;
+  let inRange = false;
   const vw = window.innerWidth, vh = window.innerHeight;
   for (const e of entries) {
     let tx = 0, ty = 0, tl = 0;
@@ -64,6 +76,7 @@ function tick() {
         const dx = px - (r.left + hw), dy = py - (r.top + hh);
         const dOut = Math.hypot(Math.max(0, Math.abs(dx) - hw), Math.max(0, Math.abs(dy) - hh));
         if (dOut < RANGE) {
+          inRange = true;
           const f = smooth(1 - dOut / RANGE); // 1 over the element → 0 at range's edge
           tx = -clamp1(dy / hh) * e.max * f;
           ty = clamp1(dx / hw) * e.max * f;
@@ -89,6 +102,7 @@ function tick() {
       `perspective(900px) rotateX(${e.rx.toFixed(3)}deg) rotateY(${e.ry.toFixed(3)}deg)` +
       (e.lf > 0.01 ? ` translateY(${(-e.lf).toFixed(2)}px)` : "");
   }
+  coldTicks = busy || inRange ? 0 : coldTicks + 1;
   // keep polling while anything is stirred, or while the pointer is on the page and could stir a
   // moving element (auto-scroll) — stop entirely only when idle with the pointer gone.
   if (busy || (pointerKnown && !document.hidden && entries.size > 0)) {
@@ -101,7 +115,7 @@ function start() { if (!raf) raf = requestAnimationFrame(tick); }
 function ensureListeners() {
   if (listening || typeof window === "undefined") return;
   listening = true;
-  window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; pointerKnown = true; start(); }, { passive: true });
+  window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; pointerKnown = true; coldTicks = 0; start(); }, { passive: true });
   // pointer left the window / tab hidden → everything eases home, then the loop stops itself
   document.documentElement.addEventListener("pointerleave", () => { pointerKnown = false; start(); });
   window.addEventListener("blur", () => { pointerKnown = false; start(); });
