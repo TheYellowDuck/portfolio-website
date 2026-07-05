@@ -21,6 +21,7 @@ import { PERSON } from "@/lib/site";
 import { content } from "@/content";
 import { skillColorFor } from "@/lib/skill-colors";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { useTilt } from "@/lib/use-tilt";
 import Reveal from "./Reveal";
 import Typewriter from "./Typewriter";
 import ProjectCard from "./ProjectCard";
@@ -74,14 +75,19 @@ function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number;
 function Section({ id, eyebrow, title, intro, titleDuration, children }: {
   id: string; eyebrow: string; title: string; intro?: string; titleDuration?: number; children: React.ReactNode;
 }) {
+  // Every section header is a whisper-level 3D scene (title floats over eyebrow/intro) — the same
+  // material as the hero identity, at furniture volume.
+  const headTilt = useTilt<HTMLDivElement>({ max: 2 });
   // No scroll-mt: the section's own top padding (py-16/24) already clears the sticky nav when an
   // anchor jumps here, so adding scroll-margin on top of it left a large empty gap above the title.
   return (
     <section id={id} className="mx-auto max-w-[1080px] px-6 py-16 sm:py-24">
       <Reveal variant="fade" duration={titleDuration}>
-        <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-pine">{eyebrow}</p>
-        <h2 className="mt-3 font-display text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
-        {intro && <p className="mt-3 max-w-[60ch] text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/70">{intro}</p>}
+        <div ref={headTilt}>
+          <p data-depth="8" className="font-mono text-[12px] uppercase tracking-[0.3em] text-pine">{eyebrow}</p>
+          <h2 data-depth="14" className="mt-3 font-display text-[28px] font-semibold tracking-tight text-walnut sm:text-[34px]">{title}</h2>
+          {intro && <p data-depth="6" className="mt-3 max-w-[60ch] text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/70">{intro}</p>}
+        </div>
       </Reveal>
       <div className="mt-9 sm:mt-11">{children}</div>
     </section>
@@ -310,14 +316,16 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
 
 function ExperienceItem({ popup, onOpen }: { popup: ExhibitPopup; onOpen: () => void }) {
   const dark = useDarkMode();
+  // Timeline rows lean gently too — wide surfaces shear fast, so keep it at a whisper.
+  const itemTilt = useTilt<HTMLDivElement>({ max: 2.5 });
   const long = (popup.description?.length ?? 0) > 280;
   return (
     <Reveal variant="left" duration={850} distance={30}>
-      <div className="relative">
+      <div ref={itemTilt} className="relative">
         <span className="absolute -left-[24.5px] top-1.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-sage bg-parchment sm:-left-[32.5px]" />
-        {popup.date && <p className="font-mono text-[12px] tracking-wide text-sage">{popup.date}</p>}
-        <h3 className="mt-1 font-display text-[19px] font-semibold text-pine">{popup.title}</h3>
-        {popup.subtitle && <p className="text-[14px] text-walnut/70">{popup.subtitle}</p>}
+        {popup.date && <p data-depth="6" className="font-mono text-[12px] tracking-wide text-sage">{popup.date}</p>}
+        <h3 data-depth="12" className="mt-1 font-display text-[19px] font-semibold text-pine">{popup.title}</h3>
+        {popup.subtitle && <p data-depth="8" className="text-[14px] text-walnut/70">{popup.subtitle}</p>}
         {popup.description && (
           <p className={`mt-2.5 max-w-[68ch] text-[14px] leading-relaxed dark:leading-[1.72] text-walnut/80 ${long ? "line-clamp-4" : ""}`}>
             {popup.description}
