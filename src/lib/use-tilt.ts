@@ -26,7 +26,7 @@ import { useCallback, useEffect, useRef } from "react";
 const RANGE = 220;     // px past the element's edge where its influence fades to zero
 const FOLLOW = 0.14;   // per-frame lerp toward the target lean — the "weight" of the surface
 const EPS = 0.02;      // settle threshold (deg / px)
-const GYRO_RANGE = 16; // degrees of device lean that map to a surface's full max
+const GYRO_RANGE = 12; // degrees of device lean that map to a surface's full max (lower = stronger)
 const GYRO_DEAD = 0.4;  // deg — sensor noise deadband (keeps the loop asleep in a still hand)
 const GYRO_RECENTER = 0.008; // per-event baseline drift toward the current posture (~2s settle)
 const NON_TRANSFORM_TRANSITIONS =
