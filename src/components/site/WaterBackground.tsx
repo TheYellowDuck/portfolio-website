@@ -4,7 +4,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { introArmed } from "@/lib/intro-gate";
 
 // A water surface behind the whole site. A height-field ripple simulation: a tap/click drops a
 // ripple, and moving or dragging the pointer pushes a flow along its path. It's rendered as subtle
@@ -189,19 +188,7 @@ export default function WaterBackground() {
     }
 
     // Opening splash at the current viewport centre so the surface visibly comes alive on load.
-    // While the intro cinematic is armed the splash is DEFERRED — the falling glass drop fires it
-    // (via the water:splash event below) at its contact frame, so the drop visibly causes the water.
-    if (!introArmed()) {
-      disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3);
-    }
-    // Imperative splash hook for the intro (and anything else): client coords in event detail.
-    const onSplash = (e: Event) => {
-      const d = (e as CustomEvent<{ x?: number; y?: number }>).detail ?? {};
-      const x = d.x ?? window.innerWidth / 2;
-      const y = d.y ?? window.innerHeight / 2;
-      disturb(fx(x), fy(y), RIPPLE_FORCE * 3.2, 3); // a real impact — slightly stronger than a tap
-    };
-    window.addEventListener("water:splash", onSplash);
+    disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3);
 
     let frame = 0;
     // Advance the wave field ONE fixed step (ambient impulse + two-buffer propagation + buffer swap).
@@ -270,7 +257,6 @@ export default function WaterBackground() {
     return () => {
       cancelAnimationFrame(raf);
       ro?.disconnect();
-      window.removeEventListener("water:splash", onSplash);
       window.removeEventListener("resize", maybeResize);
       window.removeEventListener("pointerdown", onPointerDown, { capture: true });
       window.removeEventListener("pointermove", onPointerMove, { capture: true });

@@ -8,8 +8,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import Portfolio from "./site/Portfolio";
 import { content } from "@/content";
 import IntroCurtain from "./site/IntroCurtain";
-import IntroCinematic, { INTRO_SEEN_KEY } from "./site/IntroCinematic";
-import { armIntro, introArmed, introGate } from "@/lib/intro-gate";
 import WaterBackground from "./site/WaterBackground";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
@@ -54,33 +52,6 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   const [gameOn, setGameOn] = useState(false);
 
   const reduceMotion = usePrefersReducedMotion();
-
-  // 3D glass-drop intro (first visit per session). Armed SYNCHRONOUSLY during the first client
-  // render — before any child mounts — so gated entrances (hero scramble) can't start behind the
-  // overlay. The overlay itself mounts via effect state (SSR markup must not change: the SSR'd
-  // IntroCurtain covers that first frame). `introHidden` holds the page invisible until the drop's
-  // contact frame, when the ripple fires and everything arrives together.
-  const [cinematicOn, setCinematicOn] = useState(false);
-  const [introHidden, setIntroHidden] = useState(false);
-  const armDecidedRef = useRef(false);
-  if (typeof window !== "undefined" && !armDecidedRef.current) {
-    armDecidedRef.current = true;
-    try {
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem(INTRO_SEEN_KEY)) {
-        armIntro();
-      }
-    } catch { /* storage blocked → skip the cinematic */ }
-  }
-  useEffect(() => {
-    if (!introArmed()) return;
-    setCinematicOn(true);
-    setIntroHidden(true);
-    introGate().then(() => setIntroHidden(false)); // contact: ripple + content arrive together
-  }, []);
-  // Stable identity — an inline arrow would re-run IntroCinematic's effect (and restart the
-  // timeline from zero) on every SiteShell re-render.
-  const handleCinematicDone = useCallback(() => setCinematicOn(false), []);
-
   const gameReadyRef = useRef(false);
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
@@ -329,11 +300,11 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   const enteringGame = stage.startsWith("in") || stage === "game";
   const headerLag = reduceMotion ? 0 : HEADER_LAG;
   const navStyle = {
-    opacity: siteShown && !introHidden ? 1 : 0,
+    opacity: siteShown ? 1 : 0,
     transition: `opacity ${fadeMs}ms ease ${enteringGame ? headerLag : 0}ms`,
   };
   const contentStyle = {
-    opacity: siteShown && !introHidden ? 1 : 0,
+    opacity: siteShown ? 1 : 0,
     transition: `opacity ${fadeMs}ms ease ${enteringGame ? 0 : headerLag}ms`,
   };
   const worldOpacity =
@@ -351,10 +322,6 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
       {/* Intro curtain — masks first paint, then lifts once web fonts are ready (not on a timer).
           The "lights coming up": warm lamp glow blooms, name + label + underline stage in. */}
       <IntroCurtain />
-
-      {/* 3D glass-drop cinematic (first visit per session) — sits above the curtain, ends by firing
-          the water ripple at viewport centre and revealing the page in the same beat. */}
-      {cinematicOn && <IntroCinematic onDone={handleCinematicDone} />}
 
       {/* Site layer — plain flow (sticky nav + scroll unaffected). The header and content fade as
           separate beats (see navStyle/contentStyle) so the transition reads content → header → game. */}
