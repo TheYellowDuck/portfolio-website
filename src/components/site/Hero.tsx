@@ -28,28 +28,32 @@ const QUICK_LINKS = [
 export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   const doorRef = useRef<HTMLDivElement>(null);
   // The doorway leans toward the pointer like a display case under inspection (folds in the
-  // group-hover -translate-y-1 the inline transform would otherwise override).
-  const doorTilt = useTilt<HTMLDivElement>({ max: 6, lift: 4 });
+  // group-hover -translate-y-1 the inline transform would otherwise override). Its overflow-hidden
+  // clip flattens internal 3D, so it pops as one body — more lean + a taller rise instead.
+  const doorTilt = useTilt<HTMLDivElement>({ max: 8, lift: 10 });
+  // The identity block is a 3D scene of its own: a whisper of lean, with the name floating
+  // highest, then eyebrow/tagline/links on descending planes — the hero pops without a card.
+  const identityTilt = useTilt<HTMLDivElement>({ max: 2.5 });
   return (
     <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
       {/* Left: identity */}
-      <div className="flex-1">
-        <p className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
+      <div ref={identityTilt} className="flex-1">
+        <p data-depth="16" className="font-mono text-[12px] uppercase tracking-[0.32em] text-pine">
           <ScrambleText text={content.hero.eyebrow} delay={0} />
         </p>
-        <h1 className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
+        <h1 data-depth="34" className="mt-4 font-display text-[clamp(44px,8vw,72px)] font-semibold leading-[1.04] tracking-tight text-walnut">
           <ScrambleText text={PERSON.name} delay={120} />
         </h1>
-        <p className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
+        <p data-depth="14" className="mt-4 max-w-[42ch] font-sans text-[18px] leading-relaxed dark:leading-[1.72] text-walnut/75">
           <ScrambleText text={content.hero.tagline} delay={300} />
         </p>
         {currentStatus && (
-          <p className="mt-2 font-mono text-[13px] text-walnut/55">
+          <p data-depth="10" className="mt-2 font-mono text-[13px] text-walnut/55">
             <ScrambleText text={`${content.hero.currentlyLabel} ${currentStatus}`} delay={480} />
           </p>
         )}
 
-        <nav className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[13px]">
+        <nav data-depth="8" className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[13px]">
           <PressButton
             onClick={onResume}
             className="text-pine underline decoration-sage/40 underline-offset-4 transition-colors hover:decoration-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 rounded-sm"
