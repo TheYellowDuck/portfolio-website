@@ -30,7 +30,8 @@ interface Entry {
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
   fl: number;                         // current influence 0..1 (drives the depth layers)
   styled: boolean;                    // inline overrides currently applied
-  depth: { el: HTMLElement; d: number }[] | null; // [data-depth] children, captured on engage
+  depth: { el: HTMLElement; d: number }[] | null; // [data-depth] descendants, captured on engage
+  chain: HTMLElement[] | null;        // intermediate ancestors given preserve-3d for nested depth
 }
 
 const entries = new Set<Entry>();
@@ -52,7 +53,9 @@ function settle(e: Entry) {
     e.el.style.willChange = "";
     e.el.style.transformStyle = "";
     if (e.depth) for (const c of e.depth) c.el.style.transform = "";
+    if (e.chain) for (const p of e.chain) p.style.transformStyle = "";
     e.depth = null;
+    e.chain = null;
     e.styled = false;
   }
 }
@@ -103,15 +106,23 @@ function tick() {
     if (!e.styled) {
       e.el.style.transition = NON_TRANSFORM_TRANSITIONS;
       e.el.style.willChange = "transform";
-      // Depth layers: direct children marked data-depth pop out on their own planes while the
-      // surface leans (preserve-3d keeps their translateZ in the card's 3D context). Captured on
-      // engage, so React re-renders between hovers never leave stale nodes. Their depth rides the
-      // same influence ramp (e.fl) — layers rise from flat, nothing jumps at the range boundary.
-      // NOTE: children of overflow:hidden surfaces flatten (CSS grouping property) — those
-      // surfaces simply don't mark depth children.
+      // Depth layers: descendants marked data-depth pop out on their own planes while the surface
+      // leans. Nested marks work too — every intermediate ancestor gets transform-style:
+      // preserve-3d (and is restored on settle), since any un-preserved ancestor would flatten the
+      // plane. Captured on engage, so React re-renders between hovers never leave stale nodes.
+      // Depth rides the same influence ramp (e.fl) — layers rise from flat, nothing jumps at the
+      // range boundary. NOTE: an overflow:hidden ancestor still flattens (CSS grouping property,
+      // beats preserve-3d) — keep clips on the media/leaf elements, not on ancestors of marks.
       e.el.style.transformStyle = "preserve-3d";
-      e.depth = Array.from(e.el.querySelectorAll<HTMLElement>(":scope > [data-depth]"))
-        .map((c) => ({ el: c, d: parseFloat(c.dataset.depth || "0") || 0 }));
+      const marks = Array.from(e.el.querySelectorAll<HTMLElement>("[data-depth]"));
+      const chain = new Set<HTMLElement>();
+      for (const c of marks) {
+        let p = c.parentElement;
+        while (p && p !== e.el) { chain.add(p); p = p.parentElement; }
+      }
+      for (const p of chain) p.style.transformStyle = "preserve-3d";
+      e.chain = chain.size ? Array.from(chain) : null;
+      e.depth = marks.map((c) => ({ el: c, d: parseFloat(c.dataset.depth || "0") || 0 }));
       e.styled = true;
     }
     e.el.style.transform =
@@ -154,7 +165,7 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ensureListeners();
-    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null };
+    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
     entries.add(entryRef.current);
     start();
   }, [max, lift]);

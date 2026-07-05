@@ -51,7 +51,7 @@ function CardMedia({ popup, aspect }: { popup: ExhibitPopup; aspect: number }) {
   const id = ytId(popup);
   return (
     <div
-      className="relative h-full shrink-0 overflow-hidden bg-black/5"
+      className="relative h-full shrink-0 overflow-hidden rounded-l-[11px] bg-black/5"
       style={{ aspectRatio: String(aspect) }}
     >
       {popup.videoUrl ? (
@@ -76,7 +76,7 @@ function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: numb
   const { popup, index } = item;
   const dark = useDarkMode();
   // 3D lean toward the pointer (lift folds in the hover:-translate-y-0.5 the transform overrides).
-  const tiltRef = useTilt<HTMLElement>({ max: 4, lift: 2 });
+  const tiltRef = useTilt<HTMLElement>({ max: 3.5, lift: 2 });
   const hasMedia = !!(popup.videoUrl || popup.embedUrl);
   return (
     <article
@@ -86,19 +86,19 @@ function ArchiveCard({ item, aspect, onOpen }: { item: ArchiveItem; aspect: numb
       tabIndex={0}
       aria-label={`Open ${popup.title ?? "project"}`}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
-      className="group flex h-[260px] shrink-0 cursor-pointer items-stretch overflow-hidden rounded-xl border border-[rgb(var(--c-line-rgb)/0.12)] bg-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_12px_30px_rgba(28,21,8,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+      className="group flex h-[260px] shrink-0 cursor-pointer items-stretch rounded-xl border border-[rgb(var(--c-line-rgb)/0.12)] bg-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(122,158,126,0.6)] hover:shadow-[0_12px_30px_rgba(28,21,8,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
     >
       {hasMedia && <CardMedia popup={popup} aspect={aspect} />}
       <div className={`flex min-w-0 flex-col px-5 py-4 ${hasMedia ? "w-[244px] sm:w-[272px]" : "w-[300px]"}`}>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
-        <h3 className="mt-1.5 line-clamp-2 font-display text-[17px] font-semibold leading-snug text-pine">{popup.title}</h3>
+        <span data-depth="8" className="font-mono text-[11px] tracking-[0.22em] text-pine">No. {index}</span>
+        <h3 data-depth="10" className="mt-1.5 line-clamp-2 font-display text-[17px] font-semibold leading-snug text-pine">{popup.title}</h3>
         {popup.description && (
           <p className="mt-2 line-clamp-4 flex-1 font-sans text-[13px] leading-relaxed text-walnut/80 dark:leading-[1.6]">
             {popup.description}
           </p>
         )}
         {popup.tech && popup.tech.length > 0 && (
-          <div className="mt-3 flex h-[22px] flex-wrap gap-1.5 overflow-hidden">
+          <div data-depth="6" className="mt-3 flex h-[22px] flex-wrap gap-1.5 overflow-hidden">
             {popup.tech.slice(0, 3).map((t) => {
               const c = skillColorFor(t);
               return (
