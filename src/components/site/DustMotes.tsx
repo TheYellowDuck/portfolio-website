@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react";
 //
 // Cheap: one small canvas, ~16 arcs at 30fps, paused when offscreen / hidden tab / game covering
 // the page. Skipped under prefers-reduced-motion (static specks would just read as dirt).
-const COUNT = 16;
+const COUNT = 24;
 const FPS = 30;
 const WARM = "240, 206, 120"; // lamplight (#f0ce78)
 
@@ -89,8 +89,8 @@ export default function DustMotes({ className }: { className?: string }) {
         if (beam <= 0.02) continue;
         const twinkle = 0.7 + 0.3 * Math.sin(t * m.twinkleHz * Math.PI * 2 + m.phase * 1.7);
         ctx.beginPath();
-        ctx.arc(px, py, 0.6 + m.z * 1.1, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${WARM}, ${(0.5 * beam * m.z * twinkle).toFixed(3)})`;
+        ctx.arc(px, py, 0.8 + m.z * 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${WARM}, ${(0.85 * beam * m.z * twinkle).toFixed(3)})`;
         ctx.fill();
       }
     };

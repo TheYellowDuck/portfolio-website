@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useDarkMode } from "@/lib/use-dark-mode";
 
 // Caustic lamplight over the hero: thin, slowly-breathing filaments of warm light — the look of
 // golden-hour light passing through water — drifting across the parchment behind the hero content.
@@ -14,12 +15,18 @@ import { useEffect, useRef } from "react";
 // offscreen or the tab is hidden. Skipped entirely under prefers-reduced-motion.
 const CELL = 10;         // px per pattern cell (coarse: the upscale is what makes it soft)
 const FPS = 24;          // caustics breathe — they don't need 60Hz
-const ALPHA_MAX = 0.08;  // peak filament alpha — faint, light-on-parchment, not an overlay
-const WARM = [240, 206, 120] as const; // lamplight (#f0ce78)
 const SPEED = 0.22;      // pattern drift rate — museum pace
+// Theme-aware ink: WARM LIGHT filaments are invisible on light parchment (light-on-light), so the
+// light theme draws the caustic web as faint walnut-ink refraction lines instead — like light
+// through water casting onto paper. Dark theme keeps glowing lamplight filaments.
+const DARK_COLOR = [240, 206, 120] as const;  // lamplight (#f0ce78)
+const DARK_ALPHA = 0.16;
+const LIGHT_COLOR = [58, 46, 30] as const;    // walnut ink
+const LIGHT_ALPHA = 0.11;
 
 export default function CausticLight({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const dark = useDarkMode();
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -48,6 +55,8 @@ export default function CausticLight({ className }: { className?: string }) {
 
     // Interference of a few slow waves; brightness rides the zero-crossings raised to a power,
     // which is what draws the thin caustic web rather than broad blobs.
+    const [cr, cg, cb] = dark ? DARK_COLOR : LIGHT_COLOR;
+    const alphaMax = dark ? DARK_ALPHA : LIGHT_ALPHA;
     const draw = (tSec: number) => {
       const t = tSec * SPEED;
       const data = img.data;
@@ -61,8 +70,8 @@ export default function CausticLight({ className }: { className?: string }) {
           const n = 1 - Math.min(Math.abs(v) * 0.5, 1);       // 1 at a crossing, 0 far away
           const b = n * n * n * n * n * n;                     // ^6 → thin filaments
           const o = (y * cols + x) * 4;
-          data[o] = WARM[0]; data[o + 1] = WARM[1]; data[o + 2] = WARM[2];
-          data[o + 3] = b * ALPHA_MAX * 255;
+          data[o] = cr; data[o + 1] = cg; data[o + 2] = cb;
+          data[o + 3] = b * alphaMax * 255;
         }
       }
       ctx.putImageData(img, 0, 0);
@@ -84,7 +93,7 @@ export default function CausticLight({ className }: { className?: string }) {
       io.disconnect();
       ro.disconnect();
     };
-  }, []);
+  }, [dark]);
 
   const mask = "radial-gradient(120% 90% at 50% 32%, black 45%, transparent 98%)";
   return (
