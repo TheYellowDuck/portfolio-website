@@ -48,6 +48,9 @@ const en = {
     links: { github: "GitHub", linkedin: "LinkedIn", email: "Email" },
     doorway: { label: "The museum", cta: "Step inside →", caption: "an explorable, pixel-art version" },
   },
+  // Mobile-only entry gate on the intro curtain (desktop lifts on its own): the tap that enters is
+  // a real user activation, which is what lets iOS raise the motion/gyro prompt at the door.
+  intro: { enter: "Tap to enter" },
   nav: {
     links: { work: "Work", experience: "Experience", skills: "Skills", about: "About", contact: "Contact" },
     paletteAria: "Open command palette",
