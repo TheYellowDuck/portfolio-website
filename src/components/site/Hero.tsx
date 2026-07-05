@@ -5,6 +5,7 @@
 
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
+import HeroOrb from "./HeroOrb";
 import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
 import { content } from "@/content";
@@ -67,7 +68,10 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
       </div>
 
       {/* Right: the doorway portal into the game */}
-      <div className="flex flex-1 flex-col items-center md:items-end">
+      <div className="relative flex flex-1 flex-col items-center md:items-end">
+        {/* The intro's glass drop, settled by the doorway — gently bobbing, leaning toward the
+            pointer. Decorative (pointer-events-none), so it never blocks the doorway click. */}
+        <HeroOrb className="absolute -top-8 right-[8%] z-10 md:-top-10 md:right-[-14px]" />
         <PressButton
           onClick={() => onEnter(doorRef.current?.getBoundingClientRect())}
           data-cursor="Enter"

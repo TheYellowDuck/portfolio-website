@@ -274,6 +274,25 @@ html.dark {
 
 @media (prefers-reduced-motion: reduce) { .intro-curtain { display: none; } }
 
+/* 3D glass-drop intro cinematic (IntroCinematic.tsx) — a live WebGL drop over bare parchment,
+   above the curtain (z-95). Ends by firing the water ripple at centre; the overlay then
+   cross-fades out while the page fades in beneath. Reduced-motion never mounts it (SiteShell),
+   and the CSS rule below is a belt-and-braces guarantee. */
+.intro-cinematic {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: var(--c-bg);
+  opacity: 1;
+}
+.intro-cinematic--out {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 520ms ease, visibility 0s linear 520ms;
+}
+body.intro-cinematic-active { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .intro-cinematic { display: none; } }
+
 /* Konami easter egg: ducks drifting + swaying down (per-duck --sway / --spin), plus a toast. */
 @keyframes konami-fall {
   0%   { transform: translate3d(0, -16vh, 0) rotate(0deg); }
