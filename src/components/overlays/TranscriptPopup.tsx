@@ -44,7 +44,7 @@ interface TranscriptPopupProps {
 
 export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
   // Whisper-subtle 3D lean on the popup card (it's a large reading surface).
-  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
+  const popupTilt = useTilt<HTMLDivElement>({ max: 2, glint: false });
   const [data, setData]            = useState<TranscriptData | null>(transcriptCache);
   const [error, setError]          = useState(false);
   const [activeSubject, setActive] = useState<string | null>(

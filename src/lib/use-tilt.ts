@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef } from "react";
 const RANGE = 220;     // px past the element's edge where its influence fades to zero
 const FOLLOW = 0.14;   // per-frame lerp toward the target lean — the "weight" of the surface
 const EPS = 0.02;      // settle threshold (deg / px)
+const GLINT_A = 0.13;  // peak glint alpha — the soft light catching the display-case glass
 const NON_TRANSFORM_TRANSITIONS =
   "border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease, color 300ms ease, opacity 300ms ease";
 
@@ -29,6 +30,24 @@ interface Entry {
   lift: number;
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
   styled: boolean;                    // inline overrides currently applied
+  glintEl: HTMLDivElement | null;     // the sliding specular sheen (null = disabled)
+}
+
+// The glint: a soft warm-white radial highlight that slides across the surface with the pointer —
+// light catching the glass of a display case. Lives in a pointer-transparent overlay child; its
+// position/strength are CSS vars the manager writes each frame. Warm-white matches the water sim's
+// own highlight colour, so every glint on the page is the same light.
+function makeGlint(el: HTMLElement): HTMLDivElement {
+  const g = document.createElement("div");
+  g.setAttribute("aria-hidden", "true");
+  g.style.cssText =
+    "position:absolute;inset:0;pointer-events:none;z-index:30;" +
+    `border-radius:${getComputedStyle(el).borderRadius};` +
+    "background:radial-gradient(260px circle at var(--gx,50%) var(--gy,50%)," +
+    "rgba(255,252,245,var(--ga,0)),transparent 65%);";
+  if (getComputedStyle(el).position === "static") el.style.position = "relative";
+  el.appendChild(g);
+  return g;
 }
 
 const entries = new Set<Entry>();
@@ -46,6 +65,7 @@ function settle(e: Entry) {
     e.el.style.transform = "";
     e.el.style.transition = "";
     e.el.style.willChange = "";
+    e.glintEl?.style.setProperty("--ga", "0");
     e.styled = false;
   }
 }
@@ -55,7 +75,7 @@ function tick() {
   let busy = false;
   const vw = window.innerWidth, vh = window.innerHeight;
   for (const e of entries) {
-    let tx = 0, ty = 0, tl = 0;
+    let tx = 0, ty = 0, tl = 0, gf = 0, gx = 50, gy = 50;
     if (pointerKnown && !document.hidden) {
       const r = e.el.getBoundingClientRect();
       // skip empty (display:none) and fully offscreen elements — their targets stay 0
@@ -68,6 +88,10 @@ function tick() {
           tx = -clamp1(dy / hh) * e.max * f;
           ty = clamp1(dx / hw) * e.max * f;
           tl = e.lift * f;
+          gf = f;
+          // glint rides the pointer across the surface (clamped just past the edges)
+          gx = Math.max(-15, Math.min(115, ((px - r.left) / r.width) * 100));
+          gy = Math.max(-15, Math.min(115, ((py - r.top) / r.height) * 100));
         }
       }
     }
@@ -88,6 +112,11 @@ function tick() {
     e.el.style.transform =
       `perspective(900px) rotateX(${e.rx.toFixed(3)}deg) rotateY(${e.ry.toFixed(3)}deg)` +
       (e.lf > 0.01 ? ` translateY(${(-e.lf).toFixed(2)}px)` : "");
+    if (e.glintEl) {
+      e.glintEl.style.setProperty("--gx", `${gx.toFixed(1)}%`);
+      e.glintEl.style.setProperty("--gy", `${gy.toFixed(1)}%`);
+      e.glintEl.style.setProperty("--ga", (GLINT_A * gf).toFixed(3));
+    }
   }
   // keep polling while anything is stirred, or while the pointer is on the page and could stir a
   // moving element (auto-scroll) — stop entirely only when idle with the pointer gone.
@@ -108,30 +137,30 @@ function ensureListeners() {
   document.addEventListener("visibilitychange", start);
 }
 
-export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0 }: { max?: number; lift?: number } = {}) {
+export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, glint = true }: { max?: number; lift?: number; glint?: boolean } = {}) {
   const entryRef = useRef<Entry | null>(null);
 
+  const remove = () => {
+    if (!entryRef.current) return;
+    settle(entryRef.current);
+    entryRef.current.glintEl?.remove();
+    entries.delete(entryRef.current);
+    entryRef.current = null;
+  };
+
   const ref = useCallback((el: T | null) => {
-    if (entryRef.current) {
-      settle(entryRef.current);
-      entries.delete(entryRef.current);
-      entryRef.current = null;
-    }
+    remove();
     if (!el || typeof window === "undefined") return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ensureListeners();
-    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, styled: false };
+    entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, styled: false, glintEl: glint ? makeGlint(el) : null };
     entries.add(entryRef.current);
     start();
-  }, [max, lift]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [max, lift, glint]);
 
-  useEffect(() => () => {
-    if (entryRef.current) {
-      settle(entryRef.current);
-      entries.delete(entryRef.current);
-      entryRef.current = null;
-    }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => remove(), []);
   return ref;
 }

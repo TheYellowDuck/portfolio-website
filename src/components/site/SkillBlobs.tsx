@@ -307,6 +307,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                 max={8}
                 style={{
                   position: "absolute", left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
+                  borderRadius: "9999px", // the glint overlay inherits this, clipping to the disc
                   pointerEvents: active !== null ? "none" : "auto",
                 }}
               >
@@ -362,7 +363,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                 <>
                   <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ pointerEvents: "none" }}>
                     {/* Gentle tilt on the open disc too (subtle: it's large and holds readable text). */}
-                    <TiltWrap max={3} style={{ pointerEvents: "auto" }}>
+                    <TiltWrap max={3} style={{ pointerEvents: "auto", borderRadius: "9999px" }}>
                     <motion.div
                       layoutId={`blob-${active}`}
                       onClick={() => setActive(null)}
