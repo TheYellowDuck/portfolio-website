@@ -209,11 +209,20 @@ function ensureListeners() {
     const DOE = (typeof DeviceOrientationEvent !== "undefined" ? DeviceOrientationEvent : undefined) as PermissionedDOE | undefined;
     if (!DOE) return;
     if (typeof DOE.requestPermission === "function") {
+      // Arm on the FIRST CONTACT of any kind — touchstart covers the touch that begins a scroll,
+      // not just taps. If a particular event doesn't carry user-activation (the call rejects
+      // without showing a prompt), keep listening and try again on the next contact; once the
+      // prompt has actually been ANSWERED (granted or denied resolves), stop for good.
+      const GESTURES = ["touchstart", "touchend", "click"] as const;
       const arm = () => {
-        window.removeEventListener("click", arm, true);
-        DOE.requestPermission!().then((res) => { if (res === "granted") attachGyro(); }).catch(() => { /* denied — visual-only */ });
+        DOE.requestPermission!()
+          .then((res) => {
+            for (const t of GESTURES) window.removeEventListener(t, arm, true);
+            if (res === "granted") attachGyro();
+          })
+          .catch(() => { /* no gesture context / dismissed — stay armed for the next contact */ });
       };
-      window.addEventListener("click", arm, { capture: true });
+      for (const t of GESTURES) window.addEventListener(t, arm, { capture: true, passive: true });
     } else {
       attachGyro();
     }
