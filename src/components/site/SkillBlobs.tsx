@@ -315,12 +315,15 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                   active !== null
                     ? { opacity: active === i ? 0 : 0.07, y: 0, scale: 1 }
                     : inView || reduceMotion
-                      ? { opacity: 1, y: 0, scale: 1 }            // rise up into place
+                      // rise up into place — the entry stagger delay lives HERE (on this animate
+                      // target only), NOT on the top-level transition: `default` applies to every
+                      // animation, so a top-level delay made whileHover lag by the orb's stagger.
+                      ? { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 220, damping: 22, delay: reduceMotion ? 0 : (entryDelays[i] ?? 0) } }
                       : { opacity: 0, y: 40, scale: 0.85 }        // reset below view so it replays
                 }
                 transition={{
                   layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-                  default: { type: "spring", stiffness: 220, damping: 22, delay: active === null && inView && !reduceMotion ? (entryDelays[i] ?? 0) : 0 },
+                  default: { type: "spring", stiffness: 220, damping: 22 }, // hover/tap: instant
                 }}
                 whileHover={active === null ? { y: -4, scale: 1.035 } : undefined}
                 whileTap={active === null ? { scale: 0.96 } : undefined}
