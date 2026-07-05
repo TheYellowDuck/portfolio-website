@@ -95,15 +95,16 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
             />
             {/* Floor line */}
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
-            {/* Invitation */}
-            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5">
-              <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[rgba(240,228,196,0.6)]">
-                {content.hero.doorway.label}
-              </span>
-              <span className="font-mono text-[15px] text-[rgba(240,228,196,0.95)] transition-colors group-hover:text-[#f0ce78]">
-                {content.hero.doorway.cta}
-              </span>
-            </div>
+          </div>
+          {/* Invitation — outside the panel's clip on its own plane: floats in front of the room,
+              behind the character (depth 26 < 44). */}
+          <div data-depth="26" className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5">
+            <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[rgba(240,228,196,0.6)]">
+              {content.hero.doorway.label}
+            </span>
+            <span className="font-mono text-[15px] text-[rgba(240,228,196,0.95)] transition-colors group-hover:text-[#f0ce78]">
+              {content.hero.doorway.cta}
+            </span>
           </div>
           {/* Character standing in the doorway — OUTSIDE the panel's clip, on her own depth plane,
               so she pops out of the door while the room leans behind her. The depth transform lands
