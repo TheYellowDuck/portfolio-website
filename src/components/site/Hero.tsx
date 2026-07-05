@@ -6,6 +6,7 @@
 import { useRef } from "react";
 import PixelCharacter from "./PixelCharacter";
 import CausticLight from "./CausticLight";
+import DustMotes from "./DustMotes";
 import HeroOrb from "./HeroOrb";
 import ScrambleText from "./ScrambleText";
 import { PERSON, LINKS } from "@/lib/site";
@@ -95,6 +96,8 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
               className="pointer-events-none absolute left-1/2 top-0 h-2/3 w-2/3 -translate-x-1/2 opacity-70 transition-opacity duration-300 group-hover:opacity-100"
               style={{ background: "radial-gradient(closest-side, rgba(240,206,120,0.40), transparent 75%)" }}
             />
+            {/* Dust motes drifting in the beam — behind the character, inside the panel's clip. */}
+            <DustMotes className="absolute inset-0" />
             {/* Floor line */}
             <div className="absolute inset-x-6 bottom-[22%] h-px bg-[rgba(240,206,120,0.18)]" />
             {/* Character standing in the doorway */}
