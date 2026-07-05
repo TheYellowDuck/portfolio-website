@@ -312,6 +312,10 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
               >
               <PressMotionButton
                 layoutId={`blob-${i}`}
+                // The whole field is aria-hidden (the sr-only list above is the canonical AT path),
+                // so the orbs must not be tab stops — focusable-inside-aria-hidden is a ghost stop
+                // for screen readers. Pointer interaction unchanged.
+                tabIndex={-1}
                 onActivate={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}
                 animate={

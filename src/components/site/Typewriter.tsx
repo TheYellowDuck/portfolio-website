@@ -84,7 +84,10 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
   }, [full, speed]);
 
   return (
-    <span className={className} ref={rootRef} aria-label={full}>
+    <span className={className} ref={rootRef}>
+      {/* Screen-reader text as a real (visually hidden) node — aria-label is prohibited on a
+          role-less <span>, so the same pattern as ScrambleText: sr-only copy + hidden visuals. */}
+      <span className="sr-only">{full}</span>
       {segments.map((s, i) => (
         <span key={i} ref={(el) => { spanRefs.current[i] = el; }} className={s.className} aria-hidden="true">{s.text}</span>
       ))}
