@@ -152,11 +152,6 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
   const copyRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<number | null>(null);
-  // The unzoomed orb field leans as ONE constellation — but as a HEAVY, slow surface (tiny
-  // follow weight): it drifts toward its lean instead of chasing the cursor, so the orbs' hover
-  // boundaries move glacially under the pointer and can't flicker the hover/custom cursor the
-  // way a cursor-speed rotation of a big multi-target plane did.
-  const fieldTilt = useTilt<HTMLDivElement>({ max: 2.2, follow: 0.045 });
   const [inView, setInView] = useState(false);
   const [trackH, setTrackH] = useState(0);
   const dark = useDarkMode();
@@ -298,10 +293,6 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
       <div className="relative w-full">
       <div ref={ref} className="relative w-full" aria-hidden style={{ height: containerH }}>
         <LayoutGroup>
-          {/* The closed orbs live on one tilting plane (absolute inset-0 keeps their packed
-              coordinates); the expanded disc + backdrop stay outside it, so the open view
-              never double-tilts. */}
-          <div ref={fieldTilt} className="absolute inset-0">
           {layout && groups.map((g, i) => {
             const nd = layout.nodes[i];
             if (!nd) return null;
@@ -349,7 +340,6 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
               </PressMotionButton>
             );
           })}
-          </div>
 
           {/* Zoom: the clicked blob morphs (shared layoutId) into a centred orb. Both the dim backdrop
               and the orb sit BELOW the sticky nav (z-10 < nav's z-20), so scrolling tucks them under
