@@ -41,7 +41,7 @@ interface ResumePopupProps {
 
 export default function ResumePopup({ onClose }: ResumePopupProps) {
   // Whisper-subtle 3D lean on the popup card (it's a large reading surface).
-  const popupTilt = useTilt<HTMLDivElement>({ max: 2, glint: false });
+  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
   const [collection, setCollection] = useState<ResumeCollection | null>(resumeCache);
   const [error, setError]           = useState(false);
   const [variantId, setVariantId]   = useState<string | null>(resumeCache?.variants[0]?.id ?? null);

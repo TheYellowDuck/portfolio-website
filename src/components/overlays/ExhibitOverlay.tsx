@@ -117,7 +117,7 @@ interface ExhibitOverlayProps {
 export default function ExhibitOverlay({ popup, onClose, gentle = false }: ExhibitOverlayProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   // Barely-there 3D lean on the popup card (it's a large reading surface, so keep it whisper-subtle).
-  const popupTilt = useTilt<HTMLDivElement>({ max: 2, glint: false });
+  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
   const skillRefs = useRef<(HTMLDivElement | null)[]>([]); // skill-group anchors for the left tab rail
 
   // Lock background page scroll while a popup is open, so the page behind never scrolls (e.g. when the
