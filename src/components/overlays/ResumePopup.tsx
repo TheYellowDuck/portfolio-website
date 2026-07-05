@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ResumeCollection, ResumeVariant, ResumeEntry, ResumeSection } from "@/types/resume";
 import { PressButton } from "@/components/PressButton";
-import { useTilt } from "@/lib/use-tilt";
 
 const DISPLAY_LABELS: Record<string, string> = {
   "WORK EXPERIENCE":         "Experience",
@@ -40,8 +39,6 @@ interface ResumePopupProps {
 }
 
 export default function ResumePopup({ onClose }: ResumePopupProps) {
-  // Whisper-subtle 3D lean on the popup card (it's a large reading surface).
-  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
   const [collection, setCollection] = useState<ResumeCollection | null>(resumeCache);
   const [error, setError]           = useState(false);
   const [variantId, setVariantId]   = useState<string | null>(resumeCache?.variants[0]?.id ?? null);
@@ -121,7 +118,6 @@ export default function ResumePopup({ onClose }: ResumePopupProps) {
       >
         <motion.div
           key="resume-popup"
-          ref={popupTilt}
           role="dialog"
           aria-modal="true"
           aria-label={collection?.name ?? "Résumé"}
