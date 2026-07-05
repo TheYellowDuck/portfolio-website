@@ -16,10 +16,19 @@ import { useCallback, useEffect, useRef } from "react";
 // (hover border/shadow/color fades keep working; the transform itself is rAF-lerped — buttery, all
 // directions). Once settled, every inline override is removed and the classes take back over.
 // `lift` folds a card's Tailwind hover rise into the tilt transform (which overrides the class).
-// Registration no-ops on coarse pointers (touch) and under prefers-reduced-motion.
+//
+// TOUCH devices have no pointer to be near — there the GYRO drives it instead: every visible
+// registered surface leans with the device (same max, same depth layers), relative to a slowly
+// re-centering baseline so any resting hand position is neutral and CHANGES drive the lean.
+// Android attaches directly; iOS needs DeviceOrientationEvent.requestPermission(), which Apple
+// only allows inside a user gesture — so it arms on the first tap (once, silent if denied).
+// Reduced-motion skips everything on both input modes.
 const RANGE = 220;     // px past the element's edge where its influence fades to zero
 const FOLLOW = 0.14;   // per-frame lerp toward the target lean — the "weight" of the surface
 const EPS = 0.02;      // settle threshold (deg / px)
+const GYRO_RANGE = 16; // degrees of device lean that map to a surface's full max
+const GYRO_DEAD = 0.4;  // deg — sensor noise deadband (keeps the loop asleep in a still hand)
+const GYRO_RECENTER = 0.008; // per-event baseline drift toward the current posture (~2s settle)
 const NON_TRANSFORM_TRANSITIONS =
   "border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease, color 300ms ease, opacity 300ms ease";
 
@@ -41,6 +50,12 @@ let raf = 0;
 let listening = false;
 let frameNo = 0;
 let coldTicks = 0; // consecutive full passes that found nothing stirred and nothing in range
+let coarseMode = false;      // touch device → gyro drives the lean instead of pointer proximity
+let gyroAttached = false;
+let gnx = 0, gny = 0;        // normalized device lean, -1..1 (x: left/right, y: front/back)
+let gBaseBeta: number | null = null;
+let gBaseGamma: number | null = null;
+let lastGyroT = -1e9;
 
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -60,6 +75,33 @@ function settle(e: Entry) {
   }
 }
 
+function onOrientation(e: DeviceOrientationEvent) {
+  if (e.beta == null || e.gamma == null) return;
+  if (gBaseBeta === null || gBaseGamma === null) { gBaseBeta = e.beta; gBaseGamma = e.gamma; return; }
+  // deltas from the baseline, then slowly re-center it — sustained new posture becomes neutral
+  let db = e.beta - gBaseBeta;
+  let dg = e.gamma - gBaseGamma;
+  gBaseBeta += (e.beta - gBaseBeta) * GYRO_RECENTER;
+  gBaseGamma += (e.gamma - gBaseGamma) * GYRO_RECENTER;
+  // fold in screen rotation so landscape tips the same visual axes
+  const angle = (screen.orientation?.angle ?? 0) as number;
+  let dx = dg, dy = db;
+  if (angle === 90) { dx = db; dy = -dg; }
+  else if (angle === 270 || angle === -90) { dx = -db; dy = dg; }
+  else if (angle === 180) { dx = -dg; dy = -db; }
+  if (Math.abs(dx) < GYRO_DEAD && Math.abs(dy) < GYRO_DEAD && gnx === 0 && gny === 0) return;
+  gnx = clamp1(dx / GYRO_RANGE);
+  gny = clamp1(dy / GYRO_RANGE);
+  lastGyroT = performance.now();
+  start();
+}
+
+function attachGyro() {
+  if (gyroAttached) return;
+  gyroAttached = true;
+  window.addEventListener("deviceorientation", onOrientation, { passive: true } as AddEventListenerOptions);
+}
+
 function tick() {
   raf = 0;
   // Idle throttle: with the pointer parked far from every surface there's nothing to animate, but
@@ -68,7 +110,7 @@ function tick() {
   // ~130ms — imperceptible, since its influence ramps from zero anyway) instead of burning 60fps.
   frameNo++;
   if (coldTicks > 30 && frameNo % 8 !== 0) {
-    if (pointerKnown && !document.hidden && entries.size > 0) raf = requestAnimationFrame(tick);
+    if ((pointerKnown || coarseMode) && !document.hidden && entries.size > 0) raf = requestAnimationFrame(tick);
     return;
   }
   let busy = false;
@@ -76,7 +118,18 @@ function tick() {
   const vw = window.innerWidth, vh = window.innerHeight;
   for (const e of entries) {
     let tx = 0, ty = 0, tl = 0, tf = 0;
-    if (pointerKnown && !document.hidden) {
+    if (coarseMode && !document.hidden) {
+      // gyro: every VISIBLE surface leans with the device (no lift — there's no hover to echo)
+      if (gnx !== 0 || gny !== 0) {
+        const r = e.el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw) {
+          inRange = true;
+          tx = -gny * e.max;
+          ty = gnx * e.max;
+          tf = Math.min(1, Math.hypot(gnx, gny));
+        }
+      }
+    } else if (pointerKnown && !document.hidden) {
       const r = e.el.getBoundingClientRect();
       // skip empty (display:none) and fully offscreen elements — their targets stay 0
       if (r.width > 0 && r.height > 0 && r.bottom > -RANGE && r.top < vh + RANGE && r.right > -RANGE && r.left < vw + RANGE) {
@@ -102,7 +155,11 @@ function tick() {
       if (e.styled) settle(e);
       continue;
     }
-    busy = true;
+    // converged at a NON-zero lean (gyro holding steady): keep the transform, stop polling —
+    // the next deviceorientation event restarts the loop.
+    const converged =
+      Math.abs(tx - e.rx) < EPS && Math.abs(ty - e.ry) < EPS && Math.abs(tl - e.lf) < EPS && Math.abs(tf - e.fl) < EPS;
+    if (!converged) busy = true;
     if (!e.styled) {
       e.el.style.transition = NON_TRANSFORM_TRANSITIONS;
       e.el.style.willChange = "transform";
@@ -133,9 +190,9 @@ function tick() {
     }
   }
   coldTicks = busy || inRange ? 0 : coldTicks + 1;
-  // keep polling while anything is stirred, or while the pointer is on the page and could stir a
-  // moving element (auto-scroll) — stop entirely only when idle with the pointer gone.
-  if (busy || (pointerKnown && !document.hidden && entries.size > 0)) {
+  // keep polling while anything is stirred, while the pointer could stir a moving element
+  // (auto-scroll), or briefly after gyro activity — stop entirely only when idle.
+  if (busy || ((pointerKnown || (coarseMode && performance.now() - lastGyroT < 300)) && !document.hidden && entries.size > 0)) {
     raf = requestAnimationFrame(tick);
   }
 }
@@ -145,6 +202,24 @@ function start() { if (!raf) raf = requestAnimationFrame(tick); }
 function ensureListeners() {
   if (listening || typeof window === "undefined") return;
   listening = true;
+  if (coarseMode) {
+    // Android and friends fire deviceorientation freely; iOS 13+ gates it behind a permission
+    // call that MUST run inside a user gesture — arm it on the first tap, once, silent if denied.
+    type PermissionedDOE = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
+    const DOE = (typeof DeviceOrientationEvent !== "undefined" ? DeviceOrientationEvent : undefined) as PermissionedDOE | undefined;
+    if (!DOE) return;
+    if (typeof DOE.requestPermission === "function") {
+      const arm = () => {
+        window.removeEventListener("click", arm, true);
+        DOE.requestPermission!().then((res) => { if (res === "granted") attachGyro(); }).catch(() => { /* denied — visual-only */ });
+      };
+      window.addEventListener("click", arm, { capture: true });
+    } else {
+      attachGyro();
+    }
+    document.addEventListener("visibilitychange", start);
+    return; // no pointer-proximity listeners on touch
+  }
   window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; pointerKnown = true; coldTicks = 0; start(); }, { passive: true });
   // pointer left the window / tab hidden → everything eases home, then the loop stops itself
   document.documentElement.addEventListener("pointerleave", () => { pointerKnown = false; start(); });
@@ -162,8 +237,8 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
       entryRef.current = null;
     }
     if (!el || typeof window === "undefined") return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    coarseMode = !window.matchMedia("(pointer: fine)").matches;
     ensureListeners();
     entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
     entries.add(entryRef.current);
