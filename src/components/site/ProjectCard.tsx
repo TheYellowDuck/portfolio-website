@@ -59,7 +59,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ index, popup, compact = false, inProgress = false, onOpen }: ProjectCardProps) {
   const dark = useDarkMode();
   // 3D lean toward the pointer — lift folds in the hover:-translate-y-1 the inline transform overrides.
-  const tiltRef = useTilt<HTMLElement>({ max: 6, lift: 4 });
+  const tiltRef = useTilt<HTMLElement>({ max: 4.5, lift: 4 });
   const ytId = popup.embedUrl?.match(/embed\/([\w-]+)/)?.[1];
   const hasMedia = !!(popup.videoUrl || ytId);
   return (
@@ -75,7 +75,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
     >
       {/* Demo preview — local video autoplays muted; a YouTube embed shows its thumbnail. */}
       {hasMedia && (
-        <div data-depth="40" className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
+        <div data-depth="16" className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.1)] bg-black/5">
           {popup.videoUrl ? (
             <LazyVideo src={popup.videoUrl} poster={videoPoster(popup.videoUrl)} className="h-full w-full object-cover" />
           ) : (
@@ -95,7 +95,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {inProgress ? (
-        <span data-depth="18" className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
+        <span data-depth="12" className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.12)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-pine">
           <span className="h-1.5 w-1.5 rounded-full bg-sage" aria-hidden="true" />
           {content.sections.work.inProgressTag}
         </span>
@@ -114,7 +114,7 @@ export default function ProjectCard({ index, popup, compact = false, inProgress 
       )}
 
       {popup.tech && popup.tech.length > 0 && (
-        <div data-depth="14" className="mt-4 flex flex-wrap gap-1.5">
+        <div data-depth="10" className="mt-4 flex flex-wrap gap-1.5">
           {popup.tech.slice(0, compact ? 4 : 8).map((t) => {
             const c = skillColorFor(t);
             return (
