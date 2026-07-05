@@ -4,6 +4,7 @@
 "use client";
 
 import cpStatsJson from "@/data/cp-stats.generated.json";
+import { useTilt } from "@/lib/use-tilt";
 
 interface LeetCode {
   total: number; easy: number; medium: number; hard: number;
@@ -37,8 +38,11 @@ function StatCard({
   label: string; href: string; big: number | null; unit: string; meta?: string;
   rating?: number | null; ratingNote?: string | null; children?: React.ReactNode;
 }) {
+  // 3D lean toward the pointer, like every other card on the wall.
+  const tiltRef = useTilt<HTMLAnchorElement>({ max: 4 });
   return (
     <a
+      ref={tiltRef}
       href={href}
       target="_blank"
       rel="noopener noreferrer"

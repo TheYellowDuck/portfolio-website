@@ -9,6 +9,7 @@ import { ExhibitPopup } from "@/data/projects";
 import ResumePopup from "./ResumePopup";
 import TranscriptPopup from "./TranscriptPopup";
 import { categoryColor } from "@/lib/skill-colors";
+import { useTilt } from "@/lib/use-tilt";
 import { videoPoster } from "@/lib/video";
 import CpStats from "@/components/CpStats";
 import HandwrittenNote from "@/components/site/HandwrittenNote";
@@ -115,6 +116,8 @@ interface ExhibitOverlayProps {
 
 export default function ExhibitOverlay({ popup, onClose, gentle = false }: ExhibitOverlayProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  // Barely-there 3D lean on the popup card (it's a large reading surface, so keep it whisper-subtle).
+  const popupTilt = useTilt<HTMLDivElement>({ max: 2 });
   const skillRefs = useRef<(HTMLDivElement | null)[]>([]); // skill-group anchors for the left tab rail
 
   // Lock background page scroll while a popup is open, so the page behind never scrolls (e.g. when the
@@ -207,7 +210,7 @@ export default function ExhibitOverlay({ popup, onClose, gentle = false }: Exhib
                 // enter animation, instead of a flat in-place content swap. The backdrop key is
                 // constant, so the dim persists across the swap (no flash).
                 key={popup.title ?? "exhibit"}
-                ref={modalRef}
+                ref={(el: HTMLDivElement | null) => { modalRef.current = el; popupTilt(el); }}
                 tabIndex={-1}
                 role="dialog"
                 aria-modal="true"

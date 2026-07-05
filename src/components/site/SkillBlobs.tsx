@@ -4,9 +4,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { MouseEventHandler, PointerEvent as RPointerEvent } from "react";
-import { motion, AnimatePresence, LayoutGroup, useMotionValue, useSpring, type HTMLMotionProps } from "framer-motion";
+import type { MouseEventHandler } from "react";
+import { motion, AnimatePresence, LayoutGroup, type HTMLMotionProps } from "framer-motion";
 import { useDarkMode } from "@/lib/use-dark-mode";
+import { useTilt } from "@/lib/use-tilt";
 import { categoryColor } from "@/lib/skill-colors";
 import { usePressActivate } from "@/components/PressButton";
 import Reveal from "./Reveal";
@@ -16,45 +17,23 @@ import Reveal from "./Reveal";
 // keep their layout/tap animations. Each instance owns its own press state, so dragging from one orb
 // and releasing on another never triggers the wrong one.
 //
-// `tilt` adds a pointer-tracked 3D lean (the orb tips toward the cursor) as framer motion values,
-// so it composes with the layout morph / hover / tap animations instead of fighting them. Springs
-// give it the soft physical follow; fine-pointer + reduced-motion guards keep touch/a11y unchanged.
-const TILT_MAX = 8; // deg — orbs are round and playful; a touch more lean than the flat cards
 function PressMotionButton({
   onActivate,
-  tilt = false,
-  style,
   ...rest
-}: HTMLMotionProps<"button"> & { onActivate?: MouseEventHandler<HTMLButtonElement>; tilt?: boolean }) {
+}: HTMLMotionProps<"button"> & { onActivate?: MouseEventHandler<HTMLButtonElement> }) {
   const press = usePressActivate<HTMLButtonElement>(onActivate);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 260, damping: 20 });
-  const sry = useSpring(ry, { stiffness: 260, damping: 20 });
-  const tiltOn =
-    tilt &&
-    typeof window !== "undefined" &&
-    window.matchMedia("(pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const tiltHandlers = tiltOn
-    ? {
-        onPointerMove: (e: RPointerEvent<HTMLButtonElement>) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          if (!r.width || !r.height) return;
-          rx.set(-(((e.clientY - r.top) / r.height) * 2 - 1) * TILT_MAX);
-          ry.set((((e.clientX - r.left) / r.width) * 2 - 1) * TILT_MAX);
-        },
-        onPointerLeave: () => { rx.set(0); ry.set(0); },
-      }
-    : {};
-  return (
-    <motion.button
-      {...rest}
-      {...press}
-      {...tiltHandlers}
-      style={{ ...style, ...(tiltOn ? { rotateX: srx, rotateY: sry, transformPerspective: 700 } : {}) }}
-    />
-  );
+  return <motion.button {...rest} {...press} />;
+}
+
+// A plain (non-motion) wrapper that carries the pointer tilt. The orbs' transforms are owned by
+// framer's layout projection (shared layoutIds), which discards style rotations — so the lean
+// lives on this wrapper instead: its CSS transform simply multiplies with the child's, and the
+// two systems never fight. Used for both the closed orbs and the expanded disc.
+function TiltWrap({ max, className, style, children }: {
+  max: number; className?: string; style?: React.CSSProperties; children: React.ReactNode;
+}) {
+  const ref = useTilt<HTMLDivElement>({ max });
+  return <div ref={ref} className={className} style={style}>{children}</div>;
 }
 
 export interface SkillBlobGroup {
@@ -323,9 +302,15 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             // floor + slightly tighter fit lets it actually shrink to leave breathing room there.
             const fs = Math.max(mobile ? 6 : 8.5, Math.min((nd.r * 2 * (mobile ? 0.72 : 0.8)) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
             return (
-              <PressMotionButton
+              <TiltWrap
                 key={g.title}
-                tilt
+                max={8}
+                style={{
+                  position: "absolute", left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
+                  pointerEvents: active !== null ? "none" : "auto",
+                }}
+              >
+              <PressMotionButton
                 layoutId={`blob-${i}`}
                 onActivate={() => { if (active === null) savedScroll.current = window.scrollY; setActive(active === i ? null : i); }}
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.85 }}
@@ -342,9 +327,8 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                 }}
                 whileHover={active === null ? { y: -4, scale: 1.035 } : undefined}
                 whileTap={active === null ? { scale: 0.96 } : undefined}
-                className="absolute flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 style={{
-                  left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
                   ...discStyle(sc.hue, dark), color: dark ? sc.solidDark : sc.solid, fontSize: fs, lineHeight: 1.16, letterSpacing: "-0.005em",
                   pointerEvents: active !== null ? "none" : "auto",
                 }}
@@ -356,6 +340,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                   <span className="font-mono text-[10px] opacity-55">{g.items.length}</span>
                 </span>
               </PressMotionButton>
+              </TiltWrap>
             );
           })}
 
@@ -376,6 +361,8 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
               return (
                 <>
                   <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ pointerEvents: "none" }}>
+                    {/* Gentle tilt on the open disc too (subtle: it's large and holds readable text). */}
+                    <TiltWrap max={3} style={{ pointerEvents: "auto" }}>
                     <motion.div
                       layoutId={`blob-${active}`}
                       onClick={() => setActive(null)}
@@ -405,6 +392,7 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                         </div>
                       </motion.div>
                     </motion.div>
+                    </TiltWrap>
                   </div>
                 </>
               );
