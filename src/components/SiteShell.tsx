@@ -20,6 +20,20 @@ import { PERSON } from "@/lib/site";
 // Game (engine + ~115 sprites) loads only when the visitor chooses to enter.
 const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
 
+// One soft water "plip" for the enter-museum splash — the site's single UI sound, tied to its
+// signature moment and used nowhere else. Native Audio, NOT howler: howler ships only inside the
+// lazy game chunk, and one sound isn't worth pulling it into the main bundle. Created on first
+// use (the click gesture satisfies autoplay policies); any failure is silently ignored.
+let plipEl: HTMLAudioElement | null = null;
+function playPlip() {
+  try {
+    plipEl ??= new Audio("/assets/audio/plip.mp3");
+    plipEl.volume = 0.35;
+    plipEl.currentTime = 0;
+    void plipEl.play().catch(() => { /* blocked/unsupported — the splash still reads visually */ });
+  } catch { /* ignore */ }
+}
+
 // Staged cross-fade. Enter: site fades out → world (game background) fades in →
 // player fades in → HUD fades in. Leave reverses it. Each step is one `FADE_MS` beat.
 type Stage =
@@ -157,6 +171,7 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     window.dispatchEvent(new CustomEvent("water:splash", rect
       ? { detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } }
       : undefined));
+    playPlip();
     // Push a marked history entry (preserving Next's router state) with no URL change, so the
     // browser/device Back button leaves the museum and Forward walks back in — invisibly, and
     // clear of the #slug popup deep-link system.
