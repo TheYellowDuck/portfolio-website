@@ -58,11 +58,20 @@ function useIsMobile() {
   );
 }
 
+// A pill link that leans toward the pointer — for buttons rendered inside .map() (each element
+// needs its own hook instance). Small surfaces can take a touch more angle than cards.
+function TiltA(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const ref = useTilt<HTMLAnchorElement>({ max: 5 });
+  return <a ref={ref} {...props} />;
+}
+
 // A quiet "Show all N →" / "Show less" toggle under a grid (N = the live total in that group).
 function ShowAllToggle({ open, total, onClick }: { open: boolean; total: number; onClick: () => void }) {
+  const tiltRef = useTilt<HTMLButtonElement>({ max: 5 });
   return (
     <div className="mt-8 flex justify-center">
       <PressButton
+        ref={tiltRef}
         onClick={onClick}
         className="rounded-full border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-1.5 font-mono text-[12px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
       >
@@ -113,6 +122,11 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
   const aboutText = officeExhibits.find((e) => e.popup?.title === "About Me")?.popup?.description;
   const interests = officeExhibits.find((e) => e.popup?.title === "Interests")?.popup?.description;
   const hasTranscript = officeExhibits.some((e) => e.popup?.type === "transcript");
+  // About: the documents lean like buttons; the bio text leans as one quiet plane (translateZ
+  // can't layer inline text spans, so no internal depth there).
+  const resumeTilt = useTilt<HTMLButtonElement>({ max: 5 });
+  const transcriptTilt = useTilt<HTMLButtonElement>({ max: 5 });
+  const aboutTilt = useTilt<HTMLDivElement>({ max: 2 });
 
   // No bg on the root — the html parchment + the WaterBackground canvas (fixed, -z-10) show through
   // behind the content (the body is transparent). Cards/sections keep their own opaque surfaces.
@@ -238,6 +252,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
       <Section id="about" eyebrow={content.sections.about.eyebrow} title={content.sections.about.title}>
         <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr]">
           <Reveal>
+            <div ref={aboutTilt}>
             <Typewriter
               className="theme-fade-inner block whitespace-pre-wrap text-[15px] leading-relaxed dark:leading-[1.72] text-walnut/85"
               segments={[
@@ -251,14 +266,15 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
                   : []),
               ]}
             />
+            </div>
           </Reveal>
           <Reveal delay={80}>
             <div className="flex flex-col gap-3">
-              <PressButton onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+              <PressButton ref={resumeTilt} onClick={onResume} className="rounded-lg border border-[rgba(122,158,126,0.5)] bg-[rgba(122,158,126,0.1)] px-4 py-3 text-left font-mono text-[13px] text-pine transition-colors hover:bg-[rgba(122,158,126,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                 {content.sections.about.resume}
               </PressButton>
               {hasTranscript && (
-                <PressButton onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
+                <PressButton ref={transcriptTilt} onClick={onTranscript} className="rounded-lg border border-[rgb(var(--c-line-rgb)_/_0.15)] px-4 py-3 text-left font-mono text-[13px] text-walnut/80 transition-colors hover:border-[rgba(122,158,126,0.5)] hover:text-pine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50">
                   {content.sections.about.transcript}
                 </PressButton>
               )}
@@ -276,7 +292,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
             const primary = link.url.startsWith("mailto:");
             return (
               <Reveal key={i} delay={i * 50}>
-                <a
+                <TiltA
                   href={link.url}
                   target={link.url.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
@@ -287,7 +303,7 @@ export default function Portfolio({ onEnter, onResume, onTranscript, onOpenProje
                   }
                 >
                   {e.popup?.title} {primary ? "→" : "↗"}
-                </a>
+                </TiltA>
               </Reveal>
             );
           })}
