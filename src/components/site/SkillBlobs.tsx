@@ -302,15 +302,8 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
             // floor + slightly tighter fit lets it actually shrink to leave breathing room there.
             const fs = Math.max(mobile ? 6 : 8.5, Math.min((nd.r * 2 * (mobile ? 0.72 : 0.8)) / (nd.lw * 0.62), nd.r * 0.34, mobile ? 12 : 14));
             return (
-              <TiltWrap
-                key={g.title}
-                max={8}
-                style={{
-                  position: "absolute", left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
-                  pointerEvents: active !== null ? "none" : "auto",
-                }}
-              >
               <PressMotionButton
+                key={g.title}
                 layoutId={`blob-${i}`}
                 // The whole field is aria-hidden (the sr-only list above is the canonical AT path),
                 // so the orbs must not be tab stops — focusable-inside-aria-hidden is a ghost stop
@@ -331,8 +324,9 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                 }}
                 whileHover={active === null ? { y: -4, scale: 1.035 } : undefined}
                 whileTap={active === null ? { scale: 0.96 } : undefined}
-                className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
+                className="absolute flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50"
                 style={{
+                  left: nd.x - nd.r, top: nd.y - nd.r, width: nd.r * 2, height: nd.r * 2,
                   ...discStyle(sc.hue, dark), color: dark ? sc.solidDark : sc.solid, fontSize: fs, lineHeight: 1.16, letterSpacing: "-0.005em",
                   pointerEvents: active !== null ? "none" : "auto",
                 }}
@@ -344,7 +338,6 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
                   <span className="font-mono text-[10px] opacity-55">{g.items.length}</span>
                 </span>
               </PressMotionButton>
-              </TiltWrap>
             );
           })}
 
