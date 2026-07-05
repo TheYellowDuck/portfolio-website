@@ -152,10 +152,11 @@ export default function SkillBlobs({ groups, note }: { groups: SkillBlobGroup[];
   const copyRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<number | null>(null);
-  // The unzoomed orb field leans as ONE constellation on APPROACH, easing flat once the pointer
-  // is inside — orbs are hover targets, and a rotating plane makes their hit boundaries swim
-  // under the cursor (hover/custom-cursor flicker). calmInside gives both: stir, then settle.
-  const fieldTilt = useTilt<HTMLDivElement>({ max: 2.5, calmInside: true });
+  // The unzoomed orb field leans as ONE constellation — but as a HEAVY, slow surface (tiny
+  // follow weight): it drifts toward its lean instead of chasing the cursor, so the orbs' hover
+  // boundaries move glacially under the pointer and can't flicker the hover/custom cursor the
+  // way a cursor-speed rotation of a big multi-target plane did.
+  const fieldTilt = useTilt<HTMLDivElement>({ max: 2.2, follow: 0.045 });
   const [inView, setInView] = useState(false);
   const [trackH, setTrackH] = useState(0);
   const dark = useDarkMode();

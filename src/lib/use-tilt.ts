@@ -18,7 +18,7 @@ import { useCallback, useEffect, useRef } from "react";
 // `lift` folds a card's Tailwind hover rise into the tilt transform (which overrides the class).
 // Registration no-ops on coarse pointers (touch) and under prefers-reduced-motion.
 const RANGE = 220;     // px past the element's edge where its influence fades to zero
-const FOLLOW = 0.14;   // per-frame lerp toward the target lean — the "weight" of the surface
+const FOLLOW = 0.14;   // default per-frame lerp toward the target lean — the "weight" of a surface
 const EPS = 0.02;      // settle threshold (deg / px)
 const NON_TRANSFORM_TRANSITIONS =
   "border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease, color 300ms ease, opacity 300ms ease";
@@ -27,7 +27,7 @@ interface Entry {
   el: HTMLElement;
   max: number;
   lift: number;
-  calmInside: boolean;                // lean on approach only; flat while the pointer is INSIDE
+  follow: number;                     // per-surface lerp weight (small = heavy, slow surface)
   rx: number; ry: number; lf: number; // current lean (deg, deg, px)
   fl: number;                         // current influence 0..1 (drives the depth layers)
   styled: boolean;                    // inline overrides currently applied
@@ -86,23 +86,18 @@ function tick() {
         const dOut = Math.hypot(Math.max(0, Math.abs(dx) - hw), Math.max(0, Math.abs(dy) - hh));
         if (dOut < RANGE) {
           inRange = true;
-          // calmInside surfaces (the orb field) hold FLAT while the pointer is over them — a big
-          // plane full of hover targets can't rotate under the cursor without its hit boundaries
-          // swimming (hover/custom-cursor flicker). They lean on approach, settle to interact.
-          if (!(e.calmInside && dOut === 0)) {
-            const f = smooth(1 - dOut / RANGE); // 1 over the element → 0 at range's edge
-            tx = -clamp1(dy / hh) * e.max * f;
-            ty = clamp1(dx / hw) * e.max * f;
-            tl = e.lift * f;
-            tf = f;
-          }
+          const f = smooth(1 - dOut / RANGE); // 1 over the element → 0 at range's edge
+          tx = -clamp1(dy / hh) * e.max * f;
+          ty = clamp1(dx / hw) * e.max * f;
+          tl = e.lift * f;
+          tf = f;
         }
       }
     }
-    e.rx += (tx - e.rx) * FOLLOW;
-    e.ry += (ty - e.ry) * FOLLOW;
-    e.lf += (tl - e.lf) * FOLLOW;
-    e.fl += (tf - e.fl) * FOLLOW;
+    e.rx += (tx - e.rx) * e.follow;
+    e.ry += (ty - e.ry) * e.follow;
+    e.lf += (tl - e.lf) * e.follow;
+    e.fl += (tf - e.fl) * e.follow;
     const atRest = tx === 0 && ty === 0 && Math.abs(e.rx) < EPS && Math.abs(e.ry) < EPS && e.lf < EPS && e.fl < EPS;
     if (atRest) {
       if (e.styled) settle(e);
@@ -158,7 +153,7 @@ function ensureListeners() {
   document.addEventListener("visibilitychange", start);
 }
 
-export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, calmInside = false }: { max?: number; lift?: number; calmInside?: boolean } = {}) {
+export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, follow = FOLLOW }: { max?: number; lift?: number; follow?: number } = {}) {
   const entryRef = useRef<Entry | null>(null);
 
   const ref = useCallback((el: T | null) => {
@@ -171,10 +166,10 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ensureListeners();
-    entryRef.current = { el, max, lift, calmInside, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
+    entryRef.current = { el, max, lift, follow, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
     entries.add(entryRef.current);
     start();
-  }, [max, lift, calmInside]);
+  }, [max, lift, follow]);
 
   useEffect(() => () => {
     if (entryRef.current) {
