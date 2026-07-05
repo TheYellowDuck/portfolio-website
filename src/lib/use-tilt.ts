@@ -124,8 +124,8 @@ function tick() {
         const r = e.el.getBoundingClientRect();
         if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw) {
           inRange = true;
-          tx = -gny * e.max;
-          ty = gnx * e.max;
+          tx = gny * e.max;   // tilt up -> lean down
+          ty = -gnx * e.max;  // tilt right -> lean left
           tf = Math.min(1, Math.hypot(gnx, gny));
         }
       }
