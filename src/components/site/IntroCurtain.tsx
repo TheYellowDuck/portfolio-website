@@ -97,7 +97,9 @@ export default function IntroCurtain() {
     <div
       className={`intro-curtain${phase === "out" ? " intro-curtain--out" : ""}`}
       aria-hidden={gate ? undefined : true}
-      style={gate ? { pointerEvents: "auto" } : undefined}
+      // Hits only while SHUT — the fading curtain goes hit-transparent (base CSS is
+      // pointer-events:none), so the cursor's retest reads the page beneath right after the click.
+      style={gate && phase === "shown" ? { pointerEvents: "auto" } : undefined}
     >
       <div className="intro-stage">
         <span className="intro-glow" />

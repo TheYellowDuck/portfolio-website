@@ -103,11 +103,14 @@ export default function CustomCursor() {
         magnetY = r.top + r.height / 2;
       }
     };
+    // Disabled controls read as non-interactive — the greyed door button must not show the dot,
+    // and must flip live when it enables (the mutation retest below re-resolves it).
+    const isDisabled = (el: Element) => el.matches(":disabled, [aria-disabled='true']");
     // Decide the cursor from whatever element is under the pointer.
     const resolve = (el: Element | null) => {
       if (el) {
         const labeled = el.closest("[data-cursor]") as HTMLElement | null;
-        if (labeled) {
+        if (labeled && !isDisabled(labeled)) {
           // Labelled = a popup/zoom/drag trigger (project, skill, doorway, résumé…).
           // The disc still shows, but no magnet — the cursor stays under the pointer
           // so it doesn't yank toward the centre of something that's about to open.
@@ -116,7 +119,7 @@ export default function CustomCursor() {
           return;
         }
         const click = el.closest(CLICKABLE);
-        if (click && !isEditable(click)) {
+        if (click && !isEditable(click) && !isDisabled(click)) {
           // Plain button / link → magnetic (if compact).
           apply("dot", "");
           setMagnet(click);
@@ -174,6 +177,28 @@ export default function CustomCursor() {
     };
     // While scrolling, hide the cursor entirely — it would otherwise float over content
     // sliding past. Once scrolling settles, re-test what's now under the pointer, then show.
+    // The DOM can change UNDER a stationary pointer — a button enables, the curtain fades out
+    // after its click, a popup opens/closes, an orb turns pointer-events:none. Pointer events
+    // won't fire for any of that, so watch for mutations (structure + interactivity attributes —
+    // NOT style, which animations write every frame) and re-test what's beneath the pointer,
+    // debounced so entrance-animation bursts cost one hit-test per beat instead of hundreds.
+    let retestTimer = 0;
+    const retest = () => {
+      if (retestTimer) return;
+      retestTimer = window.setTimeout(() => {
+        retestTimer = 0;
+        if (!started || hidden || document.hidden) return;
+        resolve(document.elementFromPoint(lastX, lastY));
+      }, 120);
+    };
+    const mo = new MutationObserver(retest);
+    mo.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["disabled", "aria-disabled", "data-cursor", "class", "hidden"],
+    });
+
     const onScroll = () => {
       if (!started) return;
       hide();
@@ -235,6 +260,8 @@ export default function CustomCursor() {
     document.addEventListener("visibilitychange", onVisible);
 
     return () => {
+      mo.disconnect();
+      clearTimeout(retestTimer);
       cancelAnimationFrame(raf);
       cancelAnimationFrame(themeRaf);
       clearTimeout(scrollEndTimer);
