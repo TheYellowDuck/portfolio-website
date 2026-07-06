@@ -197,22 +197,14 @@ html.dark {
   .interact-glow { animation: none; box-shadow: 0 6px 18px rgba(28,21,8,0.40), 0 0 20px 4px rgba(240,206,120,0.6); }
 }
 
-/* Smooth light/dark swap. Preferred: a View Transition (use-dark-mode.ts) — one composited
-   snapshot cross-fade, no per-element work. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.35s;
-}
-/* Fallback for browsers without View Transitions — `.theme-transition` is added to <html> only
-   during the toggle (then removed), so colors cross-fade without slowing normal hover states.
-   Deliberately NO box-shadow/fill here: they force full repaints per frame on every element,
-   which is what made the swap crawl on Linux Chrome (shadows barely differ between themes,
-   and the icons use stroke/currentColor, which `color` already carries). */
+/* Smooth light/dark swap — `.theme-transition` is added to <html> only during the
+   toggle (then removed), so colors cross-fade without slowing normal hover states. */
 .theme-transition,
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
-  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease !important;
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease,
+    fill 0.35s ease, box-shadow 0.35s ease !important;
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-transition, .theme-transition * { transition: none !important; }
