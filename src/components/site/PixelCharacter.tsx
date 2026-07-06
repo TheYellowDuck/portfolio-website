@@ -17,6 +17,12 @@ function frameSrc(state: "idle" | "walk", dir: Dir, i: number) {
   return `/assets/sprites/character/states/standing/animations/${state}/${dir}/frame_${String(i).padStart(3, "0")}.png`;
 }
 
+/** The exact frame URLs a given pose renders — the intro curtain preloads the doorway's
+ *  (idle/south) set so the character can never pop in after the door opens. */
+export function characterFrameSrcs(state: "idle" | "walk" = "idle", dir: Dir = "south"): string[] {
+  return Array.from({ length: FRAME_COUNT[state] }, (_, i) => frameSrc(state, dir, i));
+}
+
 interface PixelCharacterProps {
   state?: "idle" | "walk";
   dir?: Dir;

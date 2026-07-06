@@ -7,12 +7,14 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";
 import { playPlip, primePlip } from "@/lib/plip";
+import { characterFrameSrcs } from "@/components/site/PixelCharacter";
 import { releaseIntro } from "@/lib/intro-gate";
 import { PressButton } from "@/components/PressButton";
 
 // The intro curtain covers the first paint, then GATES on a click/tap: an enter button (greyed
-// until the page is actually ready — web fonts loaded, since the display face is what flickers —
-// or the safety timer) holds the door on every platform. The entering gesture is a real user
+// until the page is actually READY — web fonts loaded, the drop sound fetched + decoded, and the
+// doorway character's frames in cache; or the safety timer) holds the door on every platform.
+// Below-the-fold assets (card videos/posters, the game) stay lazy by design and never gate. The entering gesture is a real user
 // activation, so it carries the things browsers gate behind one: the water's plip sound plays
 // here, and on iOS the gyro-tilt motion prompt rides the same tap (via use-tilt's window-level
 // click arming; no wiring needed). Reduced-motion keeps the old auto-lift path — its curtain is
@@ -43,13 +45,26 @@ export default function IntroCurtain() {
 
   useEffect(() => {
     let cancelled = false;
-    primePlip(); // fetch + decode the drop sound NOW, so the enter click plays it with zero lag
+    // Everything the first view needs, loading in parallel behind the curtain. Each settles on
+    // failure too (a 404'd sprite must never hold the door shut), and the safety race caps the
+    // whole wait regardless.
+    const loadImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = src;
+      });
+    const assetsReady = Promise.all([
+      document.fonts?.ready ?? Promise.resolve(), // the display face is what flickers
+      primePlip(),                                // drop sound fetched + decoded → zero-lag click
+      ...characterFrameSrcs().map(loadImage),     // the doorway character (the fold's one image)
+    ]).then(() => undefined);
     // The lift decision reads matchMedia LOCALLY (not the hook's state), so it's already correct
     // even if a warm font cache resolves fonts.ready before React re-renders with `gate`.
     const gated = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const fontsReady = document.fonts?.ready ?? Promise.resolve();
     const safety = new Promise<void>((r) => setTimeout(r, SAFETY_MS));
-    Promise.race([fontsReady, safety]).then(() => {
+    Promise.race([assetsReady, safety]).then(() => {
       if (cancelled) return;
       if (gated) setReady(true); // enable the button; the visitor opens the door
       else { releaseIntro(); setPhase("out"); } // reduced-motion: lift on its own (curtain hidden anyway)

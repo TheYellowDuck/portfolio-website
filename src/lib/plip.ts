@@ -17,28 +17,35 @@ const VOLUME = 0.15; // soft — an accent under the water, not a foreground sou
 let ctx: AudioContext | null = null;
 let buffer: AudioBuffer | null = null;
 let fallback: HTMLAudioElement | null = null;
-let primed = false;
+let primePromise: Promise<void> | null = null;
 
-/** Fetch + decode ahead of time (the curtain calls this on mount, long before the click). */
-export function primePlip() {
-  if (primed || typeof window === "undefined") return;
-  primed = true;
+/** Fetch + decode ahead of time (the curtain calls this on mount, long before the click).
+ *  Returns a promise that SETTLES either way — the enter button awaits it, and a missing or
+ *  undecodable sound must never hold the door shut. */
+export function primePlip(): Promise<void> {
+  if (primePromise) return primePromise;
+  if (typeof window === "undefined") return Promise.resolve();
   try {
     const AC = window.AudioContext ?? (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (AC) {
       ctx = new AC();
-      fetch(SRC)
+      primePromise = fetch(SRC)
         .then((r) => r.arrayBuffer())
         .then((ab) => ctx!.decodeAudioData(ab))
         .then((b) => { buffer = b; })
         .catch(() => { buffer = null; /* the HTMLAudio fallback below still works */ });
-      return;
+      return primePromise;
     }
   } catch { /* fall through to the media element */ }
-  fallback = new Audio(SRC);
-  fallback.preload = "auto";
-  fallback.volume = VOLUME;
-  fallback.load();
+  primePromise = new Promise<void>((resolve) => {
+    fallback = new Audio(SRC);
+    fallback.preload = "auto";
+    fallback.volume = VOLUME;
+    fallback.addEventListener("canplaythrough", () => resolve(), { once: true });
+    fallback.addEventListener("error", () => resolve(), { once: true });
+    fallback.load();
+  });
+  return primePromise;
 }
 
 /** Play the drop. Callers ignore rejections — the water still reads visually. */
