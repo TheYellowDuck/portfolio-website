@@ -31,10 +31,10 @@ export default function Hero({ onEnter, onResume, currentStatus }: HeroProps) {
   // the (unclipped) button wrapper, NOT the panel: the panel's overflow-hidden would flatten any
   // internal 3D, so the character is re-parented beside it on her own depth plane — she pops OUT
   // of the doorway while the room leans behind her.
-  const doorTilt = useTilt<HTMLButtonElement>({ max: 9, lift: 14 });
+  const doorTilt = useTilt<HTMLButtonElement>({ max: 9, lift: 14, gyro: true });
   // The identity block is a 3D scene of its own: a whisper of lean, with the name floating
   // highest, then eyebrow/tagline/links on descending planes — the hero pops without a card.
-  const identityTilt = useTilt<HTMLDivElement>({ max: 4 });
+  const identityTilt = useTilt<HTMLDivElement>({ max: 4, gyro: true });
   return (
     <header className="mx-auto flex min-h-[88svh] max-w-[1080px] flex-col justify-center gap-12 px-6 py-20 md:flex-row md:items-center md:gap-16">
       {/* Left: identity */}
