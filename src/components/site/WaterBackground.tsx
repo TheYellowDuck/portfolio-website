@@ -193,14 +193,19 @@ export default function WaterBackground() {
     // for the curtain's enter click when the gate is armed, so the first ripple IS the entrance.
     let disposed = false;
     const splash = () => { if (!disposed) disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3); };
-    if (introArmed()) introGate().then(splash);
+    // Born 250ms into the curtain's 600ms fade: late enough that the ripple's BIRTH is visible
+    // (not an already-spread ring), early enough to still read as one beat with the click.
+    if (introArmed()) introGate().then(() => setTimeout(splash, 250));
     else splash();
 
     let frame = 0;
     // Advance the wave field ONE fixed step (ambient impulse + two-buffer propagation + buffer swap).
     const advance = () => {
       // Occasional gentle ambient ripple in the VISIBLE viewport so the water is never quite still.
-      if (frame++ % AMBIENT_EVERY === 0) {
+      // Pre-increment: the counter must NOT hit on the very first step — with the intro gate, that
+      // step lands exactly on the enter click, and a random ambient ripple would upstage the
+      // centre splash as "the first ripple".
+      if (++frame % AMBIENT_EVERY === 0) {
         disturb(fx(Math.random() * window.innerWidth), fy(Math.random() * window.innerHeight), AMBIENT_FORCE, 2);
       }
       for (let y = 1; y < rows - 1; y++) {
