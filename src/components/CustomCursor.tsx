@@ -224,7 +224,11 @@ export default function CustomCursor() {
       void root.offsetWidth;
       root.classList.add("has-custom-cursor");
     };
+    // The dropped-cursor bug this works around is WebKit's; the double forced reflow is pure
+    // cost on other engines (it was amplifying the Linux Chrome theme-swap jank), so gate it.
+    const isWebKit = "GestureEvent" in window;
     const refreshCursor = () => {
+      if (!isWebKit) return;
       reassertHide();
       cancelAnimationFrame(themeRaf);
       themeRaf = requestAnimationFrame(reassertHide);
