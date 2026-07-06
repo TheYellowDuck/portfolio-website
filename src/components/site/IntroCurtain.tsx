@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";
-import { playPlip } from "@/lib/plip";
+import { playPlip, primePlip } from "@/lib/plip";
 import { releaseIntro } from "@/lib/intro-gate";
 import { PressButton } from "@/components/PressButton";
 
@@ -43,6 +43,7 @@ export default function IntroCurtain() {
 
   useEffect(() => {
     let cancelled = false;
+    primePlip(); // fetch + decode the drop sound NOW, so the enter click plays it with zero lag
     // The lift decision reads matchMedia LOCALLY (not the hook's state), so it's already correct
     // even if a warm font cache resolves fonts.ready before React re-renders with `gate`.
     const gated = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
