@@ -320,6 +320,148 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "RLHF Pipeline",
+      "description": "An end-to-end Reinforcement Learning from Human Feedback (RLHF) pipeline that reproduces the post-training recipe behind aligned large language models — supervised fine-tuning → reward modeling → PPO — with the reinforcement-learning core written from scratch in PyTorch: generalized advantage estimation (GAE), the clipped policy-gradient surrogate, a per-token KL-to-reference penalty, and an adaptive KL controller. It also implements DPO and GRPO as modern alternatives, plus LoRA parameter-efficient fine-tuning, multi-GPU training, and an independent LLM-as-judge evaluation. Built on HuggingFace Transformers for the backbone models and tokenizers; every reward-modeling and RL component is hand-implemented, not wrapped from a higher-level library. Three alignment methods, one codebase — PPO (reward-model-based RL), DPO (reward-model-free), and GRPO (critic-free, DeepSeek-style).; PPO written from scratch — on-policy rollouts, GAE, the clipped surrogate objective, clipped value loss, entropy bonus, per-token KL-to-reference reward shaping, and an adaptive KL controller.; Reward model — a scalar reward head on a pretrained trunk, trained with the Bradley-Terry pairwise preference loss, scored at the last real token (robust to left/right padding).; Supervised fine-tuning — teacher forcing with prompt-masked labels as the policy initializer and PPO reference.; Parameter-efficient fine-tuning — LoRA adapters everywhere via PEFT; the frozen RL reference is recovered by disabling the adapter (no second copy of weights).; Scales out — multi-GPU data parallelism via HuggingFace Accelerate (DDP-ready) and gradient checkpointing for the supervised trainers.; RL stability knobs — running reward normalization, length and missing-EOS penalties to curb reward hacking, and KL-vs-reward logging.; Checkpoint resume — optimizer, global step, and KL-controller state save and restore for long runs.; Independent evaluation — an LLM-as-judge win-rate computed via the Anthropic Claude API with position-bias control, alongside reward-model accuracy.; Optional fast rollouts — a flag-gated vLLM generation backend that auto-falls back to HuggingFace generation if unavailable.; Validated to actually optimize — unit tests for the RL/RM math plus an end-to-end harness that proves the reward model learns a separable signal and a PPO step increases the log-prob of positive-advantage tokens.; Laptop-to-GPU — runs a tiny end-to-end smoke test on a CPU in seconds; trains real models on a free Kaggle GPU. The repository mirrors the standard post-training stack. The RL and reward-modeling logic (GAE, the PPO surrogate, KL shaping, the Bradley-Terry / DPO / GRPO objectives) is implemented by hand; HuggingFace Transformers supplies only the pretrained backbones and tokenizers, and PEFT supplies optional LoRA. Reward model. A scalar head reads the trunk's last non-pad hidden state and is trained with −log σ(rchosen − rrejected), the maximum-likelihood objective of the Bradley-Terry preference model.; PPO reward shaping. Each response token's reward is a KL-to-reference penalty −β·(log π − log πref); the scalar reward-model score is added at the final token. β is adapted toward a target KL, which keeps the policy from drifting off-distribution while chasing reward (reward hacking).; Advantages. GAE(γ, λ) over the value head's per-token estimates, then whitened. Token/value alignment is handled explicitly: the log-prob and value of response token j come from the model output at position j−1.; DPO. Optimizes the same Bradley-Terry preference likelihood but with the implicit reward β·log(π/πref), removing the separate reward model and RL loop. Supports sigmoid / IPO / hinge losses and optional length normalization.; GRPO. Replaces the value critic with a group baseline — sample G responses per prompt, advantage = (reward − group mean) / group std — with an unbiased k3 KL penalty. Cheaper and stable; the DeepSeek-R1 recipe. Engineering notes.",
+      "tech": [
+        "Python",
+        "Jupyter Notebook",
+        "pip",
+        "NumPy",
+        "PyTorch",
+        "Anthropic API",
+        "Transformers",
+        "Testing",
+        "Reinforcement Learning from Human Feedback (RLHF)",
+        "Proximal Policy Optimization (PPO)",
+        "Policy-gradient methods",
+        "Reward modeling",
+        "Generalized Advantage Estimation (GAE)",
+        "Adaptive KL control",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
+        "Supervised fine-tuning (SFT)",
+        "Deep learning with PyTorch",
+        "HuggingFace Transformers",
+        "Parameter-efficient fine-tuning",
+        "Distributed / multi-GPU training",
+        "Numerical stability",
+        "LLM-as-judge evaluation",
+        "Reward-hacking mitigation",
+        "Checkpointing and resumability",
+        "Unit testing and validation harnesses",
+        "Software design",
+        "Reproducibility and static analysis"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python",
+            "Jupyter Notebook"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "Anthropic API",
+            "Transformers",
+            "Reinforcement Learning from Human Feedback (RLHF)",
+            "Policy-gradient methods",
+            "Reward modeling",
+            "Generalized Advantage Estimation (GAE)",
+            "Adaptive KL control",
+            "Supervised fine-tuning (SFT)",
+            "Deep learning with PyTorch",
+            "HuggingFace Transformers",
+            "Parameter-efficient fine-tuning",
+            "LLM-as-judge evaluation",
+            "Reward-hacking mitigation",
+            "Machine Learning",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Proximal Policy Optimization (PPO)",
+            "Direct Preference Optimization (DPO)",
+            "Group Relative Policy Optimization (GRPO)"
+          ]
+        },
+        {
+          "category": "Statistics & Evaluation",
+          "items": [
+            "Reproducibility and static analysis",
+            "Statistics & Evaluation"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Distributed / multi-GPU training"
+          ]
+        },
+        {
+          "category": "Compilers & Languages",
+          "items": [
+            "Compilers & Languages"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Software design"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Unit testing and validation harnesses"
+          ]
+        },
+        {
+          "category": "Systems & Performance",
+          "items": [
+            "Numerical stability"
+          ]
+        },
+        {
+          "category": "Data & Visualization",
+          "items": [
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Checkpointing and resumability"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/RLHF-pipeline"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Web Agent",
       "description": "An autonomous LLM web agent built from scratch — a ReAct + reflection loop that drives a real headless browser (Playwright) over an accessibility-tree observation layer — paired with an honest evaluation harness over WebArena and Online-Mind2Web. The LLM layer is provider-agnostic (native Anthropic Claude / OpenAI / Gemini adapters plus a LiteLLM universal adapter for any other model), and the harness reports Wilson confidence intervals, pass@k, a failure taxonomy, and LLM-as-judge scoring. The scaffold is table stakes; the signal is the measurement — quantifying how much of any headline web-agent number comes from scoring methodology and task curation rather than capability. Claude Sonnet 4.6 driving the agent on a live Wikipedia task — search → navigate → extract → answer. (Frames from a real captured run.) action space, memory, and a ReAct loop; no agent-framework wrapper. ON vs OFF on identical tasks (the headline engineering contribution). LiteLLM universal adapter for any other model; swapping models is a config change. text, and pagination detection, with an optional Set-of-Marks screenshot modality. Online-Mind2Web LLM-as-judge, with 3-valued logic that never silently passes the unverifiable. taxonomy, and Matplotlib/pandas charts, all from reproducible JSONL trajectories. scoring, a verify-before-done gate, and site confinement. prompt caching. shopping subset the agent scores ~0.43 exact-match; a fair full-suite number would be mid-teens–30% (vs production ~60%, SOTA 71.6%, human ~78%). A solid from-scratch scaffold, not a production agent — and the writeup says exactly that. measurement/mechanism, not raw capability: +14pt from implementing WebArena's own fuzzymatch LLM scoring (I'd been under-counting \"N/A\" answers), +4pt from the one research-identified lever (an AgentOccam-style note scratchpad that cracked a 14-item extraction task). offline cross-evaluator audit holds the agent fixed and varies only the scorer: a deterministic, judge-free type-aware re-score lifts the 24-task WebArena number 0.43 → 0.61 (matching the LLM judge), and the substring-vs-type-aware disagreement is 100% one-directional (κ = 0.66) — substring systematically under-counts. That's the rule-based-under-counts direction (AgentRewardBench); the lenient WebJudge 100% on the realistic slice is the over-counts direction (Online-Mind2Web). Neither matches expert humans. scoring (strict exact-match vs lenient LLM judge), not venue — the same agent reads ~0.6 or ~1.0 depending on how you score it. but a cheaper budget/commit fix captured most of it; on saturated slices ON ≈ OFF. lowest cost; Opus matches at ~2×; Haiku is a false economy (worse and pricier). Bigger ≠ better. reported negative result); a real sandbox found three agent bugs the synthetic tests missed (all fixed). Full blow-by-blow numbers, CIs, and every caveat are in Measured results below. Every component is small and explainable: browser control, an accessibility-tree observation layer, a typed action space, a model-agnostic LLM client, and a ReAct + reflection loop. agent/ never imports eval/ — the agent doesn't know it's being benchmarked, which is what keeps the measurement honest and the agent reusable. testable module rather than a black-box framework call. it can be ablated ON vs OFF on the same tasks. adapters; any other model works through the LiteLLM universal adapter (Mistral, Llama via Ollama, Bedrock, Groq, …) via the adapter + factory pattern. Observations are a numbered list of interactable elements; the model can only act on a ref it actually saw, so hallucinated targets are caught before execution. The screenshot + vision modality is a fallback (fires when the a11y tree is empty/sparse or the agent is stuck) and how often it fires is a tracked metric. ReAct agent loop — perceive → plan → act → reflect cycle with step-budgeted termination; Reflection / self-correction — ablatable post-action self-critique that feeds the next plan;",
       "tech": [
@@ -1235,150 +1377,7 @@ export const generatedMainHall: Exhibit[] = [
   }
 ];
 
-export const generatedInProgress: Exhibit[] = [
-  {
-    "popup": {
-      "title": "RLHF Pipeline",
-      "description": "An end-to-end Reinforcement Learning from Human Feedback (RLHF) pipeline that reproduces the post-training recipe behind aligned large language models — supervised fine-tuning → reward modeling → PPO — with the reinforcement-learning core written from scratch in PyTorch: generalized advantage estimation (GAE), the clipped policy-gradient surrogate, a per-token KL-to-reference penalty, and an adaptive KL controller. It also implements DPO and GRPO as modern alternatives, plus LoRA parameter-efficient fine-tuning, multi-GPU training, and an independent LLM-as-judge evaluation. Built on HuggingFace Transformers for the backbone models and tokenizers; every reward-modeling and RL component is hand-implemented, not wrapped from a higher-level library. Three alignment methods, one codebase — PPO (reward-model-based RL), DPO (reward-model-free), and GRPO (critic-free, DeepSeek-style).; PPO written from scratch — on-policy rollouts, GAE, the clipped surrogate objective, clipped value loss, entropy bonus, per-token KL-to-reference reward shaping, and an adaptive KL controller.; Reward model — a scalar reward head on a pretrained trunk, trained with the Bradley-Terry pairwise preference loss, scored at the last real token (robust to left/right padding).; Supervised fine-tuning — teacher forcing with prompt-masked labels as the policy initializer and PPO reference.; Parameter-efficient fine-tuning — LoRA adapters everywhere via PEFT; the frozen RL reference is recovered by disabling the adapter (no second copy of weights).; Scales out — multi-GPU data parallelism via HuggingFace Accelerate (DDP-ready) and gradient checkpointing for the supervised trainers.; RL stability knobs — running reward normalization, length and missing-EOS penalties to curb reward hacking, and KL-vs-reward logging.; Checkpoint resume — optimizer, global step, and KL-controller state save and restore for long runs.; Independent evaluation — an LLM-as-judge win-rate computed via the Anthropic Claude API with position-bias control, alongside reward-model accuracy.; Optional fast rollouts — a flag-gated vLLM generation backend that auto-falls back to HuggingFace generation if unavailable.; Validated to actually optimize — unit tests for the RL/RM math plus an end-to-end harness that proves the reward model learns a separable signal and a PPO step increases the log-prob of positive-advantage tokens.; Laptop-to-GPU — runs a tiny end-to-end smoke test on a CPU in seconds; trains real models on a free Kaggle GPU. The repository mirrors the standard post-training stack. The RL and reward-modeling logic (GAE, the PPO surrogate, KL shaping, the Bradley-Terry / DPO / GRPO objectives) is implemented by hand; HuggingFace Transformers supplies only the pretrained backbones and tokenizers, and PEFT supplies optional LoRA. Reward model. A scalar head reads the trunk's last non-pad hidden state and is trained with −log σ(rchosen − rrejected), the maximum-likelihood objective of the Bradley-Terry preference model.; PPO reward shaping. Each response token's reward is a KL-to-reference penalty −β·(log π − log πref); the scalar reward-model score is added at the final token. β is adapted toward a target KL, which keeps the policy from drifting off-distribution while chasing reward (reward hacking).; Advantages. GAE(γ, λ) over the value head's per-token estimates, then whitened. Token/value alignment is handled explicitly: the log-prob and value of response token j come from the model output at position j−1.; DPO. Optimizes the same Bradley-Terry preference likelihood but with the implicit reward β·log(π/πref), removing the separate reward model and RL loop. Supports sigmoid / IPO / hinge losses and optional length normalization.; GRPO. Replaces the value critic with a group baseline — sample G responses per prompt, advantage = (reward − group mean) / group std — with an unbiased k3 KL penalty. Cheaper and stable; the DeepSeek-R1 recipe. Engineering notes.",
-      "tech": [
-        "Python",
-        "Jupyter Notebook",
-        "pip",
-        "NumPy",
-        "PyTorch",
-        "Anthropic API",
-        "Transformers",
-        "Testing",
-        "Reinforcement Learning from Human Feedback (RLHF)",
-        "Proximal Policy Optimization (PPO)",
-        "Policy-gradient methods",
-        "Reward modeling",
-        "Generalized Advantage Estimation (GAE)",
-        "Adaptive KL control",
-        "Direct Preference Optimization (DPO)",
-        "Group Relative Policy Optimization (GRPO)",
-        "Supervised fine-tuning (SFT)",
-        "Deep learning with PyTorch",
-        "HuggingFace Transformers",
-        "Parameter-efficient fine-tuning",
-        "Distributed / multi-GPU training",
-        "Numerical stability",
-        "LLM-as-judge evaluation",
-        "Reward-hacking mitigation",
-        "Checkpointing and resumability",
-        "Unit testing and validation harnesses",
-        "Software design",
-        "Reproducibility and static analysis"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python",
-            "Jupyter Notebook"
-          ]
-        },
-        {
-          "category": "ML / Data",
-          "items": [
-            "NumPy",
-            "PyTorch"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "pip"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "Anthropic API",
-            "Transformers",
-            "Reinforcement Learning from Human Feedback (RLHF)",
-            "Policy-gradient methods",
-            "Reward modeling",
-            "Generalized Advantage Estimation (GAE)",
-            "Adaptive KL control",
-            "Supervised fine-tuning (SFT)",
-            "Deep learning with PyTorch",
-            "HuggingFace Transformers",
-            "Parameter-efficient fine-tuning",
-            "LLM-as-judge evaluation",
-            "Reward-hacking mitigation",
-            "Machine Learning",
-            "Generative AI / LLMs"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Proximal Policy Optimization (PPO)",
-            "Direct Preference Optimization (DPO)",
-            "Group Relative Policy Optimization (GRPO)"
-          ]
-        },
-        {
-          "category": "Statistics & Evaluation",
-          "items": [
-            "Reproducibility and static analysis",
-            "Statistics & Evaluation"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Distributed / multi-GPU training"
-          ]
-        },
-        {
-          "category": "Compilers & Languages",
-          "items": [
-            "Compilers & Languages"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Software design"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing",
-            "Unit testing and validation harnesses"
-          ]
-        },
-        {
-          "category": "Systems & Performance",
-          "items": [
-            "Numerical stability"
-          ]
-        },
-        {
-          "category": "Data & Visualization",
-          "items": [
-            "Data Analysis"
-          ]
-        },
-        {
-          "category": "Reliability & Ops",
-          "items": [
-            "Checkpointing and resumability"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/RLHF-pipeline"
-        }
-      ]
-    }
-  }
-];
+export const generatedInProgress: Exhibit[] = [];
 
 export const generatedArchive: Exhibit[] = [
   {
@@ -2433,16 +2432,16 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
+        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
         "Java",
         "C++",
-        "Python",
         "Processing",
         "C",
         "Kotlin",
-        "CSS",
-        "Jupyter Notebook"
+        "CSS"
       ]
     }
   },
@@ -2450,17 +2449,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "AI & ML",
       "tech": [
-        "Probabilistic reasoning",
-        "Computer Vision",
-        "OpenAI API",
         "Anthropic API",
         "Transformers",
-        "LLM application development",
-        "Structured outputs",
-        "Semantic Search & Embeddings",
-        "Hierarchical classification",
-        "Machine Learning",
-        "Generative AI / LLMs",
         "Reinforcement Learning from Human Feedback (RLHF)",
         "Policy-gradient methods",
         "Reward modeling",
@@ -2471,6 +2461,15 @@ export const generatedSkills: Exhibit[] = [
         "Parameter-efficient fine-tuning",
         "LLM-as-Judge Evaluation",
         "Reward-hacking mitigation",
+        "Machine Learning",
+        "Generative AI / LLMs",
+        "Probabilistic reasoning",
+        "Computer Vision",
+        "OpenAI API",
+        "LLM application development",
+        "Structured outputs",
+        "Semantic Search & Embeddings",
+        "Hierarchical classification",
         "Retrieval-Augmented Generation (RAG)",
         "Cross-encoder reranking",
         "Listwise LLM reranking",
@@ -2493,6 +2492,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "Proximal Policy Optimization (PPO)",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
         "A* Pathfinding",
         "Constraint-propagation solver",
         "Algorithms & Data Structures",
@@ -2516,9 +2518,6 @@ export const generatedSkills: Exhibit[] = [
         "Cache optimization",
         "Data Structures",
         "Graph traversal & validation",
-        "Proximal Policy Optimization (PPO)",
-        "Direct Preference Optimization (DPO)",
-        "Group Relative Policy Optimization (GRPO)",
         "Hybrid search",
         "Code graph construction"
       ]
@@ -2542,6 +2541,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
+        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
@@ -2553,7 +2553,6 @@ export const generatedSkills: Exhibit[] = [
         "Thread-safe state",
         "Wait-free synchronization",
         "Distributed Systems",
-        "Distributed / multi-GPU training",
         "Parallel evaluation"
       ]
     }
@@ -2584,6 +2583,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Systems & Performance",
       "tech": [
+        "Numerical stability",
         "RAII & smart pointers",
         "Modern C++20",
         "Bitmasking & state encoding",
@@ -2597,8 +2597,7 @@ export const generatedSkills: Exhibit[] = [
         "Fuzzing",
         "Sanitizers",
         "C++",
-        "C++ fundamentals",
-        "Numerical stability"
+        "C++ fundamentals"
       ]
     }
   },
@@ -2720,6 +2719,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
+        "Software design",
         "Game engine architecture",
         "Object-Oriented Design",
         "Event-driven programming",
@@ -2745,7 +2745,6 @@ export const generatedSkills: Exhibit[] = [
         "Component reuse",
         "Lifecycle awareness",
         "Provider abstraction (strategy pattern)",
-        "Software design",
         "Factory pattern"
       ]
     }
@@ -2754,10 +2753,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
+        "Testing",
         "CI/CD & DevOps",
         "JAR Packaging",
         "Cross-Platform Builds",
-        "Testing",
         "Packaging",
         "Property-Based Testing",
         "Debugging with invariants",
@@ -2773,6 +2772,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
+        "Checkpointing and resumability",
         "Accessibility and performance",
         "Performance optimisation",
         "Robust error handling",
@@ -2783,7 +2783,6 @@ export const generatedSkills: Exhibit[] = [
         "Cost engineering",
         "Privacy engineering",
         "Automatic dependency management",
-        "Checkpointing and resumability",
         "Incremental computation",
         "Resilience engineering",
         "Failure taxonomy"
@@ -2807,8 +2806,8 @@ export const generatedSkills: Exhibit[] = [
       "title": "ML / Data",
       "tech": [
         "NumPy",
-        "scikit-learn",
         "PyTorch",
+        "scikit-learn",
         "Pandas",
         "Matplotlib",
         "SciPy"
@@ -2819,12 +2818,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
+        "Data Analysis",
         "PDF parsing",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
         "Pillow",
-        "Data Analysis",
         "Interactive data visualization",
         "Data visualization"
       ]
@@ -2851,13 +2850,13 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
+        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
         "CMake",
-        "pip",
         "Selenium",
         "Gradle",
         "JUnit",
@@ -2913,5 +2912,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-07-05T08:43:07.434Z"
+  "syncedAt": "2026-07-06T09:57:56.530Z"
 };
