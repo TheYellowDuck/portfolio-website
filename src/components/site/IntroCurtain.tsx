@@ -3,59 +3,54 @@
 
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";
+import { playPlip } from "@/lib/plip";
 import { PressButton } from "@/components/PressButton";
 
-// The intro curtain covers the first paint and lifts only once the page is actually ready — web
-// fonts loaded (the display face is what flickers) — rather than after a fixed timer, so it never
-// reveals half-loaded text on a slow connection or lingers on a fast one. A safety timeout
-// guarantees readiness even if font loading stalls. Reduced-motion hides it via CSS; no-JS hides
-// it via the <noscript> rule in layout.
-//
-// TOUCH devices gate on a TAP instead of auto-lifting: a "Tap to enter" button (greyed until
-// ready) holds the curtain. That tap is a genuine user activation — the one thing iOS accepts for
-// DeviceOrientationEvent.requestPermission — so the gyro tilt's motion prompt rides the entry tap
-// (via use-tilt's window-level click arming; no wiring needed here). Desktop is unchanged.
+// The intro curtain covers the first paint, then GATES on a click/tap: an enter button (greyed
+// until the page is actually ready — web fonts loaded, since the display face is what flickers —
+// or the safety timer) holds the door on every platform. The entering gesture is a real user
+// activation, so it carries the things browsers gate behind one: the water's plip sound plays
+// here, and on iOS the gyro-tilt motion prompt rides the same tap (via use-tilt's window-level
+// click arming; no wiring needed). Reduced-motion keeps the old auto-lift path — its curtain is
+// display:none via CSS, so a gate would hold an invisible door shut (and water/gyro are off
+// there anyway). No-JS hides the curtain via the <noscript> rule in layout.
 const SAFETY_MS = 3500; // consider the page ready regardless if fonts.ready never settles
 const FADE_MS = 600;
 
-// Gate on touch, but NOT under reduced-motion: the curtain is display:none there (CSS), so a gate
-// would hold an invisible door shut forever (and the gyro is off under reduced-motion anyway).
-// Server snapshot is false → the SSR curtain has no button; it appears right after hydration.
-const GATE_Q = ["(pointer: coarse)", "(prefers-reduced-motion: reduce)"] as const;
-function useGate() {
+// SSR snapshot is false → the server-rendered curtain has no button; it appears at hydration.
+function useMedia(query: string, invert = false) {
   return useSyncExternalStore(
     (cb) => {
-      const mqls = GATE_Q.map((q) => window.matchMedia(q));
-      mqls.forEach((m) => m.addEventListener("change", cb));
-      return () => mqls.forEach((m) => m.removeEventListener("change", cb));
+      const m = window.matchMedia(query);
+      m.addEventListener("change", cb);
+      return () => m.removeEventListener("change", cb);
     },
-    () => window.matchMedia(GATE_Q[0]).matches && !window.matchMedia(GATE_Q[1]).matches,
+    () => window.matchMedia(query).matches !== invert,
     () => false,
   );
 }
 
 export default function IntroCurtain() {
   const [phase, setPhase] = useState<"shown" | "out" | "gone">("shown");
-  const gate = useGate();                    // touch → hold for the tap; desktop → auto-lift
   const [ready, setReady] = useState(false); // fonts loaded (or safety fired) → button enables
+  const gate = useMedia("(prefers-reduced-motion: reduce)", true); // gate everyone except RM
+  const touch = useMedia("(pointer: coarse)");
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let cancelled = false;
     // The lift decision reads matchMedia LOCALLY (not the hook's state), so it's already correct
     // even if a warm font cache resolves fonts.ready before React re-renders with `gate`.
-    const gated =
-      window.matchMedia?.("(pointer: coarse)").matches === true &&
-      !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
+    const gated = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
     const safety = new Promise<void>((r) => setTimeout(r, SAFETY_MS));
     Promise.race([fontsReady, safety]).then(() => {
       if (cancelled) return;
       if (gated) setReady(true); // enable the button; the visitor opens the door
-      else setPhase("out");      // desktop: lift on its own, as always
+      else setPhase("out");      // reduced-motion: lift on its own (the curtain is hidden anyway)
     });
     return () => {
       cancelled = true;
@@ -72,12 +67,24 @@ export default function IntroCurtain() {
     };
   }, [gate, phase]);
 
+  // Keyboard path: the door is the page's one interactive element while shut — focus it when it
+  // unlocks so Enter opens the site without a Tab hunt.
+  useEffect(() => {
+    if (ready && gate) btnRef.current?.focus({ preventScroll: true });
+  }, [ready, gate]);
+
   // Unmount after the fade so it leaves nothing behind in the tree.
   useEffect(() => {
     if (phase !== "out") return;
     const t = setTimeout(() => setPhase("gone"), FADE_MS);
     return () => clearTimeout(t);
   }, [phase]);
+
+  const enter = () => {
+    if (!ready || phase !== "shown") return;
+    playPlip().catch(() => { /* blocked/unsupported — the splash still reads visually */ });
+    setPhase("out");
+  };
 
   if (phase === "gone") return null;
 
@@ -98,7 +105,8 @@ export default function IntroCurtain() {
         <span className="intro-line" />
         {gate && (
           <PressButton
-            onClick={() => { if (ready && phase === "shown") setPhase("out"); }}
+            ref={btnRef}
+            onClick={enter}
             disabled={!ready}
             className={`mt-6 rounded-full border px-6 py-2.5 font-mono text-[13px] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage/50 ${
               ready
@@ -106,7 +114,7 @@ export default function IntroCurtain() {
                 : "cursor-default border-[rgb(var(--c-line-rgb)_/_0.15)] text-walnut/35"
             }`}
           >
-            {content.intro.enter}
+            {touch ? content.intro.enterTouch : content.intro.enterPointer}
           </PressButton>
         )}
       </div>
