@@ -21,6 +21,15 @@ import { PERSON } from "@/lib/site";
 // Game (engine + ~115 sprites) loads only when the visitor chooses to enter.
 const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
 
+// Arm the intro gate at MODULE EVALUATION — earlier than any render or child mount, so the water
+// and every entrance animation hold still behind the curtain until its enter click releases them.
+// Idempotent, client-only. Reduced-motion never gates: its curtain is display:none, and the gated
+// things (water, scramble, reveals) are off there anyway. Paired with IntroCurtain's release —
+// this lives HERE (not in intro-gate.ts) so arming can't outlive a tree without a curtain.
+if (typeof window !== "undefined" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  armIntro();
+}
+
 // Staged cross-fade. Enter: site fades out → world (game background) fades in →
 // player fades in → HUD fades in. Leave reverses it. Each step is one `FADE_MS` beat.
 type Stage =
@@ -53,16 +62,6 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   const [gameOn, setGameOn] = useState(false);
 
   const reduceMotion = usePrefersReducedMotion();
-
-  // Arm the intro gate SYNCHRONOUSLY on the first client render — before any child mounts — so
-  // the water and every entrance animation hold still behind the curtain until its enter click.
-  // (Reduced-motion never gates: its curtain is display:none, and the gated things are off there.)
-  const armDecidedRef = useRef(false);
-  if (typeof window !== "undefined" && !armDecidedRef.current) {
-    armDecidedRef.current = true;
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) armIntro();
-  }
-
   const gameReadyRef = useRef(false);
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
