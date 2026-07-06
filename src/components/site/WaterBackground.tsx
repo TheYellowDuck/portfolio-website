@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { introArmed, introGate } from "@/lib/intro-gate";
 
 // A water surface behind the whole site. A height-field ripple simulation: a tap/click drops a
 // ripple, and moving or dragging the pointer pushes a flow along its path. It's rendered as subtle
@@ -125,7 +126,8 @@ export default function WaterBackground() {
       }
     };
 
-    const paused = () => document.body.classList.contains("game-active") || document.hidden;
+    // Also paused while the intro curtain gates the page — the water holds still behind the door.
+    const paused = () => document.body.classList.contains("game-active") || document.hidden || introArmed();
     let lastX = -1;
     let lastY = -1;
     // Lay disturbance CONTINUOUSLY along the path from the last point to (x,y), so a moving pointer
@@ -187,8 +189,12 @@ export default function WaterBackground() {
       ro.observe(document.body);
     }
 
-    // Opening splash at the current viewport centre so the surface visibly comes alive on load.
-    disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3);
+    // Opening splash at the current viewport centre so the surface visibly comes alive — waiting
+    // for the curtain's enter click when the gate is armed, so the first ripple IS the entrance.
+    let disposed = false;
+    const splash = () => { if (!disposed) disturb(fx(window.innerWidth / 2), fy(window.innerHeight / 2), RIPPLE_FORCE * 2.5, 3); };
+    if (introArmed()) introGate().then(splash);
+    else splash();
 
     let frame = 0;
     // Advance the wave field ONE fixed step (ambient impulse + two-buffer propagation + buffer swap).
@@ -255,6 +261,7 @@ export default function WaterBackground() {
     raf = requestAnimationFrame(tick);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(raf);
       ro?.disconnect();
       window.removeEventListener("resize", maybeResize);

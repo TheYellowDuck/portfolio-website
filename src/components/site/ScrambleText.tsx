@@ -4,6 +4,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { introGate } from "@/lib/intro-gate";
 
 interface ScrambleTextProps {
   text: string;
@@ -38,7 +39,9 @@ export default function ScrambleText({ text, className, delay = 0 }: ScrambleTex
     let raf = 0, cancelled = false;
     const overlays: { el: HTMLSpanElement; ch: string }[] = [];
     const fontsReady = (typeof document !== "undefined" && document.fonts?.ready) || Promise.resolve();
-    fontsReady.then(() => {
+    // Also wait for the intro curtain's enter click (a no-op when it isn't gating) — otherwise the
+    // scramble would play silently behind the opaque curtain and reveal already-finished text.
+    Promise.all([fontsReady, introGate()]).then(() => {
       if (cancelled) return;
       // Measure each non-space character's box (after fonts load) and drop an absolutely-positioned
       // overlay span exactly over it. The overlays carry the scramble; the real text underneath is

@@ -4,6 +4,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { introGate } from "@/lib/intro-gate";
 
 export interface TypeSegment {
   text: string;
@@ -75,8 +76,11 @@ export default function Typewriter({ segments, className, speed = 13 }: Typewrit
       },
       { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
     );
-    if (rootRef.current) io.observe(rootRef.current);
-    return () => { io.disconnect(); if (timer) clearTimeout(timer); };
+    // Observing starts at the curtain's enter click (no-op when it isn't gating), so the typing
+    // can't begin behind the opaque door.
+    let cancelled = false;
+    introGate().then(() => { if (!cancelled && rootRef.current) io.observe(rootRef.current); });
+    return () => { cancelled = true; io.disconnect(); if (timer) clearTimeout(timer); };
     // Key on `full` (the joined text), NOT the `segments` array identity (the parent rebuilds it each
     // render), so a re-render — e.g. opening or closing a popup — never restarts the typing. React
     // leaves the already-typed spans untouched because each span's text prop is unchanged.

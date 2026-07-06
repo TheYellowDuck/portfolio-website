@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PERSON } from "@/lib/site";
 import { content } from "@/content";
 import { playPlip } from "@/lib/plip";
+import { releaseIntro } from "@/lib/intro-gate";
 import { PressButton } from "@/components/PressButton";
 
 // The intro curtain covers the first paint, then GATES on a click/tap: an enter button (greyed
@@ -50,7 +51,7 @@ export default function IntroCurtain() {
     Promise.race([fontsReady, safety]).then(() => {
       if (cancelled) return;
       if (gated) setReady(true); // enable the button; the visitor opens the door
-      else setPhase("out");      // reduced-motion: lift on its own (the curtain is hidden anyway)
+      else { releaseIntro(); setPhase("out"); } // reduced-motion: lift on its own (curtain hidden anyway)
     });
     return () => {
       cancelled = true;
@@ -82,9 +83,13 @@ export default function IntroCurtain() {
 
   const enter = () => {
     if (!ready || phase !== "shown") return;
+    releaseIntro(); // the page exhales: opening splash, scramble, reveals — one beat with the plip
     playPlip().catch(() => { /* blocked/unsupported — the splash still reads visually */ });
     setPhase("out");
   };
+
+  // Safety: if the curtain ever unmounts without the click (error boundaries, HMR), let the page go.
+  useEffect(() => () => releaseIntro(), []);
 
   if (phase === "gone") return null;
 

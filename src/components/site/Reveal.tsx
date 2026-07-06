@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { introGate } from "@/lib/intro-gate";
 
 interface RevealProps {
   children: React.ReactNode;
@@ -55,8 +56,11 @@ export default function Reveal({ children, className = "", delay = 0, variant = 
       },
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
     );
-    io.observe(el);
-    return () => io.disconnect();
+    // Hold every reveal while the intro curtain gates the page (no-op when it isn't): observing
+    // only begins at the enter click, so nothing plays out behind the opaque door.
+    let cancelled = false;
+    introGate().then(() => { if (!cancelled) io.observe(el); });
+    return () => { cancelled = true; io.disconnect(); };
   }, []);
 
   return (

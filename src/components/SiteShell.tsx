@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import Portfolio from "./site/Portfolio";
 import { content } from "@/content";
 import IntroCurtain from "./site/IntroCurtain";
+import { armIntro } from "@/lib/intro-gate";
 import WaterBackground from "./site/WaterBackground";
 import ExhibitOverlay from "./overlays/ExhibitOverlay";
 import CommandPalette, { type Command } from "./site/CommandPalette";
@@ -52,6 +53,16 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
   const [gameOn, setGameOn] = useState(false);
 
   const reduceMotion = usePrefersReducedMotion();
+
+  // Arm the intro gate SYNCHRONOUSLY on the first client render — before any child mounts — so
+  // the water and every entrance animation hold still behind the curtain until its enter click.
+  // (Reduced-motion never gates: its curtain is display:none, and the gated things are off there.)
+  const armDecidedRef = useRef(false);
+  if (typeof window !== "undefined" && !armDecidedRef.current) {
+    armDecidedRef.current = true;
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) armIntro();
+  }
+
   const gameReadyRef = useRef(false);
   const fadeDoneRef = useRef(false);
   const bgStartedRef = useRef(false);
