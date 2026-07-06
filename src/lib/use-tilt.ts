@@ -17,9 +17,11 @@ import { useCallback, useEffect, useRef } from "react";
 // directions). Once settled, every inline override is removed and the classes take back over.
 // `lift` folds a card's Tailwind hover rise into the tilt transform (which overrides the class).
 //
-// TOUCH devices have no pointer to be near — there the GYRO drives it instead: every visible
-// registered surface leans with the device (same max, same depth layers), relative to a slowly
-// re-centering baseline so any resting hand position is neutral and CHANGES drive the lean.
+// TOUCH devices have no pointer to be near — there the GYRO drives it instead, but only for
+// surfaces that OPT IN (`gyro: true`; the hero identity + doorway): they lean with the device
+// (same max, same depth layers), relative to a slowly re-centering baseline so any resting hand
+// position is neutral and CHANGES drive the lean. Everything else simply doesn't register on
+// touch, keeping the phone experience calm and the loop's per-frame work tiny.
 // Android attaches directly; iOS needs DeviceOrientationEvent.requestPermission(), which Apple
 // only allows inside a user gesture — so it arms on the first tap (once, silent if denied).
 // Reduced-motion skips everything on both input modes.
@@ -79,8 +81,8 @@ function onOrientation(e: DeviceOrientationEvent) {
   if (e.beta == null || e.gamma == null) return;
   if (gBaseBeta === null || gBaseGamma === null) { gBaseBeta = e.beta; gBaseGamma = e.gamma; return; }
   // deltas from the baseline, then slowly re-center it — sustained new posture becomes neutral
-  let db = e.beta - gBaseBeta;
-  let dg = e.gamma - gBaseGamma;
+  const db = e.beta - gBaseBeta;
+  const dg = e.gamma - gBaseGamma;
   gBaseBeta += (e.beta - gBaseBeta) * GYRO_RECENTER;
   gBaseGamma += (e.gamma - gBaseGamma) * GYRO_RECENTER;
   // fold in screen rotation so landscape tips the same visual axes
@@ -227,7 +229,7 @@ function ensureListeners() {
   document.addEventListener("visibilitychange", start);
 }
 
-export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0 }: { max?: number; lift?: number } = {}) {
+export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0, gyro = false }: { max?: number; lift?: number; gyro?: boolean } = {}) {
   const entryRef = useRef<Entry | null>(null);
 
   const ref = useCallback((el: T | null) => {
@@ -238,12 +240,14 @@ export function useTilt<T extends HTMLElement = HTMLElement>({ max = 5, lift = 0
     }
     if (!el || typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    coarseMode = !window.matchMedia("(pointer: fine)").matches;
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    if (!fine && !gyro) return; // touch: only gyro-opted surfaces (hero/doorway) participate
+    coarseMode = !fine;
     ensureListeners();
     entryRef.current = { el, max, lift, rx: 0, ry: 0, lf: 0, fl: 0, styled: false, depth: null, chain: null };
     entries.add(entryRef.current);
     start();
-  }, [max, lift]);
+  }, [max, lift, gyro]);
 
   useEffect(() => () => {
     if (entryRef.current) {
