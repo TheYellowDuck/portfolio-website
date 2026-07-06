@@ -20,18 +20,16 @@ import { PERSON } from "@/lib/site";
 // Game (engine + ~115 sprites) loads only when the visitor chooses to enter.
 const GameCanvas = dynamic(() => import("./GameCanvas"), { ssr: false });
 
-// One soft water "plip" for the enter-museum splash — the site's single UI sound, tied to its
-// signature moment and used nowhere else. Native Audio, NOT howler: howler ships only inside the
-// lazy game chunk, and one sound isn't worth pulling it into the main bundle. Created on first
-// use (the click gesture satisfies autoplay policies); any failure is silently ignored.
+// One soft water "plip" — the site's single UI sound, paired with the water's OPENING SPLASH on
+// load (see the effect in SiteShell). Native Audio, NOT howler: howler ships only inside the lazy
+// game chunk, and one sound isn't worth pulling it into the main bundle. Returns the play promise
+// so the caller can hear a rejection (autoplay blocked) and fall back to the first gesture.
 let plipEl: HTMLAudioElement | null = null;
-function playPlip() {
-  try {
-    plipEl ??= new Audio("/assets/audio/plip.mp3");
-    plipEl.volume = 0.15; // soft — an accent under the transition, not a foreground sound
-    plipEl.currentTime = 0;
-    void plipEl.play().catch(() => { /* blocked/unsupported — the splash still reads visually */ });
-  } catch { /* ignore */ }
+function playPlip(): Promise<void> {
+  plipEl ??= new Audio("/assets/audio/plip.mp3");
+  plipEl.volume = 0.15; // soft — an accent under the water, not a foreground sound
+  plipEl.currentTime = 0;
+  return plipEl.play();
 }
 
 // Staged cross-fade. Enter: site fades out → world (game background) fades in →
@@ -88,6 +86,31 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
     }
   }, [stage]);
   useEffect(() => () => document.body.classList.remove("game-active"), []);
+
+  // The opening splash gets its sound: one soft plip as the site loads. Browsers block autoplay
+  // without a user gesture, so if the load-time attempt is refused, the FIRST gesture plays it
+  // instead — and that gesture drops its own ripple in the water (pointerdown → WaterBackground),
+  // so sound and ripple still arrive together. On mobile the first gesture is the curtain's
+  // "Tap to enter", which is exactly when the site appears. Skipped under prefers-reduced-motion:
+  // the water (whose sound this is) doesn't run there.
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let played = false;
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", onGesture, { capture: true });
+      window.removeEventListener("keydown", onGesture, { capture: true });
+    };
+    const onGesture = () => {
+      if (!played) playPlip().catch(() => { /* still blocked — stay silent */ });
+      cleanup();
+    };
+    playPlip()
+      .then(() => { played = true; cleanup(); })
+      .catch(() => { /* autoplay blocked — the first gesture will carry it */ });
+    window.addEventListener("pointerdown", onGesture, { capture: true });
+    window.addEventListener("keydown", onGesture, { capture: true });
+    return cleanup;
+  }, []);
 
   // Keep a long-open tab from *breaking* after a new deploy, without ever refreshing
   // the page out from under the visitor: if a lazily-loaded chunk 404s because its
@@ -165,7 +188,6 @@ export default function SiteShell({ currentStatus }: { currentStatus?: string })
 
   const enterGame = useCallback(() => {
     if (stage !== "site") return;
-    playPlip(); // the click's own natural ripple + one soft plip — no extra wave
     // Push a marked history entry (preserving Next's router state) with no URL change, so the
     // browser/device Back button leaves the museum and Forward walks back in — invisibly, and
     // clear of the #slug popup deep-link system.
