@@ -20,6 +20,7 @@
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
+\hyphenpenalty=10000\emergencystretch=2em   % ATS-safe: no mid-word hyphenation of keywords
 
 \newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
 
@@ -28,16 +29,12 @@
 \titlespacing*{\section}{0pt}{3pt}{0pt}
 
 \newcommand{\entry}[4]{%
-  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
-    \textbf{#1} & {\small #2}\\[1pt]
-    {\small\itshape #3} & {\small\itshape #4}\\
-  \end{tabularx}%
+  \textbf{#1}\hfill{\small #2}\\[1pt]%
+  {\small\itshape #3}\hfill{\small\itshape #4}\par%
 }
 
 \newcommand{\project}[3]{%
-  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
-    \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2} & {\small #3}\\
-  \end{tabularx}%
+  \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2}\hfill{\small #3}\par%
 }
 
 \newenvironment{bullets}
@@ -76,7 +73,7 @@
 \entry{University of British Columbia}{Vancouver, BC}{Undergraduate Research Assistant --- Centre for Brain Health}{Jun 2025 -- Aug 2025}
 \begin{bullets}
   \item Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.
-  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at $\sim$90\% accuracy with $<$100\,ms latency, fully on-device to meet PIPEDA/GDPR requirements.
+  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at \textasciitilde90\% accuracy with under 100\,ms latency, fully on-device to meet PIPEDA/GDPR requirements.
   \item Designed activity-heatmap dashboards that cut clinician monitoring overhead by 30\%; presented at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
 \end{bullets}
 
@@ -86,7 +83,7 @@
 \project{Code-Aware RAG System}{Python, Transformers}{github.com/TheYellowDuck/RAG-codebase}
 \begin{bullets}
   \item Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers --- AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).
-  \item Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder proved net-negative on code.
+  \item Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p \textless{} 0.001) while a cross-encoder proved net-negative on code.
 \end{bullets}
 
 \project{RLHF Pipeline}{PyTorch}{github.com/TheYellowDuck/rlhf-pipeline}
@@ -114,7 +111,7 @@
 \section{Awards \& Competitive Programming}
 \begin{bullets}
   \item President's Scholarship of Distinction \& Entrance Scholarship in Mathematics, University of Waterloo
-  \item ICPC Local (Waterloo) --- Rank 28 / $\sim$100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
+  \item ICPC Local (Waterloo) --- Rank 28 / \textasciitilde100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
   \item Canadian Computing Competition --- Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction
   \item RoboCup International Junior Maze Rescue 2023 (Captain) --- 2nd Place Supergroup, 17th Individual
 \end{bullets}

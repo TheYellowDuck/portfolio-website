@@ -41,7 +41,7 @@
           "period": "Jun 2025 – Aug 2025",
           "bullets": [
             "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
-            "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
+            "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at 90% accuracy with under 100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
             "Presented the work at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
           ]
         }
@@ -74,7 +74,7 @@
           "link": "github.com/TheYellowDuck/RAG-codebase",
           "bullets": [
             "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
-            "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
+            "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p 0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
           ]
         },
         {
@@ -114,7 +114,7 @@
       "title": "Awards & Competitive Programming",
       "bullets": [
         "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
-        "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+        "ICPC Local (Waterloo) — Rank 28 / 100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
         "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
         "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
       ]
@@ -167,7 +167,7 @@
               "period": "Jun 2025 – Aug 2025",
               "bullets": [
                 "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
-                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at 90% accuracy with under 100 ms latency, fully on-device to meet PIPEDA/GDPR requirements, plus activity-heatmap dashboards that cut clinician monitoring overhead by 30%.",
                 "Presented the work at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
               ]
             }
@@ -200,7 +200,7 @@
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
                 "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers, chunking on AST boundaries (tree-sitter) and fusing dense + BM25 retrieval (RRF) with a code graph and personalized PageRank.",
-                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
+                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p 0.001) while a cross-encoder was net-negative on code — with bootstrap CIs and significance tests; provider-agnostic (Anthropic/OpenAI/local)."
               ]
             },
             {
@@ -240,7 +240,7 @@
           "title": "Awards & Competitive Programming",
           "bullets": [
             "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
-            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "ICPC Local (Waterloo) — Rank 28 / 100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
             "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
             "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
           ]
@@ -293,7 +293,7 @@
               "period": "Jun 2025 – Aug 2025",
               "bullets": [
                 "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
-                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at ~90% accuracy with <100 ms latency, plus dashboards that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at 90% accuracy with under 100 ms latency, plus dashboards that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
               ]
             }
           ]
@@ -322,7 +322,7 @@
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
                 "Engineered a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.",
-                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder was net-negative on code — with recall@k, bootstrap CIs, and paired significance tests."
+                "Treated each design choice as a measured ablation — the LLM reranker significantly improved ranking (MRR/NDCG, p 0.001) while a cross-encoder was net-negative on code — with recall@k, bootstrap CIs, and paired significance tests."
               ]
             },
             {
@@ -334,7 +334,7 @@
               "link": "github.com/TheYellowDuck/web-agent",
               "bullets": [
                 "Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).",
-                "Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) — a 100%-one-directional disagreement ($$ = 0.66)."
+                "Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) — a 100%-one-directional disagreement (kappa = 0.66)."
               ]
             }
           ]
@@ -353,7 +353,7 @@
           "title": "Awards & Competitive Programming",
           "bullets": [
             "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
-            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "ICPC Local (Waterloo) — Rank 28 / 100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
             "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
             "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
           ]
@@ -405,7 +405,7 @@
               "period": "Jun 2025 – Aug 2025",
               "bullets": [
                 "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
-                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at ~90% accuracy with <100 ms latency, fully on-device to meet PIPEDA/GDPR requirements.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at 90% accuracy with under 100 ms latency, fully on-device to meet PIPEDA/GDPR requirements.",
                 "Designed activity-heatmap dashboards that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium."
               ]
             }
@@ -423,7 +423,7 @@
               "link": "github.com/TheYellowDuck/RAG-codebase",
               "bullets": [
                 "Engineered a retrieval-augmented-generation system answering codebase questions with citation-backed answers — AST-boundary chunking (tree-sitter), dense + BM25 fusion (RRF), a code graph with personalized PageRank, a validated listwise LLM reranker, and a RAGAS-style faithfulness check; provider-agnostic (Anthropic/OpenAI/local).",
-                "Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p<0.001) while a cross-encoder proved net-negative on code."
+                "Validated every choice as a measured ablation (recall@k, MRR, NDCG, bootstrap CIs, paired significance): the LLM reranker significantly improved ranking (MRR/NDCG, p 0.001) while a cross-encoder proved net-negative on code."
               ]
             },
             {
@@ -464,7 +464,7 @@
           "title": "Awards & Competitive Programming",
           "bullets": [
             "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
-            "ICPC Local (Waterloo) — Rank 28 / ~100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "ICPC Local (Waterloo) — Rank 28 / 100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
             "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
             "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
           ]

@@ -20,6 +20,7 @@
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
+\hyphenpenalty=10000\emergencystretch=2em   % ATS-safe: no mid-word hyphenation of keywords
 
 \newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
 
@@ -28,16 +29,12 @@
 \titlespacing*{\section}{0pt}{3pt}{0pt}
 
 \newcommand{\entry}[4]{%
-  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
-    \textbf{#1} & {\small #2}\\[1pt]
-    {\small\itshape #3} & {\small\itshape #4}\\
-  \end{tabularx}%
+  \textbf{#1}\hfill{\small #2}\\[1pt]%
+  {\small\itshape #3}\hfill{\small\itshape #4}\par%
 }
 
 \newcommand{\project}[3]{%
-  \begin{tabularx}{\textwidth}{@{}X@{}r@{}}
-    \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2} & {\small #3}\\
-  \end{tabularx}%
+  \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2}\hfill{\small #3}\par%
 }
 
 \newenvironment{bullets}
@@ -77,7 +74,7 @@
 \entry{University of British Columbia}{Vancouver, BC}{Undergraduate Research Assistant --- Centre for Brain Health}{Jun 2025 -- Aug 2025}
 \begin{bullets}
   \item Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.
-  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at $\sim$90\% accuracy with $<$100\,ms latency, plus dashboards that cut clinician monitoring overhead by 30\%; presented at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
+  \item Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 gestures at \textasciitilde90\% accuracy with under 100\,ms latency, plus dashboards that cut clinician monitoring overhead by 30\%; presented at the 11th Singapore International Parkinson Disease \& Movement Disorders Symposium.
 \end{bullets}
 
 % ================= PROJECTS =================
@@ -92,13 +89,13 @@
 \project{Code-Aware RAG System}{Python, tree-sitter, embeddings}{github.com/TheYellowDuck/RAG-codebase}
 \begin{bullets}
   \item Engineered a retrieval system fusing dense + BM25 (Reciprocal Rank Fusion) with a code graph and personalized PageRank, answering codebase questions with citation-backed answers.
-  \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p$<$0.001) while a cross-encoder was net-negative on code --- with recall@k, bootstrap CIs, and paired significance tests.
+  \item Treated each design choice as a measured ablation --- the LLM reranker significantly improved ranking (MRR/NDCG, p \textless{} 0.001) while a cross-encoder was net-negative on code --- with recall@k, bootstrap CIs, and paired significance tests.
 \end{bullets}
 
 \project{Autonomous LLM Web Agent}{Python, Playwright}{github.com/TheYellowDuck/web-agent}
 \begin{bullets}
   \item Designed a ReAct + reflection agent over a browser accessibility tree with a WebArena / Online-Mind2Web eval harness (Wilson CIs, pass@k, failure taxonomy).
-  \item Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) --- a 100\%-one-directional disagreement ($\kappa$ = 0.66).
+  \item Isolated measurement from capability: the same agent scores 0.43 vs 0.61 on WebArena by scorer alone (substring vs type-aware) --- a 100\%-one-directional disagreement (kappa = 0.66).
 \end{bullets}
 
 % ================= SKILLS =================
@@ -115,7 +112,7 @@
 \section{Awards \& Competitive Programming}
 \begin{bullets}
   \item President's Scholarship of Distinction \& Entrance Scholarship in Mathematics, University of Waterloo
-  \item ICPC Local (Waterloo) --- Rank 28 / $\sim$100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
+  \item ICPC Local (Waterloo) --- Rank 28 / \textasciitilde100 · 470+ LeetCode \& 220+ DMOJ solved (1{,}497 points)
   \item Canadian Computing Competition --- Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction
   \item RoboCup International Junior Maze Rescue 2023 (Captain) --- 2nd Place Supergroup, 17th Individual
 \end{bullets}
