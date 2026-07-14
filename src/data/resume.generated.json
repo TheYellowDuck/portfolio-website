@@ -471,6 +471,119 @@
         }
       ],
       "pdfPath": "/assets/resume/resume-ai.pdf"
+    },
+    {
+      "id": "data",
+      "label": "Data Analyst / Data Science",
+      "name": "George Zhang",
+      "contact": {
+        "phone": "(778) 682-9123",
+        "email": "gzhang06@outlook.com",
+        "linkedin": "linkedin.com/in/iamgeorgezhang",
+        "github": "https://github.com/TheYellowDuck"
+      },
+      "sections": [
+        {
+          "title": "Education",
+          "entries": [
+            {
+              "title": "University of Waterloo",
+              "location": "Waterloo, ON",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "period": "Sep 2024 – May 2029",
+              "bullets": [
+                "Relevant coursework: Probability & Statistics, Linear Algebra, Data Structures & Algorithms, Optimization, Logic & Computation, OOP (C++)."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Experience",
+          "entries": [
+            {
+              "title": "Ford Motor Company",
+              "location": "Waterloo, ON",
+              "subtitle": "Software Developer Intern — Android Automotive OS",
+              "period": "May 2026 – Present",
+              "bullets": [
+                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS — Ford's production infotainment platform — across a multi-module Java/Kotlin codebase (Android Telecom, Bluetooth HFP), with Robolectric unit tests and Gradle / AOSP-Soong CI."
+              ]
+            },
+            {
+              "title": "University of British Columbia",
+              "location": "Vancouver, BC",
+              "subtitle": "Undergraduate Research Assistant — Centre for Brain Health",
+              "period": "Jun 2025 – Aug 2025",
+              "bullets": [
+                "Designed activity-heatmap dashboards visualizing patient exercise data that cut clinician monitoring overhead by 30%; presented at the 11th Singapore International Parkinson Disease & Movement Disorders Symposium.",
+                "Led development of two full-stack hand-rehabilitation apps within PIKA, an AI Parkinson's-care platform deployed at Vancouver Coastal Health.",
+                "Built a real-time computer-vision pipeline (Python, OpenCV, MediaPipe) detecting 7 hand-exercise gestures at 90% accuracy with under 100 ms latency, fully on-device to meet PIPEDA/GDPR requirements."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Projects",
+          "entries": [
+            {
+              "title": "Code-Aware RAG System",
+              "tech": [
+                "Python",
+                "Pandas",
+                "embeddings"
+              ],
+              "link": "github.com/TheYellowDuck/RAG-codebase",
+              "bullets": [
+                "Designed the evaluation framework for a retrieval-augmented-generation system: a metrics suite (recall@k, MRR, NDCG) with bootstrap confidence intervals and paired significance tests, treating every design choice as a measured ablation.",
+                "Analysis drove decisions: the LLM reranker significantly improved ranking (MRR/NDCG, p 0.001) while a cross-encoder proved net-negative on code and was cut — retrieval fused dense + BM25 (RRF) with a code graph and personalized PageRank; provider-agnostic (Anthropic/OpenAI/local)."
+              ]
+            },
+            {
+              "title": "Autonomous LLM Web Agent",
+              "tech": [
+                "Python",
+                "Playwright"
+              ],
+              "link": "github.com/TheYellowDuck/web-agent",
+              "bullets": [
+                "Designed a ReAct + reflection agent (browser accessibility tree, provider-agnostic across Claude/GPT/Gemini) with a WebArena / Online-Mind2Web eval harness; showed the same agent scores 0.43 vs 0.61 by scorer alone, isolating measurement from real capability."
+              ]
+            },
+            {
+              "title": "Interactive Portfolio & Content Pipeline",
+              "tech": [
+                "TypeScript",
+                "Next.js",
+                "Redis"
+              ],
+              "link": "georgezhang.ca",
+              "bullets": [
+                "Built a personal site on a custom HTML5 Canvas engine with an automated daily data pipeline (GitHub Actions) that fetches, transforms, and publishes fresh content, plus multiplayer “ghost trails” persisted in Upstash Redis."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Technical Skills",
+          "bullets": [
+            "Data & Analysis: SQL, Pandas, NumPy, scikit-learn, Matplotlib, statistics, significance testing, bootstrap CIs, data visualization",
+            "Languages: Python, SQL, C++, Java, Kotlin, TypeScript/JavaScript",
+            "ML / AI: PyTorch, Transformers, RAG, LLM agents, computer vision (OpenCV, MediaPipe), embeddings, LLM-as-judge eval",
+            "Tools: Git, Linux, Docker, GitHub Actions, Redis, HuggingFace, Playwright, Anthropic/OpenAI APIs",
+            "Concepts: Statistical Evaluation & Experiment Design, Data Structures & Algorithms, Dashboarding, OOP"
+          ]
+        },
+        {
+          "title": "Awards & Competitive Programming",
+          "bullets": [
+            "President's Scholarship of Distinction & Entrance Scholarship in Mathematics, University of Waterloo",
+            "ICPC Local (Waterloo) — Rank 28 / 100 · 470+ LeetCode & 220+ DMOJ solved (1,497 points)",
+            "Canadian Computing Competition — Junior: perfect score, Senior: top quartile · AIME Qualifier · COMC Distinction",
+            "RoboCup International Junior Maze Rescue 2023 (Captain) — 2nd Place Supergroup, 17th Individual"
+          ]
+        }
+      ],
+      "pdfPath": "/assets/resume/resume-data.pdf"
     }
   ]
 }

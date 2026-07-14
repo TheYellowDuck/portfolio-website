@@ -9,7 +9,7 @@
 //
 // Run with `npm run sync:docs` whenever a PDF changes; the daily sync Action runs it too. Reuses the
 // exact parsers the routes used, so the output is identical to the old runtime behaviour.
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { PDFParse } from "pdf-parse";
 import { parseResumeText } from "../src/lib/resume-parser.ts";
@@ -67,7 +67,7 @@ async function fetchCourseDescriptions(subjects: string[]): Promise<Map<string, 
 // Each résumé in resume/*.tex becomes a selectable variant in the popup's tab switcher. The default
 // (variants[0]) is also mirrored at the top level so existing consumers (llms.txt, linkedin.txt,
 // /api/resume) keep working unchanged. SWE leads, then quant, then ai, then any others alphabetically.
-const VARIANT_ORDER = ["swe", "quant", "ai"];
+const VARIANT_ORDER = ["swe", "quant", "ai", "data"];
 const variantId = (texFile: string): string => texFile.replace(/\.tex$/i, "").replace(/^resume[-_]?/i, "") || "resume";
 const variantRank = (id: string): number => {
   const i = VARIANT_ORDER.indexOf(id);
@@ -78,6 +78,21 @@ async function syncResume(): Promise<void> {
   const texDir = path.join(ROOT, "resume");
   const pdfDir = path.join(ROOT, "public/assets/resume");
   const variants: ResumeVariant[] = [];
+
+  // Publish the compiled PDFs. resume/*.pdf is the single source of truth (edited and
+  // compiled alongside the .tex); copy them into public/assets/resume/ so Next.js can serve
+  // them for the popup's "Download PDF" links. Keeps the two in sync — never edit the public copy.
+  try {
+    mkdirSync(pdfDir, { recursive: true });
+    let n = 0;
+    for (const pdf of readdirSync(texDir).filter((f) => f.toLowerCase().endsWith(".pdf"))) {
+      copyFileSync(path.join(texDir, pdf), path.join(pdfDir, pdf));
+      n++;
+    }
+    if (n) console.log(`sync-docs: published ${n} résumé PDF(s) resume/ → public/assets/resume/`);
+  } catch {
+    /* no resume/ dir — nothing to publish */
+  }
 
   // Path A — generate from the .tex sources (canonical; deterministic, no LaTeX/PDF needed).
   let texFiles: string[] = [];
