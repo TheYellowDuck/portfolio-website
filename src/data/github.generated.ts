@@ -10,6 +10,7 @@ export const generatedMainHall: Exhibit[] = [
       "tech": [
         "TypeScript",
         "JavaScript",
+        "TeX",
         "GitHub Actions",
         "Vitest",
         "Framer Motion",
@@ -41,7 +42,8 @@ export const generatedMainHall: Exhibit[] = [
           "category": "Languages",
           "items": [
             "TypeScript",
-            "JavaScript"
+            "JavaScript",
+            "TeX"
           ]
         },
         {
@@ -2434,6 +2436,7 @@ export const generatedSkills: Exhibit[] = [
       "tech": [
         "TypeScript",
         "JavaScript",
+        "TeX",
         "Python",
         "Jupyter Notebook",
         "Java",
@@ -2912,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-07-22T08:11:34.145Z"
+  "syncedAt": "2026-07-23T08:14:15.054Z"
 };
