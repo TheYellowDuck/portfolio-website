@@ -1,0 +1,143 @@
+% George Zhang — 简历（AI / 机器学习方向）· 中文版
+% 用 xelatex 编译（需要 xeCJK；macOS 自带宋体/苹方字体）。单栏排版。
+% 照片：把 LinkedIn 头像存为本目录下 headshot.jpg（或 .png），重新编译即自动嵌入。
+% 此目录（resume/zh/）不会被 sync:docs 扫描，因此不会出现在网站上。
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{xeCJK}                          % 中文支持（需在设置西文字体前加载）
+\setmainfont{XCharter}                      % 西文衬线主字体
+\setCJKmainfont{Songti SC}                  % 中文正文：宋体
+\setCJKsansfont{PingFang SC}                % 中文无衬线：苹方
+\usepackage{microtype}
+\usepackage[a4paper,margin=0.45in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- 主题色（与英文版一致，换一个十六进制值即可整体换色） ----------
+\definecolor{accent}{HTML}{6F2436}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\linespread{1.03}                           % 中文正文行距略放宽
+
+% ---------- 联系方式分隔符 ----------
+\newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
+
+% ---------- 章节标题：主题色 + 下划线 ----------
+\titleformat{\section}
+  {\large\bfseries\color{accent}}{}{0em}{}[\vspace{-3pt}{\color{accent}\titlerule[0.9pt]}\vspace{2.5pt}]
+\titlespacing*{\section}{0pt}{5pt}{0.5pt}
+
+% ---------- 条目：第 1 行 = 单位 + 地点，第 2 行 = 职位 + 时间 ----------
+\newcommand{\entry}[4]{%
+  \textbf{#1}\hfill{\small #2}\\[1pt]%
+  {\small\itshape #3}\hfill{\small\itshape #4}\par%
+}
+
+% ---------- 项目：单行标题（名称 + 技术栈 | 链接） ----------
+\newcommand{\project}[3]{%
+  \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2}\hfill{\small #3}\par%
+}
+
+% ---------- 紧凑列表 ----------
+\newenvironment{bullets}
+  {\begin{itemize}[leftmargin=1.5em,labelsep=0.5em,itemsep=1.5pt,topsep=1.5pt,parsep=0pt,partopsep=0pt]\small}
+  {\end{itemize}\vspace{1pt}}
+
+% ---------- 证件照：headshot.jpg / headshot.png 存在即嵌入，否则显示占位框 ----------
+\newcommand{\headshot}{%
+  \IfFileExists{headshot.jpg}%
+    {\includegraphics[width=2.5cm,height=3.3cm,keepaspectratio]{headshot.jpg}}%
+    {\IfFileExists{headshot.png}%
+      {\includegraphics[width=2.5cm,height=3.3cm,keepaspectratio]{headshot.png}}%
+      {\fcolorbox{accent!30}{accent!4}{\parbox[c][3.1cm][c]{2.3cm}{\centering\footnotesize\color{accent!70}照片}}}}%
+}
+
+\begin{document}
+
+% ================= 抬头（左：姓名 + 联系方式；右：证件照） =================
+\noindent
+\begin{minipage}[c]{\dimexpr\textwidth-3.0cm\relax}
+  \centering
+  {\Huge\bfseries\color{accent}George Zhang}\\[5pt]
+  {\footnotesize
+  (778) 682-9123 \sep
+  \href{mailto:gzhang06@outlook.com}{gzhang06@outlook.com} \sep
+  \href{https://linkedin.com/in/iamgeorgezhang}{linkedin.com/in/iamgeorgezhang}
+  \\[2pt]
+  \href{https://github.com/TheYellowDuck}{github.com/TheYellowDuck} \sep
+  \href{https://georgezhang.ca}{georgezhang.ca}
+  \\[3pt]加拿大及中国香港公民 \; · \; 可持 J-1 签证赴美实习；毕业后符合 TN 签证资格}
+\end{minipage}%
+\begin{minipage}[c]{3.0cm}
+  \centering\headshot
+\end{minipage}
+\vspace{4pt}
+
+% ================= 教育背景 =================
+\section{教育背景}
+\entry{滑铁卢大学（University of Waterloo）}{加拿大安大略省滑铁卢}{计算机科学（荣誉）学士 · Co-op 带薪实习项目}{2024年9月 -- 2029年5月}
+\begin{bullets}
+  \item 相关课程：概率与统计、线性代数、数据结构与算法、最优化、逻辑与计算、面向对象编程（C++）。
+\end{bullets}
+
+% ================= 实习与科研经历 =================
+\section{实习与科研经历}
+
+\entry{福特汽车公司（Ford Motor Company）}{加拿大安大略省滑铁卢}{软件开发实习生 --- Android Automotive OS}{2026年5月 -- 至今}
+\begin{bullets}
+  \item 在福特量产车载信息娱乐平台 Android Automotive OS 上开发并交付车载拨号应用（Car Dialer）功能，工作于多模块 Java/Kotlin 代码库（Android Telecom、蓝牙 HFP），配备 Robolectric 单元测试与 Gradle / AOSP-Soong CI。
+\end{bullets}
+
+\entry{不列颠哥伦比亚大学（UBC）}{加拿大温哥华}{本科研究助理 --- 脑健康研究中心（Centre for Brain Health）}{2025年6月 -- 2025年8月}
+\begin{bullets}
+  \item 主导开发 PIKA 平台（已部署于 Vancouver Coastal Health 的 AI 帕金森护理平台）中的两款全栈手部康复应用。
+  \item 构建实时计算机视觉管线（Python、OpenCV、MediaPipe），识别 7 种手部康复手势，准确率约 90\%、延迟低于 100\,ms，全程端侧运行以满足 PIPEDA/GDPR 合规要求。
+  \item 设计活动热力图仪表盘，将临床医生监测工作量降低 30\%；并于第 11 届新加坡国际帕金森病与运动障碍研讨会上展示该成果。
+\end{bullets}
+
+% ================= 项目经历 =================
+\section{项目经历}
+
+\project{代码感知 RAG 系统}{Python、Transformers}{github.com/TheYellowDuck/RAG-codebase}
+\begin{bullets}
+  \item 设计并实现面向代码库问答、答案附引用出处的检索增强生成（RAG）系统——AST 边界切块（tree-sitter）、稠密向量 + BM25 融合（RRF）、带个性化 PageRank 的代码图、经验证的 listwise LLM 重排序器与 RAGAS 风格忠实度校验；支持多提供商（Anthropic/OpenAI/本地模型）。
+  \item 以可量化的消融实验验证每项设计选择（recall@k、MRR、NDCG、bootstrap 置信区间、配对显著性检验）：LLM 重排序器显著提升排序（MRR/NDCG，p < 0.001），而交叉编码器在代码场景为负收益。
+\end{bullets}
+
+\project{RLHF 训练管线}{PyTorch}{github.com/TheYellowDuck/rlhf-pipeline}
+\begin{bullets}
+  \item 复现 LLM 后训练全栈（SFT、奖励建模、PPO），RL 核心从零实现：GAE、裁剪策略梯度替代目标、逐 token 对参考模型的 KL 整形，以及自适应 KL 控制器。
+  \item 增加 DPO 与 GRPO 替代方案、LoRA 参数高效微调、多 GPU 训练（HuggingFace Accelerate），以及带位置偏差控制的独立 LLM-as-judge 胜率评估。
+\end{bullets}
+
+\project{自主 LLM 网页智能体}{Python、Playwright}{github.com/TheYellowDuck/web-agent}
+\begin{bullets}
+  \item 设计 ReAct + 反思智能体（基于浏览器无障碍树，跨 Claude/GPT/Gemini 多提供商），搭建 WebArena / Online-Mind2Web 评测框架；证明同一智能体仅因评分器不同得分即为 0.43 与 0.61，从而将测量误差与真实能力分离。
+\end{bullets}
+
+% ================= 专业技能 =================
+\section{专业技能}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  \textbf{编程语言} & Python、C++、Java、Kotlin、TypeScript/JavaScript、SQL\\
+  \textbf{机器学习 / AI} & PyTorch、Transformers、RAG、RLHF（PPO/DPO/GRPO）、LLM 智能体、提示工程、LLM-as-judge 评估\\
+  \textbf{数据} & NumPy、Pandas、scikit-learn、Matplotlib、OpenCV、MediaPipe、向量嵌入、统计学\\
+  \textbf{工具} & Git、Linux、Docker、GitHub Actions、HuggingFace、Playwright、Anthropic/OpenAI API\\
+  \textbf{核心概念} & 数据结构与算法、评估与统计严谨性、计算机视觉、面向对象\\
+\end{tabularx}
+
+% ================= 奖项与算法竞赛 =================
+\section{奖项与算法竞赛}
+\begin{bullets}
+  \item 滑铁卢大学校长卓越奖学金（President's Scholarship of Distinction）及数学入学奖学金
+  \item ICPC 滑铁卢校内选拔赛——排名 28 / 约 100 · LeetCode 已解 470+ 题 · DMOJ 已解 220+ 题（1{,}497 分）
+  \item 加拿大计算机竞赛（CCC）——初级组满分，高级组前 25\% · AIME 晋级 · COMC 优异奖（Distinction）
+  \item RoboCup 国际青少年机器人迷宫救援 2023（队长）——超级组第 2 名，个人第 17 名
+\end{bullets}
+
+\end{document}

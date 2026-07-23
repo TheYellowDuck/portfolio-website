@@ -1,0 +1,148 @@
+% George Zhang — 简历（通用软件工程 / 大厂方向）· 中文版
+% 用 xelatex 编译（需要 xeCJK；macOS 自带宋体/苹方字体）。单栏排版。
+% 照片：把 LinkedIn 头像存为本目录下 headshot.jpg（或 .png），重新编译即自动嵌入。
+% 此目录（resume/zh/）不会被 sync:docs 扫描，因此不会出现在网站上。
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{xeCJK}                          % 中文支持（需在设置西文字体前加载）
+\setmainfont{XCharter}                      % 西文衬线主字体
+\setCJKmainfont{Songti SC}                  % 中文正文：宋体
+\setCJKsansfont{PingFang SC}                % 中文无衬线：苹方
+\usepackage{microtype}
+\usepackage[a4paper,margin=0.45in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- 主题色（与英文版一致，换一个十六进制值即可整体换色） ----------
+\definecolor{accent}{HTML}{6F2436}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\linespread{1.03}                           % 中文正文行距略放宽
+
+% ---------- 联系方式分隔符 ----------
+\newcommand{\sep}{\hspace{0.5em}\textcolor{accent!55}{\textbar}\hspace{0.5em}}
+
+% ---------- 章节标题：主题色 + 下划线 ----------
+\titleformat{\section}
+  {\large\bfseries\color{accent}}{}{0em}{}[\vspace{-3pt}{\color{accent}\titlerule[0.9pt]}\vspace{2.5pt}]
+\titlespacing*{\section}{0pt}{5pt}{0.5pt}
+
+% ---------- 条目：第 1 行 = 单位 + 地点，第 2 行 = 职位 + 时间 ----------
+\newcommand{\entry}[4]{%
+  \textbf{#1}\hfill{\small #2}\\[1pt]%
+  {\small\itshape #3}\hfill{\small\itshape #4}\par%
+}
+
+% ---------- 项目：单行标题（名称 + 技术栈 | 链接） ----------
+\newcommand{\project}[3]{%
+  \textbf{#1}\enspace{\small\textcolor{accent!55}{\textbar}\enspace #2}\hfill{\small #3}\par%
+}
+
+% ---------- 紧凑列表 ----------
+\newenvironment{bullets}
+  {\begin{itemize}[leftmargin=1.5em,labelsep=0.5em,itemsep=1.5pt,topsep=1.5pt,parsep=0pt,partopsep=0pt]\small}
+  {\end{itemize}\vspace{1pt}}
+
+% ---------- 证件照：headshot.jpg / headshot.png 存在即嵌入，否则显示占位框 ----------
+\newcommand{\headshot}{%
+  \IfFileExists{headshot.jpg}%
+    {\includegraphics[width=2.5cm,height=3.3cm,keepaspectratio]{headshot.jpg}}%
+    {\IfFileExists{headshot.png}%
+      {\includegraphics[width=2.5cm,height=3.3cm,keepaspectratio]{headshot.png}}%
+      {\fcolorbox{accent!30}{accent!4}{\parbox[c][3.1cm][c]{2.3cm}{\centering\footnotesize\color{accent!70}照片}}}}%
+}
+
+\begin{document}
+
+% ================= 抬头（左：姓名 + 联系方式；右：证件照） =================
+\noindent
+\begin{minipage}[c]{\dimexpr\textwidth-3.0cm\relax}
+  \centering
+  {\Huge\bfseries\color{accent}George Zhang}\\[5pt]
+  {\footnotesize
+  (778) 682-9123 \sep
+  \href{mailto:gzhang06@outlook.com}{gzhang06@outlook.com} \sep
+  \href{https://linkedin.com/in/iamgeorgezhang}{linkedin.com/in/iamgeorgezhang}
+  \\[2pt]
+  \href{https://github.com/TheYellowDuck}{github.com/TheYellowDuck} \sep
+  \href{https://georgezhang.ca}{georgezhang.ca}
+  \\[3pt]加拿大及中国香港公民 \; · \; 可持 J-1 签证赴美实习；毕业后符合 TN 签证资格}
+\end{minipage}%
+\begin{minipage}[c]{3.0cm}
+  \centering\headshot
+\end{minipage}
+\vspace{4pt}
+
+% ================= 教育背景 =================
+\section{教育背景}
+\entry{滑铁卢大学（University of Waterloo）}{加拿大安大略省滑铁卢}{计算机科学（荣誉）学士 · Co-op 带薪实习项目}{2024年9月 -- 2029年5月}
+\begin{bullets}
+  \item 相关课程：数据结构与算法、面向对象编程（C++）、计算机组成、逻辑与计算、最优化、概率与统计。
+\end{bullets}
+
+% ================= 实习与科研经历 =================
+\section{实习与科研经历}
+
+\entry{福特汽车公司（Ford Motor Company）}{加拿大安大略省滑铁卢}{软件开发实习生 --- Android Automotive OS}{2026年5月 -- 至今}
+\begin{bullets}
+  \item 在福特量产车载信息娱乐平台 Android Automotive OS（AAOS）上开发并交付车载拨号应用（Car Dialer）功能，工作于多模块 Java/Kotlin 代码库。
+  \item 基于 Android Telecom 框架构建通话管理流程并集成蓝牙免提协议（HFP），以 Robolectric 单元测试验证，通过 Gradle / AOSP-Soong CI 流水线交付。
+\end{bullets}
+
+\entry{不列颠哥伦比亚大学（UBC）}{加拿大温哥华}{本科研究助理 --- 脑健康研究中心（Centre for Brain Health）}{2025年6月 -- 2025年8月}
+\begin{bullets}
+  \item 主导开发 PIKA 平台（已部署于 Vancouver Coastal Health 的 AI 帕金森护理平台）中的两款全栈手部康复应用。
+  \item 构建实时计算机视觉管线（Python、OpenCV、MediaPipe），识别 7 种手部康复手势，准确率约 90\%、延迟低于 100\,ms，全程端侧运行以满足 PIPEDA/GDPR 合规要求；并构建活动热力图仪表盘，将临床医生监测工作量降低 30\%。
+  \item 于第 11 届新加坡国际帕金森病与运动障碍研讨会上展示该成果。
+\end{bullets}
+
+% ================= 项目经历 =================
+\section{项目经历}
+
+\project{交互式作品集网站与自研游戏引擎}{TypeScript、Next.js、React、Canvas、Redis}{georgezhang.ca}
+\begin{bullets}
+  \item 打造“双形态”个人网站——快速加载的 Web 作品集（自定义光标 + 水波纹 Canvas 背景）与可自由探索的像素风“博物馆”，后者基于自研 HTML5 Canvas 引擎（60\,fps 主循环、AABB 碰撞检测、A* 寻路、粒子系统、程序化地图生成），并带有多人“幽灵足迹”功能（Upstash Redis）与每日 GitHub Actions 内容同步管线。
+\end{bullets}
+
+\project{代码感知 RAG 系统}{Python、tree-sitter、向量嵌入}{github.com/TheYellowDuck/RAG-codebase}
+\begin{bullets}
+  \item 设计并实现面向代码库问答、答案附引用出处的检索增强生成（RAG）系统：按 AST 边界切块（tree-sitter），融合稠密向量与 BM25 检索（RRF），并结合代码图与个性化 PageRank。
+  \item 将每项设计决策作为可量化的消融实验——LLM 重排序器显著提升排序质量（MRR/NDCG，p < 0.001），而交叉编码器在代码场景为负收益；配备 bootstrap 置信区间与显著性检验；支持多提供商（Anthropic/OpenAI/本地模型）。
+\end{bullets}
+
+\project{限价订单簿与撮合引擎}{C++20}{github.com/TheYellowDuck/limit-order-book}
+\begin{bullets}
+  \item 设计低延迟、无锁撮合引擎，严格价格-时间优先，支持 9 种订单类型（限价、市价、IOC、FOK、止损、冰山、挂钩），基于自研缓存优化数据结构。
+  \item 实现 wait-free 运行时（SPSC 环形缓冲、单写线程撮合、seqlock 行情发布）与确定性日志/回放；以差分测试、基于性质的测试与模糊测试配合 sanitizers 验证。
+\end{bullets}
+
+\project{自主 LLM 网页智能体}{Python、Playwright}{github.com/TheYellowDuck/web-agent}
+\begin{bullets}
+  \item 基于浏览器无障碍树设计 ReAct + 反思智能体，搭建 WebArena / Online-Mind2Web 评测框架；证明同一智能体仅因评分器不同得分即为 0.43 与 0.61，从而将测量误差与真实能力分离。
+\end{bullets}
+
+% ================= 专业技能 =================
+\section{专业技能}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  \textbf{编程语言} & C++、Python、Java、Kotlin、TypeScript/JavaScript、SQL、C、HTML/CSS\\
+  \textbf{框架} & React、Next.js、PyTorch、OpenCV、MediaPipe、NumPy、Pandas、Android SDK/Jetpack、Tailwind\\
+  \textbf{工具} & Git、Linux、Docker、Gradle、GitHub Actions、Redis、Playwright、Android Studio\\
+  \textbf{核心概念} & 数据结构与算法、并发编程、面向对象与设计模式、LLM / RAG、计算机视觉\\
+\end{tabularx}
+
+% ================= 奖项与算法竞赛 =================
+\section{奖项与算法竞赛}
+\begin{bullets}
+  \item 滑铁卢大学校长卓越奖学金（President's Scholarship of Distinction）及数学入学奖学金
+  \item ICPC 滑铁卢校内选拔赛——排名 28 / 约 100 · LeetCode 已解 470+ 题 · DMOJ 已解 220+ 题（1{,}497 分）
+  \item 加拿大计算机竞赛（CCC）——初级组满分，高级组前 25\% · AIME 晋级 · COMC 优异奖（Distinction）
+  \item RoboCup 国际青少年机器人迷宫救援 2023（队长）——超级组第 2 名，个人第 17 名
+\end{bullets}
+
+\end{document}
