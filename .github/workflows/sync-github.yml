@@ -24,7 +24,7 @@ jobs:
           # falls back to GITHUB_TOKEN (whose push the ruleset still blocks), so adding that one secret
           # is all that's needed to switch this on.
           token: ${{ secrets.SYNC_PAT || github.token }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
