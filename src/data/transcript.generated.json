@@ -1,9 +1,9 @@
 {
   "program": "Computer Science, Honours, Co-operative Program",
   "startTerm": "Fall 2024",
-  "currentTerm": "Spring 2026",
+  "currentTerm": "Fall 2026",
   "currentLevel": "3A",
-  "currentFormOfStudy": "Co-op Work Term",
+  "currentFormOfStudy": "Enrolment",
   "groups": [
     {
       "subject": "COOP",
@@ -18,7 +18,7 @@
         {
           "code": "COOP 2",
           "title": "Co-operative Work Term",
-          "inProgress": true,
+          "credits": 0,
           "term": "Spring 2026"
         }
       ]
@@ -83,6 +83,20 @@
           "credits": 0.5,
           "term": "Winter 2026",
           "description": "Overview of computer organization and performance. Basics of digital logic design. Combinational and sequential elements. Data representation and manipulation. Basics of processor design. Pipelining. Memory hierarchies. Multiprocessors."
+        },
+        {
+          "code": "CS 341",
+          "title": "Algorithms",
+          "inProgress": true,
+          "term": "Fall 2026",
+          "description": "The study of efficient algorithms and effective algorithm design techniques. Program design with emphasis on pragmatic and mathematical aspects of program efficiency. Topics include divide and conquer algorithms, recurrences, greedy algorithms, dynamic programming, graph search and backtrack, problems without algorithms, NP-completeness and its implications."
+        },
+        {
+          "code": "CS 350",
+          "title": "Operating Systems",
+          "inProgress": true,
+          "term": "Fall 2026",
+          "description": "An introduction to the fundamentals of operating system function, design, and implementation. Topics include concurrency, synchronization, processes, threads, scheduling, memory management, file systems, device management, and security."
         }
       ]
     },
@@ -119,9 +133,16 @@
           "description": "Introduction to the Riemann integral and approximations. Antiderivatives and the fundamental theorem of calculus. Change of variables, methods of integration. Applications of the integral. Improper integrals. Linear and separable differential equations and applications. Tests for convergence for series. Taylor polynomials and Taylor's Theorem, Big-O notation. Binomial series, functions defined as power series and Taylor series. Suitable topics are illustrated using computer software."
         },
         {
+          "code": "MATH 235",
+          "title": "Linear Algebra 2 for Honours Mathematics",
+          "inProgress": true,
+          "term": "Fall 2026",
+          "description": "Orthogonal and unitary matrices and transformations. Orthogonal projections, Gram-Schmidt procedure, best approximations, least-squares. Inner products, angles and orthogonality, orthogonal diagonalization, singular value decomposition, applications."
+        },
+        {
           "code": "MATH 237",
           "title": "Calculus 3 for Honours Mathematics",
-          "inProgress": true,
+          "credits": 0.5,
           "term": "Spring 2026",
           "description": "Calculus of functions of several variables. Limits, continuity, differentiability, the chain rule. The gradient vector and the directional derivative. Taylor's formula. Optimization problems. Mappings and the Jacobian. Multiple integrals in various co-ordinate systems."
         },
@@ -164,6 +185,13 @@
           "credits": 0.5,
           "term": "Winter 2026",
           "description": "A broad introduction to the field of optimization, discussing applications, and solution techniques. Mathematical models for real life applications; algorithms; aspects of computational complexity; geometry; linear programming duality, focusing on the development of algorithms."
+        },
+        {
+          "code": "CO 367",
+          "title": "Nonlinear Optimization",
+          "inProgress": true,
+          "term": "Fall 2026",
+          "description": "A course on the fundamentals of nonlinear optimization, including both the mathematical and the computational aspects. Necessary and sufficient optimality conditions for unconstrained and constrained problems. Convexity and its applications. Computational techniques and their analysis."
         }
       ]
     },
@@ -210,6 +238,13 @@
           "credits": 0.5,
           "term": "Winter 2025",
           "description": "This course introduces students to the measurement and behaviour of key macroeconomic variables both in Canada and around the world. Topics include national accounts, inflation, interest rates, wages, international balance of payments, business cycles, growth, employment, unemployment, poverty, and inequality."
+        },
+        {
+          "code": "ECON 371",
+          "title": "Business Finance 1",
+          "inProgress": true,
+          "term": "Fall 2026",
+          "description": "The course explores decisions faced by managers of firms. In particular, decision-makers must determine which long-term real investment opportunities to exploit. Once undertaken, managers must decide how to finance the projects, for example, by debt or equity. The course develops both the conceptual framework and the tools required for these decisions. The course assumes prior familiarity with probability, expected values, and variance."
         }
       ]
     },
@@ -240,7 +275,7 @@
         {
           "code": "PD 10",
           "title": "Professional Responsibility in Computing",
-          "inProgress": true,
+          "credits": 0,
           "term": "Spring 2026",
           "description": "This course considers many of the legal and ethical issues that arise in the development of software and digital-content products or services that are to be sold to the public.  Course topics include laws that impose obligations on products or producers (e.g., privacy laws, accessibility laws, intellectual-property laws, regulated industries); contracts (e.g., licenses, warranties, privacy policies); and ethical responsibilities to employers, clients, the users of products, and to society as a whole."
         },
@@ -280,9 +315,12 @@
       ]
     }
   ],
+  "specializations": [
+    "Artificial Intelligence"
+  ],
   "scholarships": [
     "University of Waterloo President's Scholarship of Distinction (2025)",
     "Smith Vanstokkom Family Entrance Scholarship in Mathematics (2025)"
   ],
-  "pdfPath": "/assets/transcript/transcript-2b.pdf"
+  "pdfPath": "/assets/transcript/transcript-coop2.pdf"
 }
