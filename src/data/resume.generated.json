@@ -13,7 +13,7 @@
         {
           "title": "University of Waterloo",
           "location": "Waterloo, ON",
-          "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+          "subtitle": "Bachelor of Computer Science (Honours, Co-op) — Artificial Intelligence Specialization",
           "period": "Sep 2024 – May 2029",
           "bullets": [
             "Relevant coursework: Data Structures & Algorithms, OOP (C++), Computer Organization, Logic & Computation, Optimization, Probability & Statistics."
@@ -27,11 +27,11 @@
         {
           "title": "Ford Motor Company",
           "location": "Waterloo, ON",
-          "subtitle": "Software Developer Intern — Android Automotive OS",
-          "period": "May 2026 – Present",
+          "subtitle": "Software Developer Intern — IVI Phone Apps",
+          "period": "May 2026 – Aug 2026",
           "bullets": [
-            "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
-            "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
+            "Shipped features across three in-vehicle apps (Dialer, Settings, Messenger) on Android Automotive OS, Ford's infotainment platform, in a multi-module Java/Kotlin codebase; closed all 64 completed issues at a 100% completion rate.",
+            "Spearheaded two automated DevOps workflows for the team's LLM log-analysis playbook — tag-differential/chunking updates and a direct Confluence sync — and coordinated cross-team on an in-progress MAU PowerBI dashboard."
           ]
         },
         {
@@ -139,7 +139,7 @@
             {
               "title": "University of Waterloo",
               "location": "Waterloo, ON",
-              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op) — Artificial Intelligence Specialization",
               "period": "Sep 2024 – May 2029",
               "bullets": [
                 "Relevant coursework: Data Structures & Algorithms, OOP (C++), Computer Organization, Logic & Computation, Optimization, Probability & Statistics."
@@ -153,11 +153,11 @@
             {
               "title": "Ford Motor Company",
               "location": "Waterloo, ON",
-              "subtitle": "Software Developer Intern — Android Automotive OS",
-              "period": "May 2026 – Present",
+              "subtitle": "Software Developer Intern — IVI Phone Apps",
+              "period": "May 2026 – Aug 2026",
               "bullets": [
-                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
-                "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
+                "Shipped features across three in-vehicle apps (Dialer, Settings, Messenger) on Android Automotive OS, Ford's infotainment platform, in a multi-module Java/Kotlin codebase; closed all 64 completed issues at a 100% completion rate.",
+                "Spearheaded two automated DevOps workflows for the team's LLM log-analysis playbook — tag-differential/chunking updates and a direct Confluence sync — and coordinated cross-team on an in-progress MAU PowerBI dashboard."
               ]
             },
             {
@@ -265,7 +265,7 @@
             {
               "title": "University of Waterloo",
               "location": "Waterloo, ON",
-              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op) — Artificial Intelligence Specialization",
               "period": "Sep 2024 – May 2029",
               "bullets": [
                 "Relevant coursework: Optimization, Probability & Statistics, Combinatorics, Data Structures & Algorithms, OOP (C++), Computer Organization."
@@ -279,11 +279,11 @@
             {
               "title": "Ford Motor Company",
               "location": "Waterloo, ON",
-              "subtitle": "Software Developer Intern — Android Automotive OS",
-              "period": "May 2026 – Present",
+              "subtitle": "Software Developer Intern — IVI Phone Apps",
+              "period": "May 2026 – Aug 2026",
               "bullets": [
-                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS (AAOS), part of Ford's production infotainment platform, across a multi-module Java/Kotlin codebase.",
-                "Build call-management flows on the Android Telecom framework with Bluetooth Hands-Free Profile (HFP) integration, validated by Robolectric unit tests and delivered through a Gradle / AOSP-Soong CI pipeline."
+                "Shipped features across three in-vehicle apps (Dialer, Settings, Messenger) on Android Automotive OS (AAOS), Ford's production infotainment platform, in a multi-module Java/Kotlin codebase; closed all 64 completed issues, a 100% completion rate on finalized work.",
+                "Spearheaded two automated workflows for the team's LLM log-analysis playbook: tag-differential-and-chunking updates and a direct Confluence sync, removing manual upkeep from the process."
               ]
             },
             {
@@ -378,7 +378,7 @@
             {
               "title": "University of Waterloo",
               "location": "Waterloo, ON",
-              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op) — Artificial Intelligence Specialization",
               "period": "Sep 2024 – May 2029",
               "bullets": [
                 "Relevant coursework: Probability & Statistics, Linear Algebra, Data Structures & Algorithms, Optimization, Logic & Computation, OOP (C++)."
@@ -392,10 +392,11 @@
             {
               "title": "Ford Motor Company",
               "location": "Waterloo, ON",
-              "subtitle": "Software Developer Intern — Android Automotive OS",
-              "period": "May 2026 – Present",
+              "subtitle": "Software Developer Intern — IVI Phone Apps",
+              "period": "May 2026 – Aug 2026",
               "bullets": [
-                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS — Ford's production infotainment platform — across a multi-module Java/Kotlin codebase (Android Telecom, Bluetooth HFP), with Robolectric unit tests and Gradle / AOSP-Soong CI."
+                "Spearheaded two automated workflows for the team's LLM log-analysis playbook — tag-differential/chunking updates, and a direct Confluence sync — cutting manual maintenance from the process.",
+                "Shipped features across three in-vehicle apps (Dialer, Settings, Messenger) on Android Automotive OS, Ford's infotainment platform, in a multi-module Java/Kotlin codebase; closed all 64 issues at a 100% completion rate."
               ]
             },
             {
@@ -489,7 +490,7 @@
             {
               "title": "University of Waterloo",
               "location": "Waterloo, ON",
-              "subtitle": "Bachelor of Computer Science (Honours, Co-op)",
+              "subtitle": "Bachelor of Computer Science (Honours, Co-op) — Artificial Intelligence Specialization",
               "period": "Sep 2024 – May 2029",
               "bullets": [
                 "Relevant coursework: Probability & Statistics, Linear Algebra, Data Structures & Algorithms, Optimization, Logic & Computation, OOP (C++)."
@@ -503,10 +504,12 @@
             {
               "title": "Ford Motor Company",
               "location": "Waterloo, ON",
-              "subtitle": "Software Developer Intern — Android Automotive OS",
-              "period": "May 2026 – Present",
+              "subtitle": "Software Developer Intern — IVI Phone Apps",
+              "period": "May 2026 – Aug 2026",
               "bullets": [
-                "Develop and ship features for the in-vehicle Car Dialer app on Android Automotive OS — Ford's production infotainment platform — across a multi-module Java/Kotlin codebase (Android Telecom, Bluetooth HFP), with Robolectric unit tests and Gradle / AOSP-Soong CI."
+                "Coordinated cross-team development of an in-progress MAU PowerBI dashboard for phone apps, aligning requirements and data sources between the IVI team and the analytics team.",
+                "Spearheaded two automated workflows for the team's LLM-based log-analysis playbook — tag-differential-and-chunking updates, and a sync job publishing the playbook directly to Confluence.",
+                "Shipped features across three in-vehicle apps (Dialer, Settings, Messenger) on Android Automotive OS, Ford's production infotainment platform; closed all 64 completed issues, a 100% completion rate on finalized work."
               ]
             },
             {
