@@ -26,6 +26,10 @@ const COURSE_START_RE   = /^([A-Z]{2,6})\s+(\d{1,4}[A-Z]?)\s+(.*)/;
 const TERM_HEADER_RE    = /^(Fall|Winter|Spring|Summer)\s+(\d{4})$/;
 const LEVEL_RE          = /^Level:\s+(\w+)\s+Form Of Study:\s+(.+)/;
 const PROGRAM_RE        = /^Program:\s+(.+)/;
+// A specialization/minor prints as its own line directly under "Program:" once declared
+// (e.g. a term enrolled after declaring one) — not on every term, so it can't be baked into
+// PROGRAM_RE itself.
+const PLAN_QUALIFIER_RE = /^(.+?)\s+(Specialization|Minor)$/;
 // Footer sections printed after all courses: Milestones, then Scholarships & Awards, then "End of …
 // Transcript". Stop parsing courses at the footer so its text isn't swallowed into the last course's
 // title, but capture the scholarships. A multi-page "-- 1 of 2 --" page break is NOT a terminator.
@@ -33,6 +37,11 @@ const FOOTER_START_RE       = /^(Milestones|Scholarships?\s+and\s+Awards)\b/i;
 const SCHOLARSHIP_HEADER_RE = /^Scholarships?\s+and\s+Awards/i;
 const TRANSCRIPT_END_RE     = /^End of\b.*Transcript/i;
 const SCHOLARSHIP_RE        = /^(\d{4})\s+(.+)/; // a footer line like "2025 … Scholarship of Distinction"
+// A page break ("-- 2 of 3 --") reprints the report's letterhead/page-number/name/student-ID
+// block before content resumes. It's not a terminator, but none of that reprinted block is
+// course data either — left unhandled, it glues onto whatever course was still "pending" (no
+// grade line seen yet) when the page broke, e.g. an in-progress course with no Attempted/Earned.
+const PAGE_BREAK_RE         = /^--\s*\d+\s+of\s+\d+\s*--$/;
 
 const TRAIL_WITH_GRADE_RE =
   /\s+(\d+\.\d{2})\s+(\d+\.\d{2})\s+(?:\d{1,3}|CR|NCR|DNW|WD|WF)\s*$/;
@@ -65,9 +74,14 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
 
   let currentParserTerm: string | undefined;
 
+  const specializations = new Set<string>();
+  const minors = new Set<string>();
+  let expectingPlanLine = false;
+
   const scholarships: string[] = [];
   let inFooter = false;
   let inScholarships = false;
+  let inPageBreak = false;
 
   function flush() {
     if (!pending) return;
@@ -104,6 +118,19 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
       continue;
     }
 
+    // Page break — swallow the reprinted letterhead until real content resumes.
+    if (PAGE_BREAK_RE.test(line)) { inPageBreak = true; continue; }
+    if (inPageBreak) {
+      if (
+        TERM_HEADER_RE.test(line) || PROGRAM_RE.test(line) || LEVEL_RE.test(line) ||
+        COURSE_START_RE.test(line) || FOOTER_START_RE.test(line)
+      ) {
+        inPageBreak = false;
+      } else {
+        continue;
+      }
+    }
+
     // Term header
     const termMatch = line.match(TERM_HEADER_RE);
     if (termMatch) {
@@ -118,7 +145,19 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
     const programMatch = line.match(PROGRAM_RE);
     if (programMatch) {
       if (!program) program = programMatch[1];
+      expectingPlanLine = true;
       continue;
+    }
+
+    // Specialization/minor line(s), printed right after "Program:" for terms where declared.
+    if (expectingPlanLine) {
+      const planMatch = line.match(PLAN_QUALIFIER_RE);
+      if (planMatch) {
+        const [, name, kind] = planMatch;
+        (kind === "Specialization" ? specializations : minors).add(name.trim());
+        continue;
+      }
+      expectingPlanLine = false;
     }
 
     // Level + form of study
@@ -202,6 +241,8 @@ export function parseTranscript(rawText: string): Omit<TranscriptData, "pdfPath"
 
   return {
     program, startTerm, currentTerm, currentLevel, currentFormOfStudy, groups,
+    specializations: specializations.size ? Array.from(specializations) : undefined,
+    minors: minors.size ? Array.from(minors) : undefined,
     scholarships: scholarships.length ? scholarships : undefined,
   };
 }

@@ -205,6 +205,14 @@ export default function TranscriptPopup({ onClose }: TranscriptPopupProps) {
                     {shortenProgram(data.program)}
                   </p>
                 )}
+                {(data?.specializations?.length || data?.minors?.length) && (
+                  <p className="m-0 mt-0.5 font-mono text-[11px] text-walnut opacity-45">
+                    {[
+                      ...(data?.specializations ?? []).map((s) => `${s} Specialization`),
+                      ...(data?.minors ?? []).map((m) => `${m} Minor`),
+                    ].join(" · ")}
+                  </p>
+                )}
               </div>
 
               {/* Right: dates */}

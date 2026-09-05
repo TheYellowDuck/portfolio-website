@@ -26,6 +26,10 @@ export interface TranscriptData {
   currentTerm?: string;
   currentLevel?: string;
   currentFormOfStudy?: string;
+  /** Declared specialization(s), e.g. "Artificial Intelligence". */
+  specializations?: string[];
+  /** Declared minor(s), e.g. "Statistics". */
+  minors?: string[];
   groups: SubjectGroup[];
   /** Scholarships & awards from the transcript footer, e.g. "… Scholarship of Distinction (2025)". */
   scholarships?: string[];
