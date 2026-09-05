@@ -95,15 +95,15 @@ export const experienceExhibits: Exhibit[] = [
   {
     popup: {
       title: "Ford Motor Company",
-      subtitle: "Software Developer Intern",
-      date: "May 2026 – Present",
-      description: "Working on Android Automotive OS (AAOS) development at Ford, contributing to the in-vehicle Car Dialer app for Ford's infotainment system. Work spans call management via the Android Telecom framework, Bluetooth Hands-Free Profile (HFP) integration, UI development across multi-module architecture, and unit testing with Robolectric.",
+      subtitle: "Software Developer Intern — IVI Phone Apps",
+      date: "May 2026 – Aug 2026",
+      description: "Built and shipped core in-vehicle applications — the Dialer, Settings, and Messenger apps — on Ford's Android Automotive OS infotainment platform, across a multi-module Java/Kotlin codebase. Closed all 64 completed issues, a 100% completion rate on finalized work. Spearheaded two automated workflows for the team's LLM-based log-analysis playbook: one that keeps it current via tag differentials and chunking, another that syncs it directly to Confluence. Also drove cross-functional collaboration, coordinating with another team to develop an in-progress MAU (Monthly Active Users) PowerBI dashboard for phone apps.",
       tech: ["Java", "Kotlin", "XML", "Android SDK", "Android Automotive OS", "Bash/Shell", "Groovy", "Git"],
       skills: [
         { category: "Frameworks",  items: ["Dagger Hilt", "AndroidX/Jetpack", "LiveData", "ViewModel", "Android Telecom", "Robolectric", "JaCoCo"] },
         { category: "Build & CI",  items: ["Gradle", "AOSP/Soong", "SonarQube", "ADB", "Docker"] },
-        { category: "Tools",       items: ["Android Studio", "Jira", "Ford SDK", "scrcpy"] },
-        { category: "Practice",    items: ["Unit Testing", "Code Review", "Multi-module Architecture", "Bluetooth/HFP", "Agile/Scrum", "OOP"] },
+        { category: "Tools",       items: ["Android Studio", "Jira", "Ford SDK", "scrcpy", "Confluence", "Power BI"] },
+        { category: "Practice",    items: ["Unit Testing", "Code Review", "Multi-module Architecture", "DevOps Automation", "Cross-team Collaboration", "Agile Issue Management", "OOP"] },
       ],    },
   },
   {
