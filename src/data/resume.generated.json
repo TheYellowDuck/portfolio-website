@@ -106,8 +106,8 @@
       "bullets": [
         "Languages: C++, Python, Java, Kotlin, TypeScript/JavaScript, SQL, C, HTML/CSS",
         "Frameworks: React, Next.js, PyTorch, OpenCV, MediaPipe, NumPy, Pandas, Android SDK/Jetpack, Tailwind",
-        "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio",
-        "Concepts: Data Structures & Algorithms, Concurrency, OOP & Design Patterns, LLMs / RAG, Computer Vision"
+        "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio, Confluence",
+        "Concepts: Data Structures & Algorithms, Concurrency, OOP, LLMs / RAG, Computer Vision, DevOps Automation"
       ]
     },
     {
@@ -232,8 +232,8 @@
           "bullets": [
             "Languages: C++, Python, Java, Kotlin, TypeScript/JavaScript, SQL, C, HTML/CSS",
             "Frameworks: React, Next.js, PyTorch, OpenCV, MediaPipe, NumPy, Pandas, Android SDK/Jetpack, Tailwind",
-            "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio",
-            "Concepts: Data Structures & Algorithms, Concurrency, OOP & Design Patterns, LLMs / RAG, Computer Vision"
+            "Tools: Git, Linux, Docker, Gradle, GitHub Actions, Redis, Playwright, Android Studio, Confluence",
+            "Concepts: Data Structures & Algorithms, Concurrency, OOP, LLMs / RAG, Computer Vision, DevOps Automation"
           ]
         },
         {
@@ -345,7 +345,7 @@
             "Languages: C++, Python, Java, C, Kotlin, TypeScript/JavaScript, SQL",
             "Systems: Lock-free / wait-free concurrency, cache-aware data structures, multithreading, low-latency design",
             "Math & ML: Statistics, significance testing, probability, NumPy, Pandas, PyTorch",
-            "Tools: Git, Linux, CMake, Docker, GitHub Actions, sanitizers, gdb",
+            "Tools: Git, Linux, CMake, Docker, GitHub Actions, sanitizers, gdb, Confluence",
             "Concepts: Data Structures & Algorithms, Benchmarking & Evaluation, Systems Programming, OOP"
           ]
         },
@@ -457,8 +457,8 @@
             "Languages: Python, C++, Java, Kotlin, TypeScript/JavaScript, SQL",
             "ML / AI: PyTorch, Transformers, RAG, RLHF (PPO/DPO/GRPO), LLM agents, prompt engineering, LLM-as-judge eval",
             "Data: NumPy, Pandas, scikit-learn, Matplotlib, OpenCV, MediaPipe, embeddings, statistics",
-            "Tools: Git, Linux, Docker, GitHub Actions, HuggingFace, Playwright, Anthropic/OpenAI APIs",
-            "Concepts: Data Structures & Algorithms, Evaluation & Statistical Rigor, Computer Vision, OOP"
+            "Tools: Git, Linux, Docker, GitHub Actions, HuggingFace, Playwright, Anthropic/OpenAI APIs, Confluence",
+            "Concepts: Data Structures & Algorithms, Evaluation & Statistical Rigor, Computer Vision, OOP, Workflow Automation"
           ]
         },
         {
@@ -570,9 +570,9 @@
           "title": "Technical Skills",
           "bullets": [
             "Data & Analysis: SQL, Pandas, NumPy, scikit-learn, Matplotlib, statistics, significance testing, bootstrap CIs, data visualization",
-            "Languages: Python, SQL, C++, Java, Kotlin, TypeScript/JavaScript",
+            "Languages: Python, C++, Java, Kotlin, TypeScript/JavaScript",
             "ML / AI: PyTorch, Transformers, RAG, LLM agents, computer vision (OpenCV, MediaPipe), embeddings, LLM-as-judge eval",
-            "Tools: Git, Linux, Docker, GitHub Actions, Redis, HuggingFace, Playwright, Anthropic/OpenAI APIs",
+            "Tools: Git, Linux, Docker, GitHub Actions, Playwright, Anthropic/OpenAI, Power BI, Confluence",
             "Concepts: Statistical Evaluation & Experiment Design, Data Structures & Algorithms, Dashboarding, OOP"
           ]
         },
