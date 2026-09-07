@@ -105,4 +105,12 @@ describe("delatex", () => {
     expect(delatex(String.raw`$\sim$90\% and $<$100\,ms`)).toBe("~90% and <100 ms");
     expect(delatex("a ``quoted'' word")).toBe("a “quoted” word");
   });
+
+  // These reach the parser as macros, not math. Before they were spelled out the catch-all
+  // "drop leftover \command" rule deleted them, silently rewriting a bound as an exact value.
+  it("keeps symbol macros that would otherwise be dropped", () => {
+    expect(delatex(String.raw`p \textless{} 0.001`)).toBe("p < 0.001");
+    expect(delatex(String.raw`\textasciitilde90\% accuracy`)).toBe("~90% accuracy");
+    expect(delatex(String.raw`a \textgreater{} b`)).toBe("a > b");
+  });
 });

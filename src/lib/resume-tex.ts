@@ -30,9 +30,17 @@ export function delatex(input: string): string {
   s = s.replace(/\$\\sim\$/g, "~");
   s = s.replace(/\$<\$/g, "<").replace(/\$>\$/g, ">");
   s = s.replace(/\$\\ast\$/g, "*").replace(/\$\\cdot\$/g, "·");
-  // Symbol macros
+  // Symbol macros. These must be spelled out: the catch-all "drop any leftover \command" below
+  // would otherwise delete them silently, turning "p \textless{} 0.001" into "p 0.001" and
+  // "\textasciitilde90\%" into "90%" — i.e. quietly overstating a bound as an exact figure.
   s = s.replace(/\\textbar(?:\{\})?/g, "|");
   s = s.replace(/\\textbullet(?:\{\})?/g, "•");
+  s = s.replace(/\\textless(?:\{\})?/g, "<");
+  s = s.replace(/\\textgreater(?:\{\})?/g, ">");
+  s = s.replace(/\\textasciitilde(?:\{\})?/g, "~");
+  s = s.replace(/\\textasciicircum(?:\{\})?/g, "^");
+  // No \textbackslash here on purpose: the backslash it mints would be re-consumed by the
+  // leftover-\command sweep below ("\textbackslash{}n" → "\n" → ""), taking the next word with it.
   s = s.replace(/\\(?:LaTeX|TeX)\b/g, (m) => m.slice(1));
   // Dashes (em before en) and ellipsis
   s = s.replace(/---/g, "—").replace(/--/g, "–").replace(/\\ldots|\\dots/g, "…");
