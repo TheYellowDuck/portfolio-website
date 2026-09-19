@@ -1,10 +1,10 @@
 {
   "leetcode": {
-    "total": 473,
+    "total": 474,
     "easy": 118,
-    "medium": 286,
+    "medium": 287,
     "hard": 69,
-    "ranking": 234973,
+    "ranking": 235132,
     "contestRating": null,
     "contestBadge": null,
     "url": "https://leetcode.com/u/georgezhang006/"
@@ -15,5 +15,5 @@
     "rating": null,
     "url": "https://dmoj.ca/user/georgezhang006"
   },
-  "fetchedAt": "2026-09-18T10:17:25.708Z"
+  "fetchedAt": "2026-09-19T09:57:37.548Z"
 }
