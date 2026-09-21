@@ -2434,11 +2434,11 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "Python",
-        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
         "TeX",
+        "Python",
+        "Jupyter Notebook",
         "Java",
         "C++",
         "Processing",
@@ -2495,10 +2495,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
-        "A* Pathfinding",
         "Constraint-propagation solver",
         "Algorithms & Data Structures",
         "Graph Connectivity Analysis",
@@ -2544,10 +2544,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
-        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
+        "Distributed / multi-GPU training",
         "Concurrency",
         "Real-time state propagation",
         "Real-time control loop",
@@ -2722,8 +2722,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
-        "Software design",
         "Game engine architecture",
+        "Software design",
         "Object-Oriented Design",
         "Event-driven programming",
         "Game loop architecture",
@@ -2756,8 +2756,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
-        "Testing",
         "CI/CD & DevOps",
+        "Testing",
         "JAR Packaging",
         "Cross-Platform Builds",
         "Packaging",
@@ -2775,8 +2775,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
-        "Checkpointing and resumability",
         "Accessibility and performance",
+        "Checkpointing and resumability",
         "Performance optimisation",
         "Robust error handling",
         "Error handling",
@@ -2821,8 +2821,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
-        "Data Analysis",
         "PDF parsing",
+        "Data Analysis",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
@@ -2853,12 +2853,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
+        "pip",
         "CMake",
         "Selenium",
         "Gradle",
@@ -2915,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-09-20T10:18:55.735Z"
+  "syncedAt": "2026-09-21T11:23:53.277Z"
 };
