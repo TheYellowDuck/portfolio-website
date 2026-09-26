@@ -5,6 +5,167 @@ import type { Exhibit } from "./projects";
 export const generatedMainHall: Exhibit[] = [
   {
     "popup": {
+      "title": "RAG Codebase",
+      "description": "A code-aware retrieval-augmented generation (RAG) system for asking natural-language questions about a codebase and getting grounded, citation-backed answers. It chunks source on AST boundaries with tree-sitter (not character windows), retrieves with hybrid dense + BM25 search fused by Reciprocal Rank Fusion (with an optional cross-encoder and the measured-best listwise LLM reranker), builds a code graph (imports / calls / containment) with personalized PageRank for connected context, answers with Claude using [n] citations plus an LLM-as-judge faithfulness check, and — the centerpiece — ships a rigorous evaluation harness (recall@k / MRR / NDCG, bootstrap confidence intervals, paired significance tests). Provider-agnostic (Anthropic or any OpenAI-compatible endpoint, incl. local Ollama); semantic search via sentence-transformers embeddings with an optional HNSW (approximate nearest neighbor) backend for scale. New to RAG / embeddings / the eval methodology? Start with docs/LEARN.md, a from-scratch walkthrough. Design rationale lives in outline.md; the full measured write-up is RESULTS.md. language specs (Python, JS, TS, Go, Rust, Ruby, Java, C/C++, C, PHP, Kotlin, Scala, Swift, Lua, Bash, Perl, Objective-C) + a generic pattern classifier, with line-window fallback. by Reciprocal Rank Fusion; an optional cross-encoder and a validated listwise LLM reranker refine the pool (the cross-encoder is off by default — measured net-negative on code, §3d). resolution; personalized-PageRank traversal for connected, token-cheap context. don't cover this\"), and a RAGAS-style faithfulness check that verifies each claim against its cited source. endpoint (OpenRouter, Together, Groq, Azure, local Ollama / LM Studio / vLLM). confidence intervals, paired-bootstrap significance, a holdout split, and ablations. (full retriever), so quality is validated off the self-made golden set. lever — it significantly sharpens ranking (MRR/NDCG, p<0.001) and lifts answer-correctness, with a setup-dependent recall gain. brute-force matmul is the default. hierarchical layouts) plus a live localhost server with persistent edits + reset. Cursor, Claude Desktop). (retry/backoff + timeouts), and secret hygiene (gitignored dotenv + secret scanner, CI). The pipeline is digest once, probe per query. At index time: discover files → AST-chunk → embed (header + code) into a vector store → tokenize into a BM25 index → build the code graph → persist. At query time: embed the question → dense + BM25 search → RRF fuse → (rerank) → grounded answer with citations → faithfulness verification. Design decisions, each empirically motivated: retrieves as noise. Chunks land on definition boundaries: methods are their own chunks, classes get a summary chunk, oversized functions are windowed carrying their signature, and a module chunk captures imports + top-level code. A chunk's id is its file:line location, so the retrieved unit is already its own citation. / docstring — the embedding then carries location and signature, exactly what code queries key off. (The header is embedded, not displayed.) embeddings smear together; BM25 nails them, aided by a code-aware tokenizer that splits getcurrentuser / getCurrentUser. Dense and lexical lists are fused by Reciprocal Rank Fusion (rank-based, so no score calibration). A cross-encoder reranker is wired in but off by default (measured net-negative on code retrieval — §3d); the listwise LLM reranker (--accurate) is the validated accuracy lever. connected chunks (callees, callers, imports, enclosing class) via a dictionary lookup, so the model gets a few precise neighbors plus a compact structural map instead of whole files. into atomic claims and checks each against its cited source (faithfulness = supported / total), backed by a free structural check that every [n] resolves to a real source. contribution, reported with confidence intervals and paired significance rather than vibes.",
+      "tech": [
+        "Python",
+        "GitHub Actions",
+        "pip",
+        "NumPy",
+        "PyTorch",
+        "OpenAI API",
+        "Anthropic API",
+        "Transformers",
+        "DevOps",
+        "Testing",
+        "Assembly",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic search & embeddings",
+        "Hybrid search",
+        "Cross-encoder reranking",
+        "Listwise LLM reranking",
+        "AST parsing",
+        "Code graph construction",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "LLM-as-judge & faithfulness (RAGAS-style)",
+        "Grounded generation",
+        "Prompt engineering",
+        "Provider-agnostic API design",
+        "Evaluation methodology",
+        "Statistical rigor",
+        "Benchmarking",
+        "Tokenization",
+        "Incremental computation",
+        "Performance optimization",
+        "Resilience engineering",
+        "Interactive data visualization",
+        "HTTP server",
+        "CLI design",
+        "MCP (Model Context Protocol) server",
+        "CI / DevOps",
+        "Security & secret hygiene"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "Transformers",
+            "Retrieval-Augmented Generation (RAG)",
+            "Semantic search & embeddings",
+            "Cross-encoder reranking",
+            "Listwise LLM reranking",
+            "Personalized PageRank",
+            "Approximate nearest neighbor (ANN)",
+            "LLM-as-judge & faithfulness (RAGAS-style)",
+            "Grounded generation",
+            "Prompt engineering",
+            "Machine Learning",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Algorithms & DS",
+          "items": [
+            "Hybrid search",
+            "Code graph construction",
+            "Performance optimization"
+          ]
+        },
+        {
+          "category": "Statistics & Evaluation",
+          "items": [
+            "Evaluation methodology",
+            "Statistical rigor",
+            "Statistics & Evaluation"
+          ]
+        },
+        {
+          "category": "Security & Crypto",
+          "items": [
+            "Security & secret hygiene"
+          ]
+        },
+        {
+          "category": "Compilers & Languages",
+          "items": [
+            "AST parsing",
+            "Tokenization",
+            "Compilers & Languages"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "DevOps",
+            "Testing",
+            "Benchmarking",
+            "CI / DevOps"
+          ]
+        },
+        {
+          "category": "Web & Backend",
+          "items": [
+            "Provider-agnostic API design",
+            "HTTP server",
+            "MCP (Model Context Protocol) server",
+            "Backend / APIs"
+          ]
+        },
+        {
+          "category": "Data & Visualization",
+          "items": [
+            "Interactive data visualization",
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Incremental computation",
+            "Resilience engineering"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Assembly",
+            "CLI design"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/RAG-codebase"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "RLHF Pipeline",
       "description": "An end-to-end Reinforcement Learning from Human Feedback (RLHF) pipeline that reproduces the post-training recipe behind aligned large language models — supervised fine-tuning → reward modeling → PPO — with the reinforcement-learning core written from scratch in PyTorch: generalized advantage estimation (GAE), the clipped policy-gradient surrogate, a per-token KL-to-reference penalty, and an adaptive KL controller. It also implements DPO and GRPO as modern alternatives, plus LoRA parameter-efficient fine-tuning, multi-GPU training, and an independent LLM-as-judge evaluation. Built on HuggingFace Transformers for the backbone models and tokenizers; every reward-modeling and RL component is hand-implemented, not wrapped from a higher-level library. Three alignment methods, one codebase — PPO (reward-model-based RL), DPO (reward-model-free), and GRPO (critic-free, DeepSeek-style).; PPO written from scratch — on-policy rollouts, GAE, the clipped surrogate objective, clipped value loss, entropy bonus, per-token KL-to-reference reward shaping, and an adaptive KL controller.; Reward model — a scalar reward head on a pretrained trunk, trained with the Bradley-Terry pairwise preference loss, scored at the last real token (robust to left/right padding).; Supervised fine-tuning — teacher forcing with prompt-masked labels as the policy initializer and PPO reference.; Parameter-efficient fine-tuning — LoRA adapters everywhere via PEFT; the frozen RL reference is recovered by disabling the adapter (no second copy of weights).; Scales out — multi-GPU data parallelism via HuggingFace Accelerate (DDP-ready) and gradient checkpointing for the supervised trainers.; RL stability knobs — running reward normalization, length and missing-EOS penalties to curb reward hacking, and KL-vs-reward logging.; Checkpoint resume — optimizer, global step, and KL-controller state save and restore for long runs.; Independent evaluation — an LLM-as-judge win-rate computed via the Anthropic Claude API with position-bias control, alongside reward-model accuracy.; Optional fast rollouts — a flag-gated vLLM generation backend that auto-falls back to HuggingFace generation if unavailable.; Validated to actually optimize — unit tests for the RL/RM math plus an end-to-end harness that proves the reward model learns a separable signal and a PPO step increases the log-prob of positive-advantage tokens.; Laptop-to-GPU — runs a tiny end-to-end smoke test on a CPU in seconds; trains real models on a free Kaggle GPU. The repository mirrors the standard post-training stack. The RL and reward-modeling logic (GAE, the PPO surrogate, KL shaping, the Bradley-Terry / DPO / GRPO objectives) is implemented by hand; HuggingFace Transformers supplies only the pretrained backbones and tokenizers, and PEFT supplies optional LoRA. Reward model. A scalar head reads the trunk's last non-pad hidden state and is trained with −log σ(rchosen − rrejected), the maximum-likelihood objective of the Bradley-Terry preference model.; PPO reward shaping. Each response token's reward is a KL-to-reference penalty −β·(log π − log πref); the scalar reward-model score is added at the final token. β is adapted toward a target KL, which keeps the policy from drifting off-distribution while chasing reward (reward hacking).; Advantages. GAE(γ, λ) over the value head's per-token estimates, then whitened. Token/value alignment is handled explicitly: the log-prob and value of response token j come from the model output at position j−1.; DPO. Optimizes the same Bradley-Terry preference likelihood but with the implicit reward β·log(π/πref), removing the separate reward model and RL loop. Supports sigmoid / IPO / hinge losses and optional length normalization.; GRPO. Replaces the value critic with a group baseline — sample G responses per prompt, advantage = (reward − group mean) / group std — with an unbiased k3 KL penalty. Cheaper and stable; the DeepSeek-R1 recipe. Engineering notes.",
       "tech": [
@@ -297,167 +458,6 @@ export const generatedMainHall: Exhibit[] = [
         {
           "label": "GitHub",
           "url": "https://github.com/TheYellowDuck/portfolio-website"
-        }
-      ]
-    }
-  },
-  {
-    "popup": {
-      "title": "RAG Codebase",
-      "description": "A code-aware retrieval-augmented generation (RAG) system for asking natural-language questions about a codebase and getting grounded, citation-backed answers. It chunks source on AST boundaries with tree-sitter (not character windows), retrieves with hybrid dense + BM25 search fused by Reciprocal Rank Fusion (with an optional cross-encoder and the measured-best listwise LLM reranker), builds a code graph (imports / calls / containment) with personalized PageRank for connected context, answers with Claude using [n] citations plus an LLM-as-judge faithfulness check, and — the centerpiece — ships a rigorous evaluation harness (recall@k / MRR / NDCG, bootstrap confidence intervals, paired significance tests). Provider-agnostic (Anthropic or any OpenAI-compatible endpoint, incl. local Ollama); semantic search via sentence-transformers embeddings with an optional HNSW (approximate nearest neighbor) backend for scale. New to RAG / embeddings / the eval methodology? Start with docs/LEARN.md, a from-scratch walkthrough. Design rationale lives in outline.md; the full measured write-up is RESULTS.md. language specs (Python, JS, TS, Go, Rust, Ruby, Java, C/C++, C, PHP, Kotlin, Scala, Swift, Lua, Bash, Perl, Objective-C) + a generic pattern classifier, with line-window fallback. by Reciprocal Rank Fusion; an optional cross-encoder and a validated listwise LLM reranker refine the pool (the cross-encoder is off by default — measured net-negative on code, §3d). resolution; personalized-PageRank traversal for connected, token-cheap context. don't cover this\"), and a RAGAS-style faithfulness check that verifies each claim against its cited source. endpoint (OpenRouter, Together, Groq, Azure, local Ollama / LM Studio / vLLM). confidence intervals, paired-bootstrap significance, a holdout split, and ablations. (full retriever), so quality is validated off the self-made golden set. lever — it significantly sharpens ranking (MRR/NDCG, p<0.001) and lifts answer-correctness, with a setup-dependent recall gain. brute-force matmul is the default. hierarchical layouts) plus a live localhost server with persistent edits + reset. Cursor, Claude Desktop). (retry/backoff + timeouts), and secret hygiene (gitignored dotenv + secret scanner, CI). The pipeline is digest once, probe per query. At index time: discover files → AST-chunk → embed (header + code) into a vector store → tokenize into a BM25 index → build the code graph → persist. At query time: embed the question → dense + BM25 search → RRF fuse → (rerank) → grounded answer with citations → faithfulness verification. Design decisions, each empirically motivated: retrieves as noise. Chunks land on definition boundaries: methods are their own chunks, classes get a summary chunk, oversized functions are windowed carrying their signature, and a module chunk captures imports + top-level code. A chunk's id is its file:line location, so the retrieved unit is already its own citation. / docstring — the embedding then carries location and signature, exactly what code queries key off. (The header is embedded, not displayed.) embeddings smear together; BM25 nails them, aided by a code-aware tokenizer that splits getcurrentuser / getCurrentUser. Dense and lexical lists are fused by Reciprocal Rank Fusion (rank-based, so no score calibration). A cross-encoder reranker is wired in but off by default (measured net-negative on code retrieval — §3d); the listwise LLM reranker (--accurate) is the validated accuracy lever. connected chunks (callees, callers, imports, enclosing class) via a dictionary lookup, so the model gets a few precise neighbors plus a compact structural map instead of whole files. into atomic claims and checks each against its cited source (faithfulness = supported / total), backed by a free structural check that every [n] resolves to a real source. contribution, reported with confidence intervals and paired significance rather than vibes.",
-      "tech": [
-        "Python",
-        "GitHub Actions",
-        "pip",
-        "NumPy",
-        "PyTorch",
-        "OpenAI API",
-        "Anthropic API",
-        "Transformers",
-        "DevOps",
-        "Testing",
-        "Assembly",
-        "Retrieval-Augmented Generation (RAG)",
-        "Semantic search & embeddings",
-        "Hybrid search",
-        "Cross-encoder reranking",
-        "Listwise LLM reranking",
-        "AST parsing",
-        "Code graph construction",
-        "Personalized PageRank",
-        "Approximate nearest neighbor (ANN)",
-        "LLM-as-judge & faithfulness (RAGAS-style)",
-        "Grounded generation",
-        "Prompt engineering",
-        "Provider-agnostic API design",
-        "Evaluation methodology",
-        "Statistical rigor",
-        "Benchmarking",
-        "Tokenization",
-        "Incremental computation",
-        "Performance optimization",
-        "Resilience engineering",
-        "Interactive data visualization",
-        "HTTP server",
-        "CLI design",
-        "MCP (Model Context Protocol) server",
-        "CI / DevOps",
-        "Security & secret hygiene"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "ML / Data",
-          "items": [
-            "NumPy",
-            "PyTorch"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "GitHub Actions",
-            "pip"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "OpenAI API",
-            "Anthropic API",
-            "Transformers",
-            "Retrieval-Augmented Generation (RAG)",
-            "Semantic search & embeddings",
-            "Cross-encoder reranking",
-            "Listwise LLM reranking",
-            "Personalized PageRank",
-            "Approximate nearest neighbor (ANN)",
-            "LLM-as-judge & faithfulness (RAGAS-style)",
-            "Grounded generation",
-            "Prompt engineering",
-            "Machine Learning",
-            "Generative AI / LLMs"
-          ]
-        },
-        {
-          "category": "Algorithms & DS",
-          "items": [
-            "Hybrid search",
-            "Code graph construction",
-            "Performance optimization"
-          ]
-        },
-        {
-          "category": "Statistics & Evaluation",
-          "items": [
-            "Evaluation methodology",
-            "Statistical rigor",
-            "Statistics & Evaluation"
-          ]
-        },
-        {
-          "category": "Security & Crypto",
-          "items": [
-            "Security & secret hygiene"
-          ]
-        },
-        {
-          "category": "Compilers & Languages",
-          "items": [
-            "AST parsing",
-            "Tokenization",
-            "Compilers & Languages"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "DevOps",
-            "Testing",
-            "Benchmarking",
-            "CI / DevOps"
-          ]
-        },
-        {
-          "category": "Web & Backend",
-          "items": [
-            "Provider-agnostic API design",
-            "HTTP server",
-            "MCP (Model Context Protocol) server",
-            "Backend / APIs"
-          ]
-        },
-        {
-          "category": "Data & Visualization",
-          "items": [
-            "Interactive data visualization",
-            "Data Analysis"
-          ]
-        },
-        {
-          "category": "Reliability & Ops",
-          "items": [
-            "Incremental computation",
-            "Resilience engineering"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Assembly",
-            "CLI design"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/RAG-codebase"
         }
       ]
     }
@@ -2434,10 +2434,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
         "TypeScript",
         "JavaScript",
         "TeX",
-        "Python",
         "Jupyter Notebook",
         "Java",
         "C++",
@@ -2452,8 +2452,20 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "AI & ML",
       "tech": [
+        "OpenAI API",
         "Anthropic API",
         "Transformers",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic Search & Embeddings",
+        "Cross-encoder reranking",
+        "Listwise LLM reranking",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "LLM-as-Judge Evaluation",
+        "Grounded generation",
+        "Prompt engineering",
+        "Machine Learning",
+        "Generative AI / LLMs",
         "Reinforcement Learning from Human Feedback (RLHF)",
         "Policy-gradient methods",
         "Reward modeling",
@@ -2462,24 +2474,12 @@ export const generatedSkills: Exhibit[] = [
         "Supervised fine-tuning (SFT)",
         "Deep learning with PyTorch",
         "Parameter-efficient fine-tuning",
-        "LLM-as-Judge Evaluation",
         "Reward-hacking mitigation",
-        "Machine Learning",
-        "Generative AI / LLMs",
         "Probabilistic reasoning",
         "Computer Vision",
-        "OpenAI API",
         "LLM application development",
         "Structured outputs",
-        "Semantic Search & Embeddings",
         "Hierarchical classification",
-        "Retrieval-Augmented Generation (RAG)",
-        "Cross-encoder reranking",
-        "Listwise LLM reranking",
-        "Personalized PageRank",
-        "Approximate nearest neighbor (ANN)",
-        "Grounded generation",
-        "Prompt engineering",
         "ReAct agent loop",
         "Reflection / self-correction",
         "Accessibility-tree observation",
@@ -2495,6 +2495,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "Hybrid search",
+        "Code graph construction",
+        "Performance optimization",
         "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
@@ -2515,14 +2518,11 @@ export const generatedSkills: Exhibit[] = [
         "Combinatorics & Math",
         "Computational geometry",
         "Complexity & optimization",
-        "Performance optimization",
         "Custom data structure design",
         "Intrusive data structures",
         "Cache optimization",
         "Data Structures",
-        "Graph traversal & validation",
-        "Hybrid search",
-        "Code graph construction"
+        "Graph traversal & validation"
       ]
     }
   },
@@ -2530,9 +2530,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Statistics & Evaluation",
       "tech": [
-        "Reproducibility and static analysis",
         "Evaluation methodology",
         "Statistical rigor",
+        "Reproducibility and static analysis",
         "Deterministic benchmark scoring",
         "Significance testing",
         "Cross-evaluator agreement",
@@ -2697,22 +2697,22 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Web & Backend",
       "tech": [
+        "Provider-agnostic API design",
+        "HTTP server",
+        "MCP (Model Context Protocol) server",
+        "Backend / APIs",
         "GraphQL",
         "REST",
         "REST API and route handlers",
         "Redis with Upstash REST API",
         "External API integration",
         "Web Development",
-        "Backend / APIs",
         "Automation / Scraping",
         "Browser automation",
         "Anti-bot stealth",
         "Dynamic web scraping",
         "Rate-limit handling",
         "Content extraction",
-        "Provider-agnostic API design",
-        "HTTP server",
-        "MCP (Model Context Protocol) server",
         "LiteLLM",
         "Rate-limit resilience"
       ]
@@ -2758,6 +2758,7 @@ export const generatedSkills: Exhibit[] = [
       "tech": [
         "CI/CD & DevOps",
         "Testing",
+        "Benchmarking",
         "JAR Packaging",
         "Cross-Platform Builds",
         "Packaging",
@@ -2766,8 +2767,7 @@ export const generatedSkills: Exhibit[] = [
         "Gradle build system",
         "Shipping to production",
         "Benchmarking methodology",
-        "Build and CI engineering",
-        "Benchmarking"
+        "Build and CI engineering"
       ]
     }
   },
@@ -2775,6 +2775,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
+        "Incremental computation",
+        "Resilience engineering",
         "Accessibility and performance",
         "Checkpointing and resumability",
         "Performance optimisation",
@@ -2786,8 +2788,6 @@ export const generatedSkills: Exhibit[] = [
         "Cost engineering",
         "Privacy engineering",
         "Automatic dependency management",
-        "Incremental computation",
-        "Resilience engineering",
         "Failure taxonomy"
       ]
     }
@@ -2821,13 +2821,13 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
-        "PDF parsing",
+        "Interactive data visualization",
         "Data Analysis",
+        "PDF parsing",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
         "Pillow",
-        "Interactive data visualization",
         "Data visualization"
       ]
     }
@@ -2853,12 +2853,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "TypeScript",
         "GitHub Actions",
+        "pip",
+        "TypeScript",
         "Vitest",
         "ESLint",
         "Tailwind",
-        "pip",
         "CMake",
         "Selenium",
         "Gradle",
@@ -2873,6 +2873,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
+        "Assembly",
+        "CLI design",
         "Framer Motion",
         "R",
         "React and Next.js (App Router)",
@@ -2889,11 +2891,9 @@ export const generatedSkills: Exhibit[] = [
         "Set operations",
         "Requests",
         "Prompt caching",
-        "CLI design",
         "Practical utilities",
         "Teaching & mentoring",
         "Self-directed learning",
-        "Assembly",
         "JavaScript",
         "HTML",
         "Docker sandbox integration",
@@ -2915,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-09-25T10:49:01.128Z"
+  "syncedAt": "2026-09-26T10:32:06.267Z"
 };
