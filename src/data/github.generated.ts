@@ -2434,10 +2434,10 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
-        "Python",
         "TypeScript",
         "JavaScript",
         "TeX",
+        "Python",
         "Jupyter Notebook",
         "Java",
         "C++",
@@ -2495,10 +2495,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "A* Pathfinding",
         "Hybrid search",
         "Code graph construction",
         "Performance optimization",
-        "A* Pathfinding",
         "Proximal Policy Optimization (PPO)",
         "Direct Preference Optimization (DPO)",
         "Group Relative Policy Optimization (GRPO)",
@@ -2697,17 +2697,17 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Web & Backend",
       "tech": [
-        "Provider-agnostic API design",
-        "HTTP server",
-        "MCP (Model Context Protocol) server",
-        "Backend / APIs",
         "GraphQL",
         "REST",
         "REST API and route handlers",
         "Redis with Upstash REST API",
         "External API integration",
         "Web Development",
+        "Backend / APIs",
         "Automation / Scraping",
+        "Provider-agnostic API design",
+        "HTTP server",
+        "MCP (Model Context Protocol) server",
         "Browser automation",
         "Anti-bot stealth",
         "Dynamic web scraping",
@@ -2775,9 +2775,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
+        "Accessibility and performance",
         "Incremental computation",
         "Resilience engineering",
-        "Accessibility and performance",
         "Checkpointing and resumability",
         "Performance optimisation",
         "Robust error handling",
@@ -2821,9 +2821,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
+        "PDF parsing",
         "Interactive data visualization",
         "Data Analysis",
-        "PDF parsing",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
@@ -2853,12 +2853,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
-        "GitHub Actions",
-        "pip",
         "TypeScript",
+        "GitHub Actions",
         "Vitest",
         "ESLint",
         "Tailwind",
+        "pip",
         "CMake",
         "Selenium",
         "Gradle",
@@ -2873,11 +2873,11 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
-        "Assembly",
-        "CLI design",
         "Framer Motion",
         "R",
         "React and Next.js (App Router)",
+        "Assembly",
+        "CLI design",
         "Conditional compilation",
         "Command parsing",
         "Stochastic behaviour",
@@ -2915,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-09-29T11:49:30.314Z"
+  "syncedAt": "2026-09-30T11:35:37.998Z"
 };
