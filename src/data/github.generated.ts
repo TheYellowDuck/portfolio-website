@@ -879,6 +879,157 @@ export const generatedMainHall: Exhibit[] = [
   },
   {
     "popup": {
+      "title": "Ai File Organizer",
+      "description": "A command-line tool that automatically sorts messy folders into a clean, hierarchical category tree using either a free offline semantic-embedding model or a bring-your-own-key Large Language Model — Claude, GPT, Gemini, or any OpenAI-compatible provider. It combines multi-provider LLM classification (with vision-based image understanding, prompt caching, structured JSON outputs, concurrent requests, and exponential-backoff retries) with crash-safe file operations (append-only journaling and one-click undo), secret-safe API key management, and content extraction from PDF, Word, PowerPoint, Excel, and images via OCR. Two interchangeable backends — a free, fully offline embedding classifier (sentence-transformers), or a bring-your-own-key LLM for higher accuracy.; Every major provider through one key — Anthropic Claude, OpenAI, Google Gemini, Groq, Mistral, DeepSeek, Together, OpenRouter, a local Ollama server, or any custom OpenAI-compatible endpoint.; Vision-based image sorting — image files are sent to multimodal models and classified by what they actually show, not just their filename.; Token-frugal LLM mode — request batching, Anthropic prompt caching, content truncation, and schema-constrained outputs keep cost low; each run prints a token/cache-hit summary.; Concurrent classification — batches run in parallel with a cache-warming first request, plus automatic retry/backoff on rate limits and server errors.; LLM category discovery — let the model propose a category tree from your own files, or supply a custom tree as JSON/YAML.; Crash-safe organization — every move is journaled to disk as it happens and an undo script is generated even if the run is interrupted; dry-run and copy modes included.; Secret-safe keys — API keys come from the environment, a gitignored .env, or a hidden prompt; they are masked in output and never written to config, logs, or undo scripts.; Privacy controls — exclude sensitive files via .organizerignore or --exclude globs, a notice before any data leaves your machine, and a fully offline mode.; Spend guard — a pre-run token estimate and a hard file-count cap prevent surprise bills.; Low-confidence Review folder — uncertain placements are quarantined instead of mis-filed.; Interactive setup wizard plus content extraction for PDF, DOCX, PPTX, XLSX, images (OCR), and text/code files. Files flow through a four-stage pipeline: scan → extract → classify → move. 1. Scan discovers files recursively, skipping hidden/system files and anything matched by a .organizerignore file or --exclude glob. 2. Extract pulls text from each file using a format-specific extractor (PDF, Word, PowerPoint, Excel, image OCR, or plain text), with character-encoding detection. 3. Classify assigns each file a path in a hierarchical category tree using the selected backend. 4. Move relocates (or copies) files into the destination tree, recording every operation to a crash-safe journal and emitting an undo script. Classification backends. The local backend embeds filenames and content with sentence-transformers and matches them to category descriptions by cosine similarity, walking the tree level by level and falling back to an \"Other\" folder when confidence drops below a per-node threshold — entirely offline, no key, no network. The LLM backend instead asks a language model to place each file directly into the tree, which handles messy or ambiguous files far better. Token frugality. The LLM backend classifies many files per request so the (large, fixed) category tree is sent once per batch rather than once per file. On Anthropic that tree lives in a cached system prompt (cachecontrol: ephemeral), so every batch after the first is dramatically cheaper. Responses are constrained with JSON-schema structured outputs (with defensive parsing as a fallback for providers that only support JSON-object mode), and per-file content is truncated to a short snippet. Vision.",
+      "tech": [
+        "Python",
+        "GitHub Actions",
+        "Make",
+        "pip",
+        "NumPy",
+        "scikit-learn",
+        "PyTorch",
+        "Pillow",
+        "OpenAI API",
+        "Anthropic API",
+        "Requests",
+        "Transformers",
+        "Computer Vision",
+        "Concurrency",
+        "Testing",
+        "LLM application development",
+        "Provider abstraction (strategy pattern)",
+        "Prompt caching",
+        "Structured outputs",
+        "Computer vision / multimodal AI",
+        "Semantic embeddings",
+        "Hierarchical classification",
+        "Concurrency & multithreading",
+        "Thread-safe state",
+        "Rate-limit handling",
+        "Fault tolerance",
+        "Crash-safe file operations",
+        "Secrets management",
+        "Content extraction",
+        "CLI design",
+        "Cost engineering",
+        "Privacy engineering",
+        "Automatic dependency management",
+        "Packaging",
+        "Automated testing",
+        "CI/CD",
+        "Design patterns"
+      ],
+      "skills": [
+        {
+          "category": "Languages",
+          "items": [
+            "Python"
+          ]
+        },
+        {
+          "category": "ML / Data",
+          "items": [
+            "NumPy",
+            "scikit-learn",
+            "PyTorch"
+          ]
+        },
+        {
+          "category": "Tools",
+          "items": [
+            "GitHub Actions",
+            "Make",
+            "pip"
+          ]
+        },
+        {
+          "category": "AI & ML",
+          "items": [
+            "OpenAI API",
+            "Anthropic API",
+            "Transformers",
+            "Computer Vision",
+            "LLM application development",
+            "Structured outputs",
+            "Computer vision / multimodal AI",
+            "Semantic embeddings",
+            "Hierarchical classification",
+            "Machine Learning",
+            "Generative AI / LLMs"
+          ]
+        },
+        {
+          "category": "Concurrency & Networking",
+          "items": [
+            "Concurrency",
+            "Concurrency & multithreading",
+            "Thread-safe state"
+          ]
+        },
+        {
+          "category": "Architecture & Design",
+          "items": [
+            "Provider abstraction (strategy pattern)",
+            "Design patterns",
+            "OOP & Design Patterns"
+          ]
+        },
+        {
+          "category": "Testing & Delivery",
+          "items": [
+            "Testing",
+            "Packaging",
+            "Automated testing",
+            "CI/CD",
+            "DevOps"
+          ]
+        },
+        {
+          "category": "Web & Backend",
+          "items": [
+            "Rate-limit handling",
+            "Content extraction",
+            "Backend / APIs"
+          ]
+        },
+        {
+          "category": "Data & Visualization",
+          "items": [
+            "Pillow",
+            "Data Analysis"
+          ]
+        },
+        {
+          "category": "Reliability & Ops",
+          "items": [
+            "Fault tolerance",
+            "Crash-safe file operations",
+            "Secrets management",
+            "Cost engineering",
+            "Privacy engineering",
+            "Automatic dependency management"
+          ]
+        },
+        {
+          "category": "Concepts & Practices",
+          "items": [
+            "Requests",
+            "Prompt caching",
+            "CLI design"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/TheYellowDuck/ai-file-organizer"
+        }
+      ]
+    }
+  },
+  {
+    "popup": {
       "title": "Robotics",
       "description": "Code for an autonomous maze-solving robot built for the RoboCupJunior Maze category, competed at the 2023 World Championship in Bordeaux, France. The robot navigates an unknown maze entirely on its own — perceiving walls, rescue tiles, and floor markings with an onboard camera and LiDAR, and deciding where to go with no external input. The robot navigates an unknown maze autonomously, detecting walls, colored rescue tiles, and black/white floor markings using an OpenMV camera and LiDAR sensors. It maps its path in real time and makes navigation decisions without any external input. All logic runs on-device in MicroPython (OpenMV / pyb framework). Every cycle the robot runs a perception → decision → actuation loop entirely on the OpenMV camera. Computer vision in the LAB color space classifies the tile underneath it — distinguishing red, green, yellow, blue, black, and white using tuned thresholds — while LiDAR reads distances on all four sides to detect walls. Each maze cell's four walls are encoded as a bitmask so the robot can remember the layout it has explored, and tile classification (rescue tile, checkpoint, or floor type) triggers the appropriate behavior. Motor commands (forward, turn, reverse, stop) are issued through a control interface over a low-level driver, and inter-device messages are validated with a cyclic redundancy check (CRC). The navigation logic evolved through successive rewrites — Nav through Nav6 — each refined against the physical robot during testing, with dedicated calibration scripts for color and sensing. OpenMV Cam — onboard vision processor running all navigation logic; LiDAR sensors — wall detection and distance measurement on all four sides; Servo motors — drive and steering control; Color sensor — backup floor tile detection The support modules (Control.py, Sensor.py, motor2.py, Stop.py, CRC.py) are documented helper scripts for motor control, sensing, and UART integrity. Test files (TestBlack.py, TestColor.py, TestSensing.py) were used during hardware calibration, and the earlier navigation drafts (Nav through Nav5) are kept to show the iterative development behind the final Nav6.py. Color detection in LAB color space — distinguishes red, green, yellow, blue, black, and white tiles using tuned thresholds; Wall mapping — encodes each cell's four walls as a bitmask for path memory; Tile classification — identifies rescue tiles, checkpoints, and floor type to trigger appropriate behavior; Iterative development — Nav through Nav6 represent successive rewrites as the robot's behavior was refined through testing Autonomous navigation — real-time maze traversal with no external input; Robotics & embedded programming — MicroPython on an OpenMV vision processor; Computer vision — LAB color-space tile detection with tuned thresholds; Image processing — onboard camera frame analysis for floor and rescue-tile classification; Sensor integration & fusion — combining LiDAR, camera, and a color sensor for perception; Motor control — drive and steering via servo motors over a low-level driver; Maze mapping — per-cell four-wall bitmask encoding for path memory; Algorithmic navigation — wall-aware decision logic for traversal; Bitmasking & state encoding — compact representation of maze cells; Serial communication — CRC (cyclic redundancy check) error detection; Real-time control loop — perception, decision, and actuation on-device; Iterative engineering — successive Nav rewrites refined through hardware testing; Hardware calibration — dedicated color, black-line, and sensing test routines Python / MicroPython (OpenMV pyb framework); OpenMV Cam (onboard vision processor); LiDAR sensors (four-directional distance sensing); Servo motors + low-level motor driver; Color sensor (backup tile detection); LAB color-space image processing; CRC (cyclic redundancy check) for communication integrity",
       "tech": [
@@ -1224,157 +1375,6 @@ export const generatedMainHall: Exhibit[] = [
         }
       ],
       "videoUrl": "/videos/BoxHead-2-Play.mp4"
-    }
-  },
-  {
-    "popup": {
-      "title": "Ai File Organizer",
-      "description": "A command-line tool that automatically sorts messy folders into a clean, hierarchical category tree using either a free offline semantic-embedding model or a bring-your-own-key Large Language Model — Claude, GPT, Gemini, or any OpenAI-compatible provider. It combines multi-provider LLM classification (with vision-based image understanding, prompt caching, structured JSON outputs, concurrent requests, and exponential-backoff retries) with crash-safe file operations (append-only journaling and one-click undo), secret-safe API key management, and content extraction from PDF, Word, PowerPoint, Excel, and images via OCR. Two interchangeable backends — a free, fully offline embedding classifier (sentence-transformers), or a bring-your-own-key LLM for higher accuracy.; Every major provider through one key — Anthropic Claude, OpenAI, Google Gemini, Groq, Mistral, DeepSeek, Together, OpenRouter, a local Ollama server, or any custom OpenAI-compatible endpoint.; Vision-based image sorting — image files are sent to multimodal models and classified by what they actually show, not just their filename.; Token-frugal LLM mode — request batching, Anthropic prompt caching, content truncation, and schema-constrained outputs keep cost low; each run prints a token/cache-hit summary.; Concurrent classification — batches run in parallel with a cache-warming first request, plus automatic retry/backoff on rate limits and server errors.; LLM category discovery — let the model propose a category tree from your own files, or supply a custom tree as JSON/YAML.; Crash-safe organization — every move is journaled to disk as it happens and an undo script is generated even if the run is interrupted; dry-run and copy modes included.; Secret-safe keys — API keys come from the environment, a gitignored .env, or a hidden prompt; they are masked in output and never written to config, logs, or undo scripts.; Privacy controls — exclude sensitive files via .organizerignore or --exclude globs, a notice before any data leaves your machine, and a fully offline mode.; Spend guard — a pre-run token estimate and a hard file-count cap prevent surprise bills.; Low-confidence Review folder — uncertain placements are quarantined instead of mis-filed.; Interactive setup wizard plus content extraction for PDF, DOCX, PPTX, XLSX, images (OCR), and text/code files. Files flow through a four-stage pipeline: scan → extract → classify → move. 1. Scan discovers files recursively, skipping hidden/system files and anything matched by a .organizerignore file or --exclude glob. 2. Extract pulls text from each file using a format-specific extractor (PDF, Word, PowerPoint, Excel, image OCR, or plain text), with character-encoding detection. 3. Classify assigns each file a path in a hierarchical category tree using the selected backend. 4. Move relocates (or copies) files into the destination tree, recording every operation to a crash-safe journal and emitting an undo script. Classification backends. The local backend embeds filenames and content with sentence-transformers and matches them to category descriptions by cosine similarity, walking the tree level by level and falling back to an \"Other\" folder when confidence drops below a per-node threshold — entirely offline, no key, no network. The LLM backend instead asks a language model to place each file directly into the tree, which handles messy or ambiguous files far better. Token frugality. The LLM backend classifies many files per request so the (large, fixed) category tree is sent once per batch rather than once per file. On Anthropic that tree lives in a cached system prompt (cachecontrol: ephemeral), so every batch after the first is dramatically cheaper. Responses are constrained with JSON-schema structured outputs (with defensive parsing as a fallback for providers that only support JSON-object mode), and per-file content is truncated to a short snippet. Vision.",
-      "tech": [
-        "Python",
-        "GitHub Actions",
-        "Make",
-        "pip",
-        "NumPy",
-        "scikit-learn",
-        "PyTorch",
-        "Pillow",
-        "OpenAI API",
-        "Anthropic API",
-        "Requests",
-        "Transformers",
-        "Computer Vision",
-        "Concurrency",
-        "Testing",
-        "LLM application development",
-        "Provider abstraction (strategy pattern)",
-        "Prompt caching",
-        "Structured outputs",
-        "Computer vision / multimodal AI",
-        "Semantic embeddings",
-        "Hierarchical classification",
-        "Concurrency & multithreading",
-        "Thread-safe state",
-        "Rate-limit handling",
-        "Fault tolerance",
-        "Crash-safe file operations",
-        "Secrets management",
-        "Content extraction",
-        "CLI design",
-        "Cost engineering",
-        "Privacy engineering",
-        "Automatic dependency management",
-        "Packaging",
-        "Automated testing",
-        "CI/CD",
-        "Design patterns"
-      ],
-      "skills": [
-        {
-          "category": "Languages",
-          "items": [
-            "Python"
-          ]
-        },
-        {
-          "category": "ML / Data",
-          "items": [
-            "NumPy",
-            "scikit-learn",
-            "PyTorch"
-          ]
-        },
-        {
-          "category": "Tools",
-          "items": [
-            "GitHub Actions",
-            "Make",
-            "pip"
-          ]
-        },
-        {
-          "category": "AI & ML",
-          "items": [
-            "OpenAI API",
-            "Anthropic API",
-            "Transformers",
-            "Computer Vision",
-            "LLM application development",
-            "Structured outputs",
-            "Computer vision / multimodal AI",
-            "Semantic embeddings",
-            "Hierarchical classification",
-            "Machine Learning",
-            "Generative AI / LLMs"
-          ]
-        },
-        {
-          "category": "Concurrency & Networking",
-          "items": [
-            "Concurrency",
-            "Concurrency & multithreading",
-            "Thread-safe state"
-          ]
-        },
-        {
-          "category": "Architecture & Design",
-          "items": [
-            "Provider abstraction (strategy pattern)",
-            "Design patterns",
-            "OOP & Design Patterns"
-          ]
-        },
-        {
-          "category": "Testing & Delivery",
-          "items": [
-            "Testing",
-            "Packaging",
-            "Automated testing",
-            "CI/CD",
-            "DevOps"
-          ]
-        },
-        {
-          "category": "Web & Backend",
-          "items": [
-            "Rate-limit handling",
-            "Content extraction",
-            "Backend / APIs"
-          ]
-        },
-        {
-          "category": "Data & Visualization",
-          "items": [
-            "Pillow",
-            "Data Analysis"
-          ]
-        },
-        {
-          "category": "Reliability & Ops",
-          "items": [
-            "Fault tolerance",
-            "Crash-safe file operations",
-            "Secrets management",
-            "Cost engineering",
-            "Privacy engineering",
-            "Automatic dependency management"
-          ]
-        },
-        {
-          "category": "Concepts & Practices",
-          "items": [
-            "Requests",
-            "Prompt caching",
-            "CLI design"
-          ]
-        }
-      ],
-      "links": [
-        {
-          "label": "GitHub",
-          "url": "https://github.com/TheYellowDuck/ai-file-organizer"
-        }
-      ]
     }
   }
 ];
@@ -2915,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-10-19T11:32:22.952Z"
+  "syncedAt": "2026-10-20T10:37:35.757Z"
 };
