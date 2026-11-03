@@ -316,11 +316,8 @@ export const generatedMainHall: Exhibit[] = [
         "TeX",
         "GitHub Actions",
         "Vitest",
-        "Framer Motion",
-        "Next.js",
         "React",
-        "ESLint",
-        "Tailwind",
+        "Next.js",
         "R",
         "GraphQL",
         "REST",
@@ -352,8 +349,8 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "Frameworks",
           "items": [
-            "Next.js",
-            "React"
+            "React",
+            "Next.js"
           ]
         },
         {
@@ -361,9 +358,7 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "TypeScript",
             "GitHub Actions",
-            "Vitest",
-            "ESLint",
-            "Tailwind"
+            "Vitest"
           ]
         },
         {
@@ -444,7 +439,6 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "Concepts & Practices",
           "items": [
-            "Framer Motion",
             "R",
             "React and Next.js (App Router)"
           ]
@@ -2796,8 +2790,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
-        "Next.js",
         "React",
+        "Next.js",
         "Swing",
         "SDL2",
         "Jetpack Compose"
@@ -2856,8 +2850,6 @@ export const generatedSkills: Exhibit[] = [
         "TypeScript",
         "GitHub Actions",
         "Vitest",
-        "ESLint",
-        "Tailwind",
         "pip",
         "CMake",
         "Selenium",
@@ -2873,7 +2865,6 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
-        "Framer Motion",
         "R",
         "React and Next.js (App Router)",
         "Assembly",
@@ -2915,5 +2906,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-11-02T14:05:25.374Z"
+  "syncedAt": "2026-11-03T13:13:58.084Z"
 };
