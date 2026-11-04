@@ -316,8 +316,11 @@ export const generatedMainHall: Exhibit[] = [
         "TeX",
         "GitHub Actions",
         "Vitest",
-        "React",
+        "Framer Motion",
         "Next.js",
+        "React",
+        "ESLint",
+        "Tailwind",
         "R",
         "GraphQL",
         "REST",
@@ -349,8 +352,8 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "Frameworks",
           "items": [
-            "React",
-            "Next.js"
+            "Next.js",
+            "React"
           ]
         },
         {
@@ -358,7 +361,9 @@ export const generatedMainHall: Exhibit[] = [
           "items": [
             "TypeScript",
             "GitHub Actions",
-            "Vitest"
+            "Vitest",
+            "ESLint",
+            "Tailwind"
           ]
         },
         {
@@ -439,6 +444,7 @@ export const generatedMainHall: Exhibit[] = [
         {
           "category": "Concepts & Practices",
           "items": [
+            "Framer Motion",
             "R",
             "React and Next.js (App Router)"
           ]
@@ -2428,11 +2434,11 @@ export const generatedSkills: Exhibit[] = [
       "title": "Languages",
       "description": "Languages across my repositories, by usage.",
       "tech": [
+        "Python",
+        "Jupyter Notebook",
         "TypeScript",
         "JavaScript",
         "TeX",
-        "Python",
-        "Jupyter Notebook",
         "Java",
         "C++",
         "Processing",
@@ -2446,20 +2452,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "AI & ML",
       "tech": [
-        "OpenAI API",
         "Anthropic API",
         "Transformers",
-        "Retrieval-Augmented Generation (RAG)",
-        "Semantic Search & Embeddings",
-        "Cross-encoder reranking",
-        "Listwise LLM reranking",
-        "Personalized PageRank",
-        "Approximate nearest neighbor (ANN)",
-        "LLM-as-Judge Evaluation",
-        "Grounded generation",
-        "Prompt engineering",
-        "Machine Learning",
-        "Generative AI / LLMs",
         "Reinforcement Learning from Human Feedback (RLHF)",
         "Policy-gradient methods",
         "Reward modeling",
@@ -2468,7 +2462,19 @@ export const generatedSkills: Exhibit[] = [
         "Supervised fine-tuning (SFT)",
         "Deep learning with PyTorch",
         "Parameter-efficient fine-tuning",
+        "LLM-as-Judge Evaluation",
         "Reward-hacking mitigation",
+        "Machine Learning",
+        "Generative AI / LLMs",
+        "OpenAI API",
+        "Retrieval-Augmented Generation (RAG)",
+        "Semantic Search & Embeddings",
+        "Cross-encoder reranking",
+        "Listwise LLM reranking",
+        "Personalized PageRank",
+        "Approximate nearest neighbor (ANN)",
+        "Grounded generation",
+        "Prompt engineering",
         "Probabilistic reasoning",
         "Computer Vision",
         "LLM application development",
@@ -2489,13 +2495,13 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Algorithms & DS",
       "tech": [
+        "Proximal Policy Optimization (PPO)",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
         "A* Pathfinding",
         "Hybrid search",
         "Code graph construction",
         "Performance optimization",
-        "Proximal Policy Optimization (PPO)",
-        "Direct Preference Optimization (DPO)",
-        "Group Relative Policy Optimization (GRPO)",
         "Constraint-propagation solver",
         "Algorithms & Data Structures",
         "Graph Connectivity Analysis",
@@ -2524,9 +2530,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Statistics & Evaluation",
       "tech": [
+        "Reproducibility and static analysis",
         "Evaluation methodology",
         "Statistical rigor",
-        "Reproducibility and static analysis",
         "Deterministic benchmark scoring",
         "Significance testing",
         "Cross-evaluator agreement",
@@ -2538,10 +2544,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concurrency & Networking",
       "tech": [
+        "Distributed / multi-GPU training",
         "Multiplayer presence",
         "Real-time animation",
         "Networking",
-        "Distributed / multi-GPU training",
         "Concurrency",
         "Real-time state propagation",
         "Real-time control loop",
@@ -2716,8 +2722,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Architecture & Design",
       "tech": [
-        "Game engine architecture",
         "Software design",
+        "Game engine architecture",
         "Object-Oriented Design",
         "Event-driven programming",
         "Game loop architecture",
@@ -2750,8 +2756,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Testing & Delivery",
       "tech": [
-        "CI/CD & DevOps",
         "Testing",
+        "CI/CD & DevOps",
         "Benchmarking",
         "JAR Packaging",
         "Cross-Platform Builds",
@@ -2769,10 +2775,10 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Reliability & Ops",
       "tech": [
+        "Checkpointing and resumability",
         "Accessibility and performance",
         "Incremental computation",
         "Resilience engineering",
-        "Checkpointing and resumability",
         "Performance optimisation",
         "Robust error handling",
         "Error handling",
@@ -2790,8 +2796,8 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Frameworks",
       "tech": [
-        "React",
         "Next.js",
+        "React",
         "Swing",
         "SDL2",
         "Jetpack Compose"
@@ -2815,9 +2821,9 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Data & Visualization",
       "tech": [
+        "Data Analysis",
         "PDF parsing",
         "Interactive data visualization",
-        "Data Analysis",
         "Image processing",
         "Grayscale conversion",
         "Image scaling",
@@ -2847,10 +2853,12 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Tools",
       "tech": [
+        "pip",
         "TypeScript",
         "GitHub Actions",
         "Vitest",
-        "pip",
+        "ESLint",
+        "Tailwind",
         "CMake",
         "Selenium",
         "Gradle",
@@ -2865,6 +2873,7 @@ export const generatedSkills: Exhibit[] = [
     "popup": {
       "title": "Concepts & Practices",
       "tech": [
+        "Framer Motion",
         "R",
         "React and Next.js (App Router)",
         "Assembly",
@@ -2906,5 +2915,5 @@ export const generatedSkills: Exhibit[] = [
 export const generatedMeta = {
   "username": "TheYellowDuck",
   "repoCount": 21,
-  "syncedAt": "2026-11-03T13:13:58.084Z"
+  "syncedAt": "2026-11-04T13:28:24.944Z"
 };
